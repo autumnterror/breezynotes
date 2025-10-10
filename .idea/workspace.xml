@@ -5,44 +5,44 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9859957d-2c2c-4239-80b4-4d74a8eeb2c2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/docker/deploy/configs/prod-blocknote.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker/deploy/configs/prod-gateway.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker/deploy/configs/prod-redis.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker/deploy/docker-compose.db.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker/deploy/docker-compose.repl.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker/deploy/docker-compose.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/auth/config/config.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/blocknote/config/config.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/gateway/config/config.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/redis/config/config.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/log/logger.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/log/logger_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/protos/proto/auth.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/protos/proto/domain.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/protos/proto/notes.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/protos/proto/redis.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/utils/format/format.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/utils/format/format_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/auth/grpc/app.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/auth/grpc/op.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/auth/grpc/server.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/auth/grpc/tokenop.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/auth/grpc/userop.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/blocknote/grpc/app.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/blocknote/grpc/noteop.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/blocknote/grpc/op.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/blocknote/grpc/opblock.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/blocknote/grpc/server.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/blocknote/grpc/tagop.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/gateway/clients/auth/client.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/gateway/clients/blocknote/client.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/gateway/clients/redis/client.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/redis/grpc/app.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/redis/grpc/blockop.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/redis/grpc/noteop.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/redis/grpc/op.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/redis/grpc/server.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/redis/grpc/tagop.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.obsidian/app.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.obsidian/appearance.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.obsidian/core-plugins.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.obsidian/workspace.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Auth/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/auth/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/BlockNote/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/blocknote/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Gateway/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/gateway/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Migrator/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/migrator/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/Redis/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/redis/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/Auth/dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/docker/auth/dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/BlockNote/dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/docker/blocknote/dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/Gateway/dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/docker/gateway/dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/Redis/dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/docker/redis/dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/docker-compose.local.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/docker-compose.prod.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/deploy/configs/prod-auth.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/auth/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/auth/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/blocknote/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/blocknote/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/gateway/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/gateway/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/redis/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/redis/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/deploy/configs/prod-auth.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/deploy/configs/prod-auth.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/deploy/configs/prod-blocknote.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/deploy/configs/prod-blocknote.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/deploy/configs/prod-gateway.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/deploy/configs/prod-gateway.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/deploy/configs/prod-redis.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/deploy/configs/prod-redis.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/deploy/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/deploy/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/auth/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/auth/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/blocknote/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/gateway/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/redis/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/redis/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/protos/proto/domain.proto" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/domain.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/protos/proto/gen/domain.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/gen/domain.pb.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,7 +88,7 @@
     "git-widget-placeholder": "main",
     "go.import.settings.migrated": "true",
     "go.sdk.automatically.set": "true",
-    "last_opened_file_path": "D:/progers/GLOBAL_PROJECTS/breezynotes/internal/redis/config",
+    "last_opened_file_path": "D:/progers/GLOBAL_PROJECTS/breezynotes/internal/redis/grpc",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
@@ -97,11 +97,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\internal\redis\config" />
-      <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\internal\gateway\config" />
-      <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\internal\blocknote\config" />
-      <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\docker\deploy" />
-      <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\local-config" />
+      <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\internal\redis\grpc" />
+      <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\internal\blocknote\grpc" />
+      <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\internal\auth\grpc" />
+      <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\internal\gateway\clients\redis" />
+      <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\internal\gateway\clients\blocknote" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\internal\auth" />

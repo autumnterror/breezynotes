@@ -79,6 +79,7 @@ message NotePart {
   string title = 2;
   Tag tag = 3;
   string first_block = 4;
+  int64 updated_at = 5;
 }
 
 // ===== Collections =====

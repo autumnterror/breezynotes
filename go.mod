@@ -3,8 +3,10 @@ module github.com/autumnterror/breezynotes
 go 1.25.0
 
 require (
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.2
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
+	golang.org/x/sync v0.16.0
 	google.golang.org/grpc v1.76.0
 	google.golang.org/protobuf v1.36.10
 )

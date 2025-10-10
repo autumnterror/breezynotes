@@ -1,0 +1,5 @@
+redis_addr : "redis:6379"
+redis_passwd: "limiteredisPASSWDS!O!H"
+redis_db : 0
+port: 8028
+mode: "PROD"

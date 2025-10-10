@@ -769,6 +769,7 @@ type NotePart struct {
 	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	Tag           *Tag                   `protobuf:"bytes,3,opt,name=tag,proto3" json:"tag,omitempty"`
 	FirstBlock    string                 `protobuf:"bytes,4,opt,name=first_block,json=firstBlock,proto3" json:"first_block,omitempty"`
+	UpdatedAt     int64                  `protobuf:"varint,5,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -829,6 +830,13 @@ func (x *NotePart) GetFirstBlock() string {
 		return x.FirstBlock
 	}
 	return ""
+}
+
+func (x *NotePart) GetUpdatedAt() int64 {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return 0
 }
 
 // ===== Collections =====
@@ -1062,13 +1070,15 @@ const file_domain_proto_rawDesc = "" +
 	"\areaders\x18\b \x03(\tR\areaders\x12\x16\n" +
 	"\x06blocks\x18\t \x03(\tR\x06blocks\x12%\n" +
 	"\x06status\x18\n" +
-	" \x01(\x0e2\r.brz.StatusesR\x06status\"m\n" +
+	" \x01(\x0e2\r.brz.StatusesR\x06status\"\x8c\x01\n" +
 	"\bNotePart\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1a\n" +
 	"\x03tag\x18\x03 \x01(\v2\b.brz.TagR\x03tag\x12\x1f\n" +
 	"\vfirst_block\x18\x04 \x01(\tR\n" +
-	"firstBlock\"*\n" +
+	"firstBlock\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\x05 \x01(\x03R\tupdatedAt\"*\n" +
 	"\x06Blocks\x12 \n" +
 	"\x05items\x18\x01 \x03(\v2\n" +
 	".brz.BlockR\x05items\"(\n" +

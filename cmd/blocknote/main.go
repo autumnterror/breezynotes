@@ -1,12 +1,27 @@
 package main
 
 import (
+	"fmt"
 	"github.com/autumnterror/breezynotes/internal/blocknote/config"
-	"log"
+	"github.com/autumnterror/breezynotes/internal/blocknote/grpc"
+	"github.com/autumnterror/breezynotes/pkg/log"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
-	//TODO
-	config.MustSetup()
-	log.Println(config.Test())
+	const op = "cmd.blocknote"
+	cfg := config.MustSetup()
+
+	a := grpc.New(cfg)
+	go a.MustRun()
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
+	sign := <-stop
+
+	a.Stop()
+
+	log.Success(op, "stop signal "+fmt.Sprint(sign))
 }

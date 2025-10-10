@@ -9,7 +9,7 @@ services:
     volumes:
       - ./configs:/app/configs
     environment:
-      CONFIG_FILE:
+      CONFIG_FILE: prod-gateway.yaml
     restart: unless-stopped
     networks:
       - auth

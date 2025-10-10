@@ -1,0 +1,7 @@
+db: "blocknotedb"
+pw: "mongopw"
+user: "mongouser"
+data_source: "blocknotedb"
+port_mongo: 27017
+port: 8018
+mode: "PROD"

@@ -1,0 +1,8 @@
+addr_auth: "auth:8008"
+addr_blocknote: "blocknote:8018"
+addr_redis: "redis-service:8028"
+retries_count: 5
+timeout: 10s
+backoff: 100ms
+port: 8080
+mode: "PROD"

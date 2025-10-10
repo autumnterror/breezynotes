@@ -29,7 +29,7 @@ func MustSetup() *Config {
 // setup create config structure
 func setup() (*Config, error) {
 	const op = "config.setup"
-	configPath := flag.String("cfg", "./local-config/auth.yaml", "path to config file")
+	configPath := flag.String("config", "./local-config/auth.yaml", "path to config file")
 	flag.Parse()
 	viper.SetConfigFile(*configPath)
 
