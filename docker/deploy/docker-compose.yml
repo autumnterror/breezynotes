@@ -1,0 +1,112 @@
+version: '3.8'
+
+services:
+  gateway:
+    container_name: gateway
+    image: zitrax78/breezynotes-gateway:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./configs:/app/configs
+    environment:
+      CONFIG_FILE:
+    restart: unless-stopped
+    networks:
+      - auth
+      - notes
+      - redisnet
+
+  authservice:
+    container_name: auth
+    image: zitrax78/breezynotes-auth:latest
+    ports:
+      - "8008:8008"
+    volumes:
+      - ./configs:/app/configs
+    environment:
+      CONFIG_FILE: prod-auth.yaml
+    restart: unless-stopped
+    networks:
+      - auth
+
+  blocknoteservice:
+    container_name: blocknote
+    image: zitrax78/breezynotes-blocknote:latest
+    ports:
+      - "8018:8018"
+    volumes:
+      - ./configs:/app/configs
+    environment:
+      CONFIG_FILE: prod-blocknote.yaml
+    restart: unless-stopped
+    networks:
+      - notes
+
+  redisservice:
+    container_name: redis-service
+    image: zitrax78/breezynotes-redis:latest
+    ports:
+      - "8028:8028"
+    volumes:
+      - ./configs:/app/configs
+    environment:
+      CONFIG_FILE: prod-redis.yaml
+    restart: unless-stopped
+    networks:
+      - redisnet
+
+
+  usersdb:
+    container_name: usersdb
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - auth
+
+  blocknotedb:
+    container_name: blocknotedb
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - blocknotedb-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - notes
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    command: --requirepass ${REDISPASSWD}
+    env_file: .env
+    networks:
+      - redisnet
+
+networks:
+  auth:
+    driver: bridge
+  notes:
+    driver: bridge
+  redisnet:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  blocknotedb-data:

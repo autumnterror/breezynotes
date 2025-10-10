@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package brz;
+
+import "google/protobuf/empty.proto";
+import "domain.proto";
+
+option go_package = "github.com/autumnterror/breezynotes;brzrpc";
+
+
+// Cache payloads
+message NoteListByUser { string user_id = 1; repeated NotePart items = 2; }
+message NotesByUser { string user_id = 1; repeated Note items = 2; }
+message TagsByUser { string user_id = 1; repeated Tag items = 2; }
+message BlocksOnNote { string note_id = 1; repeated Block items = 2; }
+
+service RedisService {
+  rpc GetNotesByUser(UserId) returns (Notes);
+  rpc GetNoteListByUser(UserId) returns (NoteParts);
+  rpc GetTagsByUser(UserId) returns (Tags);
+  rpc GetBlocksOnNote(Id) returns (Blocks);
+  rpc GetNotesFromTrashByUser(UserId) returns (Notes);
+
+  rpc SetBlocksOnNote(BlocksOnNote) returns (google.protobuf.Empty);
+  rpc SetTagsByUser(TagsByUser) returns (google.protobuf.Empty);
+  rpc SetNotesByUser(NotesByUser) returns (google.protobuf.Empty);
+  rpc SetNotesFromTrashByUser(UserId) returns (google.protobuf.Empty);
+  rpc SetNoteListByUser(NoteListByUser) returns (google.protobuf.Empty);
+
+  rpc RmBlocksOnNote(Id) returns (google.protobuf.Empty);
+  rpc RmTagsByUser(UserId) returns (google.protobuf.Empty);
+  rpc RmNotesByUser(UserId) returns (google.protobuf.Empty);
+  rpc RmNotesFromTrashByUser(UserId) returns (google.protobuf.Empty);
+
+  rpc Healthz(google.protobuf.Empty) returns (google.protobuf.Empty);
+}

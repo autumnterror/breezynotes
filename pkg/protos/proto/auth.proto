@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package brz;
+
+import "google/protobuf/empty.proto";
+import "domain.proto";
+
+option go_package = "github.com/autumnterror/breezynotes;brzrpc";
+
+
+// ===== Requests =====
+message AuthRequest {
+  string email = 1;
+  string login = 2;
+  string password = 3;
+}
+
+message UpdateAboutRequest {
+  string id = 1;
+  string new_about = 2;
+}
+message UpdateEmailRequest {
+  string id = 1;
+  string new_email = 2;
+}
+message UpdatePhotoRequest {
+  string id = 1;
+  string new_photo = 2;
+}
+message ChangePasswordRequest {
+  string id = 1;
+  string new_password = 2;
+}
+
+// ===== Auth Service =====
+service AuthService {
+  rpc Auth(AuthRequest) returns (Tokens);
+  
+  rpc GenerateAccessToken(UserId) returns (Token);
+  rpc GenerateRefreshToken(UserId) returns (Token);
+  rpc GenerateTokens(UserId) returns (Tokens);
+  rpc Refresh(Token) returns (Token);
+  rpc CheckToken(Token) returns (google.protobuf.Empty);
+  
+  rpc DeleteUser(UserId) returns (google.protobuf.Empty);
+  rpc UpdateAbout(UpdateAboutRequest) returns (google.protobuf.Empty);
+  rpc UpdateEmail(UpdateEmailRequest) returns (google.protobuf.Empty);
+  rpc UpdatePhoto(UpdatePhotoRequest) returns (google.protobuf.Empty);
+  rpc ChangePasswd(ChangePasswordRequest) returns (google.protobuf.Empty);
+  rpc CreateUser(User) returns (google.protobuf.Empty);
+  rpc GetUserDataFromToken(Token) returns (User);
+
+  rpc Healthz(google.protobuf.Empty) returns (google.protobuf.Empty);
+}

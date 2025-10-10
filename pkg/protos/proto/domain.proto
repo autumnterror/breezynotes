@@ -1,0 +1,125 @@
+syntax = "proto3";
+
+package brz;
+
+//import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/autumnterror/breezynotes;brzrpc";
+
+message BoolResponse { bool ok = 1; }
+message StringResponse { string value = 1; }
+
+message Token { string value = 1; }
+message Tokens {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+message UserId { string id = 1; }
+message Id { string id = 1; }
+
+enum Statuses {
+  STATUS_UNSPECIFIED = 0;
+  ARCHIVED = 1;
+  IN_USE = 2;
+  IN_TRASH = 3;
+}
+
+enum Roles {
+  ROLE_UNSPECIFIED = 0;
+  EDITOR = 1;
+  READER = 2;
+}
+
+
+message User {
+  string id = 1;
+  string login = 2;
+  string email = 3;
+  string about = 4;
+  string photo = 5;
+  string password = 6;
+}
+
+message Tag {
+  string id = 1;
+  string title = 2;
+  string color = 3;
+  string emoji = 4;
+}
+
+message Block {
+  string id = 1;
+  string type = 2;
+  string note_id = 3;
+  int32 order = 4;
+  int64 created_at = 5;
+  int64 updated_at = 6;
+  bool is_used = 7;
+  google.protobuf.Struct data = 8;
+}
+
+
+message Note {
+  string id = 1;
+  string title = 2;
+  int64 created_at = 3;
+  int64 updated_at = 4;
+  Tag tag = 5;
+  string author = 6;
+  repeated string editors = 7;
+  repeated string readers = 8;
+  repeated string blocks = 9;
+  Statuses status = 10;
+}
+
+message NotePart {
+  string id = 1;
+  string title = 2;
+  Tag tag = 3;
+  string first_block = 4;
+}
+
+// ===== Collections =====
+message Blocks { repeated Block items = 1; }
+message Notes { repeated Note items = 1; }
+message NoteParts { repeated NotePart items = 1; }
+message Tags { repeated Tag items = 1; }
+
+
+//enum Color {
+//  COLOR_UNSPECIFIED = 0;
+//  RED = 1;
+//  YELLOW = 2;
+//  LIGHT_GREEN = 3;
+//  GREEN = 4;
+//  TEAL = 5;
+//  VIOLET = 6;
+//  BLUE = 7;
+//  GRAY = 8;
+//}
+
+//enum Types {
+//  TYPES_UNSPECIFIED = 0;
+//  TEXT = 1;
+//  CODE = 2;
+//  HEADER = 3;
+//  QUOTE = 4;
+//  FILE_ = 5;
+//  LINK = 6;
+//  AFTER = 7;
+//  CANBAN = 8;
+//  IMAGE = 9;
+//  VIDEO = 10;
+//  MUSIC = 11;
+//  TABLE = 12;
+//  VS_CODE = 13;
+//}
+
+//enum Styles {
+//  STYLES_UNSPECIFIED = 0;
+//  BOLD = 1;
+//  ITALIC = 2;
+//  UNDERLINE = 3;
+//}

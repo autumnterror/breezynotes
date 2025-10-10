@@ -1,0 +1,172 @@
+version: '3.8'
+
+services:
+  gateway:
+    container_name: gateway
+    image: zitrax78/breezynotes-gateway:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./configs:/app/configs
+    environment:
+      CONFIG_FILE: prod-gateway.yaml
+    restart: unless-stopped
+    networks:
+      - auth
+      - mongo-cluster
+      - redisnet
+
+  authservice:
+    container_name: auth
+    image: zitrax78/breezynotes-auth:latest
+    ports:
+      - "8008:8008"
+    volumes:
+      - ./configs:/app/configs
+    environment:
+      CONFIG_FILE: prod-auth.yaml
+    restart: unless-stopped
+    networks:
+      - auth
+
+  blocknoteservice:
+    container_name: blocknote
+    image: zitrax78/breezynotes-blocknote:latest
+    ports:
+      - "8018:8018"
+    volumes:
+      - ./configs:/app/configs
+    environment:
+      CONFIG_FILE: prod-blocknote.yaml
+    restart: unless-stopped
+    networks:
+      - mongo-cluster
+
+  redisservice:
+    container_name: redis-service
+    image: zitrax78/breezynotes-redis:latest
+    ports:
+      - "8028:8028"
+    volumes:
+      - ./configs:/app/configs
+    environment:
+      CONFIG_FILE: prod-redis.yaml
+    restart: unless-stopped
+    networks:
+      - redisnet
+
+
+  usersdb:
+    container_name: usersdb
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - auth
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    command: --requirepass ${REDISPASSWD}
+    env_file: .env
+    networks:
+      - redisnet
+
+  blocknotedb1:
+    depends_on:
+      - mongo-keygen
+    container_name: blocknotedb1
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-keyfile:/data/keyfile:ro
+      - blocknotedb1-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    restart: unless-stopped
+    command: mongod --replSet rs0 --bind_ip_all --keyFile /data/keyfile/mongo-keyfile.key --auth
+    env_file: .env
+    networks:
+      - mongo-cluster
+
+  blocknotedb2:
+    depends_on:
+      - mongo-keygen
+    container_name: blocknotedb2
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    volumes:
+      - blocknotedb2-data:/data/db
+      - mongo-keyfile:/data/keyfile:ro
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    command: mongod --replSet rs0 --bind_ip_all --keyFile /data/keyfile/mongo-keyfile.key --auth
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - mongo-cluster
+
+  blocknotedb3:
+    depends_on:
+      - mongo-keygen
+    container_name: blocknotedb3
+    image: mongo:latest
+    ports:
+      - "27019:27017"
+    volumes:
+      - blocknotedb3-data:/data/db
+      - mongo-keyfile:/data/keyfile:ro
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    command: mongod --replSet rs0 --bind_ip_all --keyFile /data/keyfile/mongo-keyfile.key --auth
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - mongo-cluster
+
+  mongo-keygen:
+    container_name: mng-setup-key
+    image: alpine
+    command: >
+      sh -c "
+      mkdir -p /keyfile &&
+      head -c 756 /dev/urandom | base64 -w 0 > /keyfile/mongo-keyfile.key &&
+      chmod 400 /keyfile/mongo-keyfile.key &&
+      chown 999:999 /keyfile/mongo-keyfile.key
+      "
+    volumes:
+      - mongo-keyfile:/keyfile
+
+networks:
+  auth:
+    driver: bridge
+  mongo-cluster:
+    driver: bridge
+  redisnet:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  blocknotedb1-data:
+  blocknotedb2-data:
+  blocknotedb3-data:
+  mongo-keyfile:
