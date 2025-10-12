@@ -37,7 +37,7 @@ const (
 	RedisService_Healthz_FullMethodName                 = "/brz.RedisService/Healthz"
 )
 
-// RedisServiceClient is the client API for RedisService service.
+// RedisServiceClient is the client UserAPI for RedisService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RedisServiceClient interface {
@@ -216,7 +216,7 @@ func (c *redisServiceClient) Healthz(ctx context.Context, in *emptypb.Empty, opt
 	return out, nil
 }
 
-// RedisServiceServer is the server API for RedisService service.
+// RedisServiceServer is the server UserAPI for RedisService service.
 // All implementations must embed UnimplementedRedisServiceServer
 // for forward compatibility.
 type RedisServiceServer interface {

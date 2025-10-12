@@ -3,6 +3,8 @@ package grpc
 import (
 	"fmt"
 	"github.com/autumnterror/breezynotes/internal/auth/config"
+	"github.com/autumnterror/breezynotes/internal/auth/jwt"
+	"github.com/autumnterror/breezynotes/internal/auth/psql"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"google.golang.org/grpc"
@@ -15,13 +17,13 @@ type App struct {
 	cfg        *config.Config
 }
 
-func New(cfg *config.Config) *App {
+func New(cfg *config.Config, API psql.AuthRepo, JwtAPI jwt.WithConfigRepo) *App {
 	s := grpc.NewServer(
 		grpc.KeepaliveParams(keepalive.ServerParameters{
 			MaxConnectionIdle: 0,
 		}),
 	)
-	Register(s)
+	Register(s, API, JwtAPI)
 
 	return &App{
 		gRPCServer: s,

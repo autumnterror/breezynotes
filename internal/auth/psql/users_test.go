@@ -1,0 +1,266 @@
+package psql
+
+import (
+	"database/sql"
+	"errors"
+	"fmt"
+	"github.com/autumnterror/breezynotes/internal/auth/config"
+	"github.com/autumnterror/breezynotes/pkg/log"
+	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
+	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
+
+func TestUsersOperations(t *testing.T) {
+	t.Parallel()
+
+	repo, _, cleanup := setupTestTx(t)
+	defer cleanup()
+
+	userID := uuid.NewString()
+	user := &brzrpc.User{
+		Id:       userID,
+		Login:    "testlogin",
+		Email:    "testemail@example.com",
+		About:    "initial about",
+		Password: "testpassword",
+		Photo:    "testphoto",
+	}
+
+	print := func() {
+		t.Run("getAll", func(t *testing.T) {
+			users, err := repo.GetAll()
+			assert.NoError(t, err)
+			fmt.Println("🔍 Current Users in DB:")
+			for _, u := range users {
+				log.Println(format.Struct(u))
+			}
+		})
+	}
+
+	t.Run("create", func(t *testing.T) {
+		err := repo.Create(user)
+		assert.NoError(t, err)
+	})
+	print()
+
+	t.Run("get info", func(t *testing.T) {
+		info, err := repo.GetInfo(user.Id)
+		assert.NoError(t, err)
+		fmt.Printf("👤 GetInfo: %s", format.Struct(info))
+	})
+
+	t.Run("update email", func(t *testing.T) {
+		newEmail := "newemail@example.com"
+		err := repo.UpdateEmail(user.Id, newEmail)
+		assert.NoError(t, err)
+		user.Email = newEmail
+		info, err := repo.GetInfo(user.Id)
+		assert.NoError(t, err)
+		fmt.Printf("👤 GetInfo after update email: %s", format.Struct(info))
+	})
+
+	t.Run("update about", func(t *testing.T) {
+		newAbout := "updated about"
+		err := repo.UpdateAbout(user.Id, newAbout)
+		assert.NoError(t, err)
+		user.About = newAbout
+		info, err := repo.GetInfo(user.Id)
+		assert.NoError(t, err)
+		fmt.Printf("👤 GetInfo after update about: %s", format.Struct(info))
+	})
+
+	t.Run("update password", func(t *testing.T) {
+		err := repo.UpdatePassword(user.Id, "newSecurePassword")
+		assert.NoError(t, err)
+		log.Println("after update password")
+		print()
+	})
+
+	t.Run("delete", func(t *testing.T) {
+		err := repo.Delete(user.Id)
+		assert.NoError(t, err)
+		log.Println("after delete")
+		print()
+	})
+}
+
+func setupTestTx(t *testing.T) (*Driver, *sql.Tx, func()) {
+	pdb := MustConnect(config.Test())
+
+	tx, err := pdb.Driver.Begin()
+	assert.NoError(t, err)
+
+	return NewDriver(tx), tx, func() {
+		assert.NoError(t, tx.Rollback())
+		assert.NoError(t, pdb.Disconnect())
+	}
+}
+
+func TestCreateDuplicateUser(t *testing.T) {
+	t.Parallel()
+	repo, _, cleanup := setupTestTx(t)
+	defer cleanup()
+
+	uid := uuid.NewString()
+	user := &brzrpc.User{
+		Id:       uid,
+		Login:    "duplicate",
+		Email:    "dup@example.com",
+		About:    "test",
+		Password: "password",
+	}
+
+	assert.NoError(t, repo.Create(user))
+	user.Id = uuid.NewString()
+	err := repo.Create(user)
+	assert.Error(t, err)
+	assert.True(t, errors.Is(err, ErrAlreadyExist))
+}
+
+func TestUpdateNonExistentUser(t *testing.T) {
+	t.Parallel()
+	repo, _, cleanup := setupTestTx(t)
+	defer cleanup()
+
+	err := repo.UpdateAbout(uuid.NewString(), "123")
+	assert.Error(t, err)
+	assert.True(t, errors.Is(err, sql.ErrNoRows))
+}
+
+func TestDeleteNonExistentUser(t *testing.T) {
+	t.Parallel()
+	repo, _, cleanup := setupTestTx(t)
+	defer cleanup()
+
+	err := repo.Delete(uuid.NewString())
+	assert.Error(t, err)
+	assert.True(t, errors.Is(err, sql.ErrNoRows))
+}
+
+func TestGetInfo_InvalidID(t *testing.T) {
+	t.Parallel()
+	repo, _, cleanup := setupTestTx(t)
+	defer cleanup()
+
+	_, err := repo.GetInfo(uuid.NewString())
+	assert.Error(t, err)
+	assert.True(t, errors.Is(err, sql.ErrNoRows))
+}
+
+func TestAuthLogin(t *testing.T) {
+	t.Parallel()
+	repo, _, cleanup := setupTestTx(t)
+	defer cleanup()
+
+	uid := uuid.NewString()
+	user := &brzrpc.User{
+		Id:       uid,
+		Login:    "login",
+		Email:    "login@example.com",
+		About:    "test",
+		Password: "password",
+	}
+
+	assert.NoError(t, repo.Create(user))
+
+	assert.NoError(t, repo.Authentication(&brzrpc.AuthRequest{
+		Email:    "",
+		Login:    user.GetLogin(),
+		Password: user.GetPassword(),
+	}))
+}
+
+func TestAuthEmail(t *testing.T) {
+	t.Parallel()
+	repo, _, cleanup := setupTestTx(t)
+	defer cleanup()
+
+	uid := uuid.NewString()
+	user := &brzrpc.User{
+		Id:       uid,
+		Login:    "login",
+		Email:    "login@example.com",
+		About:    "test",
+		Password: "password",
+	}
+
+	assert.NoError(t, repo.Create(user))
+
+	assert.NoError(t, repo.Authentication(&brzrpc.AuthRequest{
+		Email:    user.GetEmail(),
+		Login:    "",
+		Password: user.GetPassword(),
+	}))
+}
+
+func TestAuthWrongInput1(t *testing.T) {
+	t.Parallel()
+	repo, _, cleanup := setupTestTx(t)
+	defer cleanup()
+
+	uid := uuid.NewString()
+	user := &brzrpc.User{
+		Id:       uid,
+		Login:    "login",
+		Email:    "login@example.com",
+		About:    "test",
+		Password: "password",
+	}
+
+	assert.NoError(t, repo.Create(user))
+
+	assert.True(t, errors.Is(repo.Authentication(&brzrpc.AuthRequest{
+		Email:    user.GetEmail(),
+		Login:    "",
+		Password: "",
+	}), ErrWrongInput))
+}
+
+func TestAuthWrongInput2(t *testing.T) {
+	t.Parallel()
+	repo, _, cleanup := setupTestTx(t)
+	defer cleanup()
+
+	uid := uuid.NewString()
+	user := &brzrpc.User{
+		Id:       uid,
+		Login:    "login",
+		Email:    "login@example.com",
+		About:    "test",
+		Password: "password",
+	}
+
+	assert.NoError(t, repo.Create(user))
+
+	assert.True(t, errors.Is(repo.Authentication(&brzrpc.AuthRequest{
+		Email:    "",
+		Login:    "",
+		Password: "123",
+	}), ErrWrongInput))
+}
+
+func TestAuthPwIncorrect(t *testing.T) {
+	t.Parallel()
+	repo, _, cleanup := setupTestTx(t)
+	defer cleanup()
+
+	uid := uuid.NewString()
+	user := &brzrpc.User{
+		Id:       uid,
+		Login:    "login",
+		Email:    "login@example.com",
+		About:    "test",
+		Password: "password",
+	}
+
+	assert.NoError(t, repo.Create(user))
+
+	assert.True(t, errors.Is(repo.Authentication(&brzrpc.AuthRequest{
+		Email:    "",
+		Login:    user.GetLogin(),
+		Password: "123",
+	}), ErrPasswordIncorrect))
+}

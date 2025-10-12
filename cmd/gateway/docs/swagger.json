@@ -1,0 +1,51 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Full API for BreezyNotes.",
+        "title": "Breezy notes gateway REST API",
+        "termsOfService": "https://about.breezynotes.ru/",
+        "contact": {
+            "name": "Alex \"bustard\" Provor",
+            "url": "https://contacts.breezynotes.ru",
+            "email": "help@breezynotes.ru"
+        },
+        "version": "0.1-.-infDev"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/api/health": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "healthz"
+                ],
+                "summary": "check health of gateway",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGMessage"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "views.SWGMessage": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "some info"
+                }
+            }
+        }
+    }
+}

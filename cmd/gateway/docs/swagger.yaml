@@ -1,0 +1,34 @@
+basePath: /
+definitions:
+  views.SWGMessage:
+    properties:
+      message:
+        example: some info
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: help@breezynotes.ru
+    name: Alex "bustard" Provor
+    url: https://contacts.breezynotes.ru
+  description: Full API for BreezyNotes.
+  termsOfService: https://about.breezynotes.ru/
+  title: Breezy notes gateway REST API
+  version: 0.1-.-infDev
+paths:
+  /api/health:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/views.SWGMessage'
+      summary: check health of gateway
+      tags:
+      - healthz
+schemes:
+- http
+swagger: "2.0"

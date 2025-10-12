@@ -2,14 +2,70 @@ package grpc
 
 import (
 	"context"
+	"errors"
+	"github.com/autumnterror/breezynotes/internal/auth/psql"
+	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
+	"github.com/autumnterror/breezynotes/views"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"time"
 )
 
-func (s *ServerAPI) Auth(ctx context.Context, request *brzrpc.AuthRequest) (*brzrpc.Tokens, error) {
+func (s *ServerAPI) Auth(ctx context.Context, r *brzrpc.AuthRequest) (*emptypb.Empty, error) {
+	const op = "auth.grpc.Auth"
+	log.Info(op, "")
+
+	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
+		if err := s.UserAPI.Authentication(r); err != nil {
+			switch {
+			case errors.Is(err, psql.ErrNoUser):
+				log.Warn(op, "", err)
+				res <- views.ResRPC{Res: nil, Err: status.Error(codes.Unauthenticated, err.Error())}
+			case errors.Is(err, psql.ErrPasswordIncorrect):
+				log.Warn(op, "", err)
+				res <- views.ResRPC{Res: nil, Err: status.Error(codes.Unauthenticated, err.Error())}
+			case errors.Is(err, psql.ErrWrongInput):
+				log.Warn(op, "", err)
+				res <- views.ResRPC{Res: nil, Err: status.Error(codes.InvalidArgument, err.Error())}
+			default:
+				log.Error(op, "", err)
+				res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, "check logs")}
+			}
+			return
+		}
+
+		res <- views.ResRPC{Res: nil, Err: nil}
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
 	return nil, nil
 }
 
-func (s *ServerAPI) Healthz(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
-	return nil, nil
+func (s *ServerAPI) Healthz(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
+	const op = "auth.grpc.Healthz"
+	log.Info(op, "")
+	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
+		time.Sleep(5 * time.Second)
+		res <- views.ResRPC{Res: nil, Err: nil}
+	})
+
+	return nil, err
+}
+
+func opWithContext(ctx context.Context, op func(chan views.ResRPC)) (interface{}, error) {
+	res := make(chan views.ResRPC, 1)
+
+	go op(res)
+
+	select {
+	case <-ctx.Done():
+		return nil, status.Error(codes.DeadlineExceeded, "context deadline")
+	case r := <-res:
+		return r.Res, r.Err
+	}
 }

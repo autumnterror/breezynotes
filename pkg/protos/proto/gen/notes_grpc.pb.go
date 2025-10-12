@@ -49,7 +49,7 @@ const (
 	BlockNoteService_Healthz_FullMethodName            = "/brz.BlockNoteService/Healthz"
 )
 
-// BlockNoteServiceClient is the client API for BlockNoteService service.
+// BlockNoteServiceClient is the client UserAPI for BlockNoteService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
@@ -362,7 +362,7 @@ func (c *blockNoteServiceClient) Healthz(ctx context.Context, in *emptypb.Empty,
 	return out, nil
 }
 
-// BlockNoteServiceServer is the server API for BlockNoteService service.
+// BlockNoteServiceServer is the server UserAPI for BlockNoteService service.
 // All implementations must embed UnimplementedBlockNoteServiceServer
 // for forward compatibility.
 //

@@ -1,0 +1,57 @@
+package psql
+
+import (
+	"database/sql"
+	"errors"
+	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
+	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"golang.org/x/crypto/bcrypt"
+)
+
+var (
+	ErrNoUser            = errors.New("no user found")
+	ErrPasswordIncorrect = errors.New("password incorrect")
+	ErrWrongInput        = errors.New("wrong input")
+)
+
+// Authentication search user login and password in database and compare
+func (d *Driver) Authentication(u *brzrpc.AuthRequest) error {
+	const op = "psql.Authentication"
+
+	if u.Password == "" {
+		return format.Error(op, ErrWrongInput)
+	}
+
+	var (
+		query string
+		arg   string
+	)
+
+	switch {
+	case u.Login != "":
+		query = `SELECT password FROM users WHERE login = $1`
+		arg = u.Login
+	case u.Email != "":
+		query = `SELECT password FROM users WHERE email = $1`
+		arg = u.Email
+	default:
+		return format.Error(op, ErrWrongInput)
+	}
+
+	var hashed string
+	if err := d.driver.QueryRow(query, arg).Scan(&hashed); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrNoUser
+		}
+		return format.Error(op, err)
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(u.Password)); err != nil {
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return ErrPasswordIncorrect
+		}
+		return format.Error(op, err)
+	}
+
+	return nil
+}

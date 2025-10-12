@@ -2,17 +2,33 @@ package main
 
 import (
 	"context"
+	"fmt"
+	_ "github.com/autumnterror/breezynotes/cmd/gateway/docs"
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/auth"
 	blocknote "github.com/autumnterror/breezynotes/internal/gateway/clients/blocknote"
 	redis "github.com/autumnterror/breezynotes/internal/gateway/clients/redis"
 	"github.com/autumnterror/breezynotes/internal/gateway/config"
+	"github.com/autumnterror/breezynotes/internal/gateway/net"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	"golang.org/x/sync/errgroup"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
+// @title Breezy notes gateway REST UserAPI
+// @version 0.1-.-infDev
+// @description Full UserAPI for BreezyNotes.
+// @termsOfService https://about.breezynotes.ru/
+
+// @contact.name Alex "bustard" Provor
+// @contact.url https://contacts.breezynotes.ru
+// @contact.email help@breezynotes.ru
+
+// @host localhost:8080
+// @BasePath /
+// @schemes http
 func main() {
 	const op = "cmd.gateway"
 	cfg := config.MustSetup()
@@ -38,9 +54,12 @@ func main() {
 	})
 
 	ch(g.Wait())
-
-	if _, err := a.API.Healthz(context.Background(), nil); err == nil {
+	ctx, done := context.WithTimeout(context.Background(), 6*time.Second)
+	defer done()
+	if _, err := a.API.Healthz(ctx, nil); err == nil {
 		log.Success(op, "health auth")
+	} else {
+		log.Error(op, "", err)
 	}
 	if _, err := r.API.Healthz(context.Background(), nil); err == nil {
 		log.Success(op, "health redis")
@@ -48,9 +67,19 @@ func main() {
 	if _, err := b.API.Healthz(context.Background(), nil); err == nil {
 		log.Success(op, "health blocknote")
 	}
+
+	e := net.New(cfg)
+	go e.MustRun()
+
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
-	<-stop
+	s := <-stop
+
+	if err := e.Stop(); err != nil {
+		log.Error(op, "stop echo", err)
+	}
+
+	log.Green(fmt.Sprintf("%s:%s", op, s.String()))
 }
 
 func ch(err error) {
