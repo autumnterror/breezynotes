@@ -123,7 +123,7 @@ func (s *ServerAPI) CheckToken(ctx context.Context, r *brzrpc.Token) (*emptypb.E
 				res <- views.ResRPC{Res: nil, Err: status.Error(codes.Unauthenticated, "token expired")}
 			default:
 				log.Warn(op, "", err)
-				res <- views.ResRPC{Res: nil, Err: status.Error(codes.Unauthenticated, "token bad")}
+				res <- views.ResRPC{Res: nil, Err: status.Error(codes.InvalidArgument, "token bad")}
 			}
 			return
 		}

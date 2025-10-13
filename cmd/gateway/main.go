@@ -52,23 +52,11 @@ func main() {
 		b, err = blocknote.New(cfg)
 		return err
 	})
-
 	ch(g.Wait())
-	ctx, done := context.WithTimeout(context.Background(), 6*time.Second)
-	defer done()
-	if _, err := a.API.Healthz(ctx, nil); err == nil {
-		log.Success(op, "health auth")
-	} else {
-		log.Error(op, "", err)
-	}
-	if _, err := r.API.Healthz(context.Background(), nil); err == nil {
-		log.Success(op, "health redis")
-	}
-	if _, err := b.API.Healthz(context.Background(), nil); err == nil {
-		log.Success(op, "health blocknote")
-	}
 
-	e := net.New(cfg)
+	health(a, r, b)
+
+	e := net.New(cfg, a, b, r)
 	go e.MustRun()
 
 	stop := make(chan os.Signal, 1)
@@ -80,6 +68,27 @@ func main() {
 	}
 
 	log.Green(fmt.Sprintf("%s:%s", op, s.String()))
+}
+
+func health(
+	a *auth.Client,
+	r *redis.Client,
+	b *blocknote.Client,
+) {
+	const op = "cmd.gateway.health"
+	ctx, done := context.WithTimeout(context.Background(), 6*time.Second)
+	defer done()
+	if _, err := a.API.Healthz(ctx, nil); err == nil {
+		log.Success(op, "health auth")
+	} else {
+		log.Error(op, "", err)
+	}
+	if _, err := r.API.Healthz(ctx, nil); err == nil {
+		log.Success(op, "health redis")
+	}
+	if _, err := b.API.Healthz(ctx, nil); err == nil {
+		log.Success(op, "health blocknote")
+	}
 }
 
 func ch(err error) {

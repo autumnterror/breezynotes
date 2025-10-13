@@ -1,4 +1,4 @@
-package auth
+package redis
 
 import (
 	"github.com/autumnterror/breezynotes/internal/gateway/config"

@@ -71,7 +71,7 @@ func (d *PostgresDb) Disconnect() error {
 }
 
 type AuthRepo interface {
-	Authentication(u *brzrpc.AuthRequest) error
+	Authentication(u *brzrpc.AuthRequest) (string, error)
 	GetAll() ([]*brzrpc.User, error)
 	Create(u *brzrpc.User) error
 	UpdatePhoto(id, np string) error

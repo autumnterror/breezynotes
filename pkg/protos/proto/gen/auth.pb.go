@@ -312,9 +312,9 @@ const file_auth_proto_rawDesc = "" +
 	"\tnew_photo\x18\x02 \x01(\tR\bnewPhoto\"J\n" +
 	"\x15ChangePasswordRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12!\n" +
-	"\fnew_password\x18\x02 \x01(\tR\vnewPassword2\xf3\x05\n" +
-	"\vAuthService\x120\n" +
-	"\x04Auth\x12\x10.brz.AuthRequest\x1a\x16.google.protobuf.Empty\x12.\n" +
+	"\fnew_password\x18\x02 \x01(\tR\vnewPassword2\xe8\x05\n" +
+	"\vAuthService\x12%\n" +
+	"\x04Auth\x12\x10.brz.AuthRequest\x1a\v.brz.UserId\x12.\n" +
 	"\x13GenerateAccessToken\x12\v.brz.UserId\x1a\n" +
 	".brz.Token\x12/\n" +
 	"\x14GenerateRefreshToken\x12\v.brz.UserId\x1a\n" +
@@ -378,7 +378,7 @@ var file_auth_proto_depIdxs = []int32{
 	7,  // 11: brz.AuthService.CreateUser:input_type -> brz.User
 	6,  // 12: brz.AuthService.GetUserDataFromToken:input_type -> brz.Token
 	8,  // 13: brz.AuthService.Healthz:input_type -> google.protobuf.Empty
-	8,  // 14: brz.AuthService.Auth:output_type -> google.protobuf.Empty
+	5,  // 14: brz.AuthService.Auth:output_type -> brz.UserId
 	6,  // 15: brz.AuthService.GenerateAccessToken:output_type -> brz.Token
 	6,  // 16: brz.AuthService.GenerateRefreshToken:output_type -> brz.Token
 	9,  // 17: brz.AuthService.GenerateTokens:output_type -> brz.Tokens

@@ -36,13 +36,13 @@ const (
 	AuthService_Healthz_FullMethodName              = "/brz.AuthService/Healthz"
 )
 
-// AuthServiceClient is the client UserAPI for AuthService service.
+// AuthServiceClient is the client API for AuthService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // ===== Auth Service =====
 type AuthServiceClient interface {
-	Auth(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Auth(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*UserId, error)
 	GenerateAccessToken(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Token, error)
 	GenerateRefreshToken(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Token, error)
 	GenerateTokens(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Tokens, error)
@@ -66,9 +66,9 @@ func NewAuthServiceClient(cc grpc.ClientConnInterface) AuthServiceClient {
 	return &authServiceClient{cc}
 }
 
-func (c *authServiceClient) Auth(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *authServiceClient) Auth(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*UserId, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
+	out := new(UserId)
 	err := c.cc.Invoke(ctx, AuthService_Auth_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -206,13 +206,13 @@ func (c *authServiceClient) Healthz(ctx context.Context, in *emptypb.Empty, opts
 	return out, nil
 }
 
-// AuthServiceServer is the server UserAPI for AuthService service.
+// AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
 //
 // ===== Auth Service =====
 type AuthServiceServer interface {
-	Auth(context.Context, *AuthRequest) (*emptypb.Empty, error)
+	Auth(context.Context, *AuthRequest) (*UserId, error)
 	GenerateAccessToken(context.Context, *UserId) (*Token, error)
 	GenerateRefreshToken(context.Context, *UserId) (*Token, error)
 	GenerateTokens(context.Context, *UserId) (*Tokens, error)
@@ -236,7 +236,7 @@ type AuthServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAuthServiceServer struct{}
 
-func (UnimplementedAuthServiceServer) Auth(context.Context, *AuthRequest) (*emptypb.Empty, error) {
+func (UnimplementedAuthServiceServer) Auth(context.Context, *AuthRequest) (*UserId, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Auth not implemented")
 }
 func (UnimplementedAuthServiceServer) GenerateAccessToken(context.Context, *UserId) (*Token, error) {

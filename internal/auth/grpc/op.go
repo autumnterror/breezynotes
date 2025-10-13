@@ -13,12 +13,13 @@ import (
 	"time"
 )
 
-func (s *ServerAPI) Auth(ctx context.Context, r *brzrpc.AuthRequest) (*emptypb.Empty, error) {
+func (s *ServerAPI) Auth(ctx context.Context, r *brzrpc.AuthRequest) (*brzrpc.UserId, error) {
 	const op = "auth.grpc.Auth"
 	log.Info(op, "")
 
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.UserAPI.Authentication(r); err != nil {
+	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
+		id, err := s.UserAPI.Authentication(r)
+		if err != nil {
 			switch {
 			case errors.Is(err, psql.ErrNoUser):
 				log.Warn(op, "", err)
@@ -36,14 +37,14 @@ func (s *ServerAPI) Auth(ctx context.Context, r *brzrpc.AuthRequest) (*emptypb.E
 			return
 		}
 
-		res <- views.ResRPC{Res: nil, Err: nil}
+		res <- views.ResRPC{Res: id, Err: nil}
 	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, nil
+	return &brzrpc.UserId{Id: res.(string)}, nil
 }
 
 func (s *ServerAPI) Healthz(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {

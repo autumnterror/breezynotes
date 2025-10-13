@@ -34,7 +34,7 @@ message ChangePasswordRequest {
 
 // ===== Auth Service =====
 service AuthService {
-  rpc Auth(AuthRequest) returns (google.protobuf.Empty);
+  rpc Auth(AuthRequest) returns (UserId);
   
   rpc GenerateAccessToken(UserId) returns (Token);
   rpc GenerateRefreshToken(UserId) returns (Token);

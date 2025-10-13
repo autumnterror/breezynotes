@@ -15,11 +15,11 @@ var (
 )
 
 // Authentication search user login and password in database and compare
-func (d *Driver) Authentication(u *brzrpc.AuthRequest) error {
+func (d *Driver) Authentication(u *brzrpc.AuthRequest) (string, error) {
 	const op = "psql.Authentication"
 
 	if u.Password == "" {
-		return format.Error(op, ErrWrongInput)
+		return "", format.Error(op, ErrWrongInput)
 	}
 
 	var (
@@ -29,29 +29,30 @@ func (d *Driver) Authentication(u *brzrpc.AuthRequest) error {
 
 	switch {
 	case u.Login != "":
-		query = `SELECT password FROM users WHERE login = $1`
+		query = `SELECT id, password FROM users WHERE login = $1`
 		arg = u.Login
 	case u.Email != "":
-		query = `SELECT password FROM users WHERE email = $1`
+		query = `SELECT id, password FROM users WHERE email = $1`
 		arg = u.Email
 	default:
-		return format.Error(op, ErrWrongInput)
+		return "", format.Error(op, ErrWrongInput)
 	}
 
 	var hashed string
-	if err := d.driver.QueryRow(query, arg).Scan(&hashed); err != nil {
+	var id string
+	if err := d.driver.QueryRow(query, arg).Scan(&id, &hashed); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return ErrNoUser
+			return "", ErrNoUser
 		}
-		return format.Error(op, err)
+		return "", format.Error(op, err)
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(u.Password)); err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return ErrPasswordIncorrect
+			return "", ErrPasswordIncorrect
 		}
-		return format.Error(op, err)
+		return "", format.Error(op, err)
 	}
 
-	return nil
+	return id, nil
 }

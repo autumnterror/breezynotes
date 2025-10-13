@@ -3,6 +3,9 @@ package net
 import (
 	"errors"
 	"fmt"
+	"github.com/autumnterror/breezynotes/internal/gateway/clients/auth"
+	"github.com/autumnterror/breezynotes/internal/gateway/clients/blocknote"
+	"github.com/autumnterror/breezynotes/internal/gateway/clients/redis"
 	"github.com/autumnterror/breezynotes/internal/gateway/config"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/labstack/echo/v4"
@@ -12,22 +15,46 @@ import (
 )
 
 type Echo struct {
-	echo *echo.Echo
-	cfg  *config.Config
+	echo    *echo.Echo
+	cfg     *config.Config
+	authAPI *auth.Client
+	bnAPI   *blocknote.Client
+	rdsAPI  *redis.Client
 }
 
-func New(cfg *config.Config) *Echo {
+func New(
+	cfg *config.Config,
+	authAPI *auth.Client,
+	bnAPI *blocknote.Client,
+	rdsAPI *redis.Client,
+) *Echo {
 	e := &Echo{
-		echo: echo.New(),
-		cfg:  cfg,
+		echo:    echo.New(),
+		cfg:     cfg,
+		authAPI: authAPI,
+		bnAPI:   bnAPI,
+		rdsAPI:  rdsAPI,
 	}
 
 	e.echo.GET("/swagger/*", echoSwagger.WrapHandler)
-	e.echo.Use(middleware.Logger(), middleware.Recover())
+	e.echo.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{"http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:8080"},
+		AllowMethods:     []string{echo.GET, echo.POST, echo.PUT, echo.DELETE, echo.PATCH, echo.OPTIONS},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
+		AllowCredentials: true,
+	}))
+	//e.echo.Use(middleware.Logger(), middleware.Recover())
 
-	health := e.echo.Group("/api")
+	api := e.echo.Group("/api")
 	{
-		health.GET("/health", e.Healthz)
+		api.GET("/health", e.Healthz)
+		auth := api.Group("/auth")
+		{
+			auth.GET("/token", e.ValidateToken)
+
+			auth.POST("", e.Auth)
+			auth.POST("/reg", e.Reg)
+		}
 	}
 
 	return e

@@ -1,9 +1,47 @@
 basePath: /
 definitions:
+  brzrpc.AuthRequest:
+    properties:
+      email:
+        type: string
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  brzrpc.Token:
+    properties:
+      value:
+        type: string
+    type: object
+  brzrpc.Tokens:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  views.SWGError:
+    properties:
+      error:
+        example: error
+        type: string
+    type: object
   views.SWGMessage:
     properties:
       message:
         example: some info
+        type: string
+    type: object
+  views.UserRegister:
+    properties:
+      email:
+        type: string
+      login:
+        type: string
+      pw1:
+        type: string
+      pw2:
         type: string
     type: object
 host: localhost:8080
@@ -12,11 +50,108 @@ info:
     email: help@breezynotes.ru
     name: Alex "bustard" Provor
     url: https://contacts.breezynotes.ru
-  description: Full API for BreezyNotes.
+  description: Full UserAPI for BreezyNotes.
   termsOfService: https://about.breezynotes.ru/
-  title: Breezy notes gateway REST API
+  title: Breezy notes gateway REST UserAPI
   version: 0.1-.-infDev
 paths:
+  /api/auth:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates user and returns access/refresh tokens
+      parameters:
+      - description: Login or Email and Password
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/brzrpc.AuthRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/brzrpc.Tokens'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/views.SWGError'
+      summary: Authorize user
+      tags:
+      - auth
+  /api/auth/reg:
+    post:
+      consumes:
+      - application/json
+      description: Validates registration data, creates user and returns tokens
+      parameters:
+      - description: Reg data
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/views.UserRegister'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "302":
+          description: Found
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/views.SWGError'
+      summary: Register new user
+      tags:
+      - auth
+  /api/auth/token:
+    get:
+      description: Checks access token from cookie, tries to refresh if expired
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/views.SWGMessage'
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/brzrpc.Token'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "410":
+          description: Gone
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/views.SWGError'
+      summary: Validate token (uses cookies)
+      tags:
+      - auth
   /api/health:
     get:
       produces:

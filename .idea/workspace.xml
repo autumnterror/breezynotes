@@ -5,44 +5,36 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9859957d-2c2c-4239-80b4-4d74a8eeb2c2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/internal/auth/jwt/jwt.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/auth/jwt/jwt_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/auth/jwt/op.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/auth/psql/auth.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/auth/psql/conn.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/auth/psql/users.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/auth/psql/users_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/gateway/net/client.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/gateway/net/handlers.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/migrations/0001_create_users_table.down.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/migrations/0001_create_users_table.up.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/test_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/views/swgviews.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/views/views.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/gateway/net/auth_handlers.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/gateway/net/user_handlers.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/utils/id/id.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/utils/validate/validate.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/utils/validate/validate_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/4215832a-5ec8-4bcf-8d7f-948977598263.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/4215832a-5ec8-4bcf-8d7f-948977598263.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/4215832a-5ec8-4bcf-8d7f-948977598263/storage_v2/_src_/database/userdb.iTErzg/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/4215832a-5ec8-4bcf-8d7f-948977598263/storage_v2/_src_/database/userdb.iTErzg/schema/public.abK9xQ.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/auth/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/auth/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/gateway/docs/docs.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/gateway/docs/docs.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/gateway/docs/swagger.json" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/gateway/docs/swagger.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/gateway/docs/swagger.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/gateway/docs/swagger.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/gateway/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/gateway/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/migrator/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/migrator/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/auth/grpc/app.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/auth/grpc/app.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/deploy/configs/prod-auth.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/deploy/configs/prod-auth.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/auth/grpc/op.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/auth/grpc/op.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/auth/grpc/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/auth/grpc/server.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/auth/grpc/tokenop.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/auth/grpc/tokenop.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/auth/grpc/userop.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/auth/grpc/userop.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/blocknote/grpc/noteop.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/grpc/noteop.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/blocknote/grpc/op.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/grpc/op.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/blocknote/grpc/opblock.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/grpc/opblock.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/blocknote/grpc/tagop.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/grpc/tagop.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/redis/grpc/blockop.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/redis/grpc/blockop.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/redis/grpc/noteop.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/redis/grpc/noteop.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/redis/grpc/op.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/redis/grpc/op.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/redis/grpc/tagop.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/redis/grpc/tagop.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/auth/psql/auth.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/auth/psql/auth.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/auth/psql/conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/auth/psql/conn.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/auth/psql/users_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/auth/psql/users_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/gateway/clients/blocknote/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/clients/blocknote/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/gateway/clients/redis/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/clients/redis/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/gateway/net/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/net/client.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/protos/proto/auth.proto" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/auth.proto" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/protos/proto/gen/auth.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/gen/auth.pb.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/protos/proto/gen/auth_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/gen/auth_grpc.pb.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/protos/proto/gen/notes_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/gen/notes_grpc.pb.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/protos/proto/gen/redis_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/gen/redis_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/swgviews.go" beforeDir="false" afterPath="$PROJECT_DIR$/views/swgviews.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/views.go" beforeDir="false" afterPath="$PROJECT_DIR$/views/views.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,32 +67,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultGoTemplateProperty": "Go File",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
-    "RunOnceActivity.go.modules.automatic.dependencies.download": "true",
-    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "main",
-    "go.import.settings.migrated": "true",
-    "go.sdk.automatically.set": "true",
-    "last_opened_file_path": "D:/progers/GLOBAL_PROJECTS/breezynotes/migrations",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "Errors"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.automatic.dependencies.download&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/progers/GLOBAL_PROJECTS/breezynotes/migrations&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;Errors&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql",
-      "mongo"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;,
+      &quot;mongo&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\migrations" />

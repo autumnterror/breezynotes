@@ -181,7 +181,7 @@ func (s *ServerAPI) GetUserDataFromToken(ctx context.Context, t *brzrpc.Token) (
 				res <- views.ResRPC{Res: nil, Err: status.Error(codes.Unauthenticated, "token expired")}
 			default:
 				log.Warn(op, "", err)
-				res <- views.ResRPC{Res: nil, Err: status.Error(codes.Unauthenticated, err.Error())}
+				res <- views.ResRPC{Res: nil, Err: status.Error(codes.InvalidArgument, err.Error())}
 			}
 			return
 		}

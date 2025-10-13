@@ -11,3 +11,4 @@ go.work.sum
 /local-config/
 TaskFile.yaml
 config-test.go
+/html/

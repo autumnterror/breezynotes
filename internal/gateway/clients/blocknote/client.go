@@ -1,4 +1,4 @@
-package auth
+package blocknote
 
 import (
 	"github.com/autumnterror/breezynotes/internal/gateway/config"

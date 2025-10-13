@@ -5,8 +5,8 @@ data_source: "usersdb"
 port_postgres: 5432
 
 token_key: "SANYAmt+i061Wfm6#(=m1?4G&nLKqq*P9HlQTyS@k#D%YOKSVSl@jEQVcb2cwRbPROVOROV"
-access_token_life: 10m
-refresh_token_life: 168h
+access_token_life: 1m
+refresh_token_life: 10m
 
 port: 8008
 mode: "PROD"
