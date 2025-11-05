@@ -1,6 +1,7 @@
 package psql
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"github.com/autumnterror/breezynotes/internal/auth/config"
@@ -8,6 +9,7 @@ import (
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	_ "github.com/lib/pq"
+	"time"
 )
 
 type PostgresDb struct {
@@ -15,10 +17,14 @@ type PostgresDb struct {
 }
 
 type SqlRepo interface {
-	Query(query string, args ...any) (*sql.Rows, error)
-	Exec(query string, args ...any) (sql.Result, error)
-	QueryRow(query string, args ...any) *sql.Row
+	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
+	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
+	QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row
 }
+
+const (
+	waitTime = 3 * time.Second
+)
 
 type Driver struct {
 	driver SqlRepo
@@ -71,13 +77,13 @@ func (d *PostgresDb) Disconnect() error {
 }
 
 type AuthRepo interface {
-	Authentication(u *brzrpc.AuthRequest) (string, error)
-	GetAll() ([]*brzrpc.User, error)
-	Create(u *brzrpc.User) error
-	UpdatePhoto(id, np string) error
-	UpdatePassword(id, newPassword string) error
-	UpdateEmail(id, email string) error
-	UpdateAbout(id, about string) error
-	Delete(id string) error
-	GetInfo(id string) (*brzrpc.User, error)
+	Authentication(ctx context.Context, u *brzrpc.AuthRequest) (string, error)
+	GetAll(ctx context.Context) ([]*brzrpc.User, error)
+	Create(ctx context.Context, u *brzrpc.User) error
+	UpdatePhoto(ctx context.Context, id, np string) error
+	UpdatePassword(ctx context.Context, id, newPassword string) error
+	UpdateEmail(ctx context.Context, id, email string) error
+	UpdateAbout(ctx context.Context, id, about string) error
+	Delete(ctx context.Context, id string) error
+	GetInfo(ctx context.Context, id string) (*brzrpc.User, error)
 }

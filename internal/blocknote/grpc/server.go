@@ -1,14 +1,26 @@
 package grpc
 
 import (
+	"github.com/autumnterror/breezynotes/internal/blocknote/mongo/notes"
+	"github.com/autumnterror/breezynotes/internal/blocknote/mongo/tags"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"google.golang.org/grpc"
+	"time"
 )
 
 type ServerAPI struct {
 	brzrpc.UnimplementedBlockNoteServiceServer
+	tagAPI  tags.Repo
+	noteAPI notes.Repo
 }
 
-func Register(server *grpc.Server) {
-	brzrpc.RegisterBlockNoteServiceServer(server, &ServerAPI{})
+func Register(server *grpc.Server, tagAPI tags.Repo, noteAPI notes.Repo) {
+	brzrpc.RegisterBlockNoteServiceServer(server, &ServerAPI{
+		tagAPI:  tagAPI,
+		noteAPI: noteAPI,
+	})
 }
+
+const (
+	waitTime = 3 * time.Second
+)

@@ -1,6 +1,7 @@
 package psql
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"github.com/autumnterror/breezynotes/pkg/log"
@@ -16,11 +17,14 @@ var (
 )
 
 // GetAll only for test
-func (d *Driver) GetAll() ([]*brzrpc.User, error) {
+func (d *Driver) GetAll(ctx context.Context) ([]*brzrpc.User, error) {
 	const op = "psql.users.GetAll"
 
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
 	var ls []*brzrpc.User
-	rows, err := d.driver.Query(`SELECT * FROM users`)
+	rows, err := d.driver.QueryContext(ctx, `SELECT * FROM users`)
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
@@ -39,8 +43,11 @@ func (d *Driver) GetAll() ([]*brzrpc.User, error) {
 }
 
 // Create new user
-func (d *Driver) Create(u *brzrpc.User) error {
+func (d *Driver) Create(ctx context.Context, u *brzrpc.User) error {
 	const op = "psql.users.Create"
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
 
 	query := `
 				INSERT INTO users (id, login, email, about, password, photo)
@@ -52,7 +59,7 @@ func (d *Driver) Create(u *brzrpc.User) error {
 		return format.Error(op, err)
 	}
 
-	_, err = d.driver.Exec(query, u.GetId(), u.GetLogin(), u.GetEmail(), u.GetAbout(), hashedPass, u.GetPhoto())
+	_, err = d.driver.ExecContext(ctx, query, u.GetId(), u.GetLogin(), u.GetEmail(), u.GetAbout(), hashedPass, u.GetPhoto())
 	if err != nil {
 		if isDuplicateKeyError(err) {
 			return format.Error(op, ErrAlreadyExist)
@@ -77,15 +84,17 @@ func isDuplicateKeyError(err error) bool {
 
 // UpdatePassword updates user's password by user ID.
 // Returns sql.ErrNoRows if user not found.
-func (d *Driver) UpdatePassword(id, newPassword string) error {
+func (d *Driver) UpdatePassword(ctx context.Context, id, newPassword string) error {
 	const op = "psql.users.UpdatePassword"
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
 
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
 	if err != nil {
 		return format.Error(op, err)
 	}
 
-	res, err := d.driver.Exec(`UPDATE users SET password = $1 WHERE id = $2`, hashedPass, id)
+	res, err := d.driver.ExecContext(ctx, `UPDATE users SET password = $1 WHERE id = $2`, hashedPass, id)
 	if err != nil {
 		return format.Error(op, err)
 	}
@@ -103,10 +112,13 @@ func (d *Driver) UpdatePassword(id, newPassword string) error {
 
 // UpdatePhoto updates user's photo by user ID.
 // Returns sql.ErrNoRows if user not found.
-func (d *Driver) UpdatePhoto(id, np string) error {
+func (d *Driver) UpdatePhoto(ctx context.Context, id, np string) error {
 	const op = "psql.users.UpdatePhoto"
 
-	res, err := d.driver.Exec(`UPDATE users SET photo = $1 WHERE id = $2`, np, id)
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	res, err := d.driver.ExecContext(ctx, `UPDATE users SET photo = $1 WHERE id = $2`, np, id)
 	if err != nil {
 		return format.Error(op, err)
 	}
@@ -124,10 +136,10 @@ func (d *Driver) UpdatePhoto(id, np string) error {
 
 // UpdateEmail updates user's email by user ID.
 // Returns sql.ErrNoRows if user not found.
-func (d *Driver) UpdateEmail(id, email string) error {
+func (d *Driver) UpdateEmail(ctx context.Context, id, email string) error {
 	const op = "psql.users.UpdateEmail"
 
-	res, err := d.driver.Exec(`UPDATE users SET email = $1 WHERE id = $2`, email, id)
+	res, err := d.driver.ExecContext(ctx, `UPDATE users SET email = $1 WHERE id = $2`, email, id)
 	if err != nil {
 		return format.Error(op, err)
 	}
@@ -145,10 +157,10 @@ func (d *Driver) UpdateEmail(id, email string) error {
 
 // UpdateAbout updates user's about section by user ID.
 // Returns sql.ErrNoRows if user not found.
-func (d *Driver) UpdateAbout(id, about string) error {
+func (d *Driver) UpdateAbout(ctx context.Context, id, about string) error {
 	const op = "psql.users.UpdateAbout"
 
-	res, err := d.driver.Exec(`UPDATE users SET about = $1 WHERE id = $2`, about, id)
+	res, err := d.driver.ExecContext(ctx, `UPDATE users SET about = $1 WHERE id = $2`, about, id)
 	if err != nil {
 		return format.Error(op, err)
 	}
@@ -165,14 +177,14 @@ func (d *Driver) UpdateAbout(id, about string) error {
 }
 
 // Delete user. May send sql.ErrNoRows
-func (d *Driver) Delete(id string) error {
+func (d *Driver) Delete(ctx context.Context, id string) error {
 	const op = "psql.users.Delete"
 
 	query := `
 				DELETE FROM users
 				WHERE id = $1
 			`
-	res, err := d.driver.Exec(query, id)
+	res, err := d.driver.ExecContext(ctx, query, id)
 	if err != nil {
 		return format.Error(op, err)
 	}
@@ -187,14 +199,14 @@ func (d *Driver) Delete(id string) error {
 }
 
 // GetInfo get info about user by login. May send sql.ErrNoRows
-func (d *Driver) GetInfo(id string) (*brzrpc.User, error) {
+func (d *Driver) GetInfo(ctx context.Context, id string) (*brzrpc.User, error) {
 	const op = "psql.users.GetInfo"
 	query := `
 		SELECT login,email,about FROM users
 		WHERE id = $1
 	`
 	var u brzrpc.User
-	if err := d.driver.QueryRow(query, id).Scan(&u.Login, &u.Email, &u.About); err != nil {
+	if err := d.driver.QueryRowContext(ctx, query, id).Scan(&u.Login, &u.Email, &u.About); err != nil {
 		return nil, format.Error(op, err)
 	}
 

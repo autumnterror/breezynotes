@@ -10,15 +10,17 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"time"
 )
 
 func (s *ServerAPI) Auth(ctx context.Context, r *brzrpc.AuthRequest) (*brzrpc.UserId, error) {
 	const op = "auth.grpc.Auth"
 	log.Info(op, "")
 
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		id, err := s.UserAPI.Authentication(r)
+		id, err := s.UserAPI.Authentication(ctx, r)
 		if err != nil {
 			switch {
 			case errors.Is(err, psql.ErrNoUser):
@@ -50,8 +52,11 @@ func (s *ServerAPI) Auth(ctx context.Context, r *brzrpc.AuthRequest) (*brzrpc.Us
 func (s *ServerAPI) Healthz(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
 	const op = "auth.grpc.Healthz"
 	log.Info(op, "")
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		time.Sleep(5 * time.Second)
 		res <- views.ResRPC{Res: nil, Err: nil}
 	})
 

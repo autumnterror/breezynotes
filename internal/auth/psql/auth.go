@@ -1,6 +1,7 @@
 package psql
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
@@ -15,8 +16,11 @@ var (
 )
 
 // Authentication search user login and password in database and compare
-func (d *Driver) Authentication(u *brzrpc.AuthRequest) (string, error) {
+func (d *Driver) Authentication(ctx context.Context, u *brzrpc.AuthRequest) (string, error) {
 	const op = "psql.Authentication"
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
 
 	if u.Password == "" {
 		return "", format.Error(op, ErrWrongInput)
@@ -40,7 +44,7 @@ func (d *Driver) Authentication(u *brzrpc.AuthRequest) (string, error) {
 
 	var hashed string
 	var id string
-	if err := d.driver.QueryRow(query, arg).Scan(&id, &hashed); err != nil {
+	if err := d.driver.QueryRowContext(ctx, query, arg).Scan(&id, &hashed); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return "", ErrNoUser
 		}

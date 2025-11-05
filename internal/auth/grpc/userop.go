@@ -18,8 +18,11 @@ func (s *ServerAPI) DeleteUser(ctx context.Context, r *brzrpc.UserId) (*emptypb.
 	const op = "auth.grpc.DeleteUser"
 	log.Info(op, "")
 
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.UserAPI.Delete(r.GetId()); err != nil {
+		if err := s.UserAPI.Delete(ctx, r.GetId()); err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):
 				log.Warn(op, "", err)
@@ -44,8 +47,11 @@ func (s *ServerAPI) UpdateAbout(ctx context.Context, r *brzrpc.UpdateAboutReques
 	const op = "auth.grpc.UpdateAbout"
 	log.Info(op, "")
 
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.UserAPI.UpdateAbout(r.GetId(), r.GetNewAbout()); err != nil {
+		if err := s.UserAPI.UpdateAbout(ctx, r.GetId(), r.GetNewAbout()); err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):
 				log.Warn(op, "", err)
@@ -69,8 +75,11 @@ func (s *ServerAPI) UpdateEmail(ctx context.Context, r *brzrpc.UpdateEmailReques
 	const op = "auth.grpc.UpdateEmail"
 	log.Info(op, "")
 
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.UserAPI.UpdateEmail(r.GetId(), r.GetNewEmail()); err != nil {
+		if err := s.UserAPI.UpdateEmail(ctx, r.GetId(), r.GetNewEmail()); err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):
 				log.Warn(op, "", err)
@@ -95,8 +104,11 @@ func (s *ServerAPI) UpdatePhoto(ctx context.Context, r *brzrpc.UpdatePhotoReques
 	const op = "auth.grpc.UpdatePhoto"
 	log.Info(op, "")
 
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.UserAPI.UpdatePhoto(r.GetId(), r.GetNewPhoto()); err != nil {
+		if err := s.UserAPI.UpdatePhoto(ctx, r.GetId(), r.GetNewPhoto()); err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):
 				log.Warn(op, "", err)
@@ -121,8 +133,11 @@ func (s *ServerAPI) ChangePasswd(ctx context.Context, r *brzrpc.ChangePasswordRe
 	const op = "auth.grpc.ChangePasswd"
 	log.Info(op, "")
 
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.UserAPI.UpdatePassword(r.GetId(), r.GetNewPassword()); err != nil {
+		if err := s.UserAPI.UpdatePassword(ctx, r.GetId(), r.GetNewPassword()); err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):
 				log.Warn(op, "", err)
@@ -147,8 +162,11 @@ func (s *ServerAPI) CreateUser(ctx context.Context, u *brzrpc.User) (*emptypb.Em
 	const op = "auth.grpc.CreateUser"
 	log.Info(op, "")
 
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.UserAPI.Create(u); err != nil {
+		if err := s.UserAPI.Create(ctx, u); err != nil {
 			switch {
 			case errors.Is(err, psql.ErrAlreadyExist):
 				log.Warn(op, "", err)
@@ -172,6 +190,10 @@ func (s *ServerAPI) CreateUser(ctx context.Context, u *brzrpc.User) (*emptypb.Em
 func (s *ServerAPI) GetUserDataFromToken(ctx context.Context, t *brzrpc.Token) (*brzrpc.User, error) {
 	const op = "auth.grpc.GetUserDataFromToken"
 	log.Info(op, "")
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
 		token, err := s.JwtAPI.VerifyToken(t.GetValue())
 		if err != nil {
@@ -204,7 +226,7 @@ func (s *ServerAPI) GetUserDataFromToken(ctx context.Context, t *brzrpc.Token) (
 			return
 		}
 
-		info, err := s.UserAPI.GetInfo(id)
+		info, err := s.UserAPI.GetInfo(ctx, id)
 		if err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):

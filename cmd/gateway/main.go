@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	_ "github.com/autumnterror/breezynotes/cmd/gateway/docs"
+	_ "github.com/autumnterror/breezynotes/docs"
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/auth"
 	blocknote "github.com/autumnterror/breezynotes/internal/gateway/clients/blocknote"
 	redis "github.com/autumnterror/breezynotes/internal/gateway/clients/redis"

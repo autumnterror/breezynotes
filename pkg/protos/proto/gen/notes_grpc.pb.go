@@ -33,13 +33,16 @@ const (
 	BlockNoteService_NoteFromTrash_FullMethodName      = "/brz.BlockNoteService/NoteFromTrash"
 	BlockNoteService_FindNoteInTrash_FullMethodName    = "/brz.BlockNoteService/FindNoteInTrash"
 	BlockNoteService_GetNote_FullMethodName            = "/brz.BlockNoteService/GetNote"
+	BlockNoteService_GetNoteList_FullMethodName        = "/brz.BlockNoteService/GetNoteList"
 	BlockNoteService_CreateNote_FullMethodName         = "/brz.BlockNoteService/CreateNote"
+	BlockNoteService_UpdateNoteTitle_FullMethodName    = "/brz.BlockNoteService/UpdateNoteTitle"
 	BlockNoteService_GetAllBlocksInNote_FullMethodName = "/brz.BlockNoteService/GetAllBlocksInNote"
 	BlockNoteService_GetAllNotes_FullMethodName        = "/brz.BlockNoteService/GetAllNotes"
 	BlockNoteService_GetNotesByTag_FullMethodName      = "/brz.BlockNoteService/GetNotesByTag"
 	BlockNoteService_GetNotesFromTrash_FullMethodName  = "/brz.BlockNoteService/GetNotesFromTrash"
 	BlockNoteService_AddTagToNote_FullMethodName       = "/brz.BlockNoteService/AddTagToNote"
 	BlockNoteService_CreateTag_FullMethodName          = "/brz.BlockNoteService/CreateTag"
+	BlockNoteService_GetTagsByUser_FullMethodName      = "/brz.BlockNoteService/GetTagsByUser"
 	BlockNoteService_UpdateTagTitle_FullMethodName     = "/brz.BlockNoteService/UpdateTagTitle"
 	BlockNoteService_UpdateTagColor_FullMethodName     = "/brz.BlockNoteService/UpdateTagColor"
 	BlockNoteService_UpdateTagEmoji_FullMethodName     = "/brz.BlockNoteService/UpdateTagEmoji"
@@ -68,13 +71,16 @@ type BlockNoteServiceClient interface {
 	NoteFromTrash(ctx context.Context, in *Id, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	FindNoteInTrash(ctx context.Context, in *Id, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetNote(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Note, error)
+	GetNoteList(ctx context.Context, in *Id, opts ...grpc.CallOption) (*NoteParts, error)
 	CreateNote(ctx context.Context, in *Note, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateNoteTitle(ctx context.Context, in *UpdateNoteTitleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetAllBlocksInNote(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Blocks, error)
 	GetAllNotes(ctx context.Context, in *GetAllNotesRequest, opts ...grpc.CallOption) (*Notes, error)
 	GetNotesByTag(ctx context.Context, in *GetNotesByTagRequest, opts ...grpc.CallOption) (*Notes, error)
-	GetNotesFromTrash(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Notes, error)
+	GetNotesFromTrash(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Notes, error)
 	AddTagToNote(ctx context.Context, in *AddTagToNoteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CreateTag(ctx context.Context, in *Tag, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetTagsByUser(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Tags, error)
 	UpdateTagTitle(ctx context.Context, in *UpdateTagTitleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateTagColor(ctx context.Context, in *UpdateTagColorRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateTagEmoji(ctx context.Context, in *UpdateTagEmojiRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -222,10 +228,30 @@ func (c *blockNoteServiceClient) GetNote(ctx context.Context, in *Id, opts ...gr
 	return out, nil
 }
 
+func (c *blockNoteServiceClient) GetNoteList(ctx context.Context, in *Id, opts ...grpc.CallOption) (*NoteParts, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NoteParts)
+	err := c.cc.Invoke(ctx, BlockNoteService_GetNoteList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *blockNoteServiceClient) CreateNote(ctx context.Context, in *Note, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, BlockNoteService_CreateNote_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *blockNoteServiceClient) UpdateNoteTitle(ctx context.Context, in *UpdateNoteTitleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, BlockNoteService_UpdateNoteTitle_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -262,7 +288,7 @@ func (c *blockNoteServiceClient) GetNotesByTag(ctx context.Context, in *GetNotes
 	return out, nil
 }
 
-func (c *blockNoteServiceClient) GetNotesFromTrash(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Notes, error) {
+func (c *blockNoteServiceClient) GetNotesFromTrash(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Notes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Notes)
 	err := c.cc.Invoke(ctx, BlockNoteService_GetNotesFromTrash_FullMethodName, in, out, cOpts...)
@@ -286,6 +312,16 @@ func (c *blockNoteServiceClient) CreateTag(ctx context.Context, in *Tag, opts ..
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, BlockNoteService_CreateTag_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *blockNoteServiceClient) GetTagsByUser(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Tags, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Tags)
+	err := c.cc.Invoke(ctx, BlockNoteService_GetTagsByUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -381,13 +417,16 @@ type BlockNoteServiceServer interface {
 	NoteFromTrash(context.Context, *Id) (*emptypb.Empty, error)
 	FindNoteInTrash(context.Context, *Id) (*emptypb.Empty, error)
 	GetNote(context.Context, *Id) (*Note, error)
+	GetNoteList(context.Context, *Id) (*NoteParts, error)
 	CreateNote(context.Context, *Note) (*emptypb.Empty, error)
+	UpdateNoteTitle(context.Context, *UpdateNoteTitleRequest) (*emptypb.Empty, error)
 	GetAllBlocksInNote(context.Context, *Id) (*Blocks, error)
 	GetAllNotes(context.Context, *GetAllNotesRequest) (*Notes, error)
 	GetNotesByTag(context.Context, *GetNotesByTagRequest) (*Notes, error)
-	GetNotesFromTrash(context.Context, *emptypb.Empty) (*Notes, error)
+	GetNotesFromTrash(context.Context, *Id) (*Notes, error)
 	AddTagToNote(context.Context, *AddTagToNoteRequest) (*emptypb.Empty, error)
 	CreateTag(context.Context, *Tag) (*emptypb.Empty, error)
+	GetTagsByUser(context.Context, *Id) (*Tags, error)
 	UpdateTagTitle(context.Context, *UpdateTagTitleRequest) (*emptypb.Empty, error)
 	UpdateTagColor(context.Context, *UpdateTagColorRequest) (*emptypb.Empty, error)
 	UpdateTagEmoji(context.Context, *UpdateTagEmojiRequest) (*emptypb.Empty, error)
@@ -444,8 +483,14 @@ func (UnimplementedBlockNoteServiceServer) FindNoteInTrash(context.Context, *Id)
 func (UnimplementedBlockNoteServiceServer) GetNote(context.Context, *Id) (*Note, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNote not implemented")
 }
+func (UnimplementedBlockNoteServiceServer) GetNoteList(context.Context, *Id) (*NoteParts, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNoteList not implemented")
+}
 func (UnimplementedBlockNoteServiceServer) CreateNote(context.Context, *Note) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateNote not implemented")
+}
+func (UnimplementedBlockNoteServiceServer) UpdateNoteTitle(context.Context, *UpdateNoteTitleRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateNoteTitle not implemented")
 }
 func (UnimplementedBlockNoteServiceServer) GetAllBlocksInNote(context.Context, *Id) (*Blocks, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllBlocksInNote not implemented")
@@ -456,7 +501,7 @@ func (UnimplementedBlockNoteServiceServer) GetAllNotes(context.Context, *GetAllN
 func (UnimplementedBlockNoteServiceServer) GetNotesByTag(context.Context, *GetNotesByTagRequest) (*Notes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNotesByTag not implemented")
 }
-func (UnimplementedBlockNoteServiceServer) GetNotesFromTrash(context.Context, *emptypb.Empty) (*Notes, error) {
+func (UnimplementedBlockNoteServiceServer) GetNotesFromTrash(context.Context, *Id) (*Notes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNotesFromTrash not implemented")
 }
 func (UnimplementedBlockNoteServiceServer) AddTagToNote(context.Context, *AddTagToNoteRequest) (*emptypb.Empty, error) {
@@ -464,6 +509,9 @@ func (UnimplementedBlockNoteServiceServer) AddTagToNote(context.Context, *AddTag
 }
 func (UnimplementedBlockNoteServiceServer) CreateTag(context.Context, *Tag) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTag not implemented")
+}
+func (UnimplementedBlockNoteServiceServer) GetTagsByUser(context.Context, *Id) (*Tags, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTagsByUser not implemented")
 }
 func (UnimplementedBlockNoteServiceServer) UpdateTagTitle(context.Context, *UpdateTagTitleRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateTagTitle not implemented")
@@ -741,6 +789,24 @@ func _BlockNoteService_GetNote_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BlockNoteService_GetNoteList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlockNoteServiceServer).GetNoteList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BlockNoteService_GetNoteList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlockNoteServiceServer).GetNoteList(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _BlockNoteService_CreateNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Note)
 	if err := dec(in); err != nil {
@@ -755,6 +821,24 @@ func _BlockNoteService_CreateNote_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BlockNoteServiceServer).CreateNote(ctx, req.(*Note))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BlockNoteService_UpdateNoteTitle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateNoteTitleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlockNoteServiceServer).UpdateNoteTitle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BlockNoteService_UpdateNoteTitle_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlockNoteServiceServer).UpdateNoteTitle(ctx, req.(*UpdateNoteTitleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -814,7 +898,7 @@ func _BlockNoteService_GetNotesByTag_Handler(srv interface{}, ctx context.Contex
 }
 
 func _BlockNoteService_GetNotesFromTrash_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(Id)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -826,7 +910,7 @@ func _BlockNoteService_GetNotesFromTrash_Handler(srv interface{}, ctx context.Co
 		FullMethod: BlockNoteService_GetNotesFromTrash_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BlockNoteServiceServer).GetNotesFromTrash(ctx, req.(*emptypb.Empty))
+		return srv.(BlockNoteServiceServer).GetNotesFromTrash(ctx, req.(*Id))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -863,6 +947,24 @@ func _BlockNoteService_CreateTag_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BlockNoteServiceServer).CreateTag(ctx, req.(*Tag))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BlockNoteService_GetTagsByUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlockNoteServiceServer).GetTagsByUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BlockNoteService_GetTagsByUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlockNoteServiceServer).GetTagsByUser(ctx, req.(*Id))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1053,8 +1155,16 @@ var BlockNoteService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _BlockNoteService_GetNote_Handler,
 		},
 		{
+			MethodName: "GetNoteList",
+			Handler:    _BlockNoteService_GetNoteList_Handler,
+		},
+		{
 			MethodName: "CreateNote",
 			Handler:    _BlockNoteService_CreateNote_Handler,
+		},
+		{
+			MethodName: "UpdateNoteTitle",
+			Handler:    _BlockNoteService_UpdateNoteTitle_Handler,
 		},
 		{
 			MethodName: "GetAllBlocksInNote",
@@ -1079,6 +1189,10 @@ var BlockNoteService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateTag",
 			Handler:    _BlockNoteService_CreateTag_Handler,
+		},
+		{
+			MethodName: "GetTagsByUser",
+			Handler:    _BlockNoteService_GetTagsByUser_Handler,
 		},
 		{
 			MethodName: "UpdateTagTitle",

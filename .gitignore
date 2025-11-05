@@ -9,6 +9,5 @@ go.work
 go.work.sum
 .env
 /local-config/
-TaskFile.yaml
 config-test.go
 /html/

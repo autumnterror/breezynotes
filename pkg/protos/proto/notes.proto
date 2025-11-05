@@ -54,6 +54,11 @@ message UpdateTagEmojiRequest {
   string emoji = 2;
 }
 
+message UpdateNoteTitleRequest {
+  string id = 1;
+  string title = 2;
+}
+
 message ShareNoteRequest {
   string note_id = 1;
   string login_to_share = 2;
@@ -64,6 +69,7 @@ message ChangeUserRoleRequest {
   string login = 1;
   Roles new_role = 2;
 }
+
 
 // ===== BlockNote Service =====
 service BlockNoteService {
@@ -82,15 +88,18 @@ service BlockNoteService {
   rpc FindNoteInTrash(Id) returns (google.protobuf.Empty);
 
   rpc GetNote(Id) returns (Note);
+  rpc GetNoteList(Id) returns (NoteParts);
   rpc CreateNote(Note) returns (google.protobuf.Empty);
+  rpc UpdateNoteTitle(UpdateNoteTitleRequest) returns (google.protobuf.Empty);
 
   rpc GetAllBlocksInNote(Id) returns (Blocks);
   rpc GetAllNotes(GetAllNotesRequest) returns (Notes);
   rpc GetNotesByTag(GetNotesByTagRequest) returns (Notes);
-  rpc GetNotesFromTrash(google.protobuf.Empty) returns (Notes);
+  rpc GetNotesFromTrash(Id) returns (Notes);
 
   rpc AddTagToNote(AddTagToNoteRequest) returns (google.protobuf.Empty);
   rpc CreateTag(Tag) returns (google.protobuf.Empty);
+  rpc GetTagsByUser(Id) returns (Tags);
   rpc UpdateTagTitle(UpdateTagTitleRequest) returns (google.protobuf.Empty);
   rpc UpdateTagColor(UpdateTagColorRequest) returns (google.protobuf.Empty);
   rpc UpdateTagEmoji(UpdateTagEmojiRequest) returns (google.protobuf.Empty);

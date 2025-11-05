@@ -13,7 +13,7 @@ func TestGenerateAndVerifyToken(t *testing.T) {
 
 	t.Run("generate and verify access token", func(t *testing.T) {
 		t.Parallel()
-		tokenStr, err := j.GenerateToken("user123", "editor", TokenTypeAccess)
+		tokenStr, err := j.GenerateToken("user123", TokenTypeAccess)
 		assert.NoError(t, err)
 
 		token, err := j.VerifyToken(tokenStr)
@@ -24,9 +24,9 @@ func TestGenerateAndVerifyToken(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "user123", id)
 
-		role, err := j.GetRoleFromToken(token)
-		assert.NoError(t, err)
-		assert.Equal(t, "editor", role)
+		//role, err := j.GetRoleFromToken(token)
+		//assert.NoError(t, err)
+		//assert.Equal(t, "editor", role)
 
 		tp, err := j.GetTypeFromToken(token)
 		assert.NoError(t, err)
@@ -35,7 +35,7 @@ func TestGenerateAndVerifyToken(t *testing.T) {
 
 	t.Run("generate and verify refresh token", func(t *testing.T) {
 		t.Parallel()
-		tokenStr, err := j.GenerateToken("user456", "reader", TokenTypeRefresh)
+		tokenStr, err := j.GenerateToken("user456", TokenTypeRefresh)
 		assert.NoError(t, err)
 
 		token, err := j.VerifyToken(tokenStr)
@@ -46,9 +46,9 @@ func TestGenerateAndVerifyToken(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "user456", id)
 
-		role, err := j.GetRoleFromToken(token)
-		assert.NoError(t, err)
-		assert.Equal(t, "reader", role)
+		//role, err := j.GetRoleFromToken(token)
+		//assert.NoError(t, err)
+		//assert.Equal(t, "reader", role)
 
 		tp, err := j.GetTypeFromToken(token)
 		assert.NoError(t, err)
@@ -60,7 +60,7 @@ func TestRefreshToken(t *testing.T) {
 	t.Parallel()
 	j := NewWithConfig(config.Test())
 
-	refreshToken, err := j.GenerateToken("refresh_id", "editor", TokenTypeRefresh)
+	refreshToken, err := j.GenerateToken("refresh_id", TokenTypeRefresh)
 	assert.NoError(t, err)
 
 	accessToken, err := j.Refresh(refreshToken)
@@ -81,13 +81,13 @@ func TestExpiredToken(t *testing.T) {
 	cfg.RefreshTokenLifeTime = -1 * time.Minute
 	j := NewWithConfig(cfg)
 
-	tokenStr, err := j.GenerateToken("expired_user", "", TokenTypeAccess)
+	tokenStr, err := j.GenerateToken("expired_user", TokenTypeAccess)
 	assert.NoError(t, err)
 
 	_, err = j.VerifyToken(tokenStr)
 	assert.ErrorIs(t, err, ErrTokenExpired)
 
-	tokenStr, err = j.GenerateToken("expired_user", "", TokenTypeRefresh)
+	tokenStr, err = j.GenerateToken("expired_user", TokenTypeRefresh)
 	assert.NoError(t, err)
 
 	_, err = j.VerifyToken(tokenStr)
@@ -98,7 +98,7 @@ func TestWrongTypeRefresh(t *testing.T) {
 	t.Parallel()
 	j := NewWithConfig(config.Test())
 
-	accessToken, err := j.GenerateToken("userX", "", TokenTypeAccess)
+	accessToken, err := j.GenerateToken("userX", TokenTypeAccess)
 	assert.NoError(t, err)
 
 	_, err = j.Refresh(accessToken)

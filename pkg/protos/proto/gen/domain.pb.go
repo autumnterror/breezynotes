@@ -485,6 +485,7 @@ type Tag struct {
 	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	Color         string                 `protobuf:"bytes,3,opt,name=color,proto3" json:"color,omitempty"`
 	Emoji         string                 `protobuf:"bytes,4,opt,name=emoji,proto3" json:"emoji,omitempty"`
+	UserId        string                 `protobuf:"bytes,5,opt,name=userId,proto3" json:"userId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -543,6 +544,13 @@ func (x *Tag) GetColor() string {
 func (x *Tag) GetEmoji() string {
 	if x != nil {
 		return x.Emoji
+	}
+	return ""
+}
+
+func (x *Tag) GetUserId() string {
+	if x != nil {
+		return x.UserId
 	}
 	return ""
 }
@@ -1040,12 +1048,13 @@ const file_domain_proto_rawDesc = "" +
 	"\x05email\x18\x03 \x01(\tR\x05email\x12\x14\n" +
 	"\x05about\x18\x04 \x01(\tR\x05about\x12\x14\n" +
 	"\x05photo\x18\x05 \x01(\tR\x05photo\x12\x1a\n" +
-	"\bpassword\x18\x06 \x01(\tR\bpassword\"W\n" +
+	"\bpassword\x18\x06 \x01(\tR\bpassword\"o\n" +
 	"\x03Tag\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x14\n" +
 	"\x05color\x18\x03 \x01(\tR\x05color\x12\x14\n" +
-	"\x05emoji\x18\x04 \x01(\tR\x05emoji\"\xde\x01\n" +
+	"\x05emoji\x18\x04 \x01(\tR\x05emoji\x12\x16\n" +
+	"\x06userId\x18\x05 \x01(\tR\x06userId\"\xde\x01\n" +
 	"\x05Block\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04type\x18\x02 \x01(\tR\x04type\x12\x17\n" +

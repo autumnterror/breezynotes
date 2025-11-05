@@ -21,6 +21,21 @@ definitions:
       refresh_token:
         type: string
     type: object
+  brzrpc.User:
+    properties:
+      about:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      login:
+        type: string
+      password:
+        type: string
+      photo:
+        type: string
+    type: object
   views.SWGError:
     properties:
       error:
@@ -125,31 +140,28 @@ paths:
       - auth
   /api/auth/token:
     get:
-      description: Checks access token from cookie, tries to refresh if expired
+      description: Checks access token from cookie, and return user data. If 401 call
+        ValidateToken
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/views.SWGMessage'
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/brzrpc.Token'
+            $ref: '#/definitions/brzrpc.User'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/views.SWGError'
-        "410":
-          description: Gone
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/views.SWGError'
         "502":
           description: Bad Gateway
           schema:
             $ref: '#/definitions/views.SWGError'
-      summary: Validate token (uses cookies)
+      summary: get user data from access token
       tags:
       - auth
   /api/health:

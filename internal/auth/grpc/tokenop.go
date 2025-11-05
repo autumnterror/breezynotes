@@ -17,6 +17,9 @@ func (s *ServerAPI) GenerateAccessToken(ctx context.Context, r *brzrpc.UserId) (
 	const op = "auth.grpc.GenerateAccessToken"
 	log.Info(op, "")
 
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
 		at, err := s.JwtAPI.GenerateToken(r.GetId(), jwt.TokenTypeAccess)
 		if err != nil {
@@ -38,6 +41,8 @@ func (s *ServerAPI) GenerateRefreshToken(ctx context.Context, r *brzrpc.UserId) 
 	const op = "auth.grpc.GenerateRefreshToken"
 	log.Info(op, "")
 
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
 		rt, err := s.JwtAPI.GenerateToken(r.GetId(), jwt.TokenTypeRefresh)
 		if err != nil {
@@ -59,6 +64,8 @@ func (s *ServerAPI) GenerateTokens(ctx context.Context, r *brzrpc.UserId) (*brzr
 	const op = "auth.grpc.GenerateTokens"
 	log.Info(op, "")
 
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
 	var ac, rt *brzrpc.Token
 	var err error
 	g, _ := errgroup.WithContext(ctx)
@@ -83,6 +90,9 @@ func (s *ServerAPI) GenerateTokens(ctx context.Context, r *brzrpc.UserId) (*brzr
 func (s *ServerAPI) Refresh(ctx context.Context, r *brzrpc.Token) (*brzrpc.Token, error) {
 	const op = "auth.grpc.Refresh"
 	log.Info(op, "")
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
 		at, err := s.JwtAPI.Refresh(r.GetValue())
@@ -113,6 +123,9 @@ func (s *ServerAPI) Refresh(ctx context.Context, r *brzrpc.Token) (*brzrpc.Token
 func (s *ServerAPI) CheckToken(ctx context.Context, r *brzrpc.Token) (*emptypb.Empty, error) {
 	const op = "auth.grpc.CheckToken"
 	log.Info(op, "")
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
 
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
 		_, err := s.JwtAPI.VerifyToken(r.GetValue())
