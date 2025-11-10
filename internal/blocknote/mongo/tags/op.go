@@ -9,12 +9,31 @@ import (
 )
 
 type Repo interface {
+	Get(ctx context.Context, id string) (*brzrpc.Tag, error)
 	GetAllById(ctx context.Context, id string) (*brzrpc.Tags, error)
 	Create(ctx context.Context, t *brzrpc.Tag) error
 	Delete(ctx context.Context, id string) error
 	UpdateTitle(ctx context.Context, id, nTitle string) error
 	UpdateColor(ctx context.Context, id, nColor string) error
 	UpdateEmoji(ctx context.Context, id, nEmoji string) error
+}
+
+func (a *API) Get(ctx context.Context, id string) (*brzrpc.Tag, error) {
+	const op = "tags.GetAllById"
+
+	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	defer done()
+
+	res := a.Tags().FindOne(ctx, bson.M{"_id": id})
+	if res.Err() != nil {
+		return nil, format.Error(op, res.Err())
+	}
+	var t mongo.TagDb
+	if err := res.Decode(&t); err != nil {
+		return nil, format.Error(op, err)
+	}
+
+	return mongo.FromTagDb(&t), nil
 }
 
 func (a *API) GetAllById(ctx context.Context, id string) (*brzrpc.Tags, error) {

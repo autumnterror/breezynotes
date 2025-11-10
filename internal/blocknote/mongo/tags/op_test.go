@@ -36,6 +36,9 @@ func TestCrudGood(t *testing.T) {
 			log.Green("get after update", tgs.Items)
 		}
 
+		_, err := a.Get(context.TODO(), "test_id_good")
+		assert.NoError(t, err)
+
 		t.Cleanup(func() {
 			assert.NoError(t, a.Delete(context.TODO(), "test_id_good"))
 			if tgs, err := a.GetAllById(context.TODO(), "test_userid"); assert.NoError(t, err) {

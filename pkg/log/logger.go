@@ -17,6 +17,10 @@ func Println(in ...any) {
 	log.Println(in...)
 }
 
+func Printf(format string, v ...any) {
+	log.Printf(format, v...)
+}
+
 func Panic(in ...any) {
 	log.Panic(in...)
 }

@@ -33,7 +33,7 @@ const (
 	BlockNoteService_NoteFromTrash_FullMethodName      = "/brz.BlockNoteService/NoteFromTrash"
 	BlockNoteService_FindNoteInTrash_FullMethodName    = "/brz.BlockNoteService/FindNoteInTrash"
 	BlockNoteService_GetNote_FullMethodName            = "/brz.BlockNoteService/GetNote"
-	BlockNoteService_GetNoteList_FullMethodName        = "/brz.BlockNoteService/GetNoteList"
+	BlockNoteService_GetNoteList_FullMethodName        = "/brz.BlockNoteService/GetNoteListByUser"
 	BlockNoteService_CreateNote_FullMethodName         = "/brz.BlockNoteService/CreateNote"
 	BlockNoteService_UpdateNoteTitle_FullMethodName    = "/brz.BlockNoteService/UpdateNoteTitle"
 	BlockNoteService_GetAllBlocksInNote_FullMethodName = "/brz.BlockNoteService/GetAllBlocksInNote"
@@ -75,9 +75,9 @@ type BlockNoteServiceClient interface {
 	CreateNote(ctx context.Context, in *Note, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateNoteTitle(ctx context.Context, in *UpdateNoteTitleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetAllBlocksInNote(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Blocks, error)
-	GetAllNotes(ctx context.Context, in *GetAllNotesRequest, opts ...grpc.CallOption) (*Notes, error)
-	GetNotesByTag(ctx context.Context, in *GetNotesByTagRequest, opts ...grpc.CallOption) (*Notes, error)
-	GetNotesFromTrash(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Notes, error)
+	GetAllNotes(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Notes, error)
+	GetNotesByTag(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Notes, error)
+	GetNotesFromTrash(ctx context.Context, in *Id, opts ...grpc.CallOption) (*NoteParts, error)
 	AddTagToNote(ctx context.Context, in *AddTagToNoteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CreateTag(ctx context.Context, in *Tag, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetTagsByUser(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Tags, error)
@@ -268,7 +268,7 @@ func (c *blockNoteServiceClient) GetAllBlocksInNote(ctx context.Context, in *Id,
 	return out, nil
 }
 
-func (c *blockNoteServiceClient) GetAllNotes(ctx context.Context, in *GetAllNotesRequest, opts ...grpc.CallOption) (*Notes, error) {
+func (c *blockNoteServiceClient) GetAllNotes(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Notes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Notes)
 	err := c.cc.Invoke(ctx, BlockNoteService_GetAllNotes_FullMethodName, in, out, cOpts...)
@@ -278,7 +278,7 @@ func (c *blockNoteServiceClient) GetAllNotes(ctx context.Context, in *GetAllNote
 	return out, nil
 }
 
-func (c *blockNoteServiceClient) GetNotesByTag(ctx context.Context, in *GetNotesByTagRequest, opts ...grpc.CallOption) (*Notes, error) {
+func (c *blockNoteServiceClient) GetNotesByTag(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Notes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Notes)
 	err := c.cc.Invoke(ctx, BlockNoteService_GetNotesByTag_FullMethodName, in, out, cOpts...)
@@ -288,9 +288,9 @@ func (c *blockNoteServiceClient) GetNotesByTag(ctx context.Context, in *GetNotes
 	return out, nil
 }
 
-func (c *blockNoteServiceClient) GetNotesFromTrash(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Notes, error) {
+func (c *blockNoteServiceClient) GetNotesFromTrash(ctx context.Context, in *Id, opts ...grpc.CallOption) (*NoteParts, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Notes)
+	out := new(NoteParts)
 	err := c.cc.Invoke(ctx, BlockNoteService_GetNotesFromTrash_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -421,9 +421,9 @@ type BlockNoteServiceServer interface {
 	CreateNote(context.Context, *Note) (*emptypb.Empty, error)
 	UpdateNoteTitle(context.Context, *UpdateNoteTitleRequest) (*emptypb.Empty, error)
 	GetAllBlocksInNote(context.Context, *Id) (*Blocks, error)
-	GetAllNotes(context.Context, *GetAllNotesRequest) (*Notes, error)
-	GetNotesByTag(context.Context, *GetNotesByTagRequest) (*Notes, error)
-	GetNotesFromTrash(context.Context, *Id) (*Notes, error)
+	GetAllNotes(context.Context, *Id) (*Notes, error)
+	GetNotesByTag(context.Context, *Id) (*Notes, error)
+	GetNotesFromTrash(context.Context, *Id) (*NoteParts, error)
 	AddTagToNote(context.Context, *AddTagToNoteRequest) (*emptypb.Empty, error)
 	CreateTag(context.Context, *Tag) (*emptypb.Empty, error)
 	GetTagsByUser(context.Context, *Id) (*Tags, error)
@@ -484,7 +484,7 @@ func (UnimplementedBlockNoteServiceServer) GetNote(context.Context, *Id) (*Note,
 	return nil, status.Errorf(codes.Unimplemented, "method GetNote not implemented")
 }
 func (UnimplementedBlockNoteServiceServer) GetNoteList(context.Context, *Id) (*NoteParts, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetNoteList not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method GetNoteListByUser not implemented")
 }
 func (UnimplementedBlockNoteServiceServer) CreateNote(context.Context, *Note) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateNote not implemented")
@@ -495,13 +495,13 @@ func (UnimplementedBlockNoteServiceServer) UpdateNoteTitle(context.Context, *Upd
 func (UnimplementedBlockNoteServiceServer) GetAllBlocksInNote(context.Context, *Id) (*Blocks, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllBlocksInNote not implemented")
 }
-func (UnimplementedBlockNoteServiceServer) GetAllNotes(context.Context, *GetAllNotesRequest) (*Notes, error) {
+func (UnimplementedBlockNoteServiceServer) GetAllNotes(context.Context, *Id) (*Notes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllNotes not implemented")
 }
-func (UnimplementedBlockNoteServiceServer) GetNotesByTag(context.Context, *GetNotesByTagRequest) (*Notes, error) {
+func (UnimplementedBlockNoteServiceServer) GetNotesByTag(context.Context, *Id) (*Notes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNotesByTag not implemented")
 }
-func (UnimplementedBlockNoteServiceServer) GetNotesFromTrash(context.Context, *Id) (*Notes, error) {
+func (UnimplementedBlockNoteServiceServer) GetNotesFromTrash(context.Context, *Id) (*NoteParts, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNotesFromTrash not implemented")
 }
 func (UnimplementedBlockNoteServiceServer) AddTagToNote(context.Context, *AddTagToNoteRequest) (*emptypb.Empty, error) {
@@ -862,7 +862,7 @@ func _BlockNoteService_GetAllBlocksInNote_Handler(srv interface{}, ctx context.C
 }
 
 func _BlockNoteService_GetAllNotes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAllNotesRequest)
+	in := new(Id)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -874,13 +874,13 @@ func _BlockNoteService_GetAllNotes_Handler(srv interface{}, ctx context.Context,
 		FullMethod: BlockNoteService_GetAllNotes_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BlockNoteServiceServer).GetAllNotes(ctx, req.(*GetAllNotesRequest))
+		return srv.(BlockNoteServiceServer).GetAllNotes(ctx, req.(*Id))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _BlockNoteService_GetNotesByTag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetNotesByTagRequest)
+	in := new(Id)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -892,7 +892,7 @@ func _BlockNoteService_GetNotesByTag_Handler(srv interface{}, ctx context.Contex
 		FullMethod: BlockNoteService_GetNotesByTag_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BlockNoteServiceServer).GetNotesByTag(ctx, req.(*GetNotesByTagRequest))
+		return srv.(BlockNoteServiceServer).GetNotesByTag(ctx, req.(*Id))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1155,7 +1155,7 @@ var BlockNoteService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _BlockNoteService_GetNote_Handler,
 		},
 		{
-			MethodName: "GetNoteList",
+			MethodName: "GetNoteListByUser",
 			Handler:    _BlockNoteService_GetNoteList_Handler,
 		},
 		{

@@ -3,6 +3,7 @@ package notes
 import (
 	"context"
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
+	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
@@ -22,7 +23,43 @@ func (a *API) CleanTrash(ctx context.Context, uid string) error {
 	return nil
 }
 
-// ToTrash get note from a.Notes() insert on a.Trash() and remove from a.Notes()
+// GetNotesFromTrash by author id
+func (a *API) GetNotesFromTrash(ctx context.Context, uid string) (*brzrpc.NoteParts, error) {
+	const op = "notes.CleanTrash"
+
+	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	defer done()
+
+	cur, err := a.Trash().Find(ctx, bson.M{"author": uid})
+	if err != nil {
+		return nil, format.Error(op, err)
+	}
+	defer cur.Close(ctx)
+
+	pts := &brzrpc.NoteParts{
+		Items: []*brzrpc.NotePart{},
+	}
+
+	for cur.Next(ctx) {
+		var n mongo.NoteDb
+		if err = cur.Decode(&n); err != nil {
+			return pts, format.Error(op, err)
+		}
+		np := brzrpc.NotePart{
+			Id:    n.Id,
+			Title: n.Title,
+			Tag:   mongo.FromTagDb(n.Tag),
+			//TODO first block from blocks
+			FirstBlock: "",
+			UpdatedAt:  n.UpdatedAt,
+		}
+		pts.Items = append(pts.Items, &np)
+	}
+
+	return pts, nil
+}
+
+// ToTrash get note from a.Notes() Insert on a.Trash() and remove from a.Notes()
 func (a *API) ToTrash(ctx context.Context, id string) error {
 	const op = "notes.ToTrash"
 
@@ -44,7 +81,7 @@ func (a *API) ToTrash(ctx context.Context, id string) error {
 	return nil
 }
 
-// FromTrash remove note in a.Trash() and insert in a.Notes()
+// FromTrash remove note in a.Trash() and Insert in a.Notes()
 func (a *API) FromTrash(ctx context.Context, id string) error {
 	const op = "notes.FromTrash"
 
@@ -61,7 +98,7 @@ func (a *API) FromTrash(ctx context.Context, id string) error {
 		return format.Error(op, err)
 	}
 
-	if err := a.insert(ctx, mongo.FromNoteDb(&n)); err != nil {
+	if err := a.Insert(ctx, mongo.FromNoteDb(&n)); err != nil {
 		return format.Error(op, err)
 	}
 

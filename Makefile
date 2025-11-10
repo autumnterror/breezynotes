@@ -1,3 +1,9 @@
+test-textblock:
+	go test ./pkg/pkgs/default/textblock -v
+test-textblock-bm:
+	go test ./pkg/pkgs/default/textblock/benchmark -v
+test-blocks:
+	go test ./internal/blocknote/mongo/blocks -v
 test-notes:
 	go test ./internal/blocknote/mongo/notes -v
 test-tags:
@@ -8,4 +14,4 @@ test-psql:
 	go test ./internal/auth/psql -v
 
 test-all:
-	go test ./internal/blocknote/mongo/notes ./internal/blocknote/mongo/tags  ./internal/auth/psql ./internal/auth/jwt
+	go test ./internal/blocknote/mongo/blocks ./internal/blocknote/mongo/notes ./internal/blocknote/mongo/tags  ./internal/auth/psql ./internal/auth/jwt

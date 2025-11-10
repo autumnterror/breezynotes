@@ -13,7 +13,8 @@ const (
 )
 
 var (
-	ErrNotFiend = errors.New("not fiend")
+	ErrNotFiend    = errors.New("not fiend")
+	ErrNoDocuments = mongo.ErrNoDocuments
 )
 
 func (c *Client) Tags() *mongo.Collection {

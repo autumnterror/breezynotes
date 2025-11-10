@@ -28,13 +28,7 @@ message ChangeTitleNoteRequest {
   string title = 2;
 }
 
-message GetAllNotesRequest {
-  string user_id = 1;
-}
 
-message GetNotesByTagRequest {
-  Tag tag = 1;
-}
 
 message AddTagToNoteRequest {
   string note_id = 1;
@@ -93,9 +87,9 @@ service BlockNoteService {
   rpc UpdateNoteTitle(UpdateNoteTitleRequest) returns (google.protobuf.Empty);
 
   rpc GetAllBlocksInNote(Id) returns (Blocks);
-  rpc GetAllNotes(GetAllNotesRequest) returns (Notes);
-  rpc GetNotesByTag(GetNotesByTagRequest) returns (Notes);
-  rpc GetNotesFromTrash(Id) returns (Notes);
+  rpc GetAllNotes(Id) returns (Notes);
+  rpc GetNotesByTag(Id) returns (Notes);
+  rpc GetNotesFromTrash(Id) returns (NoteParts);
 
   rpc AddTagToNote(AddTagToNoteRequest) returns (google.protobuf.Empty);
   rpc CreateTag(Tag) returns (google.protobuf.Empty);
