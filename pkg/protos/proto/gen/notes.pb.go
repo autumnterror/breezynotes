@@ -27,7 +27,8 @@ const (
 type ChangeBlockOrderRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	NewOrder      int32                  `protobuf:"varint,2,opt,name=new_order,json=newOrder,proto3" json:"new_order,omitempty"`
+	OldOrder      int32                  `protobuf:"varint,2,opt,name=old_order,json=oldOrder,proto3" json:"old_order,omitempty"`
+	NewOrder      int32                  `protobuf:"varint,3,opt,name=new_order,json=newOrder,proto3" json:"new_order,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -67,6 +68,13 @@ func (x *ChangeBlockOrderRequest) GetId() string {
 		return x.Id
 	}
 	return ""
+}
+
+func (x *ChangeBlockOrderRequest) GetOldOrder() int32 {
+	if x != nil {
+		return x.OldOrder
+	}
+	return 0
 }
 
 func (x *ChangeBlockOrderRequest) GetNewOrder() int32 {
@@ -612,14 +620,67 @@ func (x *ChangeUserRoleRequest) GetNewRole() Roles {
 	return Roles_ROLE_UNSPECIFIED
 }
 
+type CreateBlockRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	Data          *structpb.Struct       `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateBlockRequest) Reset() {
+	*x = CreateBlockRequest{}
+	mi := &file_notes_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateBlockRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateBlockRequest) ProtoMessage() {}
+
+func (x *CreateBlockRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notes_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateBlockRequest.ProtoReflect.Descriptor instead.
+func (*CreateBlockRequest) Descriptor() ([]byte, []int) {
+	return file_notes_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *CreateBlockRequest) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *CreateBlockRequest) GetData() *structpb.Struct {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
 var File_notes_proto protoreflect.FileDescriptor
 
 const file_notes_proto_rawDesc = "" +
 	"\n" +
-	"\vnotes.proto\x12\x03brz\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\fdomain.proto\"F\n" +
+	"\vnotes.proto\x12\x03brz\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\fdomain.proto\"c\n" +
 	"\x17ChangeBlockOrderRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
-	"\tnew_order\x18\x02 \x01(\x05R\bnewOrder\"C\n" +
+	"\told_order\x18\x02 \x01(\x05R\boldOrder\x12\x1b\n" +
+	"\tnew_order\x18\x03 \x01(\x05R\bnewOrder\"C\n" +
 	"\x16ChangeTypeBlockRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
 	"\bnew_type\x18\x02 \x01(\tR\anewType\"]\n" +
@@ -653,11 +714,13 @@ const file_notes_proto_rawDesc = "" +
 	"\x15ChangeUserRoleRequest\x12\x14\n" +
 	"\x05login\x18\x01 \x01(\tR\x05login\x12%\n" +
 	"\bnew_role\x18\x02 \x01(\x0e2\n" +
-	".brz.RolesR\anewRole2\xd9\f\n" +
+	".brz.RolesR\anewRole\"U\n" +
+	"\x12CreateBlockRequest\x12\x12\n" +
+	"\x04type\x18\x01 \x01(\tR\x04type\x12+\n" +
+	"\x04data\x18\x02 \x01(\v2\x17.google.protobuf.StructR\x04data2\xf4\f\n" +
 	"\x10BlockNoteService\x12.\n" +
-	"\vDeleteBlock\x12\a.brz.Id\x1a\x16.google.protobuf.Empty\x121\n" +
-	"\vCreateBlock\x12\n" +
-	".brz.Block\x1a\x16.google.protobuf.Empty\x126\n" +
+	"\vDeleteBlock\x12\a.brz.Id\x1a\x16.google.protobuf.Empty\x12/\n" +
+	"\vCreateBlock\x12\x17.brz.CreateBlockRequest\x1a\a.brz.Id\x126\n" +
 	"\aOpBlock\x12\x13.brz.OpBlockRequest\x1a\x16.google.protobuf.Empty\x12\x1f\n" +
 	"\bGetBlock\x12\a.brz.Id\x1a\n" +
 	".brz.Block\x12/\n" +
@@ -683,7 +746,8 @@ const file_notes_proto_rawDesc = "" +
 	"\x11GetNotesFromTrash\x12\a.brz.Id\x1a\x0e.brz.NoteParts\x12@\n" +
 	"\fAddTagToNote\x12\x18.brz.AddTagToNoteRequest\x1a\x16.google.protobuf.Empty\x12-\n" +
 	"\tCreateTag\x12\b.brz.Tag\x1a\x16.google.protobuf.Empty\x12#\n" +
-	"\rGetTagsByUser\x12\a.brz.Id\x1a\t.brz.Tags\x12D\n" +
+	"\rGetTagsByUser\x12\a.brz.Id\x1a\t.brz.Tags\x12\x1b\n" +
+	"\x06GetTag\x12\a.brz.Id\x1a\b.brz.Tag\x12D\n" +
 	"\x0eUpdateTagTitle\x12\x1a.brz.UpdateTagTitleRequest\x1a\x16.google.protobuf.Empty\x12D\n" +
 	"\x0eUpdateTagColor\x12\x1a.brz.UpdateTagColorRequest\x1a\x16.google.protobuf.Empty\x12D\n" +
 	"\x0eUpdateTagEmoji\x12\x1a.brz.UpdateTagEmojiRequest\x1a\x16.google.protobuf.Empty\x12,\n" +
@@ -704,7 +768,7 @@ func file_notes_proto_rawDescGZIP() []byte {
 	return file_notes_proto_rawDescData
 }
 
-var file_notes_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_notes_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_notes_proto_goTypes = []any{
 	(*ChangeBlockOrderRequest)(nil), // 0: brz.ChangeBlockOrderRequest
 	(*ChangeTypeBlockRequest)(nil),  // 1: brz.ChangeTypeBlockRequest
@@ -717,89 +781,93 @@ var file_notes_proto_goTypes = []any{
 	(*UpdateNoteTitleRequest)(nil),  // 8: brz.UpdateNoteTitleRequest
 	(*ShareNoteRequest)(nil),        // 9: brz.ShareNoteRequest
 	(*ChangeUserRoleRequest)(nil),   // 10: brz.ChangeUserRoleRequest
-	(*structpb.Struct)(nil),         // 11: google.protobuf.Struct
-	(Roles)(0),                      // 12: brz.Roles
-	(*Id)(nil),                      // 13: brz.Id
-	(*Block)(nil),                   // 14: brz.Block
+	(*CreateBlockRequest)(nil),      // 11: brz.CreateBlockRequest
+	(*structpb.Struct)(nil),         // 12: google.protobuf.Struct
+	(Roles)(0),                      // 13: brz.Roles
+	(*Id)(nil),                      // 14: brz.Id
 	(*UserId)(nil),                  // 15: brz.UserId
 	(*Note)(nil),                    // 16: brz.Note
 	(*Tag)(nil),                     // 17: brz.Tag
 	(*emptypb.Empty)(nil),           // 18: google.protobuf.Empty
-	(*StringResponse)(nil),          // 19: brz.StringResponse
-	(*NoteParts)(nil),               // 20: brz.NoteParts
-	(*Blocks)(nil),                  // 21: brz.Blocks
-	(*Notes)(nil),                   // 22: brz.Notes
-	(*Tags)(nil),                    // 23: brz.Tags
+	(*Block)(nil),                   // 19: brz.Block
+	(*StringResponse)(nil),          // 20: brz.StringResponse
+	(*NoteParts)(nil),               // 21: brz.NoteParts
+	(*Blocks)(nil),                  // 22: brz.Blocks
+	(*Notes)(nil),                   // 23: brz.Notes
+	(*Tags)(nil),                    // 24: brz.Tags
 }
 var file_notes_proto_depIdxs = []int32{
-	11, // 0: brz.OpBlockRequest.data:type_name -> google.protobuf.Struct
-	12, // 1: brz.ShareNoteRequest.role:type_name -> brz.Roles
-	12, // 2: brz.ChangeUserRoleRequest.new_role:type_name -> brz.Roles
-	13, // 3: brz.BlockNoteService.DeleteBlock:input_type -> brz.Id
-	14, // 4: brz.BlockNoteService.CreateBlock:input_type -> brz.Block
-	2,  // 5: brz.BlockNoteService.OpBlock:input_type -> brz.OpBlockRequest
-	13, // 6: brz.BlockNoteService.GetBlock:input_type -> brz.Id
-	13, // 7: brz.BlockNoteService.GetBlockAsFirst:input_type -> brz.Id
-	0,  // 8: brz.BlockNoteService.ChangeBlockOrder:input_type -> brz.ChangeBlockOrderRequest
-	1,  // 9: brz.BlockNoteService.ChangeTypeBlock:input_type -> brz.ChangeTypeBlockRequest
-	15, // 10: brz.BlockNoteService.CleanTrash:input_type -> brz.UserId
-	3,  // 11: brz.BlockNoteService.ChangeTitleNote:input_type -> brz.ChangeTitleNoteRequest
-	13, // 12: brz.BlockNoteService.NoteToTrash:input_type -> brz.Id
-	13, // 13: brz.BlockNoteService.NoteFromTrash:input_type -> brz.Id
-	13, // 14: brz.BlockNoteService.FindNoteInTrash:input_type -> brz.Id
-	13, // 15: brz.BlockNoteService.GetNote:input_type -> brz.Id
-	13, // 16: brz.BlockNoteService.GetNoteListByUser:input_type -> brz.Id
-	16, // 17: brz.BlockNoteService.CreateNote:input_type -> brz.Note
-	8,  // 18: brz.BlockNoteService.UpdateNoteTitle:input_type -> brz.UpdateNoteTitleRequest
-	13, // 19: brz.BlockNoteService.GetAllBlocksInNote:input_type -> brz.Id
-	13, // 20: brz.BlockNoteService.GetAllNotes:input_type -> brz.Id
-	13, // 21: brz.BlockNoteService.GetNotesByTag:input_type -> brz.Id
-	13, // 22: brz.BlockNoteService.GetNotesFromTrash:input_type -> brz.Id
-	4,  // 23: brz.BlockNoteService.AddTagToNote:input_type -> brz.AddTagToNoteRequest
-	17, // 24: brz.BlockNoteService.CreateTag:input_type -> brz.Tag
-	13, // 25: brz.BlockNoteService.GetTagsByUser:input_type -> brz.Id
-	5,  // 26: brz.BlockNoteService.UpdateTagTitle:input_type -> brz.UpdateTagTitleRequest
-	6,  // 27: brz.BlockNoteService.UpdateTagColor:input_type -> brz.UpdateTagColorRequest
-	7,  // 28: brz.BlockNoteService.UpdateTagEmoji:input_type -> brz.UpdateTagEmojiRequest
-	13, // 29: brz.BlockNoteService.DeleteTag:input_type -> brz.Id
-	9,  // 30: brz.BlockNoteService.ShareNote:input_type -> brz.ShareNoteRequest
-	10, // 31: brz.BlockNoteService.ChangeUserRole:input_type -> brz.ChangeUserRoleRequest
-	18, // 32: brz.BlockNoteService.Healthz:input_type -> google.protobuf.Empty
-	18, // 33: brz.BlockNoteService.DeleteBlock:output_type -> google.protobuf.Empty
-	18, // 34: brz.BlockNoteService.CreateBlock:output_type -> google.protobuf.Empty
-	18, // 35: brz.BlockNoteService.OpBlock:output_type -> google.protobuf.Empty
-	14, // 36: brz.BlockNoteService.GetBlock:output_type -> brz.Block
-	19, // 37: brz.BlockNoteService.GetBlockAsFirst:output_type -> brz.StringResponse
-	18, // 38: brz.BlockNoteService.ChangeBlockOrder:output_type -> google.protobuf.Empty
-	18, // 39: brz.BlockNoteService.ChangeTypeBlock:output_type -> google.protobuf.Empty
-	18, // 40: brz.BlockNoteService.CleanTrash:output_type -> google.protobuf.Empty
-	18, // 41: brz.BlockNoteService.ChangeTitleNote:output_type -> google.protobuf.Empty
-	18, // 42: brz.BlockNoteService.NoteToTrash:output_type -> google.protobuf.Empty
-	18, // 43: brz.BlockNoteService.NoteFromTrash:output_type -> google.protobuf.Empty
-	18, // 44: brz.BlockNoteService.FindNoteInTrash:output_type -> google.protobuf.Empty
-	16, // 45: brz.BlockNoteService.GetNote:output_type -> brz.Note
-	20, // 46: brz.BlockNoteService.GetNoteListByUser:output_type -> brz.NoteParts
-	18, // 47: brz.BlockNoteService.CreateNote:output_type -> google.protobuf.Empty
-	18, // 48: brz.BlockNoteService.UpdateNoteTitle:output_type -> google.protobuf.Empty
-	21, // 49: brz.BlockNoteService.GetAllBlocksInNote:output_type -> brz.Blocks
-	22, // 50: brz.BlockNoteService.GetAllNotes:output_type -> brz.Notes
-	22, // 51: brz.BlockNoteService.GetNotesByTag:output_type -> brz.Notes
-	20, // 52: brz.BlockNoteService.GetNotesFromTrash:output_type -> brz.NoteParts
-	18, // 53: brz.BlockNoteService.AddTagToNote:output_type -> google.protobuf.Empty
-	18, // 54: brz.BlockNoteService.CreateTag:output_type -> google.protobuf.Empty
-	23, // 55: brz.BlockNoteService.GetTagsByUser:output_type -> brz.Tags
-	18, // 56: brz.BlockNoteService.UpdateTagTitle:output_type -> google.protobuf.Empty
-	18, // 57: brz.BlockNoteService.UpdateTagColor:output_type -> google.protobuf.Empty
-	18, // 58: brz.BlockNoteService.UpdateTagEmoji:output_type -> google.protobuf.Empty
-	18, // 59: brz.BlockNoteService.DeleteTag:output_type -> google.protobuf.Empty
-	18, // 60: brz.BlockNoteService.ShareNote:output_type -> google.protobuf.Empty
-	18, // 61: brz.BlockNoteService.ChangeUserRole:output_type -> google.protobuf.Empty
-	18, // 62: brz.BlockNoteService.Healthz:output_type -> google.protobuf.Empty
-	33, // [33:63] is the sub-list for method output_type
-	3,  // [3:33] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	12, // 0: brz.OpBlockRequest.data:type_name -> google.protobuf.Struct
+	13, // 1: brz.ShareNoteRequest.role:type_name -> brz.Roles
+	13, // 2: brz.ChangeUserRoleRequest.new_role:type_name -> brz.Roles
+	12, // 3: brz.CreateBlockRequest.data:type_name -> google.protobuf.Struct
+	14, // 4: brz.BlockNoteService.DeleteBlock:input_type -> brz.Id
+	11, // 5: brz.BlockNoteService.CreateBlock:input_type -> brz.CreateBlockRequest
+	2,  // 6: brz.BlockNoteService.OpBlock:input_type -> brz.OpBlockRequest
+	14, // 7: brz.BlockNoteService.GetBlock:input_type -> brz.Id
+	14, // 8: brz.BlockNoteService.GetBlockAsFirst:input_type -> brz.Id
+	0,  // 9: brz.BlockNoteService.ChangeBlockOrder:input_type -> brz.ChangeBlockOrderRequest
+	1,  // 10: brz.BlockNoteService.ChangeTypeBlock:input_type -> brz.ChangeTypeBlockRequest
+	15, // 11: brz.BlockNoteService.CleanTrash:input_type -> brz.UserId
+	3,  // 12: brz.BlockNoteService.ChangeTitleNote:input_type -> brz.ChangeTitleNoteRequest
+	14, // 13: brz.BlockNoteService.NoteToTrash:input_type -> brz.Id
+	14, // 14: brz.BlockNoteService.NoteFromTrash:input_type -> brz.Id
+	14, // 15: brz.BlockNoteService.FindNoteInTrash:input_type -> brz.Id
+	14, // 16: brz.BlockNoteService.GetNote:input_type -> brz.Id
+	14, // 17: brz.BlockNoteService.GetNoteList:input_type -> brz.Id
+	16, // 18: brz.BlockNoteService.CreateNote:input_type -> brz.Note
+	8,  // 19: brz.BlockNoteService.UpdateNoteTitle:input_type -> brz.UpdateNoteTitleRequest
+	14, // 20: brz.BlockNoteService.GetAllBlocksInNote:input_type -> brz.Id
+	14, // 21: brz.BlockNoteService.GetAllNotes:input_type -> brz.Id
+	14, // 22: brz.BlockNoteService.GetNotesByTag:input_type -> brz.Id
+	14, // 23: brz.BlockNoteService.GetNotesFromTrash:input_type -> brz.Id
+	4,  // 24: brz.BlockNoteService.AddTagToNote:input_type -> brz.AddTagToNoteRequest
+	17, // 25: brz.BlockNoteService.CreateTag:input_type -> brz.Tag
+	14, // 26: brz.BlockNoteService.GetTagsByUser:input_type -> brz.Id
+	14, // 27: brz.BlockNoteService.GetTag:input_type -> brz.Id
+	5,  // 28: brz.BlockNoteService.UpdateTagTitle:input_type -> brz.UpdateTagTitleRequest
+	6,  // 29: brz.BlockNoteService.UpdateTagColor:input_type -> brz.UpdateTagColorRequest
+	7,  // 30: brz.BlockNoteService.UpdateTagEmoji:input_type -> brz.UpdateTagEmojiRequest
+	14, // 31: brz.BlockNoteService.DeleteTag:input_type -> brz.Id
+	9,  // 32: brz.BlockNoteService.ShareNote:input_type -> brz.ShareNoteRequest
+	10, // 33: brz.BlockNoteService.ChangeUserRole:input_type -> brz.ChangeUserRoleRequest
+	18, // 34: brz.BlockNoteService.Healthz:input_type -> google.protobuf.Empty
+	18, // 35: brz.BlockNoteService.DeleteBlock:output_type -> google.protobuf.Empty
+	14, // 36: brz.BlockNoteService.CreateBlock:output_type -> brz.Id
+	18, // 37: brz.BlockNoteService.OpBlock:output_type -> google.protobuf.Empty
+	19, // 38: brz.BlockNoteService.GetBlock:output_type -> brz.Block
+	20, // 39: brz.BlockNoteService.GetBlockAsFirst:output_type -> brz.StringResponse
+	18, // 40: brz.BlockNoteService.ChangeBlockOrder:output_type -> google.protobuf.Empty
+	18, // 41: brz.BlockNoteService.ChangeTypeBlock:output_type -> google.protobuf.Empty
+	18, // 42: brz.BlockNoteService.CleanTrash:output_type -> google.protobuf.Empty
+	18, // 43: brz.BlockNoteService.ChangeTitleNote:output_type -> google.protobuf.Empty
+	18, // 44: brz.BlockNoteService.NoteToTrash:output_type -> google.protobuf.Empty
+	18, // 45: brz.BlockNoteService.NoteFromTrash:output_type -> google.protobuf.Empty
+	18, // 46: brz.BlockNoteService.FindNoteInTrash:output_type -> google.protobuf.Empty
+	16, // 47: brz.BlockNoteService.GetNote:output_type -> brz.Note
+	21, // 48: brz.BlockNoteService.GetNoteList:output_type -> brz.NoteParts
+	18, // 49: brz.BlockNoteService.CreateNote:output_type -> google.protobuf.Empty
+	18, // 50: brz.BlockNoteService.UpdateNoteTitle:output_type -> google.protobuf.Empty
+	22, // 51: brz.BlockNoteService.GetAllBlocksInNote:output_type -> brz.Blocks
+	23, // 52: brz.BlockNoteService.GetAllNotes:output_type -> brz.Notes
+	23, // 53: brz.BlockNoteService.GetNotesByTag:output_type -> brz.Notes
+	21, // 54: brz.BlockNoteService.GetNotesFromTrash:output_type -> brz.NoteParts
+	18, // 55: brz.BlockNoteService.AddTagToNote:output_type -> google.protobuf.Empty
+	18, // 56: brz.BlockNoteService.CreateTag:output_type -> google.protobuf.Empty
+	24, // 57: brz.BlockNoteService.GetTagsByUser:output_type -> brz.Tags
+	17, // 58: brz.BlockNoteService.GetTag:output_type -> brz.Tag
+	18, // 59: brz.BlockNoteService.UpdateTagTitle:output_type -> google.protobuf.Empty
+	18, // 60: brz.BlockNoteService.UpdateTagColor:output_type -> google.protobuf.Empty
+	18, // 61: brz.BlockNoteService.UpdateTagEmoji:output_type -> google.protobuf.Empty
+	18, // 62: brz.BlockNoteService.DeleteTag:output_type -> google.protobuf.Empty
+	18, // 63: brz.BlockNoteService.ShareNote:output_type -> google.protobuf.Empty
+	18, // 64: brz.BlockNoteService.ChangeUserRole:output_type -> google.protobuf.Empty
+	18, // 65: brz.BlockNoteService.Healthz:output_type -> google.protobuf.Empty
+	35, // [35:66] is the sub-list for method output_type
+	4,  // [4:35] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_notes_proto_init() }
@@ -814,7 +882,7 @@ func file_notes_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_notes_proto_rawDesc), len(file_notes_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

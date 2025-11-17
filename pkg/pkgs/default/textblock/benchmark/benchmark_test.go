@@ -2,6 +2,7 @@ package benchmark
 
 import (
 	"bufio"
+	"fmt"
 	"github.com/autumnterror/breezynotes/pkg/pkgs/default/textblock"
 	"log"
 	"os"
@@ -20,44 +21,82 @@ func TestApplyStylePerformance(t *testing.T) {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanRunes) // читаем посимвольно
-	var text []textblock.TextData
+	scanner.Split(bufio.ScanLines) // читаем посимвольно
+	count := 0
+	lenLine := []int{}
+	//var text []textblock.TextData
+	var text string
 	for scanner.Scan() {
+		count++
 		ch := scanner.Text()
-		text = append(text, textblock.TextData{Style: "default", Text: ch})
+		text += ch
+		lenLine = append(lenLine, len(ch))
+
+		//text = append(text, textblock.TextData{Style: "default", Text: ch})
 	}
 
-	tb := &textblock.TextBlock{Text: text}
-	log.Printf("Initial segments of text: %d\n", len(tb.Text))
+	tb := &textblock.TextBlock{Text: []textblock.TextData{
+		{Style: "default", Text: text},
+	}}
+	sum := 0
+	countWithoutLow := 0
+	for _, i := range lenLine {
+		if i > 5 {
+			countWithoutLow++
+			sum += i
+		}
+	}
+
+	count *= sum / len(lenLine)
+	log.Printf("Initial segments of text: %d\n", count)
+
+	//startTimeNormal := time.Now()
+
+	//log.Println("normalization...")
+	//tb.Text = textblock.MergeSameStylesParallel(tb.Text, runtime.NumCPU())
+	//log.Printf("normalization success time: %d ms", time.Since(startTimeNormal).Milliseconds())
 
 	startTime := time.Now()
 
 	// операция 1: выделяем средний кусок и делаем bold
 	//midStart := len(tb.Text) / 2
 	//midEnd := midStart + 50
-	err = tb.ApplyStyle(100000, 300000, "bold")
+	log.Printf("tb.ApplyStyle(%d,%d, \"bold\"\n", count-2*count/3, count-count/3)
+	err = tb.ApplyStyle(count-2*count/3, count-count/3, "bold")
 	if err != nil {
 		t.Fatalf("ApplyStyle failed: %v", err)
 	}
-	log.Printf("After bold middle: %d segments. Time: %d ms\n", len(tb.Text), time.Since(startTime).Milliseconds())
-
+	log.Printf("After bold middle Time: %d ms\n", time.Since(startTime).Milliseconds())
+	for o, i := range tb.Text {
+		fmt.Printf("%d: %s", o, i.Style)
+	}
+	fmt.Println()
 	startTime2 := time.Now()
 	// операция 2: вставляем в конец
-	endStart := len(tb.Text)
-	endEnd := len(tb.Text)
-	err = tb.ApplyStyle(endStart-1, endEnd, "italic")
+	endStart := count - count/3
+	endEnd := count
+	log.Printf("tb.ApplyStyle(%d,%d, \"italic\"\n", endStart-1, endEnd)
+	err = tb.ApplyStyle(endStart, endEnd, "italic")
 	if err != nil {
 		t.Fatalf("ApplyStyle failed: %v", err)
 	}
-	log.Printf("After insert at end: %d segments. Time: %d ms\n", len(tb.Text), time.Since(startTime2).Milliseconds())
+	log.Printf("After insert at end Time: %d ms\n", time.Since(startTime2).Milliseconds())
 	startTime3 := time.Now()
-
+	for o, i := range tb.Text {
+		fmt.Printf("%d: %s", o, i.Style)
+	}
+	fmt.Println()
 	// операция 3: перекрываем первый кусок
-	err = tb.ApplyStyle(0, 100000, "underline")
+	err = tb.ApplyStyle(0, count/3, "underline")
+	log.Printf("tb.ApplyStyle(%d,%d, \"underline\"\n", 0, count/4)
 	if err != nil {
 		t.Fatalf("ApplyStyle failed: %v", err)
 	}
-	log.Printf("After underline first 100 chars: %d segments. Time: %d ms\n", len(tb.Text), time.Since(startTime3).Milliseconds())
+	for o, i := range tb.Text {
+		fmt.Printf("%d: %s", o, i.Style)
+	}
+	fmt.Println()
+	log.Printf("After underline at start Time: %d ms\n", time.Since(startTime3).Milliseconds())
 	duration := time.Since(startTime)
 	log.Printf("Total time: %s\n", duration)
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/breezynotes/views"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"time"
@@ -15,7 +16,7 @@ import (
 func (a *API) Get(ctx context.Context, id string) (*brzrpc.Note, error) {
 	const op = "notes.Get"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	res := a.Notes().FindOne(ctx, bson.M{"_id": id})
@@ -23,20 +24,20 @@ func (a *API) Get(ctx context.Context, id string) (*brzrpc.Note, error) {
 		return nil, format.Error(op, res.Err())
 	}
 
-	var n mongo.NoteDb
+	var n views.NoteDb
 	err := res.Decode(&n)
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
 
-	return mongo.FromNoteDb(&n), nil
+	return views.FromNoteDb(&n), nil
 }
 
 // GetNoteListByUser use func a.blockAPI.GetAsFirst
 func (a *API) GetNoteListByUser(ctx context.Context, id string) (*brzrpc.NoteParts, error) {
 	const op = "notes.GetNoteListByUser"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	cur, err := a.Notes().Find(ctx, bson.M{"author": id})
@@ -50,7 +51,7 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string) (*brzrpc.NotePar
 	}
 
 	for cur.Next(ctx) {
-		var n mongo.NoteDb
+		var n views.NoteDb
 		if err = cur.Decode(&n); err != nil {
 			return nts, format.Error(op, err)
 		}
@@ -64,7 +65,7 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string) (*brzrpc.NotePar
 		nts.Items = append(nts.Items, &brzrpc.NotePart{
 			Id:         n.Id,
 			Title:      n.Title,
-			Tag:        mongo.FromTagDb(n.Tag),
+			Tag:        views.FromTagDb(n.Tag),
 			FirstBlock: fb,
 			UpdatedAt:  n.UpdatedAt,
 		})
@@ -77,7 +78,7 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string) (*brzrpc.NotePar
 func (a *API) GetAllByUser(ctx context.Context, id string) (*brzrpc.Notes, error) {
 	const op = "notes.Get"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	cur, err := a.Notes().Find(ctx, bson.M{"author": id}, options.Find().SetSort(bson.M{"updatedAt": -1}))
@@ -91,11 +92,11 @@ func (a *API) GetAllByUser(ctx context.Context, id string) (*brzrpc.Notes, error
 	}
 
 	for cur.Next(ctx) {
-		var n mongo.NoteDb
+		var n views.NoteDb
 		if err = cur.Decode(&n); err != nil {
 			return nts, format.Error(op, err)
 		}
-		nts.Items = append(nts.Items, mongo.FromNoteDb(&n))
+		nts.Items = append(nts.Items, views.FromNoteDb(&n))
 	}
 
 	return nts, nil
@@ -105,7 +106,7 @@ func (a *API) GetAllByUser(ctx context.Context, id string) (*brzrpc.Notes, error
 func (a *API) GetAllByTag(ctx context.Context, id string) (*brzrpc.Notes, error) {
 	const op = "notes.Get"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	cur, err := a.Notes().Find(ctx, bson.M{"tag._id": id})
@@ -119,11 +120,11 @@ func (a *API) GetAllByTag(ctx context.Context, id string) (*brzrpc.Notes, error)
 	}
 
 	for cur.Next(ctx) {
-		var n mongo.NoteDb
+		var n views.NoteDb
 		if err = cur.Decode(&n); err != nil {
 			return nts, format.Error(op, err)
 		}
-		nts.Items = append(nts.Items, mongo.FromNoteDb(&n))
+		nts.Items = append(nts.Items, views.FromNoteDb(&n))
 	}
 
 	return nts, nil
@@ -133,13 +134,12 @@ func (a *API) GetAllByTag(ctx context.Context, id string) (*brzrpc.Notes, error)
 func (a *API) Create(ctx context.Context, n *brzrpc.Note) error {
 	const op = "notes.Create"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
-	n.CreatedAt = time.Now().UTC().Unix()
-	n.UpdatedAt = time.Now().UTC().Unix()
+	n.CreatedAt, n.UpdatedAt = time.Now().UTC().Unix(), time.Now().UTC().Unix()
 
-	if _, err := a.Notes().InsertOne(ctx, mongo.ToNoteDb(n)); err != nil {
+	if _, err := a.Notes().InsertOne(ctx, views.ToNoteDb(n)); err != nil {
 		return format.Error(op, err)
 	}
 	return nil
@@ -149,10 +149,10 @@ func (a *API) Create(ctx context.Context, n *brzrpc.Note) error {
 func (a *API) Insert(ctx context.Context, n *brzrpc.Note) error {
 	const op = "notes.Insert"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
-	if _, err := a.Notes().InsertOne(ctx, mongo.ToNoteDb(n)); err != nil {
+	if _, err := a.Notes().InsertOne(ctx, views.ToNoteDb(n)); err != nil {
 		return format.Error(op, err)
 	}
 	return nil
@@ -162,7 +162,7 @@ func (a *API) Insert(ctx context.Context, n *brzrpc.Note) error {
 func (a *API) Delete(ctx context.Context, id string) error {
 	const op = "notes.Delete"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	res, err := a.Notes().DeleteOne(ctx, bson.D{{"_id", id}})
@@ -180,7 +180,7 @@ func (a *API) Delete(ctx context.Context, id string) error {
 func (a *API) UpdateUpdatedAt(ctx context.Context, id string) error {
 	const op = "notes.UpdateUpdatedAt"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	res, err := a.
@@ -210,7 +210,7 @@ func (a *API) UpdateUpdatedAt(ctx context.Context, id string) error {
 func (a *API) UpdateTitle(ctx context.Context, id string, nTitle string) error {
 	const op = "notes.UpdateTitle"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	res, err := a.
@@ -241,7 +241,7 @@ func (a *API) UpdateTitle(ctx context.Context, id string, nTitle string) error {
 func (a *API) UpdateBlocks(ctx context.Context, id string, blocks []string) error {
 	const op = "notes.UpdateTitle"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	res, err := a.
@@ -272,7 +272,7 @@ func (a *API) UpdateBlocks(ctx context.Context, id string, blocks []string) erro
 func (a *API) AddTagToNote(ctx context.Context, id string, tag *brzrpc.Tag) error {
 	const op = "notes.AddTagToNote"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	res, err := a.
@@ -285,7 +285,7 @@ func (a *API) AddTagToNote(ctx context.Context, id string, tag *brzrpc.Tag) erro
 			},
 			bson.M{
 				"$set": bson.M{
-					"tag":        mongo.ToTagDb(tag),
+					"tag":        views.ToTagDb(tag),
 					"updated_at": time.Now().UTC().Unix(),
 				},
 			},
@@ -303,7 +303,7 @@ func (a *API) AddTagToNote(ctx context.Context, id string, tag *brzrpc.Tag) erro
 // ChangeBlockOrder вставляет блок в срез на новое место
 func (a *API) ChangeBlockOrder(ctx context.Context, noteID string, oldOrder, newOrder int) error {
 	const op = "blocks.ChangeBlockOrder"
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	if oldOrder == newOrder {

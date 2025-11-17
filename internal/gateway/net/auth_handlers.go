@@ -37,7 +37,7 @@ func (e *Echo) Auth(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
 	}
 
-	ctx, done := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
 	id, err := api.Auth(ctx, &r)
@@ -123,7 +123,7 @@ func (e *Echo) Reg(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "password not in policy"})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
 	defer cancel()
 
 	id := id.New()
@@ -209,7 +209,7 @@ func (e *Echo) ValidateToken(c echo.Context) error {
 
 	auth := e.authAPI.API
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
 	defer cancel()
 
 	if _, err := auth.CheckToken(ctx, &brzrpc.Token{Value: at.Value}); err != nil {

@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"time"
 )
 
 func (s *ServerAPI) ChangeTitleNote(ctx context.Context, req *brzrpc.ChangeTitleNoteRequest) (*emptypb.Empty, error) {
@@ -168,11 +169,54 @@ func (s *ServerAPI) CreateNote(ctx context.Context, req *brzrpc.Note) (*emptypb.
 	return nil, nil
 }
 
+// TODO check benchmark
+
 func (s *ServerAPI) GetAllBlocksInNote(ctx context.Context, req *brzrpc.Id) (*brzrpc.Blocks, error) {
 	const op = "block.note.grpc.GetAllBlocksInNote"
 	log.Info(op, "")
+	ctx, done := context.WithTimeout(ctx, waitTime+5*time.Second)
+	defer done()
 
-	return nil, nil
+	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
+		notes, err := s.noteAPI.GetAllByUser(ctx, req.GetId())
+		if err != nil {
+			log.Warn(op, "", err)
+			res <- views.ResRPC{
+				Res: nil,
+				Err: status.Error(codes.Internal, err.Error()),
+			}
+			return
+		}
+		if len(notes.GetItems()) == 0 {
+			res <- views.ResRPC{
+				Res: &brzrpc.Blocks{Items: []*brzrpc.Block{}},
+				Err: nil,
+			}
+			return
+		}
+		var bs []*brzrpc.Block
+		for _, n := range notes.GetItems() {
+			for _, id := range n.Blocks {
+				b, err := s.blocksAPI.Get(ctx, id)
+				if err != nil {
+					log.Warn(op, "BAD BLOCK", err)
+					continue
+				}
+				bs = append(bs, b)
+			}
+		}
+
+		res <- views.ResRPC{
+			Res: nil,
+			Err: nil,
+		}
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return res.(*brzrpc.Blocks), nil
 }
 
 func (s *ServerAPI) AddTagToNote(ctx context.Context, req *brzrpc.AddTagToNoteRequest) (*emptypb.Empty, error) {
@@ -219,5 +263,34 @@ func (s *ServerAPI) AddTagToNote(ctx context.Context, req *brzrpc.AddTagToNoteRe
 		return nil, err
 	}
 
+	return nil, nil
+}
+
+func (s *ServerAPI) ChangeBlockOrder(ctx context.Context, req *brzrpc.ChangeBlockOrderRequest) (*emptypb.Empty, error) {
+	const op = "block.note.grpc.ChangeBlockOrder"
+	log.Info(op, "")
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
+		if err := s.noteAPI.ChangeBlockOrder(ctx, req.GetId(), int(req.GetOldOrder()), int(req.GetNewOrder())); err != nil {
+			log.Warn(op, "", err)
+			res <- views.ResRPC{
+				Res: nil,
+				Err: status.Error(codes.Internal, err.Error()),
+			}
+			return
+		}
+
+		res <- views.ResRPC{
+			Res: nil,
+			Err: nil,
+		}
+	})
+
+	if err != nil {
+		return nil, err
+	}
 	return nil, nil
 }

@@ -167,3 +167,28 @@ func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc.Id) (*brzrpc.
 
 	return res.(*brzrpc.Tags), nil
 }
+
+func (s *ServerAPI) GetTag(ctx context.Context, req *brzrpc.Id) (*brzrpc.Tag, error) {
+	const op = "blocknote.grpc.GetTag"
+	log.Info(op, "")
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
+		tg, err := s.tagAPI.Get(ctx, req.GetId())
+		if err != nil {
+			log.Error(op, "", err)
+			res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, "check logs")}
+			return
+		}
+
+		res <- views.ResRPC{Res: tg, Err: nil}
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return res.(*brzrpc.Tag), nil
+}

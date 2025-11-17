@@ -11,6 +11,12 @@ import (
 	"testing"
 )
 
+// TODO GetNoteListByUser
+//
+//	if np, err := a.GetNoteListByUser(context.TODO(), "test_auth_TestCrudGood"); assert.NoError(t, err) {
+//		assert.Equal(t, len(np.Items), 1)
+//		assert.Equal(t, np.Items[0]., 1)
+//	}
 func TestCrudGood(t *testing.T) {
 	t.Parallel()
 	t.Run("crud good", func(t *testing.T) {
@@ -42,7 +48,7 @@ func TestCrudGood(t *testing.T) {
 				Emoji:  "test",
 				UserId: "test",
 			},
-			Author: "test_auth",
+			Author: "test_auth_TestCrudGood",
 			Editors: []string{
 				"test1ed", "test2ed",
 			},
@@ -88,6 +94,7 @@ func TestCrudGood(t *testing.T) {
 			log.Green("get after add tag ", n)
 			assert.Equal(t, "newIdTag", n.Tag.Id)
 		}
+
 	})
 }
 

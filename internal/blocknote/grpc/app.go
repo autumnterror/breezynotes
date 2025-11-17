@@ -3,6 +3,7 @@ package grpc
 import (
 	"fmt"
 	"github.com/autumnterror/breezynotes/internal/blocknote/config"
+	"github.com/autumnterror/breezynotes/internal/blocknote/mongo/blocks"
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo/notes"
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo/tags"
 	"github.com/autumnterror/breezynotes/pkg/log"
@@ -17,13 +18,13 @@ type App struct {
 	cfg        *config.Config
 }
 
-func New(cfg *config.Config, tagAPI tags.Repo, noteAPI notes.Repo) *App {
+func New(cfg *config.Config, tagAPI tags.Repo, noteAPI notes.Repo, blocksAPI blocks.Repo) *App {
 	s := grpc.NewServer(
 		grpc.KeepaliveParams(keepalive.ServerParameters{
 			MaxConnectionIdle: 0,
 		}),
 	)
-	Register(s, tagAPI, noteAPI)
+	Register(s, tagAPI, noteAPI, blocksAPI)
 
 	return &App{
 		gRPCServer: s,

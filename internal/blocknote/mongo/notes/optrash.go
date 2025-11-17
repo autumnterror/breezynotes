@@ -2,9 +2,9 @@ package notes
 
 import (
 	"context"
-	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/breezynotes/views"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
@@ -12,7 +12,7 @@ import (
 func (a *API) CleanTrash(ctx context.Context, uid string) error {
 	const op = "notes.CleanTrash"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	_, err := a.Trash().DeleteMany(ctx, bson.M{"author": uid})
@@ -27,7 +27,7 @@ func (a *API) CleanTrash(ctx context.Context, uid string) error {
 func (a *API) GetNotesFromTrash(ctx context.Context, uid string) (*brzrpc.NoteParts, error) {
 	const op = "notes.CleanTrash"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	cur, err := a.Trash().Find(ctx, bson.M{"author": uid})
@@ -41,14 +41,14 @@ func (a *API) GetNotesFromTrash(ctx context.Context, uid string) (*brzrpc.NotePa
 	}
 
 	for cur.Next(ctx) {
-		var n mongo.NoteDb
+		var n views.NoteDb
 		if err = cur.Decode(&n); err != nil {
 			return pts, format.Error(op, err)
 		}
 		np := brzrpc.NotePart{
 			Id:    n.Id,
 			Title: n.Title,
-			Tag:   mongo.FromTagDb(n.Tag),
+			Tag:   views.FromTagDb(n.Tag),
 			//TODO first block from blocks
 			FirstBlock: "",
 			UpdatedAt:  n.UpdatedAt,
@@ -63,7 +63,7 @@ func (a *API) GetNotesFromTrash(ctx context.Context, uid string) (*brzrpc.NotePa
 func (a *API) ToTrash(ctx context.Context, id string) error {
 	const op = "notes.ToTrash"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	n, err := a.Get(ctx, id)
@@ -71,7 +71,7 @@ func (a *API) ToTrash(ctx context.Context, id string) error {
 		return format.Error(op, err)
 	}
 
-	if _, err := a.Trash().InsertOne(ctx, mongo.ToNoteDb(n)); err != nil {
+	if _, err := a.Trash().InsertOne(ctx, views.ToNoteDb(n)); err != nil {
 		return format.Error(op, err)
 	}
 
@@ -85,7 +85,7 @@ func (a *API) ToTrash(ctx context.Context, id string) error {
 func (a *API) FromTrash(ctx context.Context, id string) error {
 	const op = "notes.FromTrash"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	res := a.Trash().FindOne(ctx, bson.M{"_id": id})
@@ -93,12 +93,12 @@ func (a *API) FromTrash(ctx context.Context, id string) error {
 		return format.Error(op, res.Err())
 	}
 
-	var n mongo.NoteDb
+	var n views.NoteDb
 	if err := res.Decode(&n); err != nil {
 		return format.Error(op, err)
 	}
 
-	if err := a.Insert(ctx, mongo.FromNoteDb(&n)); err != nil {
+	if err := a.Insert(ctx, views.FromNoteDb(&n)); err != nil {
 		return format.Error(op, err)
 	}
 

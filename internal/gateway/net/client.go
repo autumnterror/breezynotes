@@ -48,12 +48,59 @@ func New(
 	api := e.echo.Group("/api")
 	{
 		api.GET("/health", e.Healthz)
+
 		auth := api.Group("/auth")
 		{
 			auth.GET("/token", e.ValidateToken)
-
 			auth.POST("", e.Auth)
 			auth.POST("/reg", e.Reg)
+		}
+
+		notes := api.Group("/notes")
+		{
+			notes.GET("", e.GetNote)
+			notes.POST("", e.CreateNote)
+
+			notes.GET("/all", e.GetAllNotes)
+			notes.GET("/by-tag", e.GetNotesByTag)
+			notes.GET("/blocks", e.GetAllBlocksInNote)
+			notes.PATCH("/change-title", e.ChangeTitleNote)
+
+			notes.POST("/add-tag", e.AddTagToNote)
+		}
+
+		blocks := api.Group("/blocks")
+		{
+			blocks.GET("", e.GetBlock)
+			blocks.POST("", e.CreateBlock)
+			blocks.DELETE("", e.DeleteBlock)
+
+			blocks.GET("/as-first", e.GetBlockAsFirst)
+			blocks.POST("/op", e.OpBlock)
+			blocks.PATCH("/change-type", e.ChangeTypeBlock)
+			blocks.PATCH("/change-order", e.ChangeBlockOrder)
+		}
+
+		trash := api.Group("/trash")
+		{
+			trash.DELETE("", e.CleanTrash)
+			trash.PUT("/to", e.NoteToTrash)
+			trash.PUT("/from", e.NoteFromTrash)
+			//trash.POST("/note/find", e.FindNoteInTrash)
+			trash.GET("", e.GetNotesFromTrash)
+		}
+
+		tags := api.Group("/tags")
+		{
+			tags.GET("/by-user", e.GetTagsByUser)
+
+			tags.POST("", e.CreateTag)
+
+			tags.PUT("/title", e.UpdateTagTitle)
+			tags.PUT("/color", e.UpdateTagColor)
+			tags.PUT("/emoji", e.UpdateTagEmoji)
+
+			tags.DELETE("", e.DeleteTag)
 		}
 	}
 

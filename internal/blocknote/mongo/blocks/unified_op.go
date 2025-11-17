@@ -5,13 +5,30 @@ import (
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/breezynotes/views"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"time"
 )
 
+// createBlock with CreatedAt and UpdatedAt time.Now().UTC().Unix(). Don't create id
+func (a *API) createBlock(ctx context.Context, b *views.BlockDb) error {
+	const op = "notes.Create"
+
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
+	defer done()
+
+	b.CreatedAt, b.UpdatedAt = time.Now().UTC().Unix(), time.Now().UTC().Unix()
+
+	if _, err := a.Blocks().InsertOne(ctx, b); err != nil {
+		return format.Error(op, err)
+	}
+	return nil
+}
+
+// Delete can return mongo.ErrNotFiend
 func (a *API) Delete(ctx context.Context, id string) error {
 	const op = "blocks.Delete"
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	res, err := a.Blocks().DeleteOne(ctx, bson.D{{"_id", id}})
@@ -27,7 +44,7 @@ func (a *API) Delete(ctx context.Context, id string) error {
 
 func (a *API) Get(ctx context.Context, id string) (*brzrpc.Block, error) {
 	const op = "blocks.Get"
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	res := a.Blocks().FindOne(ctx, bson.D{{"_id", id}})
@@ -35,19 +52,19 @@ func (a *API) Get(ctx context.Context, id string) (*brzrpc.Block, error) {
 		return nil, format.Error(op, res.Err())
 	}
 
-	var b mongo.BlockDb
+	var b views.BlockDb
 	if err := res.Decode(&b); err != nil {
 		return nil, format.Error(op, err)
 	}
 
-	return mongo.FromBlockDb(&b), nil
+	return views.FromBlockDb(&b), nil
 }
 
 // UpdateData can return mongo.ErrNotFiend. Set updated_at to time.Now().UTC().Unix()
-func (a *API) UpdateData(ctx context.Context, id string, data map[string]any) error {
-	const op = "blocks.UpdateData"
+func (a *API) updateData(ctx context.Context, id string, data map[string]any) error {
+	const op = "blocks.updateData"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	res, err := a.

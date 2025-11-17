@@ -5,6 +5,7 @@ import (
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/breezynotes/views"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
@@ -21,25 +22,25 @@ type Repo interface {
 func (a *API) Get(ctx context.Context, id string) (*brzrpc.Tag, error) {
 	const op = "tags.GetAllById"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	res := a.Tags().FindOne(ctx, bson.M{"_id": id})
 	if res.Err() != nil {
 		return nil, format.Error(op, res.Err())
 	}
-	var t mongo.TagDb
+	var t views.TagDb
 	if err := res.Decode(&t); err != nil {
 		return nil, format.Error(op, err)
 	}
 
-	return mongo.FromTagDb(&t), nil
+	return views.FromTagDb(&t), nil
 }
 
 func (a *API) GetAllById(ctx context.Context, id string) (*brzrpc.Tags, error) {
 	const op = "tags.GetAllById"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	cur, err := a.Tags().Find(ctx, bson.M{"userId": id})
@@ -53,11 +54,11 @@ func (a *API) GetAllById(ctx context.Context, id string) (*brzrpc.Tags, error) {
 	}
 
 	for cur.Next(ctx) {
-		var t mongo.TagDb
+		var t views.TagDb
 		if err = cur.Decode(&t); err != nil {
 			return tags, format.Error(op, err)
 		}
-		tags.Items = append(tags.Items, mongo.FromTagDb(&t))
+		tags.Items = append(tags.Items, views.FromTagDb(&t))
 	}
 
 	return tags, nil
@@ -67,10 +68,10 @@ func (a *API) GetAllById(ctx context.Context, id string) (*brzrpc.Tags, error) {
 func (a *API) Create(ctx context.Context, t *brzrpc.Tag) error {
 	const op = "tags.Create"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
-	if _, err := a.Tags().InsertOne(ctx, mongo.ToTagDb(t)); err != nil {
+	if _, err := a.Tags().InsertOne(ctx, views.ToTagDb(t)); err != nil {
 		return format.Error(op, err)
 	}
 
@@ -80,7 +81,7 @@ func (a *API) Create(ctx context.Context, t *brzrpc.Tag) error {
 func (a *API) Delete(ctx context.Context, id string) error {
 	const op = "tags.Delete"
 
-	ctx, done := context.WithTimeout(ctx, mongo.WaitTime)
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
 	if _, err := a.Tags().DeleteOne(ctx, bson.D{{"_id", id}}); err != nil {

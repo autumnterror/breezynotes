@@ -33,6 +33,8 @@ type Repo interface {
 	UpdateUpdatedAt(ctx context.Context, id string) error
 	UpdateTitle(ctx context.Context, id string, nTitle string) error
 	AddTagToNote(ctx context.Context, id string, tag *brzrpc.Tag) error
+
+	ChangeBlockOrder(ctx context.Context, noteID string, oldOrder, newOrder int) error
 }
 
 var (

@@ -1,8 +1,11 @@
 package textblock
 
-import "sort"
+import (
+	"sort"
+	"sync"
+)
 
-func mergeSameStyles(segments []TextData) []TextData {
+func MergeSameStyles(segments []TextData) []TextData {
 	if len(segments) == 0 {
 		return segments
 	}
@@ -22,6 +25,50 @@ func mergeSameStyles(segments []TextData) []TextData {
 		out = append(out, cur)
 	}
 	return out
+}
+
+func MergeSameStylesParallel(segments []TextData, workers int) []TextData {
+	if len(segments) == 0 {
+		return segments
+	}
+
+	if len(segments) < 1000 || workers <= 1 {
+		return MergeSameStyles(segments)
+	}
+
+	batchSize := len(segments) / workers
+	results := make([][]TextData, workers)
+	var wg sync.WaitGroup
+
+	for w := 0; w < workers; w++ {
+		wg.Add(1)
+		go func(worker int) {
+			defer wg.Done()
+
+			start := worker * batchSize
+			end := start + batchSize
+			if worker == workers-1 {
+				end = len(segments)
+			}
+
+			results[worker] = MergeSameStyles(segments[start:end])
+		}(w)
+	}
+	wg.Wait()
+
+	// Объединяем результаты
+	var totalLen int
+	for _, r := range results {
+		totalLen += len(r)
+	}
+
+	out := make([]TextData, 0, totalLen)
+	for _, r := range results {
+		out = append(out, r...)
+	}
+
+	// Финальное слияние границ между батчами
+	return MergeSameStyles(out)
 }
 
 // buildPrefixLens Вычисляет префиксные суммы длин сегментов.

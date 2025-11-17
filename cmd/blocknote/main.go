@@ -28,7 +28,7 @@ func main() {
 	m := mongo.MustConnect(cfg)
 	b := blocks.NewApi(m)
 	n := notes.NewApi(m, b)
-	g := grpc.New(cfg, tags.NewApi(m), n)
+	g := grpc.New(cfg, tags.NewApi(m), n, b)
 	go g.MustRun()
 
 	stop := make(chan os.Signal, 1)

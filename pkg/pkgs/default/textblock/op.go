@@ -3,6 +3,7 @@ package textblock
 import (
 	"errors"
 	"github.com/autumnterror/breezynotes/pkg/utils/alg"
+	"runtime"
 )
 
 func (tb *TextBlock) PlainText() string {
@@ -139,7 +140,7 @@ func (tb *TextBlock) ApplyStyle(start, end int, style string) error {
 			}
 		}
 		// нормализация
-		tb.Text = mergeSameStyles(newData)
+		tb.Text = MergeSameStylesParallel(newData, runtime.NumCPU())
 		return nil
 	}
 
@@ -186,7 +187,7 @@ func (tb *TextBlock) ApplyStyle(start, end int, style string) error {
 	}
 
 	// normalize
-	tb.Text = mergeSameStyles(newData)
+	tb.Text = MergeSameStyles(newData)
 	return nil
 }
 
@@ -241,7 +242,7 @@ func (tb *TextBlock) InsertText(pos int, newText string) error {
 		newSegs = append(newSegs, tb.Text[segIdx+1:]...)
 	}
 
-	tb.Text = mergeSameStyles(newSegs)
+	tb.Text = MergeSameStyles(newSegs)
 	return nil
 }
 
@@ -299,6 +300,6 @@ func (tb *TextBlock) DeleteRange(start, end int) error {
 		newSegs = append(newSegs, tb.Text[segEnd+1:]...)
 	}
 
-	tb.Text = mergeSameStyles(newSegs)
+	tb.Text = MergeSameStyles(newSegs)
 	return nil
 }

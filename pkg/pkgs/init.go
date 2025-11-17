@@ -3,12 +3,15 @@ package pkgs
 import (
 	"context"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
+	"github.com/autumnterror/breezynotes/views"
 )
 
 type BlockRepo interface {
 	Op(ctx context.Context, block *brzrpc.Block, op string, data map[string]any) error
 	GetAsFirst(ctx context.Context, block *brzrpc.Block) string
 	ChangeType(ctx context.Context, block *brzrpc.Block, newType string) error
+	Create(ctx context.Context, _type string, data map[string]any) (*views.BlockDb, error)
+	//Render(ctx context.Context, block *brzrpc.Block) (*brzrpc.Block, error)
 }
 
 var BlockRegistry = make(map[string]BlockRepo)
