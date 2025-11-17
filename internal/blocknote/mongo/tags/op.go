@@ -43,7 +43,7 @@ func (a *API) GetAllById(ctx context.Context, id string) (*brzrpc.Tags, error) {
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
-	cur, err := a.Tags().Find(ctx, bson.M{"userId": id})
+	cur, err := a.Tags().Find(ctx, bson.M{"user_id": id})
 	if err != nil {
 		return nil, format.Error(op, err)
 	}

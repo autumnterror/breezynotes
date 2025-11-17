@@ -96,13 +96,34 @@ func (s *ServerAPI) NoteFromTrash(ctx context.Context, req *brzrpc.Id) (*emptypb
 	return nil, nil
 }
 
-//TODO what this func do
-
-func (s *ServerAPI) FindNoteInTrash(ctx context.Context, req *brzrpc.Id) (*emptypb.Empty, error) {
+func (s *ServerAPI) FindNoteInTrash(ctx context.Context, req *brzrpc.Id) (*brzrpc.Note, error) {
 	const op = "block.note.grpc.FindNoteInTrash"
 	log.Info(op, "")
 
-	return nil, nil
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
+		n, err := s.noteAPI.FindFromTrash(ctx, req.GetId())
+		if err != nil {
+			log.Warn(op, "", err)
+			res <- views.ResRPC{
+				Res: nil,
+				Err: status.Error(codes.Internal, err.Error()),
+			}
+			return
+		}
+		res <- views.ResRPC{
+			Res: n,
+			Err: nil,
+		}
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return res.(*brzrpc.Note), nil
 }
 
 func (s *ServerAPI) GetNotesFromTrash(ctx context.Context, req *brzrpc.Id) (*brzrpc.NoteParts, error) {

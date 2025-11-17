@@ -14,6 +14,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+//TODO AUTHORIZE
+
 // GetBlockAsFirst godoc
 // @Summary Get block as first string
 // @Description Returns block representation as string

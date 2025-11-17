@@ -12,6 +12,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"net/http"
+	"strings"
 )
 
 type Echo struct {
@@ -38,14 +39,17 @@ func New(
 
 	e.echo.GET("/swagger/*", echoSwagger.WrapHandler)
 	e.echo.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     []string{"http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:8080"},
+		//AllowOrigins:     []string{"http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:8080"},
+		AllowOriginFunc: func(origin string) (bool, error) {
+			return strings.Contains(origin, "localhost") || strings.Contains(origin, "127.0.0.1"), nil
+		},
 		AllowMethods:     []string{echo.GET, echo.POST, echo.PUT, echo.DELETE, echo.PATCH, echo.OPTIONS},
-		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
+		AllowHeaders:     []string{"*"},
 		AllowCredentials: true,
 	}))
 	//e.echo.Use(middleware.Logger(), middleware.Recover())
 
-	api := e.echo.Group("/api")
+	api := e.echo.Group("/api", ValidateID(), e.GetUserId())
 	{
 		api.GET("/health", e.Healthz)
 
@@ -54,6 +58,10 @@ func New(
 			auth.GET("/token", e.ValidateToken)
 			auth.POST("", e.Auth)
 			auth.POST("/reg", e.Reg)
+		}
+		user := api.Group("/user")
+		{
+			user.GET("/data", e.GetUserData)
 		}
 
 		notes := api.Group("/notes")

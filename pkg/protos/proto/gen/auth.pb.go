@@ -312,7 +312,7 @@ const file_auth_proto_rawDesc = "" +
 	"\tnew_photo\x18\x02 \x01(\tR\bnewPhoto\"J\n" +
 	"\x15ChangePasswordRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12!\n" +
-	"\fnew_password\x18\x02 \x01(\tR\vnewPassword2\xe8\x05\n" +
+	"\fnew_password\x18\x02 \x01(\tR\vnewPassword2\x8f\x06\n" +
 	"\vAuthService\x12%\n" +
 	"\x04Auth\x12\x10.brz.AuthRequest\x1a\v.brz.UserId\x12.\n" +
 	"\x13GenerateAccessToken\x12\v.brz.UserId\x1a\n" +
@@ -335,7 +335,9 @@ const file_auth_proto_rawDesc = "" +
 	"\n" +
 	"CreateUser\x12\t.brz.User\x1a\x16.google.protobuf.Empty\x12-\n" +
 	"\x14GetUserDataFromToken\x12\n" +
-	".brz.Token\x1a\t.brz.User\x129\n" +
+	".brz.Token\x1a\t.brz.User\x12%\n" +
+	"\x0eGetIdFromToken\x12\n" +
+	".brz.Token\x1a\a.brz.Id\x129\n" +
 	"\aHealthz\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.EmptyB,Z*github.com/autumnterror/breezynotes;brzrpcb\x06proto3"
 
 var (
@@ -362,6 +364,7 @@ var file_auth_proto_goTypes = []any{
 	(*User)(nil),                  // 7: brz.User
 	(*emptypb.Empty)(nil),         // 8: google.protobuf.Empty
 	(*Tokens)(nil),                // 9: brz.Tokens
+	(*Id)(nil),                    // 10: brz.Id
 }
 var file_auth_proto_depIdxs = []int32{
 	0,  // 0: brz.AuthService.Auth:input_type -> brz.AuthRequest
@@ -377,23 +380,25 @@ var file_auth_proto_depIdxs = []int32{
 	4,  // 10: brz.AuthService.ChangePasswd:input_type -> brz.ChangePasswordRequest
 	7,  // 11: brz.AuthService.CreateUser:input_type -> brz.User
 	6,  // 12: brz.AuthService.GetUserDataFromToken:input_type -> brz.Token
-	8,  // 13: brz.AuthService.Healthz:input_type -> google.protobuf.Empty
-	5,  // 14: brz.AuthService.Auth:output_type -> brz.UserId
-	6,  // 15: brz.AuthService.GenerateAccessToken:output_type -> brz.Token
-	6,  // 16: brz.AuthService.GenerateRefreshToken:output_type -> brz.Token
-	9,  // 17: brz.AuthService.GenerateTokens:output_type -> brz.Tokens
-	6,  // 18: brz.AuthService.Refresh:output_type -> brz.Token
-	8,  // 19: brz.AuthService.CheckToken:output_type -> google.protobuf.Empty
-	8,  // 20: brz.AuthService.DeleteUser:output_type -> google.protobuf.Empty
-	8,  // 21: brz.AuthService.UpdateAbout:output_type -> google.protobuf.Empty
-	8,  // 22: brz.AuthService.UpdateEmail:output_type -> google.protobuf.Empty
-	8,  // 23: brz.AuthService.UpdatePhoto:output_type -> google.protobuf.Empty
-	8,  // 24: brz.AuthService.ChangePasswd:output_type -> google.protobuf.Empty
-	8,  // 25: brz.AuthService.CreateUser:output_type -> google.protobuf.Empty
-	7,  // 26: brz.AuthService.GetUserDataFromToken:output_type -> brz.User
-	8,  // 27: brz.AuthService.Healthz:output_type -> google.protobuf.Empty
-	14, // [14:28] is the sub-list for method output_type
-	0,  // [0:14] is the sub-list for method input_type
+	6,  // 13: brz.AuthService.GetIdFromToken:input_type -> brz.Token
+	8,  // 14: brz.AuthService.Healthz:input_type -> google.protobuf.Empty
+	5,  // 15: brz.AuthService.Auth:output_type -> brz.UserId
+	6,  // 16: brz.AuthService.GenerateAccessToken:output_type -> brz.Token
+	6,  // 17: brz.AuthService.GenerateRefreshToken:output_type -> brz.Token
+	9,  // 18: brz.AuthService.GenerateTokens:output_type -> brz.Tokens
+	6,  // 19: brz.AuthService.Refresh:output_type -> brz.Token
+	8,  // 20: brz.AuthService.CheckToken:output_type -> google.protobuf.Empty
+	8,  // 21: brz.AuthService.DeleteUser:output_type -> google.protobuf.Empty
+	8,  // 22: brz.AuthService.UpdateAbout:output_type -> google.protobuf.Empty
+	8,  // 23: brz.AuthService.UpdateEmail:output_type -> google.protobuf.Empty
+	8,  // 24: brz.AuthService.UpdatePhoto:output_type -> google.protobuf.Empty
+	8,  // 25: brz.AuthService.ChangePasswd:output_type -> google.protobuf.Empty
+	8,  // 26: brz.AuthService.CreateUser:output_type -> google.protobuf.Empty
+	7,  // 27: brz.AuthService.GetUserDataFromToken:output_type -> brz.User
+	10, // 28: brz.AuthService.GetIdFromToken:output_type -> brz.Id
+	8,  // 29: brz.AuthService.Healthz:output_type -> google.protobuf.Empty
+	15, // [15:30] is the sub-list for method output_type
+	0,  // [0:15] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name

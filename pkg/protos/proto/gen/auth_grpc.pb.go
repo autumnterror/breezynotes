@@ -33,6 +33,7 @@ const (
 	AuthService_ChangePasswd_FullMethodName         = "/brz.AuthService/ChangePasswd"
 	AuthService_CreateUser_FullMethodName           = "/brz.AuthService/CreateUser"
 	AuthService_GetUserDataFromToken_FullMethodName = "/brz.AuthService/GetUserDataFromToken"
+	AuthService_GetIdFromToken_FullMethodName       = "/brz.AuthService/GetIdFromToken"
 	AuthService_Healthz_FullMethodName              = "/brz.AuthService/Healthz"
 )
 
@@ -55,6 +56,7 @@ type AuthServiceClient interface {
 	ChangePasswd(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CreateUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetUserDataFromToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*User, error)
+	GetIdFromToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Id, error)
 	Healthz(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -196,6 +198,16 @@ func (c *authServiceClient) GetUserDataFromToken(ctx context.Context, in *Token,
 	return out, nil
 }
 
+func (c *authServiceClient) GetIdFromToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Id, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Id)
+	err := c.cc.Invoke(ctx, AuthService_GetIdFromToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authServiceClient) Healthz(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
@@ -225,6 +237,7 @@ type AuthServiceServer interface {
 	ChangePasswd(context.Context, *ChangePasswordRequest) (*emptypb.Empty, error)
 	CreateUser(context.Context, *User) (*emptypb.Empty, error)
 	GetUserDataFromToken(context.Context, *Token) (*User, error)
+	GetIdFromToken(context.Context, *Token) (*Id, error)
 	Healthz(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
@@ -274,6 +287,9 @@ func (UnimplementedAuthServiceServer) CreateUser(context.Context, *User) (*empty
 }
 func (UnimplementedAuthServiceServer) GetUserDataFromToken(context.Context, *Token) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserDataFromToken not implemented")
+}
+func (UnimplementedAuthServiceServer) GetIdFromToken(context.Context, *Token) (*Id, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetIdFromToken not implemented")
 }
 func (UnimplementedAuthServiceServer) Healthz(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Healthz not implemented")
@@ -533,6 +549,24 @@ func _AuthService_GetUserDataFromToken_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_GetIdFromToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Token)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetIdFromToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetIdFromToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetIdFromToken(ctx, req.(*Token))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AuthService_Healthz_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
@@ -609,6 +643,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserDataFromToken",
 			Handler:    _AuthService_GetUserDataFromToken_Handler,
+		},
+		{
+			MethodName: "GetIdFromToken",
+			Handler:    _AuthService_GetIdFromToken_Handler,
 		},
 		{
 			MethodName: "Healthz",

@@ -214,6 +214,7 @@ func (x *StringResponse) GetValue() string {
 type Token struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Value         string                 `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	Exp           int64                  `protobuf:"varint,2,opt,name=exp,proto3" json:"exp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -255,10 +256,19 @@ func (x *Token) GetValue() string {
 	return ""
 }
 
+func (x *Token) GetExp() int64 {
+	if x != nil {
+		return x.Exp
+	}
+	return 0
+}
+
 type Tokens struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AccessToken   string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
 	RefreshToken  string                 `protobuf:"bytes,2,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	ExpAccess     int64                  `protobuf:"varint,3,opt,name=expAccess,proto3" json:"expAccess,omitempty"`
+	ExpRefresh    int64                  `protobuf:"varint,4,opt,name=expRefresh,proto3" json:"expRefresh,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -305,6 +315,20 @@ func (x *Tokens) GetRefreshToken() string {
 		return x.RefreshToken
 	}
 	return ""
+}
+
+func (x *Tokens) GetExpAccess() int64 {
+	if x != nil {
+		return x.ExpAccess
+	}
+	return 0
+}
+
+func (x *Tokens) GetExpRefresh() int64 {
+	if x != nil {
+		return x.ExpRefresh
+	}
+	return 0
 }
 
 type UserId struct {
@@ -1032,12 +1056,17 @@ const file_domain_proto_rawDesc = "" +
 	"\fBoolResponse\x12\x0e\n" +
 	"\x02ok\x18\x01 \x01(\bR\x02ok\"&\n" +
 	"\x0eStringResponse\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\tR\x05value\"\x1d\n" +
+	"\x05value\x18\x01 \x01(\tR\x05value\"/\n" +
 	"\x05Token\x12\x14\n" +
-	"\x05value\x18\x01 \x01(\tR\x05value\"P\n" +
+	"\x05value\x18\x01 \x01(\tR\x05value\x12\x10\n" +
+	"\x03exp\x18\x02 \x01(\x03R\x03exp\"\x8e\x01\n" +
 	"\x06Tokens\x12!\n" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12#\n" +
-	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\"\x18\n" +
+	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\x12\x1c\n" +
+	"\texpAccess\x18\x03 \x01(\x03R\texpAccess\x12\x1e\n" +
+	"\n" +
+	"expRefresh\x18\x04 \x01(\x03R\n" +
+	"expRefresh\"\x18\n" +
 	"\x06UserId\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"\x14\n" +
 	"\x02Id\x12\x0e\n" +

@@ -6,9 +6,9 @@ tasks:
       - build-all
     cmds:
       - docker build -t zitrax78/breezynotes-gateway --file ./build/gateway/dockerfile .
-      - docker build -t zitrax78/breezynotes-auth --file ../build/auth/dockerfile .
-      - docker build -t zitrax78/breezynotes-blocknote --file ../build/blocknote/dockerfile .
-      - docker build -t zitrax78/breezynotes-redis --file ../build/redis/dockerfile .
+      - docker build -t zitrax78/breezynotes-auth --file ./build/auth/dockerfile .
+      - docker build -t zitrax78/breezynotes-blocknote --file ./build/blocknote/dockerfile .
+      - docker build -t zitrax78/breezynotes-redis --file ./build/redis/dockerfile .
   build gateway:
     aliases:
       - build-gateway

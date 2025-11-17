@@ -13,12 +13,15 @@ type UserRegister struct {
 }
 
 type NoteReq struct {
-	Id      string   `json:"id"`
 	Title   string   `json:"title,omitempty"`
 	TagId   string   `json:"tag,omitempty"`
-	Author  string   `json:"author,omitempty"`
 	Editors []string `json:"editors,omitempty"`
 	Readers []string `json:"readers,omitempty"`
 	Blocks  []string `json:"blocks,omitempty"`
 	Status  int      `json:"status"`
+}
+type TagReq struct {
+	Title string `json:"title"`
+	Color string `json:"color"`
+	Emoji string `json:"emoji"`
 }

@@ -57,10 +57,17 @@ func (s *ServerAPI) Healthz(ctx context.Context, _ *emptypb.Empty) (*emptypb.Emp
 	defer done()
 
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
+		if err := s.UserAPI.Healthz(ctx); err != nil {
+			res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, err.Error())}
+			return
+		}
 		res <- views.ResRPC{Res: nil, Err: nil}
 	})
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, err
+	return nil, nil
 }
 
 func opWithContext(ctx context.Context, op func(chan views.ResRPC)) (interface{}, error) {

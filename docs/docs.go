@@ -100,7 +100,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/brzrpc.Tokens"
                         }
                     },
                     "302": {
@@ -126,19 +126,25 @@ const docTemplate = `{
         },
         "/api/auth/token": {
             "get": {
-                "description": "Checks access token from cookie, and return user data. If 401 call ValidateToken",
+                "description": "Checks access token from cookie, tries to refresh if expired. If 410 (GONE) need to re-auth",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "auth"
                 ],
-                "summary": "get user data from access token",
+                "summary": "Validate token (uses cookies)",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.User"
+                            "$ref": "#/definitions/views.SWGMessage"
+                        }
+                    },
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/brzrpc.Token"
                         }
                     },
                     "400": {
@@ -147,8 +153,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/views.SWGError"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "410": {
+                        "description": "Gone",
                         "schema": {
                             "$ref": "#/definitions/views.SWGError"
                         }
@@ -625,15 +631,6 @@ const docTemplate = `{
                     "note"
                 ],
                 "summary": "Get all notes of user",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -819,7 +816,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.Tag"
+                            "$ref": "#/definitions/views.TagReq"
                         }
                     }
                 ],
@@ -897,15 +894,6 @@ const docTemplate = `{
                     "tag"
                 ],
                 "summary": "Get tags by user",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1076,6 +1064,39 @@ const docTemplate = `{
             }
         },
         "/api/trash": {
+            "get": {
+                "description": "Returns notes from trash by user ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "trash"
+                ],
+                "summary": "Get notes from trash",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/brzrpc.NoteParts"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "description": "Deletes all notes from trash for user",
                 "consumes": [
@@ -1088,15 +1109,6 @@ const docTemplate = `{
                     "trash"
                 ],
                 "summary": "Clean trash",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -1116,8 +1128,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/trash/note/from": {
-            "post": {
+        "/api/trash/from": {
+            "put": {
                 "description": "Restores note from trash",
                 "consumes": [
                     "application/json"
@@ -1163,7 +1175,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/trash/note/to": {
+        "/api/trash/to": {
             "put": {
                 "description": "Moves note to trash",
                 "consumes": [
@@ -1210,37 +1222,31 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/trash/notes": {
-            "post": {
-                "description": "Returns notes from trash by user ID",
-                "consumes": [
-                    "application/json"
-                ],
+        "/api/user/data": {
+            "get": {
+                "description": "Checks access token from cookie, and return user data. If 401 call ValidateToken",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "trash"
+                    "user"
                 ],
-                "summary": "Get notes from trash",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
+                "summary": "get user data from access token",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.NoteParts"
+                            "$ref": "#/definitions/brzrpc.User"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/views.SWGError"
                         }
@@ -1543,9 +1549,6 @@ const docTemplate = `{
         "views.NoteReq": {
             "type": "object",
             "properties": {
-                "author": {
-                    "type": "string"
-                },
                 "blocks": {
                     "type": "array",
                     "items": {
@@ -1557,9 +1560,6 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
-                },
-                "id": {
-                    "type": "string"
                 },
                 "readers": {
                     "type": "array",
@@ -1664,6 +1664,20 @@ const docTemplate = `{
                 }
             }
         },
+        "views.TagReq": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "emoji": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "views.UserRegister": {
             "type": "object",
             "properties": {
@@ -1691,7 +1705,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{"http"},
 	Title:            "Breezy notes gateway REST UserAPI",
-	Description:      "Full UserAPI for BreezyNotes.",
+	Description:      "Full API for BreezyNotes.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	//LeftDelim:        "{{",

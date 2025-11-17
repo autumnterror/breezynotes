@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
-	"github.com/autumnterror/breezynotes/pkg/utils/id"
+	"github.com/autumnterror/breezynotes/pkg/utils/uid"
 	"github.com/autumnterror/breezynotes/views"
 	"github.com/labstack/echo/v4"
 	"google.golang.org/grpc/codes"
@@ -19,7 +19,7 @@ import (
 // @Tags tag
 // @Accept json
 // @Produce json
-// @Param Tag body brzrpc.Tag true "Tag data"
+// @Param Tag body views.TagReq true "Tag data"
 // @Success 201 {object} brzrpc.Id
 // @Failure 400 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
@@ -30,7 +30,13 @@ func (e *Echo) CreateTag(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	var r brzrpc.Tag
+	idInt := c.Get("id")
+	idUser, ok := idInt.(string)
+	if !ok || idUser == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
+	}
+
+	var r views.TagReq
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "create tag bind", err)
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
@@ -39,9 +45,15 @@ func (e *Echo) CreateTag(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	r.Id = id.New()
+	newId := uid.New()
 
-	_, err := api.CreateTag(ctx, &r)
+	_, err := api.CreateTag(ctx, &brzrpc.Tag{
+		Id:     newId,
+		Title:  r.Title,
+		Color:  r.Color,
+		Emoji:  r.Emoji,
+		UserId: idUser,
+	})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -58,7 +70,7 @@ func (e *Echo) CreateTag(c echo.Context) error {
 
 	log.Success(op, "")
 
-	return c.JSON(http.StatusCreated, brzrpc.Id{Id: r.Id})
+	return c.JSON(http.StatusCreated, brzrpc.Id{Id: newId})
 }
 
 // UpdateTagTitle godoc
@@ -262,7 +274,6 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 // @Tags tag
 // @Accept json
 // @Produce json
-// @Param id query string true "User ID"
 // @Success 200 {object} brzrpc.Tags
 // @Failure 400 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
@@ -273,13 +284,16 @@ func (e *Echo) GetTagsByUser(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	id := c.QueryParam("id")
-	if id == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+	idInt := c.Get("id")
+	id, ok := idInt.(string)
+	if !ok && id == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
 	}
 
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
+
+	log.Println(id)
 
 	tags, err := api.GetTagsByUser(ctx, &brzrpc.Id{Id: id})
 	if err != nil {

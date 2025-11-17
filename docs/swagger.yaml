@@ -187,8 +187,6 @@ definitions:
     type: object
   views.NoteReq:
     properties:
-      author:
-        type: string
       blocks:
         items:
           type: string
@@ -197,8 +195,6 @@ definitions:
         items:
           type: string
         type: array
-      id:
-        type: string
       readers:
         items:
           type: string
@@ -267,6 +263,15 @@ definitions:
       op:
         type: string
     type: object
+  views.TagReq:
+    properties:
+      color:
+        type: string
+      emoji:
+        type: string
+      title:
+        type: string
+    type: object
   views.UserRegister:
     properties:
       email:
@@ -284,7 +289,7 @@ info:
     email: help@breezynotes.ru
     name: Alex "bustard" Provor
     url: https://contacts.breezynotes.ru
-  description: Full UserAPI for BreezyNotes.
+  description: Full API for BreezyNotes.
   termsOfService: https://about.breezynotes.ru/
   title: Breezy notes gateway REST UserAPI
   version: 0.1-.-infDev
@@ -341,7 +346,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/brzrpc.Tokens'
         "302":
           description: Found
           schema:
@@ -359,28 +364,32 @@ paths:
       - auth
   /api/auth/token:
     get:
-      description: Checks access token from cookie, and return user data. If 401 call
-        ValidateToken
+      description: Checks access token from cookie, tries to refresh if expired. If
+        410 (GONE) need to re-auth
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/brzrpc.User'
+            $ref: '#/definitions/views.SWGMessage'
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/brzrpc.Token'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/views.SWGError'
-        "401":
-          description: Unauthorized
+        "410":
+          description: Gone
           schema:
             $ref: '#/definitions/views.SWGError'
         "502":
           description: Bad Gateway
           schema:
             $ref: '#/definitions/views.SWGError'
-      summary: get user data from access token
+      summary: Validate token (uses cookies)
       tags:
       - auth
   /api/blocks:
@@ -683,12 +692,6 @@ paths:
       consumes:
       - application/json
       description: Returns all notes by user ID
-      parameters:
-      - description: User ID
-        in: query
-        name: id
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -838,7 +841,7 @@ paths:
         name: Tag
         required: true
         schema:
-          $ref: '#/definitions/brzrpc.Tag'
+          $ref: '#/definitions/views.TagReq'
       produces:
       - application/json
       responses:
@@ -862,12 +865,6 @@ paths:
       consumes:
       - application/json
       description: Returns all tags for user
-      parameters:
-      - description: User ID
-        in: query
-        name: id
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -987,12 +984,6 @@ paths:
       consumes:
       - application/json
       description: Deletes all notes from trash for user
-      parameters:
-      - description: User ID
-        in: query
-        name: id
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -1009,8 +1000,30 @@ paths:
       summary: Clean trash
       tags:
       - trash
-  /api/trash/note/from:
-    post:
+    get:
+      consumes:
+      - application/json
+      description: Returns notes from trash by user ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/brzrpc.NoteParts'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/views.SWGError'
+      summary: Get notes from trash
+      tags:
+      - trash
+  /api/trash/from:
+    put:
       consumes:
       - application/json
       description: Restores note from trash
@@ -1040,7 +1053,7 @@ paths:
       summary: Restore note from trash
       tags:
       - trash
-  /api/trash/note/to:
+  /api/trash/to:
     put:
       consumes:
       - application/json
@@ -1071,35 +1084,32 @@ paths:
       summary: Move note to trash
       tags:
       - trash
-  /api/trash/notes:
-    post:
-      consumes:
-      - application/json
-      description: Returns notes from trash by user ID
-      parameters:
-      - description: User ID
-        in: query
-        name: id
-        required: true
-        type: string
+  /api/user/data:
+    get:
+      description: Checks access token from cookie, and return user data. If 401 call
+        ValidateToken
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/brzrpc.NoteParts'
+            $ref: '#/definitions/brzrpc.User'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/views.SWGError'
         "502":
           description: Bad Gateway
           schema:
             $ref: '#/definitions/views.SWGError'
-      summary: Get notes from trash
+      summary: get user data from access token
       tags:
-      - trash
+      - user
 schemes:
 - http
 swagger: "2.0"

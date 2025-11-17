@@ -22,10 +22,16 @@ func (s *ServerAPI) ChangeUserRole(context.Context, *brzrpc.ChangeUserRoleReques
 
 	return nil, nil
 }
-func (s *ServerAPI) Healthz(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+func (s *ServerAPI) Healthz(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
 	const op = "block.note.grpc.healthz"
 	log.Info(op, "")
 
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	if err := s.noteAPI.Healthz(ctx); err != nil {
+		return nil, err
+	}
 	return nil, nil
 }
 

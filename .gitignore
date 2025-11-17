@@ -11,3 +11,4 @@ go.work.sum
 /local-config/
 config-test.go
 /html/
+/.idea

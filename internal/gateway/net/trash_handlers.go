@@ -17,7 +17,6 @@ import (
 // @Tags trash
 // @Accept json
 // @Produce json
-// @Param id query string true "User ID"
 // @Success 200
 // @Failure 400 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
@@ -28,9 +27,10 @@ func (e *Echo) CleanTrash(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	id := c.QueryParam("id")
-	if id == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+	idInt := c.Get("id")
+	id, ok := idInt.(string)
+	if !ok && id == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
 	}
 
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
@@ -67,7 +67,7 @@ func (e *Echo) CleanTrash(c echo.Context) error {
 // @Failure 400 {object} views.SWGError
 // @Failure 404 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/trash/note/to [put]
+// @Router /api/trash/to [put]
 func (e *Echo) NoteToTrash(c echo.Context) error {
 	const op = "gateway.net.NoteToTrash"
 	log.Info(op, "")
@@ -79,8 +79,25 @@ func (e *Echo) NoteToTrash(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
 	}
 
+	idInt := c.Get("id")
+	idUser, ok := idInt.(string)
+	if !ok || idUser == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	}
+
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
+
+	//AUTHORIZE
+	if n, err := api.GetNote(ctx, &brzrpc.Id{Id: id}); err == nil {
+		if n.GetAuthor() != idUser {
+			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "not author"})
+		}
+	} else {
+		log.Error(op, "get note", err)
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad note id"})
+	}
+	//AUTHORIZE
 
 	_, err := api.NoteToTrash(ctx, &brzrpc.Id{Id: id})
 	if err != nil {
@@ -113,7 +130,7 @@ func (e *Echo) NoteToTrash(c echo.Context) error {
 // @Failure 400 {object} views.SWGError
 // @Failure 404 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/trash/note/from [post]
+// @Router /api/trash/from [put]
 func (e *Echo) NoteFromTrash(c echo.Context) error {
 	const op = "gateway.net.NoteFromTrash"
 	log.Info(op, "")
@@ -125,8 +142,25 @@ func (e *Echo) NoteFromTrash(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
 	}
 
+	idInt := c.Get("id")
+	idUser, ok := idInt.(string)
+	if !ok || idUser == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	}
+
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
+
+	//AUTHORIZE
+	if n, err := api.FindNoteInTrash(ctx, &brzrpc.Id{Id: id}); err == nil {
+		if n.GetAuthor() != idUser {
+			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "not author"})
+		}
+	} else {
+		log.Error(op, "get note", err)
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad note id"})
+	}
+	//AUTHORIZE
 
 	_, err := api.NoteFromTrash(ctx, &brzrpc.Id{Id: id})
 	if err != nil {
@@ -154,20 +188,20 @@ func (e *Echo) NoteFromTrash(c echo.Context) error {
 // @Tags trash
 // @Accept json
 // @Produce json
-// @Param id query string true "User ID"
 // @Success 200 {object} brzrpc.NoteParts
 // @Failure 400 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/trash/notes [post]
+// @Router /api/trash [get]
 func (e *Echo) GetNotesFromTrash(c echo.Context) error {
 	const op = "gateway.net.GetNotesFromTrash"
 	log.Info(op, "")
 
 	api := e.bnAPI.API
 
-	id := c.QueryParam("id")
-	if id == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+	idInt := c.Get("id")
+	id, ok := idInt.(string)
+	if !ok && id == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
 	}
 
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)

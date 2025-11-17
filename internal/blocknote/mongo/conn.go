@@ -53,7 +53,7 @@ func newConnect(
 func (c *Client) Disconnect() (err error) {
 	ctx, done := context.WithTimeout(context.Background(), time.Second)
 	defer done()
-	
+
 	if err = c.C.Disconnect(ctx); err != nil {
 		return fmt.Errorf("error when terminating connection to app: %w", err)
 	}

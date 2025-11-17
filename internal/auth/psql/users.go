@@ -209,6 +209,7 @@ func (d *Driver) GetInfo(ctx context.Context, id string) (*brzrpc.User, error) {
 	if err := d.driver.QueryRowContext(ctx, query, id).Scan(&u.Login, &u.Email, &u.About); err != nil {
 		return nil, format.Error(op, err)
 	}
+	u.Id = id
 
 	return &u, nil
 }

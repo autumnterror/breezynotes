@@ -22,10 +22,13 @@ type Repo interface {
 	CleanTrash(ctx context.Context, uid string) error
 	ToTrash(ctx context.Context, id string) error
 	FromTrash(ctx context.Context, id string) error
+	FindFromTrash(ctx context.Context, id string) (*brzrpc.Note, error)
 
 	Get(ctx context.Context, id string) (*brzrpc.Note, error)
-	GetAllByTag(ctx context.Context, id string) (*brzrpc.Notes, error)
+	//GetAllByTag(ctx context.Context, id string) (*brzrpc.Notes, error)
 	GetAllByUser(ctx context.Context, id string) (*brzrpc.Notes, error)
+	GetNoteListByUser(ctx context.Context, id string) (*brzrpc.NoteParts, error)
+	GetNoteListByTag(ctx context.Context, id, idUser string) (*brzrpc.NoteParts, error)
 	Create(ctx context.Context, n *brzrpc.Note) error
 	Insert(ctx context.Context, n *brzrpc.Note) error
 	Delete(ctx context.Context, id string) error
@@ -35,8 +38,20 @@ type Repo interface {
 	AddTagToNote(ctx context.Context, id string, tag *brzrpc.Tag) error
 
 	ChangeBlockOrder(ctx context.Context, noteID string, oldOrder, newOrder int) error
+
+	Healthz(ctx context.Context) error
 }
 
 var (
 	ErrBadRequest = errors.New("bad fields")
 )
+
+func (a *API) Healthz(ctx context.Context) error {
+	var result map[string]interface{}
+
+	err := a.Blocks().Database().RunCommand(ctx, map[string]interface{}{"ping": 1}).Decode(&result)
+	if err != nil {
+		return err
+	}
+	return nil
+}

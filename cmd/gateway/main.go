@@ -19,7 +19,7 @@ import (
 
 // @title Breezy notes gateway REST UserAPI
 // @version 0.1-.-infDev
-// @description Full UserAPI for BreezyNotes.
+// @description Full API for BreezyNotes.
 // @termsOfService https://about.breezynotes.ru/
 
 // @contact.name Alex "bustard" Provor

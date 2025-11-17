@@ -49,6 +49,7 @@ service AuthService {
   rpc ChangePasswd(ChangePasswordRequest) returns (google.protobuf.Empty);
   rpc CreateUser(User) returns (google.protobuf.Empty);
   rpc GetUserDataFromToken(Token) returns (User);
+  rpc GetIdFromToken(Token) returns (Id);
 
   rpc Healthz(google.protobuf.Empty) returns (google.protobuf.Empty);
 }

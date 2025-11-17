@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
-	"github.com/autumnterror/breezynotes/pkg/utils/id"
+	"github.com/autumnterror/breezynotes/pkg/utils/uid"
 	"github.com/autumnterror/breezynotes/pkg/utils/validate"
 	"github.com/autumnterror/breezynotes/views"
 	"github.com/labstack/echo/v4"
@@ -73,6 +73,7 @@ func (e *Echo) Auth(c echo.Context) error {
 		Path:     "/",
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
+		Expires:  time.Unix(tokens.ExpAccess, 0).UTC(),
 	})
 	c.SetCookie(&http.Cookie{
 		Name:     "refresh_token",
@@ -80,6 +81,7 @@ func (e *Echo) Auth(c echo.Context) error {
 		Path:     "/",
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
+		Expires:  time.Unix(tokens.ExpRefresh, 0).UTC(),
 	})
 
 	log.Success(op, "")
@@ -97,7 +99,7 @@ func (e *Echo) Auth(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param User body views.UserRegister true "Reg data"
-// @Success 200 {object} views.SWGError
+// @Success 200 {object} brzrpc.Tokens
 // @Failure 400 {object} views.SWGError
 // @Failure 302 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
@@ -126,7 +128,7 @@ func (e *Echo) Reg(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
 	defer cancel()
 
-	id := id.New()
+	id := uid.New()
 	_, err := auth.CreateUser(ctx, &brzrpc.User{
 		Id:       id,
 		Login:    u.Login,
@@ -164,6 +166,7 @@ func (e *Echo) Reg(c echo.Context) error {
 		Path:     "/",
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
+		Expires:  time.Unix(tokens.ExpAccess, 0).UTC(),
 	})
 	c.SetCookie(&http.Cookie{
 		Name:     "refresh_token",
@@ -171,6 +174,7 @@ func (e *Echo) Reg(c echo.Context) error {
 		Path:     "/",
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
+		Expires:  time.Unix(tokens.ExpRefresh, 0).UTC(),
 	})
 
 	log.Success(op, "")
@@ -248,13 +252,7 @@ func (e *Echo) ValidateToken(c echo.Context) error {
 				Path:     "/",
 				HttpOnly: true,
 				SameSite: http.SameSiteLaxMode,
-			})
-			c.SetCookie(&http.Cookie{
-				Name:     "refresh_token",
-				Value:    rt.Value,
-				Path:     "/",
-				HttpOnly: true,
-				SameSite: http.SameSiteLaxMode,
+				Expires:  time.Unix(newAt.GetExp(), 0).UTC(),
 			})
 			return c.JSON(http.StatusCreated, newAt)
 		case codes.InvalidArgument:

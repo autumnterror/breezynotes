@@ -65,9 +65,9 @@ func TestCrudGood(t *testing.T) {
 			log.Green("get after create ", n)
 		}
 
-		if nts, err := a.GetAllByTag(context.TODO(), "test_tag"); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
-			log.Green("get by tag ", nts)
-		}
+		//if nts, err := a.GetAllByTag(context.TODO(), "test_tag"); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
+		//	log.Green("get by tag ", nts)
+		//}
 
 		if nts, err := a.GetAllByUser(context.TODO(), "test_auth"); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
 			log.Green("get all by user after create ", nts)

@@ -74,6 +74,47 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string) (*brzrpc.NotePar
 	return nts, nil
 }
 
+// GetNoteListByTag use func a.blockAPI.GetAsFirst
+func (a *API) GetNoteListByTag(ctx context.Context, id, idUser string) (*brzrpc.NoteParts, error) {
+	const op = "notes.GetNoteListByUser"
+
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
+	defer done()
+
+	cur, err := a.Notes().Find(ctx, bson.M{"tag._id": id, "author": idUser})
+	if err != nil {
+		return nil, format.Error(op, err)
+	}
+	defer cur.Close(ctx)
+
+	nts := &brzrpc.NoteParts{
+		Items: []*brzrpc.NotePart{},
+	}
+
+	for cur.Next(ctx) {
+		var n views.NoteDb
+		if err = cur.Decode(&n); err != nil {
+			return nts, format.Error(op, err)
+		}
+		fb := ""
+		if len(n.Blocks) > 0 {
+			nfb, err := a.blockAPI.GetAsFirst(ctx, n.Blocks[0])
+			if err == nil {
+				fb = nfb
+			}
+		}
+		nts.Items = append(nts.Items, &brzrpc.NotePart{
+			Id:         n.Id,
+			Title:      n.Title,
+			Tag:        views.FromTagDb(n.Tag),
+			FirstBlock: fb,
+			UpdatedAt:  n.UpdatedAt,
+		})
+	}
+
+	return nts, nil
+}
+
 // GetAllByUser return note by id author
 func (a *API) GetAllByUser(ctx context.Context, id string) (*brzrpc.Notes, error) {
 	const op = "notes.Get"
@@ -102,33 +143,33 @@ func (a *API) GetAllByUser(ctx context.Context, id string) (*brzrpc.Notes, error
 	return nts, nil
 }
 
-// GetAllByTag return note by id tag
-func (a *API) GetAllByTag(ctx context.Context, id string) (*brzrpc.Notes, error) {
-	const op = "notes.Get"
-
-	ctx, done := context.WithTimeout(ctx, views.WaitTime)
-	defer done()
-
-	cur, err := a.Notes().Find(ctx, bson.M{"tag._id": id})
-	if err != nil {
-		return nil, format.Error(op, err)
-	}
-	defer cur.Close(ctx)
-
-	nts := &brzrpc.Notes{
-		Items: []*brzrpc.Note{},
-	}
-
-	for cur.Next(ctx) {
-		var n views.NoteDb
-		if err = cur.Decode(&n); err != nil {
-			return nts, format.Error(op, err)
-		}
-		nts.Items = append(nts.Items, views.FromNoteDb(&n))
-	}
-
-	return nts, nil
-}
+// GetAllByTag return note by id tag. !UNSAFE!
+//func (a *API) GetAllByTag(ctx context.Context, id string) (*brzrpc.Notes, error) {
+//	const op = "notes.Get"
+//
+//	ctx, done := context.WithTimeout(ctx, views.WaitTime)
+//	defer done()
+//
+//	cur, err := a.Notes().Find(ctx, bson.M{"tag._id": id})
+//	if err != nil {
+//		return nil, format.Error(op, err)
+//	}
+//	defer cur.Close(ctx)
+//
+//	nts := &brzrpc.Notes{
+//		Items: []*brzrpc.Note{},
+//	}
+//
+//	for cur.Next(ctx) {
+//		var n views.NoteDb
+//		if err = cur.Decode(&n); err != nil {
+//			return nts, format.Error(op, err)
+//		}
+//		nts.Items = append(nts.Items, views.FromNoteDb(&n))
+//	}
+//
+//	return nts, nil
+//}
 
 // Create note with CreatedAt and UpdatedAt time.Now().UTC().Unix(). Don't create id
 func (a *API) Create(ctx context.Context, n *brzrpc.Note) error {

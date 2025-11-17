@@ -2,7 +2,7 @@ package net
 
 import (
 	"context"
-	"github.com/autumnterror/breezynotes/pkg/utils/id"
+	"github.com/autumnterror/breezynotes/pkg/utils/uid"
 	"net/http"
 	"time"
 
@@ -38,8 +38,25 @@ func (e *Echo) ChangeTitleNote(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
 	}
 
+	idInt := c.Get("id")
+	idUser, ok := idInt.(string)
+	if !ok || idUser == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	}
+
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
+
+	//AUTHORIZE
+	if n, err := api.GetNote(ctx, &brzrpc.Id{Id: r.GetId()}); err == nil {
+		if n.GetAuthor() != idUser {
+			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "not author"})
+		}
+	} else {
+		log.Error(op, "get note", err)
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad note id"})
+	}
+	//AUTHORIZE
 
 	_, err := api.ChangeTitleNote(ctx, &r)
 	if err != nil {
@@ -70,7 +87,7 @@ func (e *Echo) ChangeTitleNote(c echo.Context) error {
 // @Tags note
 // @Accept json
 // @Produce json
-// @Param id query string true  "Note ID"
+// @Param id query string true "Note ID"
 // @Success 200 {object} brzrpc.Note
 // @Failure 400 {object} views.SWGError
 // @Failure 404 {object} views.SWGError
@@ -85,6 +102,12 @@ func (e *Echo) GetNote(c echo.Context) error {
 	id := c.QueryParam("id")
 	if id == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+	}
+
+	idInt := c.Get("id")
+	idUser, ok := idInt.(string)
+	if !ok || idUser == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
 	}
 
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
@@ -104,6 +127,9 @@ func (e *Echo) GetNote(c echo.Context) error {
 			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get note error"})
 		}
 	}
+	if note.GetAuthor() != idUser {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "not author"})
+	}
 
 	log.Success(op, "")
 
@@ -116,7 +142,6 @@ func (e *Echo) GetNote(c echo.Context) error {
 // @Tags note
 // @Accept json
 // @Produce json
-// @Param id query string true  "User ID"
 // @Success 200 {object} brzrpc.Notes
 // @Failure 400 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
@@ -127,9 +152,10 @@ func (e *Echo) GetAllNotes(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	id := c.QueryParam("id")
-	if id == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+	idInt := c.Get("id")
+	id, ok := idInt.(string)
+	if !ok && id == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
 	}
 
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
@@ -177,10 +203,19 @@ func (e *Echo) GetNotesByTag(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
 	}
 
+	idInt := c.Get("id")
+	idUser, ok := idInt.(string)
+	if !ok || idUser == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	}
+
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	notes, err := api.GetNotesByTag(ctx, &brzrpc.Id{Id: id})
+	notes, err := api.GetNotesByTag(ctx, &brzrpc.GetNotesByTagRequest{
+		IdTag:  id,
+		IdUser: idUser,
+	})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -218,6 +253,12 @@ func (e *Echo) CreateNote(c echo.Context) error {
 
 	api := e.bnAPI.API
 
+	idInt := c.Get("id")
+	idUser, ok := idInt.(string)
+	if !ok || idUser == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	}
+
 	var r views.NoteReq
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "create note bind", err)
@@ -231,14 +272,14 @@ func (e *Echo) CreateNote(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad tag"})
 	}
-	id := id.New()
+	id := uid.New()
 	_, err = api.CreateNote(ctx, &brzrpc.Note{
 		Id:        id,
 		Title:     r.Title,
 		CreatedAt: 0,
 		UpdatedAt: 0,
 		Tag:       t,
-		Author:    r.Author,
+		Author:    idUser,
 		Editors:   r.Editors,
 		Readers:   r.Readers,
 		Blocks:    r.Blocks,
@@ -281,6 +322,12 @@ func (e *Echo) GetAllBlocksInNote(c echo.Context) error {
 
 	api := e.bnAPI.API
 
+	idInt := c.Get("id")
+	idUser, ok := idInt.(string)
+	if !ok || idUser == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	}
+
 	id := c.QueryParam("id")
 	if id == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
@@ -288,6 +335,17 @@ func (e *Echo) GetAllBlocksInNote(c echo.Context) error {
 
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
+
+	//AUTHORIZE
+	if n, err := api.GetNote(ctx, &brzrpc.Id{Id: id}); err == nil {
+		if n.GetAuthor() != idUser {
+			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "not author"})
+		}
+	} else {
+		log.Error(op, "get note", err)
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad note id"})
+	}
+	//AUTHORIZE
 
 	blocks, err := api.GetAllBlocksInNote(ctx, &brzrpc.Id{Id: id})
 	if err != nil {
@@ -327,6 +385,12 @@ func (e *Echo) AddTagToNote(c echo.Context) error {
 
 	api := e.bnAPI.API
 
+	idInt := c.Get("id")
+	idUser, ok := idInt.(string)
+	if !ok || idUser == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	}
+
 	var r brzrpc.AddTagToNoteRequest
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "add tag to note bind", err)
@@ -335,6 +399,15 @@ func (e *Echo) AddTagToNote(c echo.Context) error {
 
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
+
+	if n, err := api.GetNote(ctx, &brzrpc.Id{Id: r.GetNoteId()}); err == nil {
+		if n.GetAuthor() != idUser {
+			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "not author"})
+		}
+	} else {
+		log.Error(op, "get note", err)
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad note id"})
+	}
 
 	_, err := api.AddTagToNote(ctx, &r)
 	if err != nil {

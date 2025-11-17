@@ -70,6 +70,10 @@ message CreateBlockRequest {
   google.protobuf.Struct data = 2;
 }
 
+message GetNotesByTagRequest {
+  string idTag = 1;
+  string idUser = 2;
+}
 
 // ===== BlockNote Service =====
 service BlockNoteService {
@@ -85,7 +89,7 @@ service BlockNoteService {
   rpc ChangeTitleNote(ChangeTitleNoteRequest) returns (google.protobuf.Empty);
   rpc NoteToTrash(Id) returns (google.protobuf.Empty);
   rpc NoteFromTrash(Id) returns (google.protobuf.Empty);
-  rpc FindNoteInTrash(Id) returns (google.protobuf.Empty);
+  rpc FindNoteInTrash(Id) returns (Note);
 
   rpc GetNote(Id) returns (Note);
   rpc GetNoteList(Id) returns (NoteParts);
@@ -93,8 +97,8 @@ service BlockNoteService {
   rpc UpdateNoteTitle(UpdateNoteTitleRequest) returns (google.protobuf.Empty);
 
   rpc GetAllBlocksInNote(Id) returns (Blocks);
-  rpc GetAllNotes(Id) returns (Notes);
-  rpc GetNotesByTag(Id) returns (Notes);
+  rpc GetAllNotes(Id) returns (NoteParts);
+  rpc GetNotesByTag(GetNotesByTagRequest) returns (NoteParts);
   rpc GetNotesFromTrash(Id) returns (NoteParts);
 
   rpc AddTagToNote(AddTagToNoteRequest) returns (google.protobuf.Empty);

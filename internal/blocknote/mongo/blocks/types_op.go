@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/autumnterror/breezynotes/pkg/pkgs"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
-	"github.com/autumnterror/breezynotes/pkg/utils/id"
+	"github.com/autumnterror/breezynotes/pkg/utils/uid"
 	"github.com/autumnterror/breezynotes/views"
 )
 
@@ -23,7 +23,7 @@ func (a *API) Create(ctx context.Context, _type string, data map[string]any) (st
 	if err != nil {
 		return "", format.Error(op, err)
 	}
-	block.Id = id.New()
+	block.Id = uid.New()
 	if err := a.createBlock(ctx, block); err != nil {
 		return "", format.Error(op, err)
 	}

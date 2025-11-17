@@ -76,7 +76,16 @@ func (d *PostgresDb) Disconnect() error {
 	return nil
 }
 
+func (d *Driver) Healthz(ctx context.Context) error {
+	const op = "psql.Healthz"
+	if _, err := d.driver.ExecContext(ctx, "SELECT 1;"); err != nil {
+		return format.Error(op, err)
+	}
+	return nil
+}
+
 type AuthRepo interface {
+	Healthz(ctx context.Context) error
 	Authentication(ctx context.Context, u *brzrpc.AuthRequest) (string, error)
 	GetAll(ctx context.Context) ([]*brzrpc.User, error)
 	Create(ctx context.Context, u *brzrpc.User) error

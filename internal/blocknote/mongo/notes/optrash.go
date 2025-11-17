@@ -45,12 +45,18 @@ func (a *API) GetNotesFromTrash(ctx context.Context, uid string) (*brzrpc.NotePa
 		if err = cur.Decode(&n); err != nil {
 			return pts, format.Error(op, err)
 		}
+		fb := ""
+		if len(n.Blocks) > 0 {
+			nfb, err := a.blockAPI.GetAsFirst(ctx, n.Blocks[0])
+			if err == nil {
+				fb = nfb
+			}
+		}
 		np := brzrpc.NotePart{
-			Id:    n.Id,
-			Title: n.Title,
-			Tag:   views.FromTagDb(n.Tag),
-			//TODO first block from blocks
-			FirstBlock: "",
+			Id:         n.Id,
+			Title:      n.Title,
+			Tag:        views.FromTagDb(n.Tag),
+			FirstBlock: fb,
 			UpdatedAt:  n.UpdatedAt,
 		}
 		pts.Items = append(pts.Items, &np)
@@ -108,4 +114,25 @@ func (a *API) FromTrash(ctx context.Context, id string) error {
 	}
 
 	return nil
+}
+
+// FindFromTrash return note by id from Trash
+func (a *API) FindFromTrash(ctx context.Context, id string) (*brzrpc.Note, error) {
+	const op = "notes.Get"
+
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
+	defer done()
+
+	res := a.Trash().FindOne(ctx, bson.M{"_id": id})
+	if res.Err() != nil {
+		return nil, format.Error(op, res.Err())
+	}
+
+	var n views.NoteDb
+	err := res.Decode(&n)
+	if err != nil {
+		return nil, format.Error(op, err)
+	}
+
+	return views.FromNoteDb(&n), nil
 }

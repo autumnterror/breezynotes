@@ -9,7 +9,7 @@ import (
 	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
-	"github.com/autumnterror/breezynotes/pkg/utils/id"
+	"github.com/autumnterror/breezynotes/pkg/utils/uid"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -20,7 +20,7 @@ func TestUsersOperations(t *testing.T) {
 	repo, _, cleanup := setupTestTx(t)
 	defer cleanup()
 
-	userID := id.New()
+	userID := uid.New()
 	user := &brzrpc.User{
 		Id:       userID,
 		Login:    "testlogin",
@@ -105,7 +105,7 @@ func TestCreateDuplicateUser(t *testing.T) {
 	repo, _, cleanup := setupTestTx(t)
 	defer cleanup()
 
-	uid := id.New()
+	uid := uid.New()
 	user := &brzrpc.User{
 		Id:       uid,
 		Login:    "duplicate",
@@ -115,7 +115,7 @@ func TestCreateDuplicateUser(t *testing.T) {
 	}
 
 	assert.NoError(t, repo.Create(context.TODO(), user))
-	user.Id = id.New()
+	user.Id = uid.New()
 	err := repo.Create(context.TODO(), user)
 	assert.Error(t, err)
 	assert.True(t, errors.Is(err, ErrAlreadyExist))
@@ -126,7 +126,7 @@ func TestUpdateNonExistentUser(t *testing.T) {
 	repo, _, cleanup := setupTestTx(t)
 	defer cleanup()
 
-	err := repo.UpdateAbout(context.TODO(), id.New(), "123")
+	err := repo.UpdateAbout(context.TODO(), uid.New(), "123")
 	assert.Error(t, err)
 	assert.True(t, errors.Is(err, sql.ErrNoRows))
 }
@@ -136,7 +136,7 @@ func TestDeleteNonExistentUser(t *testing.T) {
 	repo, _, cleanup := setupTestTx(t)
 	defer cleanup()
 
-	err := repo.Delete(context.TODO(), id.New())
+	err := repo.Delete(context.TODO(), uid.New())
 	assert.Error(t, err)
 	assert.True(t, errors.Is(err, sql.ErrNoRows))
 }
@@ -146,7 +146,7 @@ func TestGetInfo_InvalidID(t *testing.T) {
 	repo, _, cleanup := setupTestTx(t)
 	defer cleanup()
 
-	_, err := repo.GetInfo(context.TODO(), id.New())
+	_, err := repo.GetInfo(context.TODO(), uid.New())
 	assert.Error(t, err)
 	assert.True(t, errors.Is(err, sql.ErrNoRows))
 }
@@ -156,7 +156,7 @@ func TestAuthLogin(t *testing.T) {
 	repo, _, cleanup := setupTestTx(t)
 	defer cleanup()
 
-	uid := id.New()
+	uid := uid.New()
 	user := &brzrpc.User{
 		Id:       uid,
 		Login:    "login",
@@ -181,7 +181,7 @@ func TestAuthEmail(t *testing.T) {
 	repo, _, cleanup := setupTestTx(t)
 	defer cleanup()
 
-	uid := id.New()
+	uid := uid.New()
 	user := &brzrpc.User{
 		Id:       uid,
 		Login:    "login",
@@ -205,7 +205,7 @@ func TestAuthWrongInput1(t *testing.T) {
 	repo, _, cleanup := setupTestTx(t)
 	defer cleanup()
 
-	uid := id.New()
+	uid := uid.New()
 	user := &brzrpc.User{
 		Id:       uid,
 		Login:    "login",
@@ -229,7 +229,7 @@ func TestAuthWrongInput2(t *testing.T) {
 	repo, _, cleanup := setupTestTx(t)
 	defer cleanup()
 
-	uid := id.New()
+	uid := uid.New()
 	user := &brzrpc.User{
 		Id:       uid,
 		Login:    "login",
@@ -253,7 +253,7 @@ func TestAuthPwIncorrect(t *testing.T) {
 	repo, _, cleanup := setupTestTx(t)
 	defer cleanup()
 
-	uid := id.New()
+	uid := uid.New()
 	user := &brzrpc.User{
 		Id:       uid,
 		Login:    "login",
