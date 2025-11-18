@@ -23,7 +23,7 @@ func New(cfg *config.Config, API psql.AuthRepo, JwtAPI jwt.WithConfigRepo) *App 
 			MaxConnectionIdle: 0,
 		}),
 	)
-	Register(s, API, JwtAPI)
+	Register(s, API, JwtAPI, cfg)
 
 	return &App{
 		gRPCServer: s,
