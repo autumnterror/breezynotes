@@ -3,13 +3,15 @@ package notes
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
+	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/autumnterror/breezynotes/views"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
-	"time"
 )
 
 // Get return note by id
@@ -60,6 +62,8 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string) (*brzrpc.NotePar
 			nfb, err := a.blockAPI.GetAsFirst(ctx, n.Blocks[0])
 			if err == nil {
 				fb = nfb
+			} else {
+				log.Warn(op, "get as first", err)
 			}
 		}
 		nts.Items = append(nts.Items, &brzrpc.NotePart{

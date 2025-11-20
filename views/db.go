@@ -1,10 +1,11 @@
 package views
 
 import (
+	"time"
+
 	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"google.golang.org/protobuf/types/known/structpb"
-	"time"
 )
 
 const (
@@ -37,6 +38,16 @@ func ToNoteDb(n *brzrpc.Note) *NoteDb {
 	if n == nil {
 		return nil
 	}
+	nn := brzrpc.Note{}
+	if n.Blocks == nil {
+		nn.Blocks = []string{}
+	}
+	if n.Editors == nil {
+		nn.Editors = []string{}
+	}
+	if n.Readers == nil {
+		nn.Readers = []string{}
+	}
 	return &NoteDb{
 		Id:        n.Id,
 		Title:     n.Title,
@@ -44,9 +55,9 @@ func ToNoteDb(n *brzrpc.Note) *NoteDb {
 		UpdatedAt: n.UpdatedAt,
 		Tag:       ToTagDb(n.Tag),
 		Author:    n.Author,
-		Editors:   n.Editors,
-		Readers:   n.Readers,
-		Blocks:    n.Blocks,
+		Editors:   nn.Editors,
+		Readers:   nn.Readers,
+		Blocks:    nn.Blocks,
 		Status:    n.Status,
 	}
 }
@@ -55,6 +66,16 @@ func FromNoteDb(n *NoteDb) *brzrpc.Note {
 	if n == nil {
 		return nil
 	}
+	nn := NoteDb{}
+	if n.Blocks == nil {
+		nn.Blocks = []string{}
+	}
+	if n.Editors == nil {
+		nn.Editors = []string{}
+	}
+	if n.Readers == nil {
+		nn.Readers = []string{}
+	}
 	return &brzrpc.Note{
 		Id:        n.Id,
 		Title:     n.Title,
@@ -62,9 +83,9 @@ func FromNoteDb(n *NoteDb) *brzrpc.Note {
 		UpdatedAt: n.UpdatedAt,
 		Tag:       FromTagDb(n.Tag),
 		Author:    n.Author,
-		Editors:   n.Editors,
-		Readers:   n.Readers,
-		Blocks:    n.Blocks,
+		Editors:   nn.Editors,
+		Readers:   nn.Readers,
+		Blocks:    nn.Blocks,
 		Status:    n.Status,
 	}
 }

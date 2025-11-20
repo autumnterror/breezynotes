@@ -3,20 +3,21 @@ package blocks
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	"github.com/autumnterror/breezynotes/pkg/pkgs"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/autumnterror/breezynotes/pkg/utils/uid"
 	"github.com/autumnterror/breezynotes/views"
-	"time"
 )
 
 // Create universal func that get block, calls func blocks.createBlock by field _type.
 // NEED TO REGISTER TYPE BEFORE USE.
 // method create id
 func (a *API) Create(ctx context.Context, _type, noteId string, data map[string]any) (string, error) {
-	const op = "blocks.OpBlock"
+	const op = "blocks.Create"
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
@@ -38,7 +39,7 @@ func (a *API) Create(ctx context.Context, _type, noteId string, data map[string]
 		return "", format.Error(op, err)
 	}
 
-	return "", nil
+	return block.Id, nil
 }
 
 // Render universal func that calls func blocks.Render by field _type.
