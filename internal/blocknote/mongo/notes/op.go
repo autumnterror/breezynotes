@@ -147,34 +147,6 @@ func (a *API) GetAllByUser(ctx context.Context, id string) (*brzrpc.Notes, error
 	return nts, nil
 }
 
-// GetAllByTag return note by id tag. !UNSAFE!
-//func (a *API) GetAllByTag(ctx context.Context, id string) (*brzrpc.Notes, error) {
-//	const op = "notes.Get"
-//
-//	ctx, done := context.WithTimeout(ctx, views.WaitTime)
-//	defer done()
-//
-//	cur, err := a.Notes().Find(ctx, bson.M{"tag._id": id})
-//	if err != nil {
-//		return nil, format.Error(op, err)
-//	}
-//	defer cur.Close(ctx)
-//
-//	nts := &brzrpc.Notes{
-//		Items: []*brzrpc.Note{},
-//	}
-//
-//	for cur.Next(ctx) {
-//		var n views.NoteDb
-//		if err = cur.Decode(&n); err != nil {
-//			return nts, format.Error(op, err)
-//		}
-//		nts.Items = append(nts.Items, views.FromNoteDb(&n))
-//	}
-//
-//	return nts, nil
-//}
-
 // Create note with CreatedAt and UpdatedAt time.Now().UTC().Unix(). Don't create id
 func (a *API) Create(ctx context.Context, n *brzrpc.Note) error {
 	const op = "notes.Create"
@@ -314,7 +286,7 @@ func (a *API) UpdateBlocks(ctx context.Context, id string, blocks []string) erro
 }
 
 // InsertBlock can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix()
-func (a *API) InsertBlock(ctx context.Context, id, block string, pos int) error {
+func (a *API) InsertBlock(ctx context.Context, id, blockId string, pos int) error {
 	const op = "notes.InsertBlock"
 
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
@@ -330,7 +302,7 @@ func (a *API) InsertBlock(ctx context.Context, id, block string, pos int) error 
 			bson.M{
 				"$push": bson.M{
 					"blocks": bson.M{
-						"$each":     []string{block},
+						"$each":     []string{blockId},
 						"$position": pos,
 					},
 				},

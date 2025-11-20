@@ -6,35 +6,18 @@
   <component name="ChangeListManager">
     <list default="true" id="9859957d-2c2c-4239-80b4-4d74a8eeb2c2" name="Changes" comment="add blocknote funcs">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/docs.go" beforeDir="false" afterPath="$PROJECT_DIR$/docs/docs.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/swagger.json" beforeDir="false" afterPath="$PROJECT_DIR$/docs/swagger.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/swagger.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docs/swagger.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/auth/grpc/userop.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/auth/grpc/userop.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/blocknote/grpc/noteop.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/grpc/noteop.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/blocknote/grpc/opblock.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/grpc/opblock.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/blocknote/grpc/tagop.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/grpc/tagop.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/blocknote/mongo/blocks/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/mongo/blocks/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/blocknote/mongo/blocks/op_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/mongo/blocks/op_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/blocknote/mongo/blocks/types_op.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/mongo/blocks/types_op.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/blocknote/mongo/blocks/unified_op.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/mongo/blocks/unified_op.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/blocknote/mongo/cfg.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/mongo/cfg.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/blocknote/mongo/notes/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/mongo/notes/client.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/blocknote/mongo/notes/op.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/mongo/notes/op.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/blocknote/mongo/notes/op_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/mongo/notes/op_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/blocknote/mongo/tags/op.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/mongo/tags/op.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/blocknote/mongo/tags/op_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/mongo/tags/op_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/gateway/net/auth_handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/net/auth_handlers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/gateway/net/block_handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/net/block_handlers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/gateway/net/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/net/client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/gateway/net/note_handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/net/note_handlers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/gateway/net/user_handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/net/user_handlers.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/pkgs/default/textblock/pub_op.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/pkgs/default/textblock/pub_op.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/pkgs/default/textblock/view.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/pkgs/default/textblock/view.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/pkgs/init.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/pkgs/init.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/protos/proto/gen/notes.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/gen/notes.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/protos/proto/notes.proto" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/notes.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/utils/alg/alg.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/utils/alg/alg.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/protos/proto/domain.proto" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/domain.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/protos/proto/gen/domain.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/gen/domain.pb.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/views/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/views/db.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/views.go" beforeDir="false" afterPath="$PROJECT_DIR$/views/views.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/models_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/views/models_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

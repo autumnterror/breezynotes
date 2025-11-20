@@ -1,6 +1,8 @@
 
 test-method:
 	go test -run $(METHOD) ./... -v
+test-views:
+	go test ./views -v
 test-textblock:
 	go test ./pkg/pkgs/default/textblock -v
 test-textblock-bm:

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/views"
 )
@@ -11,6 +12,7 @@ import (
 type Driver struct{}
 
 func (tb *Driver) GetAsFirst(ctx context.Context, block *brzrpc.Block) string {
+	log.Println(block)
 	b, err := FromUnified(block)
 	if err != nil {
 		return ""
@@ -21,31 +23,36 @@ func (tb *Driver) ChangeType(ctx context.Context, block *brzrpc.Block, newType s
 	return nil
 }
 
-func (tb *Driver) Op(ctx context.Context, block *brzrpc.Block, op string, data map[string]any) error {
+func (tb *Driver) Op(ctx context.Context, block *brzrpc.Block, op string, data map[string]any) (map[string]any, error) {
 	b, err := FromUnified(block)
 	if err != nil {
-		return errors.New("bad block")
+		return nil, errors.New("bad block")
 	}
 	switch op {
 	case "apply_style":
 		raw, err := json.Marshal(data)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		var req struct {
-			start int
-			end   int
-			style string
+			Start int    `json:"start"`
+			End   int    `json:"end"`
+			Style string `json:"style"`
 		}
 		if err := json.Unmarshal(raw, &req); err != nil {
-			return err
+			return nil, err
 		}
-		if err := b.ApplyStyle(req.start, req.end, req.style); err != nil {
-			return err
+		if err := b.ApplyStyle(req.Start, req.End, req.Style); err != nil {
+			return nil, err
 		}
-		return nil
+		nb, err := b.ToUnified()
+		if err != nil {
+			return nil, err
+		}
+
+		return nb.GetData().AsMap(), nil
 	default:
-		return errors.New("unsupported type") //TODO dic errors
+		return nil, errors.New("unsupported type") //TODO dic errors
 	}
 }
 

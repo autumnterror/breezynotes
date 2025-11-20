@@ -1,6 +1,8 @@
 package views
 
 import (
+	"fmt"
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"time"
 
 	"github.com/autumnterror/breezynotes/pkg/log"
@@ -22,8 +24,6 @@ type NoteDb struct {
 	Editors   []string `bson:"editors"`
 	Readers   []string `bson:"readers"`
 	Blocks    []string `bson:"blocks"`
-	//TODO deprecated (status in table)
-	Status brzrpc.Statuses `bson:"status"`
 }
 
 type TagDb struct {
@@ -38,7 +38,7 @@ func ToNoteDb(n *brzrpc.Note) *NoteDb {
 	if n == nil {
 		return nil
 	}
-	nn := brzrpc.Note{}
+	nn := brzrpc.Note{Blocks: n.Blocks, Editors: n.Editors, Readers: n.Readers}
 	if n.Blocks == nil {
 		nn.Blocks = []string{}
 	}
@@ -58,7 +58,6 @@ func ToNoteDb(n *brzrpc.Note) *NoteDb {
 		Editors:   nn.Editors,
 		Readers:   nn.Readers,
 		Blocks:    nn.Blocks,
-		Status:    n.Status,
 	}
 }
 
@@ -66,7 +65,7 @@ func FromNoteDb(n *NoteDb) *brzrpc.Note {
 	if n == nil {
 		return nil
 	}
-	nn := NoteDb{}
+	nn := brzrpc.Note{Blocks: n.Blocks, Editors: n.Editors, Readers: n.Readers}
 	if n.Blocks == nil {
 		nn.Blocks = []string{}
 	}
@@ -86,7 +85,6 @@ func FromNoteDb(n *NoteDb) *brzrpc.Note {
 		Editors:   nn.Editors,
 		Readers:   nn.Readers,
 		Blocks:    nn.Blocks,
-		Status:    n.Status,
 	}
 }
 
@@ -143,40 +141,56 @@ func ToBlockDb(b *brzrpc.Block) *BlockDb {
 	}
 }
 
-// FromBlockDb on data field u can insert only base type. If u want ur struct convert to map[string]any
-//
-//	type B struct {
-//		I int
-//		F float32
-//	}
-//
-//	func (b B) ToMap() map[string]interface{} {
-//		return map[string]interface{}{
-//			"I": b.I,
-//			"F": b.F,
-//		}
-//	}
-//
-//	&BlockDb{
-//			Id:        "test",
-//			Type:      "test",
-//			NoteId:    "test",
-//			Order:     1,
-//			CreatedAt: 2,
-//			UpdatedAt: 3,
-//			IsUsed:    true,
-//			Data: map[string]any{
-//				"test": B{
-//					I: 1,
-//					F: 1.0,
-//				}.ToMap(),
-//				"test2": B{
-//					I: 2,
-//					F: 2.0,
-//				}.ToMap(),
-//			},
+func normalize(v any) any {
+	switch x := v.(type) {
+
+	case bson.M:
+		m := make(map[string]any, len(x))
+		for k, v2 := range x {
+			m[k] = normalize(v2)
+		}
+		return m
+	case bson.D:
+		m := make(map[string]any, len(x))
+		for _, e := range x {
+			m[e.Key] = normalize(e.Value)
+		}
+		return m
+	case bson.A:
+		s := make([]any, len(x))
+		for i, v2 := range x {
+			s[i] = normalize(v2)
+		}
+		return s
+
+	case map[string]any:
+		for k, v2 := range x {
+			x[k] = normalize(v2)
+		}
+		return x
+
+	case []any:
+		for i, v2 := range x {
+			x[i] = normalize(v2)
+		}
+		return x
+
+	default:
+		return v
+	}
+}
+
+// FromBlockDb on data field u can insert only base type. If u want ur struct convert to map[string]any (check models_test.go)
 func FromBlockDb(b *BlockDb) *brzrpc.Block {
-	s, err := structpb.NewStruct(b.Data)
+	normalized := normalize(b.Data)
+
+	m, ok := normalized.(map[string]any)
+	if !ok {
+		log.Warn("mongo.FromBlockDb", "", fmt.Errorf("data is not a map[string]any after normalize, got %T", normalized))
+		m = nil
+	}
+
+	s, err := structpb.NewStruct(m)
 	if err != nil {
 		log.Warn("mongo.FromBlockDb", "", err)
 		s = nil

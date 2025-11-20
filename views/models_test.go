@@ -2,6 +2,7 @@ package views
 
 import (
 	"github.com/autumnterror/breezynotes/pkg/log"
+	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"testing"
 )
 
@@ -38,6 +39,27 @@ func TestBlockDb(t *testing.T) {
 		},
 	}
 	brzb := FromBlockDb(bdb)
-	log.Blue(*brzb)
-	log.Blue(*ToBlockDb(brzb))
+	log.Blue(format.Struct(*brzb))
+	log.Blue(format.Struct(*ToBlockDb(brzb)))
+}
+
+func TestBlockDb2(t *testing.T) {
+	bdb := &BlockDb{
+		Id:        "test",
+		Type:      "test",
+		NoteId:    "test",
+		Order:     1,
+		CreatedAt: 2,
+		UpdatedAt: 3,
+		IsUsed:    true,
+		Data: map[string]any{
+			"text": []any{
+				map[string]any{"style": "default", "text": "hello its example!"},
+				map[string]any{"style": "default", "text": "hello its example!"},
+			},
+		},
+	}
+	brzb := FromBlockDb(bdb)
+	log.Blue(format.Struct(*brzb))
+	log.Blue(format.Struct(*ToBlockDb(brzb)))
 }

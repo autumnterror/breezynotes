@@ -21,12 +21,6 @@ message Tokens {
 message UserId { string id = 1; }
 message Id { string id = 1; }
 
-enum Statuses {
-  STATUS_UNSPECIFIED = 0;
-  ARCHIVED = 1;
-  IN_USE = 2;
-  IN_TRASH = 3;
-}
 
 enum Roles {
   ROLE_UNSPECIFIED = 0;
@@ -74,7 +68,6 @@ message Note {
   repeated string editors = 7;
   repeated string readers = 8;
   repeated string blocks = 9;
-  Statuses status = 10;
 }
 
 message NotePart {

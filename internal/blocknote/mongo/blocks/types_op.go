@@ -42,24 +42,6 @@ func (a *API) Create(ctx context.Context, _type, noteId string, data map[string]
 	return block.Id, nil
 }
 
-// Render universal func that calls func blocks.Render by field _type.
-// NEED TO REGISTER TYPE BEFORE USE.
-//func (a *API) Render(ctx context.Context, id, _type string) (*brzrpc.Block, error) {
-//	const op = "blocks.Render"
-//	ctx, done := context.WithTimeout(ctx, views.WaitTime)
-//	defer done()
-//
-//	if pkgs.BlockRegistry[_type] == nil {
-//		return nil, ErrTypeNotDefined
-//	}
-//	block, err := pkgs.BlockRegistry[_type].Render(ctx, id, _type)
-//	if err != nil {
-//		return nil, format.Error(op, err)
-//	}
-//
-//	return "", nil
-//}
-
 // OpBlock universal func that get block, calls func op by field _type and set field data of block after op func. NEED TO REGISTER TYPE BEFORE USE
 func (a *API) OpBlock(ctx context.Context, id, opName string, data map[string]any) error {
 	const op = "blocks.OpBlock"
@@ -86,11 +68,12 @@ func (a *API) OpBlock(ctx context.Context, id, opName string, data map[string]an
 	if pkgs.BlockRegistry[block.GetType()] == nil {
 		return ErrTypeNotDefined
 	}
-	if err := pkgs.BlockRegistry[block.GetType()].Op(ctx, block, opName, data); err != nil {
+	newData, err := pkgs.BlockRegistry[block.GetType()].Op(ctx, block, opName, data)
+	if err != nil {
 		return format.Error(op, err)
 	}
 
-	if err := a.updateData(ctx, id, block.GetData().AsMap()); err != nil {
+	if err := a.updateData(ctx, id, newData); err != nil {
 		return format.Error(op, err)
 	}
 
@@ -99,7 +82,7 @@ func (a *API) OpBlock(ctx context.Context, id, opName string, data map[string]an
 
 // GetAsFirst universal func that get block, calls func GetAsFirst by field _type. NEED TO REGISTER TYPE BEFORE USE
 func (a *API) GetAsFirst(ctx context.Context, id string) (string, error) {
-	const op = "blocks.OpBlock"
+	const op = "blocks.GetAsFirst"
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 

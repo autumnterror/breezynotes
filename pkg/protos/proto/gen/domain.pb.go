@@ -22,58 +22,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Statuses int32
-
-const (
-	Statuses_STATUS_UNSPECIFIED Statuses = 0
-	Statuses_ARCHIVED           Statuses = 1
-	Statuses_IN_USE             Statuses = 2
-	Statuses_IN_TRASH           Statuses = 3
-)
-
-// Enum value maps for Statuses.
-var (
-	Statuses_name = map[int32]string{
-		0: "STATUS_UNSPECIFIED",
-		1: "ARCHIVED",
-		2: "IN_USE",
-		3: "IN_TRASH",
-	}
-	Statuses_value = map[string]int32{
-		"STATUS_UNSPECIFIED": 0,
-		"ARCHIVED":           1,
-		"IN_USE":             2,
-		"IN_TRASH":           3,
-	}
-)
-
-func (x Statuses) Enum() *Statuses {
-	p := new(Statuses)
-	*p = x
-	return p
-}
-
-func (x Statuses) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (Statuses) Descriptor() protoreflect.EnumDescriptor {
-	return file_domain_proto_enumTypes[0].Descriptor()
-}
-
-func (Statuses) Type() protoreflect.EnumType {
-	return &file_domain_proto_enumTypes[0]
-}
-
-func (x Statuses) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use Statuses.Descriptor instead.
-func (Statuses) EnumDescriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{0}
-}
-
 type Roles int32
 
 const (
@@ -107,11 +55,11 @@ func (x Roles) String() string {
 }
 
 func (Roles) Descriptor() protoreflect.EnumDescriptor {
-	return file_domain_proto_enumTypes[1].Descriptor()
+	return file_domain_proto_enumTypes[0].Descriptor()
 }
 
 func (Roles) Type() protoreflect.EnumType {
-	return &file_domain_proto_enumTypes[1]
+	return &file_domain_proto_enumTypes[0]
 }
 
 func (x Roles) Number() protoreflect.EnumNumber {
@@ -120,7 +68,7 @@ func (x Roles) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Roles.Descriptor instead.
 func (Roles) EnumDescriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{1}
+	return file_domain_proto_rawDescGZIP(), []int{0}
 }
 
 type BoolResponse struct {
@@ -690,7 +638,6 @@ type Note struct {
 	Editors       []string               `protobuf:"bytes,7,rep,name=editors,proto3" json:"editors,omitempty"`
 	Readers       []string               `protobuf:"bytes,8,rep,name=readers,proto3" json:"readers,omitempty"`
 	Blocks        []string               `protobuf:"bytes,9,rep,name=blocks,proto3" json:"blocks,omitempty"`
-	Status        Statuses               `protobuf:"varint,10,opt,name=status,proto3,enum=brz.Statuses" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -786,13 +733,6 @@ func (x *Note) GetBlocks() []string {
 		return x.Blocks
 	}
 	return nil
-}
-
-func (x *Note) GetStatus() Statuses {
-	if x != nil {
-		return x.Status
-	}
-	return Statuses_STATUS_UNSPECIFIED
 }
 
 type NotePart struct {
@@ -1094,7 +1034,7 @@ const file_domain_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\x06 \x01(\x03R\tupdatedAt\x12\x17\n" +
 	"\ais_used\x18\a \x01(\bR\x06isUsed\x12+\n" +
-	"\x04data\x18\b \x01(\v2\x17.google.protobuf.StructR\x04data\"\x91\x02\n" +
+	"\x04data\x18\b \x01(\v2\x17.google.protobuf.StructR\x04data\"\xea\x01\n" +
 	"\x04Note\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1d\n" +
@@ -1106,9 +1046,7 @@ const file_domain_proto_rawDesc = "" +
 	"\x06author\x18\x06 \x01(\tR\x06author\x12\x18\n" +
 	"\aeditors\x18\a \x03(\tR\aeditors\x12\x18\n" +
 	"\areaders\x18\b \x03(\tR\areaders\x12\x16\n" +
-	"\x06blocks\x18\t \x03(\tR\x06blocks\x12%\n" +
-	"\x06status\x18\n" +
-	" \x01(\x0e2\r.brz.StatusesR\x06status\"\x8c\x01\n" +
+	"\x06blocks\x18\t \x03(\tR\x06blocks\"\x8c\x01\n" +
 	"\bNotePart\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1a\n" +
@@ -1125,13 +1063,7 @@ const file_domain_proto_rawDesc = "" +
 	"\tNoteParts\x12#\n" +
 	"\x05items\x18\x01 \x03(\v2\r.brz.NotePartR\x05items\"&\n" +
 	"\x04Tags\x12\x1e\n" +
-	"\x05items\x18\x01 \x03(\v2\b.brz.TagR\x05items*J\n" +
-	"\bStatuses\x12\x16\n" +
-	"\x12STATUS_UNSPECIFIED\x10\x00\x12\f\n" +
-	"\bARCHIVED\x10\x01\x12\n" +
-	"\n" +
-	"\x06IN_USE\x10\x02\x12\f\n" +
-	"\bIN_TRASH\x10\x03*5\n" +
+	"\x05items\x18\x01 \x03(\v2\b.brz.TagR\x05items*5\n" +
 	"\x05Roles\x12\x14\n" +
 	"\x10ROLE_UNSPECIFIED\x10\x00\x12\n" +
 	"\n" +
@@ -1151,42 +1083,40 @@ func file_domain_proto_rawDescGZIP() []byte {
 	return file_domain_proto_rawDescData
 }
 
-var file_domain_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_domain_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_domain_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_domain_proto_goTypes = []any{
-	(Statuses)(0),           // 0: brz.Statuses
-	(Roles)(0),              // 1: brz.Roles
-	(*BoolResponse)(nil),    // 2: brz.BoolResponse
-	(*StringResponse)(nil),  // 3: brz.StringResponse
-	(*Token)(nil),           // 4: brz.Token
-	(*Tokens)(nil),          // 5: brz.Tokens
-	(*UserId)(nil),          // 6: brz.UserId
-	(*Id)(nil),              // 7: brz.Id
-	(*User)(nil),            // 8: brz.User
-	(*Tag)(nil),             // 9: brz.Tag
-	(*Block)(nil),           // 10: brz.Block
-	(*Note)(nil),            // 11: brz.Note
-	(*NotePart)(nil),        // 12: brz.NotePart
-	(*Blocks)(nil),          // 13: brz.Blocks
-	(*Notes)(nil),           // 14: brz.Notes
-	(*NoteParts)(nil),       // 15: brz.NoteParts
-	(*Tags)(nil),            // 16: brz.Tags
-	(*structpb.Struct)(nil), // 17: google.protobuf.Struct
+	(Roles)(0),              // 0: brz.Roles
+	(*BoolResponse)(nil),    // 1: brz.BoolResponse
+	(*StringResponse)(nil),  // 2: brz.StringResponse
+	(*Token)(nil),           // 3: brz.Token
+	(*Tokens)(nil),          // 4: brz.Tokens
+	(*UserId)(nil),          // 5: brz.UserId
+	(*Id)(nil),              // 6: brz.Id
+	(*User)(nil),            // 7: brz.User
+	(*Tag)(nil),             // 8: brz.Tag
+	(*Block)(nil),           // 9: brz.Block
+	(*Note)(nil),            // 10: brz.Note
+	(*NotePart)(nil),        // 11: brz.NotePart
+	(*Blocks)(nil),          // 12: brz.Blocks
+	(*Notes)(nil),           // 13: brz.Notes
+	(*NoteParts)(nil),       // 14: brz.NoteParts
+	(*Tags)(nil),            // 15: brz.Tags
+	(*structpb.Struct)(nil), // 16: google.protobuf.Struct
 }
 var file_domain_proto_depIdxs = []int32{
-	17, // 0: brz.Block.data:type_name -> google.protobuf.Struct
-	9,  // 1: brz.Note.tag:type_name -> brz.Tag
-	0,  // 2: brz.Note.status:type_name -> brz.Statuses
-	9,  // 3: brz.NotePart.tag:type_name -> brz.Tag
-	10, // 4: brz.Blocks.items:type_name -> brz.Block
-	11, // 5: brz.Notes.items:type_name -> brz.Note
-	12, // 6: brz.NoteParts.items:type_name -> brz.NotePart
-	9,  // 7: brz.Tags.items:type_name -> brz.Tag
-	8,  // [8:8] is the sub-list for method output_type
-	8,  // [8:8] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	16, // 0: brz.Block.data:type_name -> google.protobuf.Struct
+	8,  // 1: brz.Note.tag:type_name -> brz.Tag
+	8,  // 2: brz.NotePart.tag:type_name -> brz.Tag
+	9,  // 3: brz.Blocks.items:type_name -> brz.Block
+	10, // 4: brz.Notes.items:type_name -> brz.Note
+	11, // 5: brz.NoteParts.items:type_name -> brz.NotePart
+	8,  // 6: brz.Tags.items:type_name -> brz.Tag
+	7,  // [7:7] is the sub-list for method output_type
+	7,  // [7:7] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_domain_proto_init() }
@@ -1199,7 +1129,7 @@ func file_domain_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_domain_proto_rawDesc), len(file_domain_proto_rawDesc)),
-			NumEnums:      2,
+			NumEnums:      1,
 			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   0,
