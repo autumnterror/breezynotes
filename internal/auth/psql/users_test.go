@@ -5,13 +5,14 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"testing"
+
 	"github.com/autumnterror/breezynotes/internal/auth/config"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/autumnterror/breezynotes/pkg/utils/uid"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestUsersOperations(t *testing.T) {
@@ -105,9 +106,9 @@ func TestCreateDuplicateUser(t *testing.T) {
 	repo, _, cleanup := setupTestTx(t)
 	defer cleanup()
 
-	uid := uid.New()
+	usid := uid.New()
 	user := &brzrpc.User{
-		Id:       uid,
+		Id:       usid,
 		Login:    "duplicate",
 		Email:    "dup@example.com",
 		About:    "test",

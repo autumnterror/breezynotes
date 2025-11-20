@@ -1,9 +1,10 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/autumnterror/breezynotes/pkg/log"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
-	"testing"
 )
 
 type b struct {
@@ -11,7 +12,7 @@ type b struct {
 	B string
 }
 
-func Foo() interface{} {
+func Foo() any {
 	return b{
 		A: 12,
 		B: "123",

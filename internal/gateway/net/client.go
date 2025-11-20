@@ -3,6 +3,9 @@ package net
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/auth"
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/blocknote"
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/redis"
@@ -11,8 +14,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
-	"net/http"
-	"strings"
 )
 
 type Echo struct {
@@ -83,7 +84,6 @@ func New(
 			blocks.POST("", e.CreateBlock)
 			blocks.DELETE("", e.DeleteBlock)
 
-			blocks.GET("/as-first", e.GetBlockAsFirst)
 			blocks.POST("/op", e.OpBlock)
 			blocks.PATCH("/change-type", e.ChangeTypeBlock)
 			blocks.PATCH("/change-order", e.ChangeBlockOrder)

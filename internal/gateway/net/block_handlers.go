@@ -16,55 +16,6 @@ import (
 
 //TODO AUTHORIZE
 
-// GetBlockAsFirst godoc
-// @Summary Get block as first string
-// @Description Returns block representation as string
-// @Tags block
-// @Accept json
-// @Produce json
-// @Param id query string true "Block ID"
-// @Success 200 {object} brzrpc.StringResponse
-// @Failure 400 {object} views.SWGError
-// @Failure 404 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
-// @Router /api/blocks/as-first [get]
-func (e *Echo) GetBlockAsFirst(c echo.Context) error {
-	const op = "gateway.net.GetBlockAsFirst"
-	log.Info(op, "")
-
-	api := e.bnAPI.API
-
-	id := c.QueryParam("id")
-	if id == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
-	}
-
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
-	defer done()
-
-	resp, err := api.GetBlockAsFirst(ctx, &brzrpc.Id{Id: id})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "get block as first error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get block as first error"})
-		}
-
-		switch st.Code() {
-		case codes.Unknown:
-			log.Warn(op, "unknown block type", err)
-			return c.JSON(http.StatusBadRequest, views.SWGError{Error: "unknown block type"})
-		default:
-			log.Error(op, "get block as first error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get block as first error"})
-		}
-	}
-
-	log.Success(op, "")
-
-	return c.JSON(http.StatusOK, resp)
-}
-
 // GetBlock godoc
 // @Summary Get block
 // @Description Returns block by ID
