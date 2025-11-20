@@ -43,6 +43,7 @@ func (s *ServerAPI) DeleteUser(ctx context.Context, r *brzrpc.UserId) (*emptypb.
 
 	return nil, nil
 }
+
 func (s *ServerAPI) UpdateAbout(ctx context.Context, r *brzrpc.UpdateAboutRequest) (*emptypb.Empty, error) {
 	const op = "auth.grpc.UpdateAbout"
 	log.Info(op, "")

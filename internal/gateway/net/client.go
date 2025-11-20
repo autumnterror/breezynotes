@@ -63,6 +63,11 @@ func New(
 		user := api.Group("/user")
 		{
 			user.GET("/data", e.GetUserData)
+			user.DELETE("", e.DeleteUser)
+			user.PATCH("/about", e.UpdateAbout)
+			user.PATCH("/email", e.UpdateEmail)
+			user.PATCH("/photo", e.UpdatePhoto)
+			user.PATCH("/pw", e.ChangePassword)
 		}
 
 		notes := api.Group("/notes")

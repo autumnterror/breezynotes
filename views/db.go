@@ -12,16 +12,17 @@ const (
 )
 
 type NoteDb struct {
-	Id        string          `bson:"_id"`
-	Title     string          `bson:"title"`
-	CreatedAt int64           `bson:"created_at"`
-	UpdatedAt int64           `bson:"updated_at"`
-	Tag       *TagDb          `bson:"tag"`
-	Author    string          `bson:"author"`
-	Editors   []string        `bson:"editors"`
-	Readers   []string        `bson:"readers"`
-	Blocks    []string        `bson:"blocks"`
-	Status    brzrpc.Statuses `bson:"status"`
+	Id        string   `bson:"_id"`
+	Title     string   `bson:"title"`
+	CreatedAt int64    `bson:"created_at"`
+	UpdatedAt int64    `bson:"updated_at"`
+	Tag       *TagDb   `bson:"tag"`
+	Author    string   `bson:"author"`
+	Editors   []string `bson:"editors"`
+	Readers   []string `bson:"readers"`
+	Blocks    []string `bson:"blocks"`
+	//TODO deprecated (status in table)
+	Status brzrpc.Statuses `bson:"status"`
 }
 
 type TagDb struct {
@@ -33,6 +34,9 @@ type TagDb struct {
 }
 
 func ToNoteDb(n *brzrpc.Note) *NoteDb {
+	if n == nil {
+		return nil
+	}
 	return &NoteDb{
 		Id:        n.Id,
 		Title:     n.Title,
@@ -48,6 +52,9 @@ func ToNoteDb(n *brzrpc.Note) *NoteDb {
 }
 
 func FromNoteDb(n *NoteDb) *brzrpc.Note {
+	if n == nil {
+		return nil
+	}
 	return &brzrpc.Note{
 		Id:        n.Id,
 		Title:     n.Title,
@@ -63,6 +70,9 @@ func FromNoteDb(n *NoteDb) *brzrpc.Note {
 }
 
 func ToTagDb(t *brzrpc.Tag) *TagDb {
+	if t == nil {
+		return nil
+	}
 	return &TagDb{
 		Id:     t.Id,
 		Title:  t.Title,
@@ -73,6 +83,9 @@ func ToTagDb(t *brzrpc.Tag) *TagDb {
 }
 
 func FromTagDb(t *TagDb) *brzrpc.Tag {
+	if t == nil {
+		return nil
+	}
 	return &brzrpc.Tag{
 		Id:     t.Id,
 		Title:  t.Title,

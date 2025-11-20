@@ -623,7 +623,9 @@ func (x *ChangeUserRoleRequest) GetNewRole() Roles {
 type CreateBlockRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
-	Data          *structpb.Struct       `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+	NoteId        string                 `protobuf:"bytes,2,opt,name=noteId,proto3" json:"noteId,omitempty"`
+	Pos           int32                  `protobuf:"varint,3,opt,name=pos,proto3" json:"pos,omitempty"`
+	Data          *structpb.Struct       `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -663,6 +665,20 @@ func (x *CreateBlockRequest) GetType() string {
 		return x.Type
 	}
 	return ""
+}
+
+func (x *CreateBlockRequest) GetNoteId() string {
+	if x != nil {
+		return x.NoteId
+	}
+	return ""
+}
+
+func (x *CreateBlockRequest) GetPos() int32 {
+	if x != nil {
+		return x.Pos
+	}
+	return 0
 }
 
 func (x *CreateBlockRequest) GetData() *structpb.Struct {
@@ -766,10 +782,12 @@ const file_notes_proto_rawDesc = "" +
 	"\x15ChangeUserRoleRequest\x12\x14\n" +
 	"\x05login\x18\x01 \x01(\tR\x05login\x12%\n" +
 	"\bnew_role\x18\x02 \x01(\x0e2\n" +
-	".brz.RolesR\anewRole\"U\n" +
+	".brz.RolesR\anewRole\"\x7f\n" +
 	"\x12CreateBlockRequest\x12\x12\n" +
-	"\x04type\x18\x01 \x01(\tR\x04type\x12+\n" +
-	"\x04data\x18\x02 \x01(\v2\x17.google.protobuf.StructR\x04data\"D\n" +
+	"\x04type\x18\x01 \x01(\tR\x04type\x12\x16\n" +
+	"\x06noteId\x18\x02 \x01(\tR\x06noteId\x12\x10\n" +
+	"\x03pos\x18\x03 \x01(\x05R\x03pos\x12+\n" +
+	"\x04data\x18\x04 \x01(\v2\x17.google.protobuf.StructR\x04data\"D\n" +
 	"\x14GetNotesByTagRequest\x12\x14\n" +
 	"\x05idTag\x18\x01 \x01(\tR\x05idTag\x12\x16\n" +
 	"\x06idUser\x18\x02 \x01(\tR\x06idUser2\x81\r\n" +

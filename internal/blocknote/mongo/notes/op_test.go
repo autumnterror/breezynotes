@@ -12,11 +12,7 @@ import (
 )
 
 // TODO GetNoteListByUser
-//
-//	if np, err := a.GetNoteListByUser(context.TODO(), "test_auth_TestCrudGood"); assert.NoError(t, err) {
-//		assert.Equal(t, len(np.Items), 1)
-//		assert.Equal(t, np.Items[0]., 1)
-//	}
+
 func TestCrudGood(t *testing.T) {
 	t.Parallel()
 	t.Run("crud good", func(t *testing.T) {
@@ -65,11 +61,11 @@ func TestCrudGood(t *testing.T) {
 			log.Green("get after create ", n)
 		}
 
-		//if nts, err := a.GetAllByTag(context.TODO(), "test_tag"); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
-		//	log.Green("get by tag ", nts)
-		//}
+		if nts, err := a.GetNoteListByTag(context.TODO(), "test_tag", "test_auth_TestCrudGood"); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
+			log.Green("get by tag ", nts)
+		}
 
-		if nts, err := a.GetAllByUser(context.TODO(), "test_auth"); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
+		if nts, err := a.GetAllByUser(context.TODO(), "test_auth_TestCrudGood"); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
 			log.Green("get all by user after create ", nts)
 		}
 
@@ -95,6 +91,20 @@ func TestCrudGood(t *testing.T) {
 			assert.Equal(t, "newIdTag", n.Tag.Id)
 		}
 
+		assert.NoError(t, a.InsertBlock(context.TODO(), id, "newblock", 0))
+		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
+			log.Green("get after insert block ", n)
+			if assert.Greater(t, len(n.Blocks), 1) {
+				assert.Equal(t, "newblock", n.Blocks[0])
+			}
+		}
+		assert.NoError(t, a.InsertBlock(context.TODO(), id, "newblock2", 10))
+		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
+			log.Green("get after insert block2 ", n)
+			if assert.Greater(t, len(n.Blocks), 3) {
+				assert.Equal(t, "newblock2", n.Blocks[3])
+			}
+		}
 	})
 }
 
@@ -112,8 +122,8 @@ func TestCrudNotExist(t *testing.T) {
 		_, err := a.Get(context.TODO(), id)
 		assert.Error(t, err)
 
-		assert.ErrorIs(t, a.UpdateTitle(context.TODO(), id, "new_title"), mongo.ErrNotFiend)
-		assert.ErrorIs(t, a.UpdateUpdatedAt(context.TODO(), id), mongo.ErrNotFiend)
+		assert.ErrorIs(t, a.UpdateTitle(context.TODO(), id, "new_title"), mongo.ErrNotFound)
+		assert.ErrorIs(t, a.UpdateUpdatedAt(context.TODO(), id), mongo.ErrNotFound)
 		assert.Error(t, a.Delete(context.TODO(), id))
 	})
 }

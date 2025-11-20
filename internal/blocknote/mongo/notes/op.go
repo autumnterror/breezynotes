@@ -209,7 +209,7 @@ func (a *API) Delete(ctx context.Context, id string) error {
 	res, err := a.Notes().DeleteOne(ctx, bson.D{{"_id", id}})
 	if err != nil || res.DeletedCount == 0 {
 		if res.DeletedCount == 0 {
-			return format.Error(op, mongo.ErrNotFiend)
+			return format.Error(op, mongo.ErrNotFound)
 		}
 		return format.Error(op, err)
 	}
@@ -217,7 +217,7 @@ func (a *API) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-// UpdateUpdatedAt update updated time to time.Now().UTC().Unix() can return mongo.ErrNotFiend
+// UpdateUpdatedAt update updated time to time.Now().UTC().Unix() can return mongo.ErrNotFound
 func (a *API) UpdateUpdatedAt(ctx context.Context, id string) error {
 	const op = "notes.UpdateUpdatedAt"
 
@@ -237,17 +237,17 @@ func (a *API) UpdateUpdatedAt(ctx context.Context, id string) error {
 				},
 			},
 		)
-	if err != nil || res.MatchedCount == 0 {
-		if res.MatchedCount == 0 {
-			return format.Error(op, mongo.ErrNotFiend)
-		}
+	if err != nil {
 		return format.Error(op, err)
+	}
+	if res.MatchedCount == 0 {
+		return format.Error(op, mongo.ErrNotFound)
 	}
 
 	return nil
 }
 
-// UpdateTitle can return mongo.ErrNotFiend. Set updated_at to time.Now().UTC().Unix()
+// UpdateTitle can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix()
 func (a *API) UpdateTitle(ctx context.Context, id string, nTitle string) error {
 	const op = "notes.UpdateTitle"
 
@@ -268,17 +268,17 @@ func (a *API) UpdateTitle(ctx context.Context, id string, nTitle string) error {
 				},
 			},
 		)
-	if err != nil || res.MatchedCount == 0 {
-		if res.MatchedCount == 0 {
-			return format.Error(op, mongo.ErrNotFiend)
-		}
+	if err != nil {
 		return format.Error(op, err)
+	}
+	if res.MatchedCount == 0 {
+		return format.Error(op, mongo.ErrNotFound)
 	}
 
 	return nil
 }
 
-// UpdateBlocks can return mongo.ErrNotFiend. Set updated_at to time.Now().UTC().Unix()
+// UpdateBlocks can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix()
 func (a *API) UpdateBlocks(ctx context.Context, id string, blocks []string) error {
 	const op = "notes.UpdateTitle"
 
@@ -299,17 +299,53 @@ func (a *API) UpdateBlocks(ctx context.Context, id string, blocks []string) erro
 				},
 			},
 		)
-	if err != nil || res.MatchedCount == 0 {
-		if res.MatchedCount == 0 {
-			return format.Error(op, mongo.ErrNotFiend)
-		}
+	if err != nil {
 		return format.Error(op, err)
+	}
+	if res.MatchedCount == 0 {
+		return format.Error(op, mongo.ErrNotFound)
 	}
 
 	return nil
 }
 
-// AddTagToNote can return mongo.ErrNotFiend. Set updated_at to time.Now().UTC().Unix(). If tag exist func rewrite it
+// InsertBlock can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix()
+func (a *API) InsertBlock(ctx context.Context, id, block string, pos int) error {
+	const op = "notes.InsertBlock"
+
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
+	defer done()
+
+	res, err := a.
+		Notes().
+		UpdateOne(
+			ctx,
+			bson.M{
+				"_id": id,
+			},
+			bson.M{
+				"$push": bson.M{
+					"blocks": bson.M{
+						"$each":     []string{block},
+						"$position": pos,
+					},
+				},
+				"$set": bson.M{
+					"updated_at": time.Now().UTC().Unix(),
+				},
+			},
+		)
+	if err != nil {
+		return format.Error(op, err)
+	}
+	if res.MatchedCount == 0 {
+		return format.Error(op, mongo.ErrNotFound)
+	}
+
+	return nil
+}
+
+// AddTagToNote can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix(). If tag exist func rewrite it
 func (a *API) AddTagToNote(ctx context.Context, id string, tag *brzrpc.Tag) error {
 	const op = "notes.AddTagToNote"
 
@@ -333,7 +369,7 @@ func (a *API) AddTagToNote(ctx context.Context, id string, tag *brzrpc.Tag) erro
 		)
 	if err != nil || res.MatchedCount == 0 {
 		if res != nil && res.MatchedCount == 0 {
-			return format.Error(op, mongo.ErrNotFiend)
+			return format.Error(op, mongo.ErrNotFound)
 		}
 		return format.Error(op, err)
 	}

@@ -20,3 +20,13 @@ func SliceCopy[T any](s []T, start, end int) []T {
 	copy(out, s[start:end])
 	return out
 }
+
+func IsIn[T comparable](obj T, sl []T) bool {
+	for _, o := range sl {
+		if obj == o {
+			return true
+		}
+	}
+
+	return false
+}

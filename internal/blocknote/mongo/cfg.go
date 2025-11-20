@@ -13,7 +13,7 @@ const (
 )
 
 var (
-	ErrNotFiend    = errors.New("not fiend")
+	ErrNotFound    = errors.New("not fiend")
 	ErrNoDocuments = mongo.ErrNoDocuments
 )
 

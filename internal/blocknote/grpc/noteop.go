@@ -23,7 +23,7 @@ func (s *ServerAPI) ChangeTitleNote(ctx context.Context, req *brzrpc.ChangeTitle
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
 		if err := s.noteAPI.UpdateTitle(ctx, req.GetId(), req.GetTitle()); err != nil {
 			switch {
-			case errors.Is(err, mongo.ErrNotFiend):
+			case errors.Is(err, mongo.ErrNotFound):
 				res <- views.ResRPC{
 					Res: nil,
 					Err: status.Error(codes.NotFound, err.Error()),

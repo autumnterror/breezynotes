@@ -259,56 +259,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/blocks/as-first": {
-            "get": {
-                "description": "Returns block representation as string",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "block"
-                ],
-                "summary": "Get block as first string",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Block ID",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/brzrpc.StringResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/views.SWGError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/views.SWGError"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/views.SWGError"
-                        }
-                    }
-                }
-            }
-        },
         "/api/blocks/change-order": {
             "patch": {
                 "description": "Changes order of block in note",
@@ -1222,6 +1172,108 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/user": {
+            "delete": {
+                "description": "Deletes user account by ID. Requires authentication.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "delete user account",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/about": {
+            "patch": {
+                "description": "Updates user \"about\" field. Requires authentication.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "update user about",
+                "parameters": [
+                    {
+                        "description": "new about text",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/views.UpdateAboutRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    }
+                }
+            }
+        },
         "/api/user/data": {
             "get": {
                 "description": "Checks access token from cookie, and return user data. If 401 call ValidateToken",
@@ -1247,6 +1299,189 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/email": {
+            "patch": {
+                "description": "Updates user email. Requires authentication.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "update user email",
+                "parameters": [
+                    {
+                        "description": "new email",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/views.UpdateEmailRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/photo": {
+            "patch": {
+                "description": "Updates user photo. Requires authentication.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "update user photo",
+                "parameters": [
+                    {
+                        "description": "new photo",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/views.UpdatePhotoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/pw": {
+            "patch": {
+                "description": "Changes user password. Requires authentication.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "change user password",
+                "parameters": [
+                    {
+                        "description": "new password",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/views.ChangePasswordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/views.SWGError"
                         }
@@ -1432,14 +1667,6 @@ const docTemplate = `{
                 "Statuses_IN_TRASH"
             ]
         },
-        "brzrpc.StringResponse": {
-            "type": "object",
-            "properties": {
-                "value": {
-                    "type": "string"
-                }
-            }
-        },
         "brzrpc.Tag": {
             "type": "object",
             "properties": {
@@ -1474,6 +1701,9 @@ const docTemplate = `{
         "brzrpc.Token": {
             "type": "object",
             "properties": {
+                "exp": {
+                    "type": "integer"
+                },
                 "value": {
                     "type": "string"
                 }
@@ -1484,6 +1714,12 @@ const docTemplate = `{
             "properties": {
                 "access_token": {
                     "type": "string"
+                },
+                "expAccess": {
+                    "type": "integer"
+                },
+                "expRefresh": {
+                    "type": "integer"
                 },
                 "refresh_token": {
                     "type": "string"
@@ -1546,33 +1782,20 @@ const docTemplate = `{
                 }
             }
         },
+        "views.ChangePasswordRequest": {
+            "type": "object",
+            "properties": {
+                "new_password": {
+                    "type": "string"
+                },
+                "new_password_2": {
+                    "type": "string"
+                }
+            }
+        },
         "views.NoteReq": {
             "type": "object",
             "properties": {
-                "blocks": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "editors": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "readers": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "status": {
-                    "type": "integer"
-                },
-                "tag": {
-                    "type": "string"
-                },
                 "title": {
                     "type": "string"
                 }
@@ -1674,6 +1897,30 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "views.UpdateAboutRequest": {
+            "type": "object",
+            "properties": {
+                "new_about": {
+                    "type": "string"
+                }
+            }
+        },
+        "views.UpdateEmailRequest": {
+            "type": "object",
+            "properties": {
+                "new_email": {
+                    "type": "string"
+                }
+            }
+        },
+        "views.UpdatePhotoRequest": {
+            "type": "object",
+            "properties": {
+                "new_photo": {
                     "type": "string"
                 }
             }

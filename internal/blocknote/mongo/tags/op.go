@@ -90,7 +90,7 @@ func (a *API) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-// UpdateTitle return mongo.ErrNotFiend
+// UpdateTitle return mongo.ErrNotFound
 func (a *API) UpdateTitle(ctx context.Context, id, nTitle string) error {
 	const op = "tags.UpdateTitle"
 
@@ -108,16 +108,16 @@ func (a *API) UpdateTitle(ctx context.Context, id, nTitle string) error {
 			},
 		)
 
-	if err != nil || res.MatchedCount == 0 {
-		if res.MatchedCount == 0 {
-			return format.Error(op, mongo.ErrNotFiend)
-		}
+	if err != nil {
 		return format.Error(op, err)
+	}
+	if res.MatchedCount == 0 {
+		return format.Error(op, mongo.ErrNotFound)
 	}
 	return nil
 }
 
-// UpdateColor return mongo.ErrNotFiend
+// UpdateColor return mongo.ErrNotFound
 func (a *API) UpdateColor(ctx context.Context, id, nColor string) error {
 	const op = "tags.UpdateTitle"
 
@@ -135,16 +135,16 @@ func (a *API) UpdateColor(ctx context.Context, id, nColor string) error {
 			},
 		)
 
-	if err != nil || res.MatchedCount == 0 {
-		if res.MatchedCount == 0 {
-			return format.Error(op, mongo.ErrNotFiend)
-		}
+	if err != nil {
 		return format.Error(op, err)
+	}
+	if res.MatchedCount == 0 {
+		return format.Error(op, mongo.ErrNotFound)
 	}
 	return nil
 }
 
-// UpdateEmoji return mongo.ErrNotFiend
+// UpdateEmoji return mongo.ErrNotFound
 func (a *API) UpdateEmoji(ctx context.Context, id, nEmoji string) error {
 	const op = "tags.UpdateTitle"
 
@@ -162,11 +162,11 @@ func (a *API) UpdateEmoji(ctx context.Context, id, nEmoji string) error {
 			},
 		)
 
-	if err != nil || res.MatchedCount == 0 {
-		if res.MatchedCount == 0 {
-			return format.Error(op, mongo.ErrNotFiend)
-		}
+	if err != nil {
 		return format.Error(op, err)
+	}
+	if res.MatchedCount == 0 {
+		return format.Error(op, mongo.ErrNotFound)
 	}
 	return nil
 }

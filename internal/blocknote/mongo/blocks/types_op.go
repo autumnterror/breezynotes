@@ -2,16 +2,20 @@ package blocks
 
 import (
 	"context"
+	"errors"
+	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
+	"github.com/autumnterror/breezynotes/pkg/log"
 	"github.com/autumnterror/breezynotes/pkg/pkgs"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/autumnterror/breezynotes/pkg/utils/uid"
 	"github.com/autumnterror/breezynotes/views"
+	"time"
 )
 
 // Create universal func that get block, calls func blocks.createBlock by field _type.
 // NEED TO REGISTER TYPE BEFORE USE.
 // method create id
-func (a *API) Create(ctx context.Context, _type string, data map[string]any) (string, error) {
+func (a *API) Create(ctx context.Context, _type, noteId string, data map[string]any) (string, error) {
 	const op = "blocks.OpBlock"
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
@@ -19,11 +23,17 @@ func (a *API) Create(ctx context.Context, _type string, data map[string]any) (st
 	if pkgs.BlockRegistry[_type] == nil {
 		return "", ErrTypeNotDefined
 	}
-	block, err := pkgs.BlockRegistry[_type].Create(ctx, _type, data)
+	block, err := pkgs.BlockRegistry[_type].Create(ctx, data)
 	if err != nil {
 		return "", format.Error(op, err)
 	}
 	block.Id = uid.New()
+	block.NoteId = noteId
+	block.Type = _type
+	block.CreatedAt = time.Now().UTC().Unix()
+	block.UpdatedAt = time.Now().UTC().Unix()
+	block.IsUsed = false
+
 	if err := a.createBlock(ctx, block); err != nil {
 		return "", format.Error(op, err)
 	}
@@ -54,6 +64,18 @@ func (a *API) OpBlock(ctx context.Context, id, opName string, data map[string]an
 	const op = "blocks.OpBlock"
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
+
+	if err := a.UpdateUsed(ctx, id, true); err != nil {
+		if errors.Is(err, mongo.ErrNotFound) {
+			return ErrAlreadyUsed
+		}
+		return format.Error(op, err)
+	}
+	defer func() {
+		if err := a.UpdateUsed(ctx, id, false); err != nil {
+			log.Error(op, "cant set isUse to false", err)
+		}
+	}()
 
 	block, err := a.Get(ctx, id)
 	if err != nil {
@@ -97,6 +119,17 @@ func (a *API) ChangeType(ctx context.Context, id, newType string) error {
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
+	if err := a.UpdateUsed(ctx, id, true); err != nil {
+		if errors.Is(err, mongo.ErrNotFound) {
+			return ErrAlreadyUsed
+		}
+		return format.Error(op, err)
+	}
+	defer func() {
+		if err := a.UpdateUsed(ctx, id, false); err != nil {
+			log.Error(op, "cant set isUse to false", err)
+		}
+	}()
 	block, err := a.Get(ctx, id)
 	if err != nil {
 		return format.Error(op, err)

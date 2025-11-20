@@ -26,7 +26,7 @@ func (s *ServerAPI) DeleteBlock(ctx context.Context, req *brzrpc.Id) (*emptypb.E
 		if err := s.blocksAPI.Delete(ctx, req.GetId()); err != nil {
 			log.Warn(op, "", err)
 			switch {
-			case errors.Is(err, mongo.ErrNotFiend):
+			case errors.Is(err, mongo.ErrNotFound):
 				res <- views.ResRPC{
 					Res: nil,
 					Err: status.Error(codes.NotFound, err.Error()),
@@ -92,7 +92,7 @@ func (s *ServerAPI) CreateBlock(ctx context.Context, req *brzrpc.CreateBlockRequ
 	defer done()
 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		id, err := s.blocksAPI.Create(ctx, req.GetType(), req.GetData().AsMap())
+		id, err := s.blocksAPI.Create(ctx, req.GetType(), req.GetNoteId(), req.GetData().AsMap())
 		if err != nil {
 			log.Warn(op, "", err)
 			switch {
@@ -107,7 +107,23 @@ func (s *ServerAPI) CreateBlock(ctx context.Context, req *brzrpc.CreateBlockRequ
 					Err: status.Error(codes.Internal, err.Error()),
 				}
 			}
-
+			return
+		}
+		err = s.noteAPI.InsertBlock(ctx, req.GetNoteId(), id, int(req.GetPos()))
+		if err != nil {
+			log.Warn(op, "", err)
+			switch {
+			case errors.Is(err, mongo.ErrNotFound):
+				res <- views.ResRPC{
+					Res: nil,
+					Err: status.Error(codes.NotFound, err.Error()),
+				}
+			default:
+				res <- views.ResRPC{
+					Res: nil,
+					Err: status.Error(codes.Internal, err.Error()),
+				}
+			}
 			return
 		}
 		res <- views.ResRPC{

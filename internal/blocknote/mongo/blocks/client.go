@@ -17,6 +17,7 @@ func NewApi(c *mongo.Client) *API {
 
 var (
 	ErrTypeNotDefined = errors.New("need to register type")
+	ErrAlreadyUsed    = errors.New("block already in use")
 )
 
 type Repo interface {
@@ -26,6 +27,7 @@ type Repo interface {
 	OpBlock(ctx context.Context, id, opName string, data map[string]any) error
 	GetAsFirst(ctx context.Context, id string) (string, error)
 	ChangeType(ctx context.Context, id, newType string) error
-	Create(ctx context.Context, _type string, data map[string]any) (string, error)
+	Create(ctx context.Context, _type, idNote string, data map[string]any) (string, error)
+	UpdateUsed(ctx context.Context, id string, isUsedNew bool) error
 	//Render(ctx context.Context, id, _type string) (*brzrpc.Block, error)
 }

@@ -44,7 +44,7 @@ func (s *ServerAPI) UpdateTagTitle(ctx context.Context, req *brzrpc.UpdateTagTit
 
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
 		if err := s.tagAPI.UpdateTitle(ctx, req.GetId(), req.GetTitle()); err != nil {
-			if errors.Is(err, mongo.ErrNotFiend) {
+			if errors.Is(err, mongo.ErrNotFound) {
 				res <- views.ResRPC{Res: nil, Err: status.Error(codes.NotFound, "not found")}
 				return
 			} else {
@@ -72,7 +72,7 @@ func (s *ServerAPI) UpdateTagColor(ctx context.Context, req *brzrpc.UpdateTagCol
 
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
 		if err := s.tagAPI.UpdateColor(ctx, req.GetId(), req.GetColor()); err != nil {
-			if errors.Is(err, mongo.ErrNotFiend) {
+			if errors.Is(err, mongo.ErrNotFound) {
 				res <- views.ResRPC{Res: nil, Err: status.Error(codes.NotFound, "not found")}
 				return
 			} else {
@@ -100,7 +100,7 @@ func (s *ServerAPI) UpdateTagEmoji(ctx context.Context, req *brzrpc.UpdateTagEmo
 
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
 		if err := s.tagAPI.UpdateEmoji(ctx, req.GetId(), req.GetEmoji()); err != nil {
-			if errors.Is(err, mongo.ErrNotFiend) {
+			if errors.Is(err, mongo.ErrNotFound) {
 				res <- views.ResRPC{Res: nil, Err: status.Error(codes.NotFound, "not found")}
 				return
 			} else {

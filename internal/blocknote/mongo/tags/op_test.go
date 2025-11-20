@@ -76,9 +76,9 @@ func TestBad(t *testing.T) {
 		assert.NoError(t, a.Delete(context.TODO(), "test_id"))
 	})
 
-	t.Run("BAD update ErrNotFiend", func(t *testing.T) {
-		assert.ErrorIs(t, a.UpdateColor(context.TODO(), "test_id", "new_color"), mongo.ErrNotFiend)
-		assert.ErrorIs(t, a.UpdateTitle(context.TODO(), "test_id", "new_title"), mongo.ErrNotFiend)
-		assert.ErrorIs(t, a.UpdateEmoji(context.TODO(), "test_id", "new_emoji"), mongo.ErrNotFiend)
+	t.Run("BAD update ErrNotFound", func(t *testing.T) {
+		assert.ErrorIs(t, a.UpdateColor(context.TODO(), "test_id", "new_color"), mongo.ErrNotFound)
+		assert.ErrorIs(t, a.UpdateTitle(context.TODO(), "test_id", "new_title"), mongo.ErrNotFound)
+		assert.ErrorIs(t, a.UpdateEmoji(context.TODO(), "test_id", "new_emoji"), mongo.ErrNotFound)
 	})
 }

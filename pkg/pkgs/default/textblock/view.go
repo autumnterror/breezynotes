@@ -6,20 +6,20 @@ import (
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 )
 
-func FromUnified(u *brzrpc.Block) (TextBlock, error) {
+func FromUnified(b *brzrpc.Block) (TextBlock, error) {
 	const op = "textblock.FromUnified"
 	tb := TextBlock{
-		Id:        u.GetId(),
-		Type:      u.GetType(),
-		NoteId:    u.GetNoteId(),
-		Order:     int(u.GetOrder()),
-		CreatedAt: u.GetCreatedAt(),
-		UpdatedAt: u.GetUpdatedAt(),
-		IsUsed:    u.GetIsUsed(),
+		Id:        b.GetId(),
+		Type:      b.GetType(),
+		NoteId:    b.GetNoteId(),
+		Order:     int(b.GetOrder()),
+		CreatedAt: b.GetCreatedAt(),
+		UpdatedAt: b.GetUpdatedAt(),
+		IsUsed:    b.GetIsUsed(),
 		Text:      nil,
 	}
 
-	raw, err := json.Marshal(u.Data)
+	raw, err := json.Marshal(b.Data)
 	if err != nil {
 		return tb, format.Error(op, err)
 	}
@@ -65,6 +65,6 @@ type TextBlock struct {
 }
 
 type TextData struct {
-	Style string
-	Text  string
+	Style string `json:"style" bson:"style"`
+	Text  string `json:"text" bson:"text"`
 }

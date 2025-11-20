@@ -112,11 +112,6 @@ definitions:
     - Statuses_ARCHIVED
     - Statuses_IN_USE
     - Statuses_IN_TRASH
-  brzrpc.StringResponse:
-    properties:
-      value:
-        type: string
-    type: object
   brzrpc.Tag:
     properties:
       color:
@@ -139,6 +134,8 @@ definitions:
     type: object
   brzrpc.Token:
     properties:
+      exp:
+        type: integer
       value:
         type: string
     type: object
@@ -146,6 +143,10 @@ definitions:
     properties:
       access_token:
         type: string
+      expAccess:
+        type: integer
+      expRefresh:
+        type: integer
       refresh_token:
         type: string
     type: object
@@ -185,24 +186,15 @@ definitions:
       photo:
         type: string
     type: object
+  views.ChangePasswordRequest:
+    properties:
+      new_password:
+        type: string
+      new_password_2:
+        type: string
+    type: object
   views.NoteReq:
     properties:
-      blocks:
-        items:
-          type: string
-        type: array
-      editors:
-        items:
-          type: string
-        type: array
-      readers:
-        items:
-          type: string
-        type: array
-      status:
-        type: integer
-      tag:
-        type: string
       title:
         type: string
     type: object
@@ -270,6 +262,21 @@ definitions:
       emoji:
         type: string
       title:
+        type: string
+    type: object
+  views.UpdateAboutRequest:
+    properties:
+      new_about:
+        type: string
+    type: object
+  views.UpdateEmailRequest:
+    properties:
+      new_email:
+        type: string
+    type: object
+  views.UpdatePhotoRequest:
+    properties:
+      new_photo:
         type: string
     type: object
   views.UserRegister:
@@ -450,39 +457,6 @@ paths:
           schema:
             $ref: '#/definitions/views.SWGError'
       summary: Create block
-      tags:
-      - block
-  /api/blocks/as-first:
-    get:
-      consumes:
-      - application/json
-      description: Returns block representation as string
-      parameters:
-      - description: Block ID
-        in: query
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/brzrpc.StringResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/views.SWGError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/views.SWGError'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/views.SWGError'
-      summary: Get block as first string
       tags:
       - block
   /api/blocks/change-order:
@@ -1084,6 +1058,73 @@ paths:
       summary: Move note to trash
       tags:
       - trash
+  /api/user:
+    delete:
+      description: Deletes user account by ID. Requires authentication.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/views.SWGError'
+      summary: delete user account
+      tags:
+      - user
+  /api/user/about:
+    patch:
+      consumes:
+      - application/json
+      description: Updates user "about" field. Requires authentication.
+      parameters:
+      - description: new about text
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/views.UpdateAboutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/views.SWGError'
+      summary: update user about
+      tags:
+      - user
   /api/user/data:
     get:
       description: Checks access token from cookie, and return user data. If 401 call
@@ -1108,6 +1149,126 @@ paths:
           schema:
             $ref: '#/definitions/views.SWGError'
       summary: get user data from access token
+      tags:
+      - user
+  /api/user/email:
+    patch:
+      consumes:
+      - application/json
+      description: Updates user email. Requires authentication.
+      parameters:
+      - description: new email
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/views.UpdateEmailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/views.SWGError'
+      summary: update user email
+      tags:
+      - user
+  /api/user/photo:
+    patch:
+      consumes:
+      - application/json
+      description: Updates user photo. Requires authentication.
+      parameters:
+      - description: new photo
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/views.UpdatePhotoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/views.SWGError'
+      summary: update user photo
+      tags:
+      - user
+  /api/user/pw:
+    patch:
+      consumes:
+      - application/json
+      description: Changes user password. Requires authentication.
+      parameters:
+      - description: new password
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/views.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/views.SWGError'
+      summary: change user password
       tags:
       - user
 schemes:

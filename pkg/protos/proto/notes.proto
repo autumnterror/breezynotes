@@ -67,7 +67,9 @@ message ChangeUserRoleRequest {
 
 message CreateBlockRequest {
   string type = 1;
-  google.protobuf.Struct data = 2;
+  string noteId = 2;
+  int32 pos = 3;
+  google.protobuf.Struct data = 4;
 }
 
 message GetNotesByTagRequest {

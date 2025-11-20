@@ -2,6 +2,7 @@ package net
 
 import (
 	"context"
+	"github.com/autumnterror/breezynotes/pkg/utils/alg"
 	"github.com/autumnterror/breezynotes/pkg/utils/uid"
 	"net/http"
 	"time"
@@ -127,8 +128,8 @@ func (e *Echo) GetNote(c echo.Context) error {
 			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get note error"})
 		}
 	}
-	if note.GetAuthor() != idUser {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "not author"})
+	if note.GetAuthor() != idUser || alg.IsIn(idUser, note.GetEditors()) || alg.IsIn(idUser, note.GetReaders()) {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 	}
 
 	log.Success(op, "")
@@ -268,22 +269,23 @@ func (e *Echo) CreateNote(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	t, err := api.GetTag(ctx, &brzrpc.Id{Id: r.TagId})
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad tag"})
-	}
+	//t, err := api.GetTag(ctx, &brzrpc.Id{Id: r.TagId})
+	//if err != nil {
+	//	return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad tag"})
+	//}
+
 	id := uid.New()
-	_, err = api.CreateNote(ctx, &brzrpc.Note{
+	_, err := api.CreateNote(ctx, &brzrpc.Note{
 		Id:        id,
 		Title:     r.Title,
 		CreatedAt: 0,
 		UpdatedAt: 0,
-		Tag:       t,
+		Tag:       nil,
 		Author:    idUser,
-		Editors:   r.Editors,
-		Readers:   r.Readers,
-		Blocks:    r.Blocks,
-		Status:    brzrpc.Statuses(r.Status),
+		Editors:   []string{},
+		Readers:   []string{},
+		Blocks:    []string{},
+		Status:    brzrpc.Statuses(2),
 	})
 	if err != nil {
 		st, ok := status.FromError(err)
@@ -338,8 +340,8 @@ func (e *Echo) GetAllBlocksInNote(c echo.Context) error {
 
 	//AUTHORIZE
 	if n, err := api.GetNote(ctx, &brzrpc.Id{Id: id}); err == nil {
-		if n.GetAuthor() != idUser {
-			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "not author"})
+		if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) || alg.IsIn(idUser, n.GetReaders()) {
+			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
 	} else {
 		log.Error(op, "get note", err)
@@ -401,8 +403,8 @@ func (e *Echo) AddTagToNote(c echo.Context) error {
 	defer done()
 
 	if n, err := api.GetNote(ctx, &brzrpc.Id{Id: r.GetNoteId()}); err == nil {
-		if n.GetAuthor() != idUser {
-			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "not author"})
+		if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) || alg.IsIn(idUser, n.GetReaders()) {
+			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
 	} else {
 		log.Error(op, "get note", err)

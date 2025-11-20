@@ -202,8 +202,7 @@ func (e *Echo) ValidateToken(c echo.Context) error {
 
 	at, err := c.Cookie("access_token")
 	if err != nil {
-		log.Warn(op, "access_token cookie missing", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "access_token cookie missing"})
+		at = &http.Cookie{Value: "BAD"}
 	}
 	rt, err := c.Cookie("refresh_token")
 	if err != nil {
@@ -217,51 +216,37 @@ func (e *Echo) ValidateToken(c echo.Context) error {
 	defer cancel()
 
 	if _, err := auth.CheckToken(ctx, &brzrpc.Token{Value: at.Value}); err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "verify failed", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "verify failed"})
-		}
-		switch st.Code() {
-		case codes.Unauthenticated:
-			newAt, err := auth.Refresh(ctx, &brzrpc.Token{Value: rt.Value})
-			if err != nil {
-				st, ok := status.FromError(err)
-				if !ok {
-					log.Error(op, "refresh failed", err)
-					return c.JSON(http.StatusBadGateway, views.SWGError{Error: "refresh failed"})
-				}
-
-				switch st.Code() {
-				case codes.Unauthenticated:
-					log.Warn(op, "refresh token expired. Terminate authorization", err)
-					return c.JSON(http.StatusGone, views.SWGError{Error: "refresh token expired. Terminate authorization"})
-
-				case codes.InvalidArgument:
-					log.Warn(op, "invalid refresh token", err)
-					return c.JSON(http.StatusBadRequest, views.SWGError{Error: "invalid refresh token"})
-
-				default:
-					log.Error(op, "refresh failed", err)
-					return c.JSON(http.StatusBadGateway, views.SWGError{Error: "refresh failed"})
-				}
+		newAt, err := auth.Refresh(ctx, &brzrpc.Token{Value: rt.Value})
+		if err != nil {
+			st, ok := status.FromError(err)
+			if !ok {
+				log.Error(op, "refresh failed", err)
+				return c.JSON(http.StatusBadGateway, views.SWGError{Error: "refresh failed"})
 			}
-			c.SetCookie(&http.Cookie{
-				Name:     "access_token",
-				Value:    newAt.GetValue(),
-				Path:     "/",
-				HttpOnly: true,
-				SameSite: http.SameSiteLaxMode,
-				Expires:  time.Unix(newAt.GetExp(), 0).UTC(),
-			})
-			return c.JSON(http.StatusCreated, newAt)
-		case codes.InvalidArgument:
-			log.Warn(op, "invalid access token", err)
-			return c.JSON(http.StatusBadRequest, views.SWGError{Error: "invalid access token"})
-		default:
-			log.Error(op, "unexpected token error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "unexpected token error"})
+
+			switch st.Code() {
+			case codes.Unauthenticated:
+				log.Warn(op, "refresh token expired. Terminate authorization", err)
+				return c.JSON(http.StatusGone, views.SWGError{Error: "refresh token expired. Terminate authorization"})
+
+			case codes.InvalidArgument:
+				log.Warn(op, "invalid refresh token", err)
+				return c.JSON(http.StatusBadRequest, views.SWGError{Error: "invalid refresh token"})
+
+			default:
+				log.Error(op, "refresh failed", err)
+				return c.JSON(http.StatusBadGateway, views.SWGError{Error: "refresh failed"})
+			}
 		}
+		c.SetCookie(&http.Cookie{
+			Name:     "access_token",
+			Value:    newAt.GetValue(),
+			Path:     "/",
+			HttpOnly: true,
+			SameSite: http.SameSiteLaxMode,
+			Expires:  time.Unix(newAt.GetExp(), 0).UTC(),
+		})
+		return c.JSON(http.StatusCreated, newAt)
 	}
 	log.Success(op, "")
 	return c.JSON(http.StatusOK, views.SWGMessage{Message: "tokens valid"})
