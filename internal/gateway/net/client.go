@@ -77,12 +77,11 @@ func New(
 
 			notes.GET("/all", e.GetAllNotes)
 			notes.GET("/by-tag", e.GetNotesByTag)
-			notes.GET("/blocks", e.GetAllBlocksInNote)
 			notes.PATCH("/change-title", e.ChangeTitleNote)
 
 			notes.POST("/add-tag", e.AddTagToNote)
 		}
-
+		//TODO block and change del
 		blocks := api.Group("/blocks")
 		{
 			blocks.GET("", e.GetBlock)

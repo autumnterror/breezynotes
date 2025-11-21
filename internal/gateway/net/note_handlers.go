@@ -2,10 +2,11 @@ package net
 
 import (
 	"context"
-	"github.com/autumnterror/breezynotes/pkg/utils/alg"
-	"github.com/autumnterror/breezynotes/pkg/utils/uid"
 	"net/http"
 	"time"
+
+	"github.com/autumnterror/breezynotes/pkg/utils/alg"
+	"github.com/autumnterror/breezynotes/pkg/utils/uid"
 
 	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
@@ -89,7 +90,7 @@ func (e *Echo) ChangeTitleNote(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param id query string true "Note ID"
-// @Success 200 {object} brzrpc.Note
+// @Success 200 {object} views.SWGNoteWithBlocks
 // @Failure 400 {object} views.SWGError
 // @Failure 404 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
@@ -132,9 +133,40 @@ func (e *Echo) GetNote(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 	}
 
+	blocks, err := api.GetAllBlocksInNote(ctx, &brzrpc.Strings{Values: note.Blocks})
+	if err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "get blocks error", err)
+			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get blocks error"})
+		}
+
+		switch st.Code() {
+		default:
+			log.Error(op, "get blocks error", err)
+			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get blocks error"})
+		}
+	}
+
+	if blocks == nil || len(blocks.Items) == 0 {
+		blocks = &brzrpc.Blocks{Items: []*brzrpc.Block{}}
+	}
+
 	log.Success(op, "")
 
-	return c.JSON(http.StatusOK, note)
+	nwb := views.NoteWithBlocks{
+		Id:        note.GetId(),
+		Title:     note.GetTitle(),
+		Blocks:    blocks.GetItems(),
+		Author:    note.GetAuthor(),
+		Readers:   note.GetReaders(),
+		Editors:   note.GetEditors(),
+		CreatedAt: note.GetCreatedAt(),
+		UpdatedAt: note.GetUpdatedAt(),
+		Tag:       note.GetTag(),
+	}
+
+	return c.JSON(http.StatusOK, nwb)
 }
 
 // GetAllNotes godoc
@@ -285,7 +317,6 @@ func (e *Echo) CreateNote(c echo.Context) error {
 		Editors:   []string{},
 		Readers:   []string{},
 		Blocks:    []string{},
-		Status:    brzrpc.Statuses(2),
 	})
 	if err != nil {
 		st, ok := status.FromError(err)
@@ -304,69 +335,6 @@ func (e *Echo) CreateNote(c echo.Context) error {
 	log.Success(op, "")
 
 	return c.JSON(http.StatusCreated, brzrpc.Id{Id: id})
-}
-
-// GetAllBlocksInNote godoc
-// @Summary Get all blocks in note
-// @Description Returns all blocks of given note
-// @Tags note
-// @Accept json
-// @Produce json
-// @Param id query string true "Note ID"
-// @Success 200 {object} views.SWGBlocks
-// @Failure 400 {object} views.SWGError
-// @Failure 404 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
-// @Router /api/notes/blocks [get]
-func (e *Echo) GetAllBlocksInNote(c echo.Context) error {
-	const op = "gateway.net.GetAllBlocksInNote"
-	log.Info(op, "")
-
-	api := e.bnAPI.API
-
-	idInt := c.Get("id")
-	idUser, ok := idInt.(string)
-	if !ok || idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
-	}
-
-	id := c.QueryParam("id")
-	if id == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
-	}
-
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
-	defer done()
-
-	//AUTHORIZE
-	if n, err := api.GetNote(ctx, &brzrpc.Id{Id: id}); err == nil {
-		if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) || alg.IsIn(idUser, n.GetReaders()) {
-			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
-		}
-	} else {
-		log.Error(op, "get note", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad note id"})
-	}
-	//AUTHORIZE
-
-	blocks, err := api.GetAllBlocksInNote(ctx, &brzrpc.Id{Id: id})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "get all blocks error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get all blocks error"})
-		}
-
-		switch st.Code() {
-		default:
-			log.Error(op, "get all blocks error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get all blocks error"})
-		}
-	}
-
-	log.Success(op, "")
-
-	return c.JSON(http.StatusOK, blocks)
 }
 
 // AddTagToNote godoc

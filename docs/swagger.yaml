@@ -64,8 +64,6 @@ definitions:
         items:
           type: string
         type: array
-      status:
-        $ref: '#/definitions/brzrpc.Statuses'
       tag:
         $ref: '#/definitions/brzrpc.Tag'
       title:
@@ -100,18 +98,6 @@ definitions:
           $ref: '#/definitions/brzrpc.Note'
         type: array
     type: object
-  brzrpc.Statuses:
-    enum:
-    - 0
-    - 1
-    - 2
-    - 3
-    type: integer
-    x-enum-varnames:
-    - Statuses_STATUS_UNSPECIFIED
-    - Statuses_ARCHIVED
-    - Statuses_IN_USE
-    - Statuses_IN_TRASH
   brzrpc.Tag:
     properties:
       color:
@@ -244,6 +230,33 @@ definitions:
       message:
         example: some info
         type: string
+    type: object
+  views.SWGNoteWithBlocks:
+    properties:
+      author:
+        type: string
+      blocks:
+        items:
+          $ref: '#/definitions/views.SWGBlock'
+        type: array
+      created_at:
+        type: integer
+      editors:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      readers:
+        items:
+          type: string
+        type: array
+      tag:
+        $ref: '#/definitions/brzrpc.Tag'
+      title:
+        type: string
+      updated_at:
+        type: integer
     type: object
   views.SWGOpBlockRequest:
     properties:
@@ -584,7 +597,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/brzrpc.Note'
+            $ref: '#/definitions/views.SWGNoteWithBlocks'
         "400":
           description: Bad Request
           schema:

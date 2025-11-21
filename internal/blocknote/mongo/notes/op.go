@@ -381,56 +381,59 @@ func (a *API) ChangeBlockOrder(ctx context.Context, noteID string, oldOrder, new
 		return format.Error(op, ErrBadRequest)
 	}
 
-	if newOrder < 0 {
-		newOrder = 0
-	} else if newOrder >= l {
-		newOrder = l
-	}
-
 	val := blocks[oldOrder]
 
 	arrWithout := make([]string, 0, l-1)
 	arrWithout = append(arrWithout, blocks[:oldOrder]...)
 	arrWithout = append(arrWithout, blocks[oldOrder+1:]...)
 
-	// Корректируем целевой индекс с учётом удаления:
-	// если мы перемещаем элемент вправо (old < new) — после удаления
-	// все индексы справа сдвинулись на -1, значит целевая позиция уменьшается на 1.
-	to := newOrder
-	if oldOrder < newOrder {
-		to = newOrder - 1
-	}
-
-	// Зажимаем to в допустимый промежуток [0..len(arrWithout)]
-	// (равенство правой границе означает «вставить в конец»)
-	if to < 0 {
-		to = 0
-	} else if to > len(arrWithout) {
-		to = len(arrWithout)
-	}
-
-	// Формируем итоговый массив
 	newBlocks := make([]string, 0, l)
-	newBlocks = append(newBlocks, arrWithout[:to]...)
-	newBlocks = append(newBlocks, val)
-	newBlocks = append(newBlocks, arrWithout[to:]...)
 
-	// Если ничего не изменилось — выходим
-	changed := false
-	if len(newBlocks) == len(blocks) {
-		for i := range blocks {
-			if blocks[i] != newBlocks[i] {
-				changed = true
-				break
+	if newOrder < 0 {
+		newOrder = 0
+	} else if newOrder >= l {
+		newOrder = l - 1
+		newBlocks = append(newBlocks, arrWithout[:newOrder]...)
+		newBlocks = append(newBlocks, val)
+	} else {
+		newBlocks = append(newBlocks, arrWithout[:newOrder]...)
+		newBlocks = append(newBlocks, val)
+		newBlocks = append(newBlocks, arrWithout[newOrder:]...)
+
+		// Если ничего не изменилось — выходим
+		changed := false
+		if len(newBlocks) == len(blocks) {
+			for i := range blocks {
+				if blocks[i] != newBlocks[i] {
+					changed = true
+					break
+				}
 			}
 		}
+		if !changed {
+			return nil
+		}
 	}
-	if !changed {
-		return nil
-	}
-
 	if err := a.UpdateBlocks(ctx, noteID, newBlocks); err != nil {
 		return format.Error(op, err)
 	}
 	return nil
+	// Корректируем целевой индекс с учётом удаления:
+	// если мы перемещаем элемент вправо (old < new) — после удаления
+	// все индексы справа сдвинулись на -1, значит целевая позиция уменьшается на 1.
+	// to := newOrder
+	// if oldOrder < newOrder {
+	// 	to = newOrder - 1
+	// }
+
+	// Зажимаем to в допустимый промежуток [0..len(arrWithout)]
+	// (равенство правой границе означает «вставить в конец»)
+	// if to < 0 {
+	// 	to = 0
+	// } else if to > len(arrWithout) {
+	// 	to = len(arrWithout)
+	// }
+
+	// Формируем итоговый массив
+
 }

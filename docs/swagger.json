@@ -448,7 +448,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.Note"
+                            "$ref": "#/definitions/views.SWGNoteWithBlocks"
                         }
                     },
                     "400": {
@@ -1593,9 +1593,6 @@
                         "type": "string"
                     }
                 },
-                "status": {
-                    "$ref": "#/definitions/brzrpc.Statuses"
-                },
                 "tag": {
                     "$ref": "#/definitions/brzrpc.Tag"
                 },
@@ -1648,21 +1645,6 @@
                     }
                 }
             }
-        },
-        "brzrpc.Statuses": {
-            "type": "integer",
-            "enum": [
-                0,
-                1,
-                2,
-                3
-            ],
-            "x-enum-varnames": [
-                "Statuses_STATUS_UNSPECIFIED",
-                "Statuses_ARCHIVED",
-                "Statuses_IN_USE",
-                "Statuses_IN_TRASH"
-            ]
         },
         "brzrpc.Tag": {
             "type": "object",
@@ -1866,6 +1848,47 @@
                 "message": {
                     "type": "string",
                     "example": "some info"
+                }
+            }
+        },
+        "views.SWGNoteWithBlocks": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "type": "string"
+                },
+                "blocks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/views.SWGBlock"
+                    }
+                },
+                "created_at": {
+                    "type": "integer"
+                },
+                "editors": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "readers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "tag": {
+                    "$ref": "#/definitions/brzrpc.Tag"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "integer"
                 }
             }
         },

@@ -1,5 +1,7 @@
 package views
 
+import brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
+
 type SWGMessage struct {
 	Message string `json:"message" example:"some info"`
 }
@@ -18,6 +20,18 @@ type SWGBlock struct {
 	IsUsed    bool           `json:"is_used,omitempty"`
 	Data      map[string]any `json:"data,omitempty"`
 }
+type SWGNoteWithBlocks struct {
+	Title     string      `json:"title,omitempty"`
+	CreatedAt int64       `json:"created_at,omitempty"`
+	UpdatedAt int64       `json:"updated_at,omitempty"`
+	Tag       *brzrpc.Tag `json:"tag,omitempty"`
+	Id        string      `json:"id,omitempty"`
+	Author    string      `json:"author,omitempty"`
+	Editors   []string    `json:"editors,omitempty"`
+	Readers   []string    `json:"readers,omitempty"`
+	Blocks    []SWGBlock  `json:"blocks,omitempty"`
+}
+
 type SWGBlocks struct {
 	Items []*SWGBlock `json:"items,omitempty"`
 }

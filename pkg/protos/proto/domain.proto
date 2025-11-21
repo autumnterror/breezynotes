@@ -9,6 +9,8 @@ option go_package = "github.com/autumnterror/breezynotes;brzrpc";
 
 message BoolResponse { bool ok = 1; }
 message StringResponse { string value = 1; }
+message Strings { repeated string values = 1; }
+
 
 message Token { string value = 1; int64 exp = 2;}
 message Tokens {

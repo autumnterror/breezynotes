@@ -98,7 +98,7 @@ service BlockNoteService {
   rpc CreateNote(Note) returns (google.protobuf.Empty);
   rpc UpdateNoteTitle(UpdateNoteTitleRequest) returns (google.protobuf.Empty);
 
-  rpc GetAllBlocksInNote(Id) returns (Blocks);
+  rpc GetAllBlocksInNote(Strings) returns (Blocks);
   rpc GetAllNotes(Id) returns (NoteParts);
   rpc GetNotesByTag(GetNotesByTagRequest) returns (NoteParts);
   rpc GetNotesFromTrash(Id) returns (NoteParts);

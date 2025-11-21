@@ -3,6 +3,8 @@ package grpc
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/autumnterror/breezynotes/internal/auth/jwt"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
@@ -11,7 +13,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"time"
 )
 
 func (s *ServerAPI) GenerateAccessToken(ctx context.Context, r *brzrpc.UserId) (*brzrpc.Token, error) {
@@ -121,7 +122,7 @@ func (s *ServerAPI) Refresh(ctx context.Context, r *brzrpc.Token) (*brzrpc.Token
 		return nil, err
 	}
 
-	return &brzrpc.Token{Value: res.(string)}, nil
+	return &brzrpc.Token{Value: res.(string), Exp: time.Now().UTC().Add(s.cfg.AccessTokenLifeTime).Unix()}, nil
 }
 func (s *ServerAPI) CheckToken(ctx context.Context, r *brzrpc.Token) (*emptypb.Empty, error) {
 	const op = "auth.grpc.CheckToken"

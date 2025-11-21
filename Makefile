@@ -1,6 +1,8 @@
 
 test-method:
 	go test -run $(METHOD) ./... -v
+test-test:
+	go test ./test -v
 test-views:
 	go test ./views -v
 test-textblock:

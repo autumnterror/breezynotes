@@ -451,7 +451,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.Note"
+                            "$ref": "#/definitions/views.SWGNoteWithBlocks"
                         }
                     },
                     "400": {
@@ -1596,9 +1596,6 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
-                "status": {
-                    "$ref": "#/definitions/brzrpc.Statuses"
-                },
                 "tag": {
                     "$ref": "#/definitions/brzrpc.Tag"
                 },
@@ -1651,21 +1648,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "brzrpc.Statuses": {
-            "type": "integer",
-            "enum": [
-                0,
-                1,
-                2,
-                3
-            ],
-            "x-enum-varnames": [
-                "Statuses_STATUS_UNSPECIFIED",
-                "Statuses_ARCHIVED",
-                "Statuses_IN_USE",
-                "Statuses_IN_TRASH"
-            ]
         },
         "brzrpc.Tag": {
             "type": "object",
@@ -1872,6 +1854,47 @@ const docTemplate = `{
                 }
             }
         },
+        "views.SWGNoteWithBlocks": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "type": "string"
+                },
+                "blocks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/views.SWGBlock"
+                    }
+                },
+                "created_at": {
+                    "type": "integer"
+                },
+                "editors": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "readers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "tag": {
+                    "$ref": "#/definitions/brzrpc.Tag"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "integer"
+                }
+            }
+        },
         "views.SWGOpBlockRequest": {
             "type": "object",
             "properties": {
@@ -1955,8 +1978,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "Full API for BreezyNotes.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
-	//LeftDelim:        "{{",
-	//RightDelim:       "}}",
+	// LeftDelim:        "{{",
+	// RightDelim:       "}}",
 }
 
 func init() {

@@ -3,6 +3,8 @@ package grpc
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
@@ -10,7 +12,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"time"
 )
 
 func (s *ServerAPI) ChangeTitleNote(ctx context.Context, req *brzrpc.ChangeTitleNoteRequest) (*emptypb.Empty, error) {
@@ -169,45 +170,28 @@ func (s *ServerAPI) CreateNote(ctx context.Context, req *brzrpc.Note) (*emptypb.
 	return nil, nil
 }
 
-// TODO check benchmark
+// TODO check benchmark get by array
 
-func (s *ServerAPI) GetAllBlocksInNote(ctx context.Context, req *brzrpc.Id) (*brzrpc.Blocks, error) {
+func (s *ServerAPI) GetAllBlocksInNote(ctx context.Context, req *brzrpc.Strings) (*brzrpc.Blocks, error) {
 	const op = "block.note.grpc.GetAllBlocksInNote"
 	log.Info(op, "")
 	ctx, done := context.WithTimeout(ctx, waitTime+5*time.Second)
 	defer done()
 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		notes, err := s.noteAPI.GetAllByUser(ctx, req.GetId())
-		if err != nil {
-			log.Warn(op, "", err)
-			res <- views.ResRPC{
-				Res: nil,
-				Err: status.Error(codes.Internal, err.Error()),
-			}
-			return
-		}
-		if len(notes.GetItems()) == 0 {
-			res <- views.ResRPC{
-				Res: &brzrpc.Blocks{Items: []*brzrpc.Block{}},
-				Err: nil,
-			}
-			return
-		}
 		var bs []*brzrpc.Block
-		for _, n := range notes.GetItems() {
-			for _, id := range n.Blocks {
-				b, err := s.blocksAPI.Get(ctx, id)
-				if err != nil {
-					log.Warn(op, "BAD BLOCK", err)
-					continue
-				}
-				bs = append(bs, b)
+
+		for _, id := range req.Values {
+			b, err := s.blocksAPI.Get(ctx, id)
+			if err != nil {
+				log.Warn(op, "BAD BLOCK", err)
+				continue
 			}
+			bs = append(bs, b)
 		}
 
 		res <- views.ResRPC{
-			Res: nil,
+			Res: bs,
 			Err: nil,
 		}
 	})
@@ -216,7 +200,7 @@ func (s *ServerAPI) GetAllBlocksInNote(ctx context.Context, req *brzrpc.Id) (*br
 		return nil, err
 	}
 
-	return res.(*brzrpc.Blocks), nil
+	return &brzrpc.Blocks{Items: res.([]*brzrpc.Block)}, nil
 }
 
 func (s *ServerAPI) AddTagToNote(ctx context.Context, req *brzrpc.AddTagToNoteRequest) (*emptypb.Empty, error) {
@@ -274,6 +258,7 @@ func (s *ServerAPI) ChangeBlockOrder(ctx context.Context, req *brzrpc.ChangeBloc
 	defer done()
 
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
+		log.Blue(req)
 		if err := s.noteAPI.ChangeBlockOrder(ctx, req.GetId(), int(req.GetOldOrder()), int(req.GetNewOrder())); err != nil {
 			log.Warn(op, "", err)
 			res <- views.ResRPC{

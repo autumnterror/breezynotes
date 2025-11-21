@@ -2,9 +2,10 @@ package net
 
 import (
 	"context"
-	"github.com/autumnterror/breezynotes/pkg/utils/alg"
 	"net/http"
 	"time"
+
+	"github.com/autumnterror/breezynotes/pkg/utils/alg"
 
 	"github.com/labstack/echo/v4"
 
@@ -307,15 +308,13 @@ func (e *Echo) ChangeBlockOrder(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if block, err := api.GetBlock(ctx, &brzrpc.Id{Id: r.GetId()}); err != nil {
-		if n, err := api.GetNote(ctx, &brzrpc.Id{Id: block.GetNoteId()}); err == nil {
-			if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) {
-				return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
-			}
-		} else {
-			log.Error(op, "get note", err)
-			return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad note id"})
+	if n, err := api.GetNote(ctx, &brzrpc.Id{Id: r.GetId()}); err == nil {
+		if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) {
+			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
+	} else {
+		log.Error(op, "get note", err)
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad note id"})
 	}
 
 	_, err := api.ChangeBlockOrder(ctx, &r)
@@ -355,7 +354,7 @@ func (e *Echo) DeleteBlock(c echo.Context) error {
 	log.Info(op, "")
 
 	api := e.bnAPI.API
-
+	//TODO authentication
 	id := c.QueryParam("id")
 	if id == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})

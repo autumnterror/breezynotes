@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+
 	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/views"
@@ -12,11 +13,12 @@ import (
 type Driver struct{}
 
 func (tb *Driver) GetAsFirst(ctx context.Context, block *brzrpc.Block) string {
-	log.Println(block)
 	b, err := FromUnified(block)
 	if err != nil {
+		log.Warn("textblock.GetAsFirst", "", err)
 		return ""
 	}
+
 	return b.PlainText()
 }
 func (tb *Driver) ChangeType(ctx context.Context, block *brzrpc.Block, newType string) error {
