@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"errors"
+	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"time"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
@@ -45,7 +46,7 @@ func (s *ServerAPI) ChangeTitleNote(ctx context.Context, req *brzrpc.ChangeTitle
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return nil, nil
@@ -61,10 +62,18 @@ func (s *ServerAPI) GetNote(ctx context.Context, req *brzrpc.Id) (*brzrpc.Note, 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
 		n, err := s.noteAPI.Get(ctx, req.GetId())
 		if err != nil {
-			log.Warn(op, "", err)
-			res <- views.ResRPC{
-				Res: nil,
-				Err: status.Error(codes.Internal, err.Error()),
+			switch {
+			case errors.Is(err, mongo.ErrNotFound):
+				res <- views.ResRPC{
+					Res: nil,
+					Err: status.Error(codes.NotFound, err.Error()),
+				}
+			default:
+				log.Warn(op, "", err)
+				res <- views.ResRPC{
+					Res: nil,
+					Err: status.Error(codes.Internal, err.Error()),
+				}
 			}
 			return
 		}
@@ -75,21 +84,25 @@ func (s *ServerAPI) GetNote(ctx context.Context, req *brzrpc.Id) (*brzrpc.Note, 
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return res.(*brzrpc.Note), nil
 }
 
-func (s *ServerAPI) GetAllNotes(ctx context.Context, req *brzrpc.Id) (*brzrpc.NoteParts, error) {
+func (s *ServerAPI) GetAllNotes(ctx context.Context, req *brzrpc.GetNotesRequestPagination) (*brzrpc.NoteParts, error) {
 	const op = "block.note.grpc.GetAllNotes"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
+	if req.GetStart() < 0 {
+		return nil, status.Error(codes.InvalidArgument, "start<0")
+	}
+
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		n, err := s.noteAPI.GetNoteListByUser(ctx, req.GetId())
+		n, err := s.noteAPI.GetNoteListByUser(ctx, req.GetIdUser(), int(req.GetStart()), int(req.GetEnd()))
 		if err != nil {
 			log.Warn(op, "", err)
 			res <- views.ResRPC{
@@ -105,21 +118,25 @@ func (s *ServerAPI) GetAllNotes(ctx context.Context, req *brzrpc.Id) (*brzrpc.No
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return res.(*brzrpc.NoteParts), nil
 }
 
-func (s *ServerAPI) GetNotesByTag(ctx context.Context, req *brzrpc.GetNotesByTagRequest) (*brzrpc.NoteParts, error) {
+func (s *ServerAPI) GetNotesByTag(ctx context.Context, req *brzrpc.GetNotesByTagRequestPagination) (*brzrpc.NoteParts, error) {
 	const op = "block.note.grpc.GetNotesByTag"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
+	if req.GetStart() < 0 {
+		return nil, status.Error(codes.InvalidArgument, "start<0")
+	}
+
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		n, err := s.noteAPI.GetNoteListByTag(ctx, req.GetIdTag(), req.GetIdUser())
+		n, err := s.noteAPI.GetNoteListByTag(ctx, req.GetIdTag(), req.GetIdUser(), int(req.GetStart()), int(req.GetEnd()))
 		if err != nil {
 			log.Warn(op, "", err)
 			res <- views.ResRPC{
@@ -135,7 +152,7 @@ func (s *ServerAPI) GetNotesByTag(ctx context.Context, req *brzrpc.GetNotesByTag
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return res.(*brzrpc.NoteParts), nil
@@ -164,13 +181,13 @@ func (s *ServerAPI) CreateNote(ctx context.Context, req *brzrpc.Note) (*emptypb.
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return nil, nil
 }
 
-// TODO check benchmark get by array
+// TODO check benchmark
 
 func (s *ServerAPI) GetAllBlocksInNote(ctx context.Context, req *brzrpc.Strings) (*brzrpc.Blocks, error) {
 	const op = "block.note.grpc.GetAllBlocksInNote"
@@ -197,13 +214,13 @@ func (s *ServerAPI) GetAllBlocksInNote(ctx context.Context, req *brzrpc.Strings)
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return &brzrpc.Blocks{Items: res.([]*brzrpc.Block)}, nil
 }
 
-func (s *ServerAPI) AddTagToNote(ctx context.Context, req *brzrpc.AddTagToNoteRequest) (*emptypb.Empty, error) {
+func (s *ServerAPI) AddTagToNote(ctx context.Context, req *brzrpc.TagToNoteRequest) (*emptypb.Empty, error) {
 	const op = "block.note.grpc.AddTagToNote"
 	log.Info(op, "")
 
@@ -230,10 +247,18 @@ func (s *ServerAPI) AddTagToNote(ctx context.Context, req *brzrpc.AddTagToNoteRe
 		}
 
 		if err := s.noteAPI.AddTagToNote(ctx, req.GetNoteId(), tag); err != nil {
-			log.Warn(op, "", err)
-			res <- views.ResRPC{
-				Res: nil,
-				Err: status.Error(codes.Internal, err.Error()),
+			switch {
+			case errors.Is(err, mongo.ErrNoDocuments):
+				res <- views.ResRPC{
+					Res: nil,
+					Err: status.Error(codes.InvalidArgument, err.Error()),
+				}
+			default:
+				log.Warn(op, "", err)
+				res <- views.ResRPC{
+					Res: nil,
+					Err: status.Error(codes.Internal, err.Error()),
+				}
 			}
 			return
 		}
@@ -244,7 +269,44 @@ func (s *ServerAPI) AddTagToNote(ctx context.Context, req *brzrpc.AddTagToNoteRe
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
+	}
+
+	return nil, nil
+}
+
+func (s *ServerAPI) RemoveTagFromNote(ctx context.Context, req *brzrpc.TagToNoteRequest) (*emptypb.Empty, error) {
+	const op = "block.note.grpc.RemoveTagFromNote"
+	log.Info(op, "")
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
+		if err := s.noteAPI.RemoveTagFromNote(ctx, req.GetNoteId(), req.GetTagId()); err != nil {
+			switch {
+			case errors.Is(err, mongo.ErrNoDocuments):
+				res <- views.ResRPC{
+					Res: nil,
+					Err: status.Error(codes.InvalidArgument, err.Error()),
+				}
+			default:
+				log.Warn(op, "", err)
+				res <- views.ResRPC{
+					Res: nil,
+					Err: status.Error(codes.Internal, err.Error()),
+				}
+			}
+			return
+		}
+		res <- views.ResRPC{
+			Res: nil,
+			Err: nil,
+		}
+	})
+
+	if err != nil {
+		return nil, format.Error(op, err)
 	}
 
 	return nil, nil
@@ -275,7 +337,7 @@ func (s *ServerAPI) ChangeBlockOrder(ctx context.Context, req *brzrpc.ChangeBloc
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 	return nil, nil
 }

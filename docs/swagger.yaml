@@ -1,12 +1,5 @@
 basePath: /
 definitions:
-  brzrpc.AddTagToNoteRequest:
-    properties:
-      note_id:
-        type: string
-      tag_id:
-        type: string
-    type: object
   brzrpc.AuthRequest:
     properties:
       email:
@@ -44,33 +37,6 @@ definitions:
       id:
         type: string
     type: object
-  brzrpc.Note:
-    properties:
-      author:
-        type: string
-      blocks:
-        items:
-          type: string
-        type: array
-      created_at:
-        type: integer
-      editors:
-        items:
-          type: string
-        type: array
-      id:
-        type: string
-      readers:
-        items:
-          type: string
-        type: array
-      tag:
-        $ref: '#/definitions/brzrpc.Tag'
-      title:
-        type: string
-      updated_at:
-        type: integer
-    type: object
   brzrpc.NotePart:
     properties:
       first_block:
@@ -91,13 +57,6 @@ definitions:
           $ref: '#/definitions/brzrpc.NotePart'
         type: array
     type: object
-  brzrpc.Notes:
-    properties:
-      items:
-        items:
-          $ref: '#/definitions/brzrpc.Note'
-        type: array
-    type: object
   brzrpc.Tag:
     properties:
       color:
@@ -109,6 +68,13 @@ definitions:
       title:
         type: string
       userId:
+        type: string
+    type: object
+  brzrpc.TagToNoteRequest:
+    properties:
+      note_id:
+        type: string
+      tag_id:
         type: string
     type: object
   brzrpc.Tags:
@@ -203,13 +169,6 @@ definitions:
         type: string
       updated_at:
         type: integer
-    type: object
-  views.SWGBlocks:
-    properties:
-      items:
-        items:
-          $ref: '#/definitions/views.SWGBlock'
-        type: array
     type: object
   views.SWGCreateBlockRequest:
     properties:
@@ -412,7 +371,7 @@ paths:
       summary: Validate token (uses cookies)
       tags:
       - auth
-  /api/blocks:
+  /api/block:
     delete:
       consumes:
       - application/json
@@ -472,7 +431,39 @@ paths:
       summary: Create block
       tags:
       - block
-  /api/blocks/change-order:
+  /api/block/op:
+    post:
+      consumes:
+      - application/json
+      description: Performs operation on block
+      parameters:
+      - description: Block ID, operation and data
+        in: body
+        name: OpBlockRequest
+        required: true
+        schema:
+          $ref: '#/definitions/views.SWGOpBlockRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/views.SWGError'
+      summary: Operate on block
+      tags:
+      - block
+  /api/block/order:
     patch:
       consumes:
       - application/json
@@ -504,7 +495,7 @@ paths:
       summary: Change block order in note
       tags:
       - block
-  /api/blocks/change-type:
+  /api/block/type:
     patch:
       consumes:
       - application/json
@@ -534,38 +525,6 @@ paths:
           schema:
             $ref: '#/definitions/views.SWGError'
       summary: Change block type
-      tags:
-      - block
-  /api/blocks/op:
-    post:
-      consumes:
-      - application/json
-      description: Performs operation on block
-      parameters:
-      - description: Block ID, operation and data
-        in: body
-        name: OpBlockRequest
-        required: true
-        schema:
-          $ref: '#/definitions/views.SWGOpBlockRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/views.SWGError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/views.SWGError'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/views.SWGError'
-      summary: Operate on block
       tags:
       - block
   /api/health:
@@ -642,50 +601,29 @@ paths:
       summary: Create note
       tags:
       - note
-  /api/notes/add-tag:
-    post:
-      consumes:
-      - application/json
-      description: Attaches tag to note
-      parameters:
-      - description: Note ID and Tag ID
-        in: body
-        name: AddTagToNoteRequest
-        required: true
-        schema:
-          $ref: '#/definitions/brzrpc.AddTagToNoteRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/views.SWGError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/views.SWGError'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/views.SWGError'
-      summary: Add tag to note
-      tags:
-      - note
   /api/notes/all:
     get:
       consumes:
       - application/json
       description: Returns all notes by user ID
+      parameters:
+      - description: start > 0
+        in: query
+        name: start
+        required: true
+        type: integer
+      - description: end
+        in: query
+        name: end
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/brzrpc.Notes'
+            $ref: '#/definitions/brzrpc.NoteParts'
         "400":
           description: Bad Request
           schema:
@@ -695,39 +633,6 @@ paths:
           schema:
             $ref: '#/definitions/views.SWGError'
       summary: Get all notes of user
-      tags:
-      - note
-  /api/notes/blocks:
-    get:
-      consumes:
-      - application/json
-      description: Returns all blocks of given note
-      parameters:
-      - description: Note ID
-        in: query
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/views.SWGBlocks'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/views.SWGError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/views.SWGError'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/views.SWGError'
-      summary: Get all blocks in note
       tags:
       - note
   /api/notes/by-tag:
@@ -741,13 +646,23 @@ paths:
         name: id
         required: true
         type: string
+      - description: start > 0
+        in: query
+        name: start
+        required: true
+        type: integer
+      - description: end
+        in: query
+        name: end
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/brzrpc.Notes'
+            $ref: '#/definitions/brzrpc.NoteParts'
         "400":
           description: Bad Request
           schema:
@@ -789,6 +704,69 @@ paths:
           schema:
             $ref: '#/definitions/views.SWGError'
       summary: Change note title
+      tags:
+      - note
+  /api/notes/tag:
+    delete:
+      consumes:
+      - application/json
+      description: Remove tag from note
+      parameters:
+      - description: Note ID and Tag ID
+        in: body
+        name: AddTagToNoteRequest
+        required: true
+        schema:
+          $ref: '#/definitions/brzrpc.TagToNoteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/views.SWGError'
+      summary: Remove tag from note
+      tags:
+      - note
+    post:
+      consumes:
+      - application/json
+      description: Attaches tag to note
+      parameters:
+      - description: Note ID and Tag ID
+        in: body
+        name: AddTagToNoteRequest
+        required: true
+        schema:
+          $ref: '#/definitions/brzrpc.TagToNoteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/views.SWGError'
+      summary: Add tag to note
       tags:
       - note
   /api/tags:

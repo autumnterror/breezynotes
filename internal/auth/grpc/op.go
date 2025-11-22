@@ -6,6 +6,7 @@ import (
 	"github.com/autumnterror/breezynotes/internal/auth/psql"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
+	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/autumnterror/breezynotes/views"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -43,7 +44,7 @@ func (s *ServerAPI) Auth(ctx context.Context, r *brzrpc.AuthRequest) (*brzrpc.Us
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return &brzrpc.UserId{Id: res.(string)}, nil
@@ -64,7 +65,7 @@ func (s *ServerAPI) Healthz(ctx context.Context, _ *emptypb.Empty) (*emptypb.Emp
 		res <- views.ResRPC{Res: nil, Err: nil}
 	})
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return nil, nil

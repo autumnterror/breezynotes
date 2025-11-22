@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/autumnterror/breezynotes/internal/redis/config"
 	"github.com/autumnterror/breezynotes/internal/redis/grpc"
+	"github.com/autumnterror/breezynotes/internal/redis/redis"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	"os"
 	"os/signal"
@@ -14,7 +15,7 @@ func main() {
 	const op = "cmd.redis"
 	cfg := config.MustSetup()
 
-	a := grpc.New(cfg)
+	a := grpc.New(cfg, redis.New(cfg))
 	go a.MustRun()
 
 	stop := make(chan os.Signal, 1)

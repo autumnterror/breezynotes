@@ -1,6 +1,11 @@
 package test
 
 import (
+	"github.com/autumnterror/breezynotes/pkg/log"
+	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -88,4 +93,41 @@ func TestTest(t *testing.T) {
 			assert.Equal(t, tt.needS, res)
 		}
 	}
+}
+
+func TestErrors(t *testing.T) {
+	err := format.Error("op", status.Error(codes.FailedPrecondition, "test"))
+
+	s, ok := status.FromError(err)
+	if assert.True(t, ok) {
+		log.Println(s.Code())
+	}
+}
+
+type Test struct {
+	A int
+	B int
+}
+
+func TestArray(t *testing.T) {
+	ta := []Test{{1, 2}, {3, 4}, {5, 6}}
+
+	idx := slices.IndexFunc(ta, func(tt Test) bool {
+		return tt.A == 3
+	})
+	assert.Equal(t, idx, 1)
+
+	ta = append(ta[:idx], ta[idx+1:]...)
+	log.Println(ta)
+	assert.Equal(t, 2, len(ta))
+	idx = slices.IndexFunc(ta, func(tt Test) bool {
+		return tt.B == 2
+	})
+	assert.Equal(t, idx, 0)
+
+	idx = slices.IndexFunc(ta, func(tt Test) bool {
+		return tt.B == 33
+	})
+	assert.Equal(t, idx, -1)
+
 }

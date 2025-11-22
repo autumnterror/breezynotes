@@ -2,6 +2,7 @@ package blocks
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
@@ -50,6 +51,9 @@ func (a *API) Get(ctx context.Context, id string) (*brzrpc.Block, error) {
 
 	res := a.Blocks().FindOne(ctx, bson.D{{"_id", id}})
 	if res.Err() != nil {
+		if errors.Is(res.Err(), mongo.ErrNoDocuments) {
+			return nil, format.Error(op, mongo.ErrNotFound)
+		}
 		return nil, format.Error(op, res.Err())
 	}
 

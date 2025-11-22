@@ -72,6 +72,18 @@ message Note {
   repeated string blocks = 9;
 }
 
+message NoteWithBlocks {
+  string id = 1;
+  string title = 2;
+  int64 created_at = 3;
+  int64 updated_at = 4;
+  Tag tag = 5;
+  string author = 6;
+  repeated string editors = 7;
+  repeated string readers = 8;
+  repeated Block blocks = 9;
+}
+
 message NotePart {
   string id = 1;
   string title = 2;

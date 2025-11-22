@@ -2,6 +2,8 @@ package notes
 
 import (
 	"context"
+	"github.com/autumnterror/breezynotes/pkg/pkgs"
+	"github.com/autumnterror/breezynotes/pkg/pkgs/default/textblock"
 	"testing"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/config"
@@ -12,253 +14,268 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// func TestWithBlocks(t *testing.T) {
-// 	t.Parallel()
-// 	t.Run("test with blocks", func(t *testing.T) {
-// 		pkgs.RegisterBlock("text", &textblock.Driver{})
-// 		m := mongo.MustConnect(config.Test())
-// 		b := blocks.NewApi(m)
-// 		a := NewApi(m, b)
-// 		id := "test_with_blocks"
-// 		t.Cleanup(func() {
-// 			assert.NoError(t, a.Delete(context.TODO(), id))
-// 			_, err := a.Get(context.TODO(), id)
-// 			assert.Error(t, err)
+func TestWithBlocks(t *testing.T) {
+	t.Parallel()
+	t.Run("test with blocks", func(t *testing.T) {
+		pkgs.RegisterBlock("text", &textblock.Driver{})
+		m := mongo.MustConnect(config.Test())
+		b := blocks.NewApi(m)
+		a := NewApi(m, b)
+		id := "test_with_blocks"
+		t.Cleanup(func() {
+			assert.NoError(t, a.Delete(context.TODO(), id))
+			_, err := a.Get(context.TODO(), id)
+			assert.Error(t, err)
 
-// 			nts, err := a.GetAllByUser(context.TODO(), id)
-// 			assert.NoError(t, err)
-// 			assert.Equal(t, 0, len(nts.Items))
+			nts, err := a.getAllByUser(context.TODO(), id)
+			assert.NoError(t, err)
+			assert.Equal(t, 0, len(nts.Items))
 
-// 			assert.NoError(t, m.Disconnect())
-// 		})
-// 		assert.NoError(t, a.Create(context.TODO(), &brzrpc.Note{
-// 			Id:        id,
-// 			Title:     "test",
-// 			CreatedAt: 0,
-// 			UpdatedAt: 0,
-// 			Tag: &brzrpc.Tag{
-// 				Id:     "test_tag",
-// 				Title:  "test",
-// 				Color:  "test",
-// 				Emoji:  "test",
-// 				UserId: "test",
-// 			},
-// 			Author: "test_auth_TestCrudGood",
-// 			Editors: []string{
-// 				"test1ed", "test2ed",
-// 			},
-// 			Readers: []string{
-// 				"test1red", "test2red",
-// 			},
-// 			Blocks: []string{},
-// 		}))
-// 		idBlock1, err := b.Create(context.TODO(), "text", id, map[string]any{
-// 			"text": []any{
-// 				map[string]any{"style": "default", "text": "test1"},
-// 				map[string]any{"style": "bald", "text": " test2"},
-// 			},
-// 		})
-// 		assert.NoError(t, err)
-// 		idBlock2, err := b.Create(context.TODO(), "text", id, map[string]any{
-// 			"text": []any{
-// 				map[string]any{"style": "default", "text": "test3"},
-// 				map[string]any{"style": "bald", "text": " test4"},
-// 			},
-// 		})
+			assert.NoError(t, m.Disconnect())
+		})
+		assert.NoError(t, a.Create(context.TODO(), &brzrpc.Note{
+			Id:        id,
+			Title:     "test",
+			CreatedAt: 0,
+			UpdatedAt: 0,
+			Tag: &brzrpc.Tag{
+				Id:     "test_tag",
+				Title:  "test",
+				Color:  "test",
+				Emoji:  "test",
+				UserId: "test",
+			},
+			Author: "test_auth_TestCrudGood",
+			Editors: []string{
+				"test1ed", "test2ed",
+			},
+			Readers: []string{
+				"test1red", "test2red",
+			},
+			Blocks: []string{},
+		}))
+		idBlock1, err := b.Create(context.TODO(), "text", id, map[string]any{
+			"text": []any{
+				map[string]any{"style": "default", "text": "test1"},
+				map[string]any{"style": "bald", "text": " test2"},
+			},
+		})
+		assert.NoError(t, err)
+		idBlock2, err := b.Create(context.TODO(), "text", id, map[string]any{
+			"text": []any{
+				map[string]any{"style": "default", "text": "test3"},
+				map[string]any{"style": "bald", "text": " test4"},
+			},
+		})
 
-// 		assert.NoError(t, err)
+		assert.NoError(t, err)
 
-// 		assert.NoError(t, a.InsertBlock(context.TODO(), id, idBlock1, 0))
-// 		assert.NoError(t, a.InsertBlock(context.TODO(), id, idBlock2, 0))
+		assert.NoError(t, a.InsertBlock(context.TODO(), id, idBlock1, 0))
+		assert.NoError(t, a.InsertBlock(context.TODO(), id, idBlock2, 0))
 
-// 		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
-// 			log.Green("get after add insert ", n)
-// 			assert.Equal(t, 2, len(n.Blocks))
-// 		}
+		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
+			log.Green("get after add insert ", n)
+			assert.Equal(t, 2, len(n.Blocks))
+		}
 
-// 		if nts, err := a.GetNoteListByTag(context.TODO(), "test_tag", "test_auth_TestCrudGood"); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
-// 			log.Green("get by tag ", nts)
-// 		}
+		if nts, err := a.GetNoteListByTag(context.TODO(), "test_tag", "test_auth_TestCrudGood", 0, 2); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
+			log.Green("get by tag ", nts)
+		}
 
-// 		if nts, err := a.GetNoteListByUser(context.TODO(), "test_auth_TestCrudGood"); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
-// 			log.Green("get by user ", nts)
-// 			if assert.Greater(t, len(nts.GetItems()), 0) {
-// 				assert.Equal(t, "test3 test4", nts.GetItems()[0].GetFirstBlock())
-// 			}
-// 		}
-// 	})
-// }
+		if nts, err := a.GetNoteListByTag(context.TODO(), "test_tag", "test_auth_TestCrudGood", 0, 0); assert.NoError(t, err) && assert.Equal(t, 0, len(nts.Items)) {
+		}
 
-// func TestCrudGood(t *testing.T) {
-// 	t.Parallel()
-// 	t.Run("crud good", func(t *testing.T) {
-// 		m := mongo.MustConnect(config.Test())
-// 		b := blocks.NewApi(m)
-// 		a := NewApi(m, b)
-// 		id := "testIDGood"
-// 		t.Cleanup(func() {
-// 			assert.NoError(t, a.Delete(context.TODO(), id))
-// 			_, err := a.Get(context.TODO(), id)
-// 			assert.Error(t, err)
+		if nts, err := a.GetNoteListByUser(context.TODO(), "test_auth_TestCrudGood", 0, 2); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
+			log.Green("get by user ", nts)
+			if assert.Greater(t, len(nts.GetItems()), 0) {
+				assert.Equal(t, "test3 test4", nts.GetItems()[0].GetFirstBlock())
+			}
+		}
+		if nts, err := a.GetNoteListByUser(context.TODO(), "test_auth_TestCrudGood", 0, 0); assert.NoError(t, err) && assert.Equal(t, 0, len(nts.Items)) {
+		}
+	})
+}
 
-// 			nts, err := a.GetAllByUser(context.TODO(), id)
-// 			assert.NoError(t, err)
-// 			assert.Equal(t, 0, len(nts.Items))
+func TestCrudGood(t *testing.T) {
+	t.Parallel()
+	t.Run("crud good", func(t *testing.T) {
+		m := mongo.MustConnect(config.Test())
+		b := blocks.NewApi(m)
+		a := NewApi(m, b)
+		id := "testIDGood"
+		t.Cleanup(func() {
+			assert.NoError(t, a.Delete(context.TODO(), id))
+			_, err := a.Get(context.TODO(), id)
+			assert.Error(t, err)
 
-// 			assert.NoError(t, m.Disconnect())
-// 		})
+			nts, err := a.getAllByUser(context.TODO(), id)
+			assert.NoError(t, err)
+			assert.Equal(t, 0, len(nts.Items))
 
-// 		assert.NoError(t, a.Create(context.TODO(), &brzrpc.Note{
-// 			Id:        id,
-// 			Title:     "test",
-// 			CreatedAt: 0,
-// 			UpdatedAt: 0,
-// 			Tag: &brzrpc.Tag{
-// 				Id:     "test_tag",
-// 				Title:  "test",
-// 				Color:  "test",
-// 				Emoji:  "test",
-// 				UserId: "test",
-// 			},
-// 			Author: "test_auth_TestCrudGood",
-// 			Editors: []string{
-// 				"test1ed", "test2ed",
-// 			},
-// 			Readers: []string{
-// 				"test1red", "test2red",
-// 			},
-// 			Blocks: []string{
-// 				"test1", "test2",
-// 			},
-// 		}))
+			assert.NoError(t, m.Disconnect())
+		})
 
-// 		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
-// 			log.Green("get after create ", n)
-// 		}
+		assert.NoError(t, a.Create(context.TODO(), &brzrpc.Note{
+			Id:        id,
+			Title:     "test",
+			CreatedAt: 0,
+			UpdatedAt: 0,
+			Tag: &brzrpc.Tag{
+				Id:     "test_tag",
+				Title:  "test",
+				Color:  "test",
+				Emoji:  "test",
+				UserId: "test",
+			},
+			Author: "test_auth_TestCrudGood",
+			Editors: []string{
+				"test1ed", "test2ed",
+			},
+			Readers: []string{
+				"test1red", "test2red",
+			},
+			Blocks: []string{
+				"test1", "test2",
+			},
+		}))
 
-// 		if nts, err := a.GetAllByUser(context.TODO(), "test_auth_TestCrudGood"); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
-// 			log.Green("get all by user after create ", nts)
-// 		}
+		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
+			log.Green("get after create ", n)
+		}
 
-// 		assert.NoError(t, a.UpdateTitle(context.TODO(), id, "new_title"))
-// 		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
-// 			log.Green("get after update title ", n)
-// 		}
+		if nts, err := a.getAllByUser(context.TODO(), "test_auth_TestCrudGood"); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
+			log.Green("get all by user after create ", nts)
+		}
 
-// 		assert.NoError(t, a.UpdateUpdatedAt(context.TODO(), id))
-// 		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
-// 			log.Green("get after update updated ", n)
-// 		}
+		assert.NoError(t, a.UpdateTitle(context.TODO(), id, "new_title"))
+		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
+			log.Green("get after update title ", n)
+		}
 
-// 		assert.NoError(t, a.AddTagToNote(context.TODO(), id, &brzrpc.Tag{
-// 			Id:     "newIdTag",
-// 			Title:  "newTag",
-// 			Color:  "newColor",
-// 			Emoji:  "newEmoji",
-// 			UserId: "newUserId",
-// 		}))
-// 		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
-// 			log.Green("get after add tag ", n)
-// 			assert.Equal(t, "newIdTag", n.Tag.Id)
-// 		}
-// 	})
-// }
+		assert.NoError(t, a.UpdateUpdatedAt(context.TODO(), id))
+		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
+			log.Green("get after update updated ", n)
+		}
 
-// func TestCrudNotExist(t *testing.T) {
-// 	t.Parallel()
-// 	t.Run("crud bad", func(t *testing.T) {
-// 		m := mongo.MustConnect(config.Test())
-// 		b := blocks.NewApi(m)
-// 		a := NewApi(m, b)
-// 		id := "testIDNotExist"
-// 		t.Cleanup(func() {
-// 			assert.NoError(t, m.Disconnect())
-// 		})
+		idTag := "newIdTag"
+		assert.NoError(t, a.AddTagToNote(context.TODO(), id, &brzrpc.Tag{
+			Id:     "newIdTag",
+			Title:  "newTag",
+			Color:  "newColor",
+			Emoji:  "newEmoji",
+			UserId: "newUserId",
+		}))
+		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
+			log.Green("get after add tag ", n)
+			assert.Equal(t, "newIdTag", n.Tag.Id)
+		}
 
-// 		_, err := a.Get(context.TODO(), id)
-// 		assert.Error(t, err)
+		assert.NoError(t, a.RemoveTagFromNote(context.TODO(), id, idTag))
+		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
+			log.Green("get after remove tag ", n)
+			assert.Nil(t, n.Tag)
+		}
+	})
+}
 
-// 		assert.ErrorIs(t, a.UpdateTitle(context.TODO(), id, "new_title"), mongo.ErrNotFound)
-// 		assert.ErrorIs(t, a.UpdateUpdatedAt(context.TODO(), id), mongo.ErrNotFound)
-// 		assert.Error(t, a.Delete(context.TODO(), id))
-// 	})
-// }
+func TestCrudNotExist(t *testing.T) {
+	t.Parallel()
+	t.Run("crud bad", func(t *testing.T) {
+		m := mongo.MustConnect(config.Test())
+		b := blocks.NewApi(m)
+		a := NewApi(m, b)
+		id := "testIDNotExist"
+		t.Cleanup(func() {
+			assert.NoError(t, m.Disconnect())
+		})
 
-// func TestTrashCycle(t *testing.T) {
-// 	t.Parallel()
-// 	t.Run("Trash Cycle", func(t *testing.T) {
-// 		m := mongo.MustConnect(config.Test())
-// 		b := blocks.NewApi(m)
-// 		a := NewApi(m, b)
+		if _, err := a.Get(context.TODO(), id); assert.ErrorIs(t, err, mongo.ErrNotFound) {
+		}
+		if n, err := a.GetNoteListByUser(context.TODO(), id, 0, 100); assert.NoError(t, err) && assert.Equal(t, 0, len(n.GetItems())) {
+		}
+		if n, err := a.GetNoteListByTag(context.TODO(), id, id, 0, 100); assert.NoError(t, err) && assert.Equal(t, 0, len(n.GetItems())) {
+		}
+		assert.ErrorIs(t, a.UpdateTitle(context.TODO(), id, "new_title"), mongo.ErrNotFound)
+		assert.ErrorIs(t, a.UpdateUpdatedAt(context.TODO(), id), mongo.ErrNotFound)
+		assert.Error(t, a.Delete(context.TODO(), id))
+	})
+}
 
-// 		t.Cleanup(func() {
-// 			assert.NoError(t, m.Disconnect())
-// 		})
-// 		id := "testIDTrashCycle"
-// 		assert.NoError(t, a.Create(context.TODO(), &brzrpc.Note{
-// 			Id:        id,
-// 			Title:     "test",
-// 			CreatedAt: 0,
-// 			UpdatedAt: 0,
-// 			Tag: &brzrpc.Tag{
-// 				Id:     "test",
-// 				Title:  "test",
-// 				Color:  "test",
-// 				Emoji:  "test",
-// 				UserId: "test",
-// 			},
-// 			Author: "testAuthor",
-// 			Editors: []string{
-// 				"test1ed", "test2ed",
-// 			},
-// 			Readers: []string{
-// 				"test1red", "test2red",
-// 			},
-// 			Blocks: []string{
-// 				"test1bl", "test2bl",
-// 			},
-// 		}))
+func TestTrashCycle(t *testing.T) {
+	t.Parallel()
+	t.Run("Trash Cycle", func(t *testing.T) {
+		m := mongo.MustConnect(config.Test())
+		b := blocks.NewApi(m)
+		a := NewApi(m, b)
 
-// 		assert.NoError(t, a.ToTrash(context.TODO(), id))
+		t.Cleanup(func() {
+			assert.NoError(t, m.Disconnect())
+		})
+		id := "testIDTrashCycle"
+		assert.NoError(t, a.Create(context.TODO(), &brzrpc.Note{
+			Id:        id,
+			Title:     "test",
+			CreatedAt: 0,
+			UpdatedAt: 0,
+			Tag: &brzrpc.Tag{
+				Id:     "test",
+				Title:  "test",
+				Color:  "test",
+				Emoji:  "test",
+				UserId: "test",
+			},
+			Author: "testAuthor",
+			Editors: []string{
+				"test1ed", "test2ed",
+			},
+			Readers: []string{
+				"test1red", "test2red",
+			},
+			Blocks: []string{
+				"test1bl", "test2bl",
+			},
+		}))
 
-// 		_, err := a.Get(context.TODO(), id)
-// 		assert.Error(t, err)
+		assert.NoError(t, a.ToTrash(context.TODO(), id))
 
-// 		if nts, err := a.GetNotesFromTrash(context.TODO(), "testAuthor"); assert.NoError(t, err) {
-// 			log.Green("trash notes after create", nts)
-// 		}
+		_, err := a.Get(context.TODO(), id)
+		assert.Error(t, err)
 
-// 		assert.NoError(t, a.FromTrash(context.TODO(), id))
+		if nts, err := a.GetNotesFromTrash(context.TODO(), "testAuthor"); assert.NoError(t, err) {
+			log.Green("trash notes after create", nts)
+		}
 
-// 		_, err = a.Get(context.TODO(), id)
-// 		assert.NoError(t, err)
+		assert.NoError(t, a.FromTrash(context.TODO(), id))
 
-// 		assert.NoError(t, a.ToTrash(context.TODO(), id))
+		_, err = a.Get(context.TODO(), id)
+		assert.NoError(t, err)
 
-// 		assert.NoError(t, a.CleanTrash(context.TODO(), "testAuthor"))
-// 		assert.Error(t, a.FromTrash(context.TODO(), id))
-// 		if nts, err := a.GetNotesFromTrash(context.TODO(), "testAuthor"); assert.NoError(t, err) {
-// 			log.Green("trash notes after clean", nts)
-// 		}
-// 	})
-// }
+		assert.NoError(t, a.ToTrash(context.TODO(), id))
 
-// func TestTrashCycleBad(t *testing.T) {
-// 	t.Parallel()
-// 	t.Run("Trash Cycle Bad", func(t *testing.T) {
-// 		m := mongo.MustConnect(config.Test())
-// 		b := blocks.NewApi(m)
-// 		a := NewApi(m, b)
+		assert.NoError(t, a.CleanTrash(context.TODO(), "testAuthor"))
+		assert.Error(t, a.FromTrash(context.TODO(), id))
+		if nts, err := a.GetNotesFromTrash(context.TODO(), "testAuthor"); assert.NoError(t, err) {
+			log.Green("trash notes after clean", nts)
+		}
+	})
+}
 
-// 		t.Cleanup(func() {
-// 			assert.NoError(t, m.Disconnect())
-// 		})
-// 		id := "testIDTrashCycleBad"
+func TestTrashCycleBad(t *testing.T) {
+	t.Parallel()
+	t.Run("Trash Cycle Bad", func(t *testing.T) {
+		m := mongo.MustConnect(config.Test())
+		b := blocks.NewApi(m)
+		a := NewApi(m, b)
 
-// 		assert.Error(t, a.ToTrash(context.TODO(), id))
-// 		assert.Error(t, a.FromTrash(context.TODO(), id))
-// 	})
-// }
+		t.Cleanup(func() {
+			assert.NoError(t, m.Disconnect())
+		})
+		id := "testIDTrashCycleBad"
+
+		assert.Error(t, a.ToTrash(context.TODO(), id))
+		assert.Error(t, a.FromTrash(context.TODO(), id))
+	})
+}
 
 func TestBlockOrder(t *testing.T) {
 	t.Parallel()

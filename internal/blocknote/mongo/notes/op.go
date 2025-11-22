@@ -2,6 +2,7 @@ package notes
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -14,7 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-// Get return note by id
+// Get return note by id can return mongo.ErrNotFound
 func (a *API) Get(ctx context.Context, id string) (*brzrpc.Note, error) {
 	const op = "notes.Get"
 
@@ -23,6 +24,9 @@ func (a *API) Get(ctx context.Context, id string) (*brzrpc.Note, error) {
 
 	res := a.Notes().FindOne(ctx, bson.M{"_id": id})
 	if res.Err() != nil {
+		if errors.Is(res.Err(), mongo.ErrNoDocuments) {
+			return nil, format.Error(op, mongo.ErrNotFound)
+		}
 		return nil, format.Error(op, res.Err())
 	}
 
@@ -35,14 +39,21 @@ func (a *API) Get(ctx context.Context, id string) (*brzrpc.Note, error) {
 	return views.FromNoteDb(&n), nil
 }
 
-// GetNoteListByUser use func a.blockAPI.GetAsFirst
-func (a *API) GetNoteListByUser(ctx context.Context, id string) (*brzrpc.NoteParts, error) {
+// GetNoteListByUser use func a.blockAPI.GetAsFirst return notes in [start, end)
+func (a *API) GetNoteListByUser(ctx context.Context, id string, start, end int) (*brzrpc.NoteParts, error) {
 	const op = "notes.GetNoteListByUser"
+
+	if end <= start {
+		return &brzrpc.NoteParts{Items: []*brzrpc.NotePart{}}, nil
+	}
+	if start < 0 {
+		return nil, fmt.Errorf("bad start")
+	}
 
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
-	cur, err := a.Notes().Find(ctx, bson.M{"author": id})
+	cur, err := a.Notes().Find(ctx, bson.M{"author": id}, options.Find().SetSort(bson.M{"updatedAt": -1}))
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
@@ -51,8 +62,15 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string) (*brzrpc.NotePar
 	nts := &brzrpc.NoteParts{
 		Items: []*brzrpc.NotePart{},
 	}
-
+	idx := 0
 	for cur.Next(ctx) {
+		if idx < start {
+			idx++
+			continue
+		}
+		if idx >= end {
+			break
+		}
 		var n views.NoteDb
 		if err = cur.Decode(&n); err != nil {
 			return nts, format.Error(op, err)
@@ -73,19 +91,27 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string) (*brzrpc.NotePar
 			FirstBlock: fb,
 			UpdatedAt:  n.UpdatedAt,
 		})
+		idx++
 	}
 
 	return nts, nil
 }
 
-// GetNoteListByTag use func a.blockAPI.GetAsFirst
-func (a *API) GetNoteListByTag(ctx context.Context, id, idUser string) (*brzrpc.NoteParts, error) {
+// GetNoteListByTag use func a.blockAPI.GetAsFirst return notes in [start, end)
+func (a *API) GetNoteListByTag(ctx context.Context, id, idUser string, start, end int) (*brzrpc.NoteParts, error) {
 	const op = "notes.GetNoteListByUser"
+
+	if end <= start {
+		return &brzrpc.NoteParts{Items: []*brzrpc.NotePart{}}, nil
+	}
+	if start < 0 {
+		return nil, fmt.Errorf("bad start")
+	}
 
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
-	cur, err := a.Notes().Find(ctx, bson.M{"tag._id": id, "author": idUser})
+	cur, err := a.Notes().Find(ctx, bson.M{"tag._id": id, "author": idUser}, options.Find().SetSort(bson.M{"updatedAt": -1}))
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
@@ -95,7 +121,16 @@ func (a *API) GetNoteListByTag(ctx context.Context, id, idUser string) (*brzrpc.
 		Items: []*brzrpc.NotePart{},
 	}
 
+	idx := 0
 	for cur.Next(ctx) {
+		if idx < start {
+			idx++
+			continue
+		}
+		if idx >= end {
+			break
+		}
+
 		var n views.NoteDb
 		if err = cur.Decode(&n); err != nil {
 			return nts, format.Error(op, err)
@@ -114,13 +149,14 @@ func (a *API) GetNoteListByTag(ctx context.Context, id, idUser string) (*brzrpc.
 			FirstBlock: fb,
 			UpdatedAt:  n.UpdatedAt,
 		})
+		idx++
 	}
 
 	return nts, nil
 }
 
 // GetAllByUser return note by id author
-func (a *API) GetAllByUser(ctx context.Context, id string) (*brzrpc.Notes, error) {
+func (a *API) getAllByUser(ctx context.Context, id string) (*brzrpc.Notes, error) {
 	const op = "notes.Get"
 
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
@@ -343,6 +379,39 @@ func (a *API) AddTagToNote(ctx context.Context, id string, tag *brzrpc.Tag) erro
 				},
 			},
 		)
+	if err != nil || res.MatchedCount == 0 {
+		if res != nil && res.MatchedCount == 0 {
+			return format.Error(op, mongo.ErrNotFound)
+		}
+		return format.Error(op, err)
+	}
+
+	return nil
+}
+
+// RemoveTagFromNote can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix().
+func (a *API) RemoveTagFromNote(ctx context.Context, id string, tagID string) error {
+	const op = "notes.RemoveTagFromNote"
+
+	ctx, done := context.WithTimeout(ctx, views.WaitTime)
+	defer done()
+
+	res, err := a.
+		Notes().
+		UpdateOne(
+			ctx,
+			bson.M{
+				"_id":     id,
+				"tag._id": tagID,
+			},
+			bson.M{
+				"$set": bson.M{
+					"tag":        nil,
+					"updated_at": time.Now().UTC().Unix(),
+				},
+			},
+		)
+
 	if err != nil || res.MatchedCount == 0 {
 		if res != nil && res.MatchedCount == 0 {
 			return format.Error(op, mongo.ErrNotFound)

@@ -31,7 +31,7 @@ message ChangeTitleNoteRequest {
 
 
 
-message AddTagToNoteRequest {
+message TagToNoteRequest {
   string note_id = 1;
   string tag_id = 2;
 }
@@ -76,6 +76,17 @@ message GetNotesByTagRequest {
   string idTag = 1;
   string idUser = 2;
 }
+message GetNotesByTagRequestPagination {
+  string idTag = 1;
+  string idUser = 2;
+  int32 start = 3;
+  int32 end = 4;
+}
+message GetNotesRequestPagination {
+  string idUser = 1;
+  int32 start = 2;
+  int32 end = 3;
+}
 
 // ===== BlockNote Service =====
 service BlockNoteService {
@@ -94,16 +105,16 @@ service BlockNoteService {
   rpc FindNoteInTrash(Id) returns (Note);
 
   rpc GetNote(Id) returns (Note);
-  rpc GetNoteList(Id) returns (NoteParts);
   rpc CreateNote(Note) returns (google.protobuf.Empty);
   rpc UpdateNoteTitle(UpdateNoteTitleRequest) returns (google.protobuf.Empty);
 
   rpc GetAllBlocksInNote(Strings) returns (Blocks);
-  rpc GetAllNotes(Id) returns (NoteParts);
-  rpc GetNotesByTag(GetNotesByTagRequest) returns (NoteParts);
+  rpc GetAllNotes(GetNotesRequestPagination) returns (NoteParts);
+  rpc GetNotesByTag(GetNotesByTagRequestPagination) returns (NoteParts);
   rpc GetNotesFromTrash(Id) returns (NoteParts);
 
-  rpc AddTagToNote(AddTagToNoteRequest) returns (google.protobuf.Empty);
+  rpc AddTagToNote(TagToNoteRequest) returns (google.protobuf.Empty);
+  rpc RemoveTagFromNote(TagToNoteRequest) returns (google.protobuf.Empty);
   rpc CreateTag(Tag) returns (google.protobuf.Empty);
   rpc GetTagsByUser(Id) returns (Tags);
   rpc GetTag(Id) returns (Tag);

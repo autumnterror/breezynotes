@@ -68,6 +68,10 @@ func (e *Echo) CreateTag(c echo.Context) error {
 		}
 	}
 
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{Id: idUser}); err != nil {
+		log.Error(op, "REDIS ERROR", err)
+	}
+
 	log.Success(op, "")
 
 	return c.JSON(http.StatusCreated, brzrpc.Id{Id: newId})
@@ -90,6 +94,12 @@ func (e *Echo) UpdateTagTitle(c echo.Context) error {
 	log.Info(op, "")
 
 	api := e.bnAPI.API
+
+	idInt := c.Get("id")
+	idUser, ok := idInt.(string)
+	if !ok || idUser == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
+	}
 
 	var r brzrpc.UpdateTagTitleRequest
 	if err := c.Bind(&r); err != nil {
@@ -118,6 +128,10 @@ func (e *Echo) UpdateTagTitle(c echo.Context) error {
 		}
 	}
 
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{Id: idUser}); err != nil {
+		log.Error(op, "REDIS ERROR", err)
+	}
+
 	log.Success(op, "")
 
 	return c.NoContent(http.StatusOK)
@@ -140,6 +154,12 @@ func (e *Echo) UpdateTagColor(c echo.Context) error {
 	log.Info(op, "")
 
 	api := e.bnAPI.API
+
+	idInt := c.Get("id")
+	idUser, ok := idInt.(string)
+	if !ok || idUser == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
+	}
 
 	var r brzrpc.UpdateTagColorRequest
 	if err := c.Bind(&r); err != nil {
@@ -168,6 +188,10 @@ func (e *Echo) UpdateTagColor(c echo.Context) error {
 		}
 	}
 
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{Id: idUser}); err != nil {
+		log.Error(op, "REDIS ERROR", err)
+	}
+
 	log.Success(op, "")
 
 	return c.NoContent(http.StatusOK)
@@ -190,6 +214,12 @@ func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 	log.Info(op, "")
 
 	api := e.bnAPI.API
+
+	idInt := c.Get("id")
+	idUser, ok := idInt.(string)
+	if !ok || idUser == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
+	}
 
 	var r brzrpc.UpdateTagEmojiRequest
 	if err := c.Bind(&r); err != nil {
@@ -218,10 +248,16 @@ func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 		}
 	}
 
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{Id: idUser}); err != nil {
+		log.Error(op, "REDIS ERROR", err)
+	}
+
 	log.Success(op, "")
 
 	return c.NoContent(http.StatusOK)
 }
+
+//TODO auth
 
 // DeleteTag godoc
 // @Summary Delete tag
@@ -239,6 +275,12 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 	log.Info(op, "")
 
 	api := e.bnAPI.API
+
+	idInt := c.Get("id")
+	idUser, ok := idInt.(string)
+	if !ok || idUser == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
+	}
 
 	id := c.QueryParam("id")
 	if id == "" {
@@ -263,6 +305,10 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 		}
 	}
 
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{Id: idUser}); err != nil {
+		log.Error(op, "REDIS ERROR", err)
+	}
+
 	log.Success(op, "")
 
 	return c.NoContent(http.StatusOK)
@@ -284,18 +330,24 @@ func (e *Echo) GetTagsByUser(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	idInt := c.Get("id")
-	id, ok := idInt.(string)
-	if !ok && id == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	idInt := c.Get("idUser")
+	idUser, ok := idInt.(string)
+	if !ok && idUser == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	log.Println(id)
+	if tgs, err := e.rdsAPI.API.GetTagsByUser(ctx, &brzrpc.UserId{Id: idUser}); err != nil {
+		log.Error(op, "REDIS ERROR", err)
+	} else {
+		if tgs != nil {
+			return c.JSON(http.StatusOK, tgs)
+		}
+	}
 
-	tags, err := api.GetTagsByUser(ctx, &brzrpc.Id{Id: id})
+	tags, err := api.GetTagsByUser(ctx, &brzrpc.Id{Id: idUser})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -308,6 +360,10 @@ func (e *Echo) GetTagsByUser(c echo.Context) error {
 			log.Error(op, "get tags by user error", err)
 			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get tags by user error"})
 		}
+	}
+
+	if _, err := e.rdsAPI.API.SetTagsByUser(ctx, &brzrpc.TagsByUser{UserId: idUser, Items: tags.GetItems()}); err != nil {
+		log.Error(op, "REDIS ERROR", err)
 	}
 
 	log.Success(op, "")

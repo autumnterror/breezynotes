@@ -8,6 +8,7 @@ import (
 	"github.com/autumnterror/breezynotes/internal/auth/psql"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
+	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/autumnterror/breezynotes/views"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -38,7 +39,7 @@ func (s *ServerAPI) DeleteUser(ctx context.Context, r *brzrpc.UserId) (*emptypb.
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return nil, nil
@@ -68,7 +69,7 @@ func (s *ServerAPI) UpdateAbout(ctx context.Context, r *brzrpc.UpdateAboutReques
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 	return nil, nil
 }
@@ -96,7 +97,7 @@ func (s *ServerAPI) UpdateEmail(ctx context.Context, r *brzrpc.UpdateEmailReques
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return nil, nil
@@ -125,7 +126,7 @@ func (s *ServerAPI) UpdatePhoto(ctx context.Context, r *brzrpc.UpdatePhotoReques
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return nil, nil
@@ -154,7 +155,7 @@ func (s *ServerAPI) ChangePasswd(ctx context.Context, r *brzrpc.ChangePasswordRe
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return nil, nil
@@ -183,7 +184,7 @@ func (s *ServerAPI) CreateUser(ctx context.Context, u *brzrpc.User) (*emptypb.Em
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return nil, nil
@@ -244,7 +245,7 @@ func (s *ServerAPI) GetUserDataFromToken(ctx context.Context, t *brzrpc.Token) (
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return res.(*brzrpc.User), nil

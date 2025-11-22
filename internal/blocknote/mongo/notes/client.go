@@ -25,10 +25,9 @@ type Repo interface {
 	FindFromTrash(ctx context.Context, id string) (*brzrpc.Note, error)
 
 	Get(ctx context.Context, id string) (*brzrpc.Note, error)
-	//GetAllByTag(ctx context.Context, id string) (*brzrpc.Notes, error)
-	GetAllByUser(ctx context.Context, id string) (*brzrpc.Notes, error)
-	GetNoteListByUser(ctx context.Context, id string) (*brzrpc.NoteParts, error)
-	GetNoteListByTag(ctx context.Context, id, idUser string) (*brzrpc.NoteParts, error)
+	//getAllByUser(ctx context.Context, id string) (*brzrpc.Notes, error)
+	GetNoteListByUser(ctx context.Context, id string, start, end int) (*brzrpc.NoteParts, error)
+	GetNoteListByTag(ctx context.Context, id, idUser string, start, end int) (*brzrpc.NoteParts, error)
 	Create(ctx context.Context, n *brzrpc.Note) error
 	Insert(ctx context.Context, n *brzrpc.Note) error
 	Delete(ctx context.Context, id string) error
@@ -36,6 +35,7 @@ type Repo interface {
 	UpdateUpdatedAt(ctx context.Context, id string) error
 	UpdateTitle(ctx context.Context, id string, nTitle string) error
 	AddTagToNote(ctx context.Context, id string, tag *brzrpc.Tag) error
+	RemoveTagFromNote(ctx context.Context, id string, tagID string) error
 	InsertBlock(ctx context.Context, id, block string, pos int) error
 
 	ChangeBlockOrder(ctx context.Context, noteID string, oldOrder, newOrder int) error

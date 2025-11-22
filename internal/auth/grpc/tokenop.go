@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"errors"
+	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"time"
 
 	"github.com/autumnterror/breezynotes/internal/auth/jwt"
@@ -34,7 +35,7 @@ func (s *ServerAPI) GenerateAccessToken(ctx context.Context, r *brzrpc.UserId) (
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return &brzrpc.Token{Value: res.(string), Exp: time.Now().UTC().Add(s.cfg.AccessTokenLifeTime).Unix()}, nil
@@ -57,7 +58,7 @@ func (s *ServerAPI) GenerateRefreshToken(ctx context.Context, r *brzrpc.UserId) 
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return &brzrpc.Token{Value: res.(string), Exp: time.Now().UTC().Add(s.cfg.RefreshTokenLifeTime).Unix()}, nil
@@ -119,7 +120,7 @@ func (s *ServerAPI) Refresh(ctx context.Context, r *brzrpc.Token) (*brzrpc.Token
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return &brzrpc.Token{Value: res.(string), Exp: time.Now().UTC().Add(s.cfg.AccessTokenLifeTime).Unix()}, nil
@@ -149,7 +150,7 @@ func (s *ServerAPI) CheckToken(ctx context.Context, r *brzrpc.Token) (*emptypb.E
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 	return nil, nil
 }
@@ -197,7 +198,7 @@ func (s *ServerAPI) GetIdFromToken(ctx context.Context, t *brzrpc.Token) (*brzrp
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return &brzrpc.Id{Id: res.(string)}, nil

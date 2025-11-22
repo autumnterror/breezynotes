@@ -54,5 +54,4 @@ func TestOnText(t *testing.T) {
 	assert.NoError(t, err)
 	log.Green("get block after op ", b)
 	log.Green("data block after op ", b.Data.AsMap())
-
 }

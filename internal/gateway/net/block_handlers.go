@@ -27,7 +27,7 @@ import (
 // @Failure 400 {object} views.SWGError
 // @Failure 404 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/blocks [post]
+// @Router /api/block [post]
 func (e *Echo) GetBlock(c echo.Context) error {
 	const op = "gateway.net.GetBlock"
 	log.Info(op, "")
@@ -57,6 +57,8 @@ func (e *Echo) GetBlock(c echo.Context) error {
 		}
 
 		switch st.Code() {
+		case codes.NotFound:
+			return c.JSON(http.StatusNotFound, views.SWGError{Error: "not found"})
 		default:
 			log.Error(op, "get block error", err)
 			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get block error"})
@@ -84,7 +86,7 @@ func (e *Echo) GetBlock(c echo.Context) error {
 // @Success 201 {object} brzrpc.Id
 // @Failure 400 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/blocks [post]
+// @Router /api/block [post]
 func (e *Echo) CreateBlock(c echo.Context) error {
 	const op = "gateway.net.CreateBlock"
 	log.Info(op, "")
@@ -152,7 +154,7 @@ func (e *Echo) CreateBlock(c echo.Context) error {
 // @Failure 400 {object} views.SWGError
 // @Failure 404 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/blocks/op [post]
+// @Router /api/block/op [post]
 func (e *Echo) OpBlock(c echo.Context) error {
 	const op = "gateway.net.OpBlock"
 	log.Info(op, "")
@@ -219,7 +221,7 @@ func (e *Echo) OpBlock(c echo.Context) error {
 // @Failure 400 {object} views.SWGError
 // @Failure 404 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/blocks/change-type [patch]
+// @Router /api/block/type [patch]
 func (e *Echo) ChangeTypeBlock(c echo.Context) error {
 	const op = "gateway.net.ChangeTypeBlock"
 	log.Info(op, "")
@@ -286,7 +288,7 @@ func (e *Echo) ChangeTypeBlock(c echo.Context) error {
 // @Failure 400 {object} views.SWGError
 // @Failure 404 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/blocks/change-order [patch]
+// @Router /api/block/order [patch]
 func (e *Echo) ChangeBlockOrder(c echo.Context) error {
 	const op = "gateway.net.ChangeBlockOrder"
 	log.Info(op, "")
@@ -348,20 +350,37 @@ func (e *Echo) ChangeBlockOrder(c echo.Context) error {
 // @Failure 400 {object} views.SWGError
 // @Failure 404 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/blocks [delete]
+// @Router /api/block [delete]
 func (e *Echo) DeleteBlock(c echo.Context) error {
 	const op = "gateway.net.DeleteBlock"
 	log.Info(op, "")
 
 	api := e.bnAPI.API
-	//TODO authentication
+
 	id := c.QueryParam("id")
 	if id == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
 	}
 
+	idInt := c.Get("id")
+	idUser, ok := idInt.(string)
+	if !ok || idUser == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	}
+
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
+
+	if block, err := api.GetBlock(ctx, &brzrpc.Id{Id: id}); err != nil {
+		if n, err := api.GetNote(ctx, &brzrpc.Id{Id: block.GetNoteId()}); err == nil {
+			if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) {
+				return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
+			}
+		} else {
+			log.Error(op, "get note", err)
+			return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad note id"})
+		}
+	}
 
 	_, err := api.DeleteBlock(ctx, &brzrpc.Id{Id: id})
 	if err != nil {

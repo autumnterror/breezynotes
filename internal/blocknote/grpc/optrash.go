@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
+	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/autumnterror/breezynotes/views"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -33,7 +34,7 @@ func (s *ServerAPI) CleanTrash(ctx context.Context, req *brzrpc.UserId) (*emptyp
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return nil, nil
@@ -62,7 +63,7 @@ func (s *ServerAPI) NoteToTrash(ctx context.Context, req *brzrpc.Id) (*emptypb.E
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return nil, nil
@@ -90,7 +91,7 @@ func (s *ServerAPI) NoteFromTrash(ctx context.Context, req *brzrpc.Id) (*emptypb
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return nil, nil
@@ -120,7 +121,7 @@ func (s *ServerAPI) FindNoteInTrash(ctx context.Context, req *brzrpc.Id) (*brzrp
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return res.(*brzrpc.Note), nil
@@ -150,7 +151,7 @@ func (s *ServerAPI) GetNotesFromTrash(ctx context.Context, req *brzrpc.Id) (*brz
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return res.(*brzrpc.NoteParts), nil

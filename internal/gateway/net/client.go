@@ -3,9 +3,6 @@ package net
 import (
 	"errors"
 	"fmt"
-	"net/http"
-	"strings"
-
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/auth"
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/blocknote"
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/redis"
@@ -14,6 +11,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
+	"net/http"
+	"strings"
 )
 
 type Echo struct {
@@ -45,11 +44,12 @@ func New(
 			return strings.Contains(origin, "localhost") || strings.Contains(origin, "127.0.0.1"), nil
 		},
 		AllowMethods:     []string{echo.GET, echo.POST, echo.PUT, echo.DELETE, echo.PATCH, echo.OPTIONS},
-		AllowHeaders:     []string{"*"},
+		AllowHeaders:     []string{echo.HeaderContentType},
 		AllowCredentials: true,
 	}))
-	//e.echo.Use(middleware.Logger(), middleware.Recover())
 
+	//e.echo.Use(middleware.Logger(), middleware.Recover())
+	//e.echo.Static("/", "./example/html")
 	api := e.echo.Group("/api", ValidateID(), e.GetUserId())
 	{
 		api.GET("/health", e.Healthz)
@@ -79,18 +79,19 @@ func New(
 			notes.GET("/by-tag", e.GetNotesByTag)
 			notes.PATCH("/change-title", e.ChangeTitleNote)
 
-			notes.POST("/add-tag", e.AddTagToNote)
+			notes.POST("/tag", e.AddTagToNote)
+			notes.DELETE("/tag", e.RmTagFromNote)
 		}
-		//TODO block and change del
-		blocks := api.Group("/blocks")
+
+		blocks := api.Group("/block")
 		{
 			blocks.GET("", e.GetBlock)
 			blocks.POST("", e.CreateBlock)
 			blocks.DELETE("", e.DeleteBlock)
 
 			blocks.POST("/op", e.OpBlock)
-			blocks.PATCH("/change-type", e.ChangeTypeBlock)
-			blocks.PATCH("/change-order", e.ChangeBlockOrder)
+			blocks.PATCH("/type", e.ChangeTypeBlock)
+			blocks.PATCH("/order", e.ChangeBlockOrder)
 		}
 
 		trash := api.Group("/trash")

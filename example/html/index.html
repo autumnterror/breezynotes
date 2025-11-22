@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>BreezyNotes – клиент</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="logo">
+        <span class="logo-mark">BN</span>
+        <span class="logo-text">BreezyNotes</span>
+      </div>
+      <div class="header-actions">
+        <button id="header-login-btn" class="btn-outline">Войти</button>
+        <button id="header-register-btn" class="btn-primary">Регистрация</button>
+        <button id="header-logout-btn" class="btn-outline hidden">Выйти</button>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <!-- Левое меню с иконками -->
+      <aside class="main-nav">
+        <button
+          id="nav-notes-btn"
+          class="nav-btn active"
+          data-view="notes"
+          title="Заметки"
+        >
+          📝
+        </button>
+        <button
+          id="nav-trash-btn"
+          class="nav-btn"
+          data-view="trash"
+          title="Корзина"
+        >
+          🗑️
+        </button>
+        <button
+          id="nav-tags-btn"
+          class="nav-btn"
+          data-view="tags"
+          title="Теги"
+        >
+          🏷️
+        </button>
+        <button
+          id="nav-profile-btn"
+          class="nav-btn"
+          data-view="profile"
+          title="Профиль"
+        >
+          👤
+        </button>
+      </aside>
+
+      <!-- Область контента -->
+      <div class="view-container">
+        <!-- Главная -->
+        <section id="view-landing" class="view active">
+          <div class="hero">
+            <div class="hero-text">
+              <h1>Розовый клиент для BreezyNotes 💖</h1>
+              <p>
+                Нажми «Войти» или «Регистрация», авторизуйся и переходи к заметкам.
+              </p>
+              <div class="hero-actions">
+                <button id="landing-login-btn" class="btn-primary hero-btn">
+                  Войти
+                </button>
+                <button id="landing-register-btn" class="btn-ghost hero-btn">
+                  Зарегистрироваться
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Авторизация / регистрация -->
+        <section id="view-auth" class="view">
+          <div class="auth-card">
+            <div class="auth-header">
+              <h2 id="auth-title">Войти в аккаунт</h2>
+              <p id="auth-subtitle" class="hint">
+                Введи логин или email и пароль.
+              </p>
+            </div>
+
+            <div class="auth-tabs">
+              <button
+                id="auth-tab-login"
+                class="auth-tab-btn active"
+                type="button"
+              >
+                Вход
+              </button>
+              <button
+                id="auth-tab-register"
+                class="auth-tab-btn"
+                type="button"
+              >
+                Регистрация
+              </button>
+            </div>
+
+            <!-- Форма входа -->
+            <form id="login-form" class="auth-form">
+              <label>
+                Email
+                <input
+                  type="email"
+                  id="login-email"
+                  placeholder="you@example.com"
+                />
+              </label>
+
+              <div class="or-label">или</div>
+
+              <label>
+                Логин
+                <input
+                  type="text"
+                  id="login-login"
+                  placeholder="your_login"
+                />
+              </label>
+
+              <label>
+                Пароль
+                <input type="password" id="login-password" required />
+              </label>
+
+              <button type="submit" class="btn-primary">
+                Войти
+              </button>
+            </form>
+
+            <!-- Форма регистрации -->
+            <form id="register-form" class="auth-form hidden">
+              <label>
+                Email
+                <input
+                  type="email"
+                  id="reg-email"
+                  required
+                  placeholder="you@example.com"
+                />
+              </label>
+
+              <label>
+                Логин
+                <input
+                  type="text"
+                  id="reg-login"
+                  required
+                  placeholder="your_login"
+                />
+              </label>
+
+              <label>
+                Пароль
+                <input type="password" id="reg-pw1" required />
+              </label>
+
+              <label>
+                Повтор пароля
+                <input type="password" id="reg-pw2" required />
+              </label>
+
+              <button type="submit" class="btn-primary">
+                Зарегистрироваться
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <!-- Страница заметок -->
+        <section id="view-notes" class="view">
+          <div class="notes-layout">
+            <aside class="notes-sidebar">
+              <div class="notes-sidebar-header">
+                <h2>Заметки</h2>
+                <div class="notes-sidebar-actions">
+                  <button id="add-note-btn" class="btn-primary small">
+                    + Новая
+                  </button>
+                  <button id="open-trash-btn" class="btn-outline small">
+                    Корзина
+                  </button>
+                </div>
+              </div>
+
+              <div class="notes-filter">
+                <label>
+                  Фильтр по тегу
+                  <select id="notes-tag-filter">
+                    <option value="">Все теги</option>
+                  </select>
+                </label>
+              </div>
+
+              <div id="notes-list" class="notes-list">
+                <div class="notes-list-empty">Пока нет заметок</div>
+              </div>
+            </aside>
+            <div class="notes-main">
+              <div class="notes-main-placeholder">
+                <p>Выбери заметку слева или создай новую.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Корзина -->
+        <section id="view-trash" class="view">
+          <div class="notes-layout">
+            <aside class="notes-sidebar">
+              <div class="notes-sidebar-header">
+                <h2>Корзина</h2>
+                <div class="notes-sidebar-actions">
+                  <button id="clear-trash-btn" class="btn-primary small">
+                    Очистить
+                  </button>
+                  <button id="back-to-notes-btn" class="btn-outline small">
+                    К заметкам
+                  </button>
+                </div>
+              </div>
+              <div id="trash-list" class="notes-list">
+                <div class="notes-list-empty">Корзина пуста</div>
+              </div>
+            </aside>
+            <div class="notes-main">
+              <div class="notes-main-placeholder">
+                <p>Выберите заметку из корзины, чтобы восстановить её в список.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Теги -->
+        <section id="view-tags" class="view">
+          <div class="tags-card">
+            <div class="tags-header">
+              <h2>Теги</h2>
+              <button id="add-tag-btn" class="btn-primary small">
+                + Новый тег
+              </button>
+            </div>
+            <div id="tags-list" class="tags-list">
+              <div class="notes-list-empty">Пока нет тегов</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Профиль -->
+        <section id="view-profile" class="view">
+          <div class="profile-card">
+            <div class="profile-header">
+              <div class="profile-avatar-wrapper">
+                <img
+                  id="profile-photo"
+                  class="profile-avatar"
+                  src=""
+                  alt="Аватар"
+                />
+                <div id="profile-avatar-fallback" class="profile-avatar-fallback">
+                  👤
+                </div>
+              </div>
+              <div class="profile-main-info">
+                <div class="profile-login" id="profile-login">—</div>
+                <div class="profile-email" id="profile-email">—</div>
+                <div class="profile-id" id="profile-id">ID: —</div>
+              </div>
+            </div>
+
+            <div class="profile-section">
+              <div class="profile-section-header">
+                <h3>О себе</h3>
+                <button id="edit-about-btn" class="btn-ghost small">
+                  Изменить
+                </button>
+              </div>
+              <p id="profile-about" class="profile-about">
+                Описание пока пустое.
+              </p>
+            </div>
+
+            <div class="profile-section">
+              <div class="profile-section-header">
+                <h3>Email</h3>
+                <button id="edit-email-btn" class="btn-ghost small">
+                  Изменить
+                </button>
+              </div>
+              <p class="profile-field-help">
+                Текущий email: <span id="profile-email-inline">—</span>
+              </p>
+            </div>
+
+            <div class="profile-section">
+              <div class="profile-section-header">
+                <h3>Фото</h3>
+                <button id="edit-photo-btn" class="btn-ghost small">
+                  Изменить
+                </button>
+              </div>
+              <p class="profile-field-help">
+                Храним ссылку на аватар. Можно задать URL.
+              </p>
+            </div>
+
+            <div class="profile-section">
+              <div class="profile-section-header">
+                <h3>Пароль</h3>
+                <button id="change-pw-btn" class="btn-primary small">
+                  Сменить пароль
+                </button>
+              </div>
+              <p class="profile-field-help">
+                Будет предложено дважды ввести новый пароль.
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

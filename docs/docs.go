@@ -168,7 +168,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/blocks": {
+        "/api/block": {
             "post": {
                 "description": "Creates block of given type",
                 "consumes": [
@@ -259,7 +259,56 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/blocks/change-order": {
+        "/api/block/op": {
+            "post": {
+                "description": "Performs operation on block",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "block"
+                ],
+                "summary": "Operate on block",
+                "parameters": [
+                    {
+                        "description": "Block ID, operation and data",
+                        "name": "OpBlockRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGOpBlockRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/block/order": {
             "patch": {
                 "description": "Changes order of block in note",
                 "consumes": [
@@ -308,7 +357,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/blocks/change-type": {
+        "/api/block/type": {
             "patch": {
                 "description": "Changes block type",
                 "consumes": [
@@ -329,55 +378,6 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/brzrpc.ChangeTypeBlockRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/views.SWGError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/views.SWGError"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/views.SWGError"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/blocks/op": {
-            "post": {
-                "description": "Performs operation on block",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "block"
-                ],
-                "summary": "Operate on block",
-                "parameters": [
-                    {
-                        "description": "Block ID, operation and data",
-                        "name": "OpBlockRequest",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/views.SWGOpBlockRequest"
                         }
                     }
                 ],
@@ -519,55 +519,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/notes/add-tag": {
-            "post": {
-                "description": "Attaches tag to note",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "note"
-                ],
-                "summary": "Add tag to note",
-                "parameters": [
-                    {
-                        "description": "Note ID and Tag ID",
-                        "name": "AddTagToNoteRequest",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/brzrpc.AddTagToNoteRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/views.SWGError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/views.SWGError"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/views.SWGError"
-                        }
-                    }
-                }
-            }
-        },
         "/api/notes/all": {
             "get": {
                 "description": "Returns all notes by user ID",
@@ -581,46 +532,18 @@ const docTemplate = `{
                     "note"
                 ],
                 "summary": "Get all notes of user",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/brzrpc.Notes"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/views.SWGError"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/views.SWGError"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/notes/blocks": {
-            "get": {
-                "description": "Returns all blocks of given note",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "note"
-                ],
-                "summary": "Get all blocks in note",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Note ID",
-                        "name": "id",
+                        "type": "integer",
+                        "description": "start \u003e 0",
+                        "name": "start",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "end",
+                        "name": "end",
                         "in": "query",
                         "required": true
                     }
@@ -629,17 +552,11 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGBlocks"
+                            "$ref": "#/definitions/brzrpc.NoteParts"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/views.SWGError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/views.SWGError"
                         }
@@ -673,13 +590,27 @@ const docTemplate = `{
                         "name": "id",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "start \u003e 0",
+                        "name": "start",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "end",
+                        "name": "end",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.Notes"
+                            "$ref": "#/definitions/brzrpc.NoteParts"
                         }
                     },
                     "400": {
@@ -718,6 +649,102 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/brzrpc.ChangeTitleNoteRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/notes/tag": {
+            "post": {
+                "description": "Attaches tag to note",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "note"
+                ],
+                "summary": "Add tag to note",
+                "parameters": [
+                    {
+                        "description": "Note ID and Tag ID",
+                        "name": "AddTagToNoteRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/brzrpc.TagToNoteRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove tag from note",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "note"
+                ],
+                "summary": "Remove tag from note",
+                "parameters": [
+                    {
+                        "description": "Note ID and Tag ID",
+                        "name": "AddTagToNoteRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/brzrpc.TagToNoteRequest"
                         }
                     }
                 ],
@@ -1497,17 +1524,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "brzrpc.AddTagToNoteRequest": {
-            "type": "object",
-            "properties": {
-                "note_id": {
-                    "type": "string"
-                },
-                "tag_id": {
-                    "type": "string"
-                }
-            }
-        },
         "brzrpc.AuthRequest": {
             "type": "object",
             "properties": {
@@ -1566,47 +1582,6 @@ const docTemplate = `{
                 }
             }
         },
-        "brzrpc.Note": {
-            "type": "object",
-            "properties": {
-                "author": {
-                    "type": "string"
-                },
-                "blocks": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "created_at": {
-                    "type": "integer"
-                },
-                "editors": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "id": {
-                    "type": "string"
-                },
-                "readers": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "tag": {
-                    "$ref": "#/definitions/brzrpc.Tag"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "integer"
-                }
-            }
-        },
         "brzrpc.NotePart": {
             "type": "object",
             "properties": {
@@ -1638,17 +1613,6 @@ const docTemplate = `{
                 }
             }
         },
-        "brzrpc.Notes": {
-            "type": "object",
-            "properties": {
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/brzrpc.Note"
-                    }
-                }
-            }
-        },
         "brzrpc.Tag": {
             "type": "object",
             "properties": {
@@ -1665,6 +1629,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userId": {
+                    "type": "string"
+                }
+            }
+        },
+        "brzrpc.TagToNoteRequest": {
+            "type": "object",
+            "properties": {
+                "note_id": {
+                    "type": "string"
+                },
+                "tag_id": {
                     "type": "string"
                 }
             }
@@ -1810,17 +1785,6 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "integer"
-                }
-            }
-        },
-        "views.SWGBlocks": {
-            "type": "object",
-            "properties": {
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/views.SWGBlock"
-                    }
                 }
             }
         },
@@ -1978,8 +1942,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "Full API for BreezyNotes.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
-	// LeftDelim:        "{{",
-	// RightDelim:       "}}",
+	//LeftDelim:        "{{",
+	//RightDelim:       "}}",
 }
 
 func init() {

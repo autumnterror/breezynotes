@@ -47,7 +47,7 @@ func (s *ServerAPI) DeleteBlock(ctx context.Context, req *brzrpc.Id) (*emptypb.E
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return nil, nil
@@ -62,10 +62,18 @@ func (s *ServerAPI) GetBlock(ctx context.Context, req *brzrpc.Id) (*brzrpc.Block
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
 		b, err := s.blocksAPI.Get(ctx, req.GetId())
 		if err != nil {
-			log.Warn(op, "", err)
-			res <- views.ResRPC{
-				Res: nil,
-				Err: status.Error(codes.Internal, err.Error()),
+			switch {
+			case errors.Is(err, mongo.ErrNotFound):
+				res <- views.ResRPC{
+					Res: nil,
+					Err: status.Error(codes.NotFound, err.Error()),
+				}
+			default:
+				log.Warn(op, "", err)
+				res <- views.ResRPC{
+					Res: nil,
+					Err: status.Error(codes.Internal, err.Error()),
+				}
 			}
 			return
 		}
@@ -76,7 +84,7 @@ func (s *ServerAPI) GetBlock(ctx context.Context, req *brzrpc.Id) (*brzrpc.Block
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return res.(*brzrpc.Block), nil
@@ -133,7 +141,7 @@ func (s *ServerAPI) CreateBlock(ctx context.Context, req *brzrpc.CreateBlockRequ
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return &brzrpc.Id{Id: res.(string)}, nil
@@ -170,7 +178,7 @@ func (s *ServerAPI) OpBlock(ctx context.Context, req *brzrpc.OpBlockRequest) (*e
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return nil, nil
@@ -209,7 +217,7 @@ func (s *ServerAPI) GetBlockAsFirst(ctx context.Context, req *brzrpc.Id) (*brzrp
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return &brzrpc.StringResponse{Value: res.(string)}, nil
@@ -246,7 +254,7 @@ func (s *ServerAPI) ChangeTypeBlock(ctx context.Context, req *brzrpc.ChangeTypeB
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, format.Error(op, err)
 	}
 
 	return nil, nil

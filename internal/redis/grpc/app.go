@@ -3,11 +3,13 @@ package grpc
 import (
 	"fmt"
 	"github.com/autumnterror/breezynotes/internal/redis/config"
+	"github.com/autumnterror/breezynotes/internal/redis/redis"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"net"
+	"time"
 )
 
 type App struct {
@@ -15,19 +17,23 @@ type App struct {
 	cfg        *config.Config
 }
 
-func New(cfg *config.Config) *App {
+func New(cfg *config.Config, rds redis.Repo) *App {
 	s := grpc.NewServer(
 		grpc.KeepaliveParams(keepalive.ServerParameters{
 			MaxConnectionIdle: 0,
 		}),
 	)
-	Register(s)
+	Register(s, rds)
 
 	return &App{
 		gRPCServer: s,
 		cfg:        cfg,
 	}
 }
+
+const (
+	waitTime = time.Second
+)
 
 // MustRun running gRPC server and panic if error
 func (a *App) MustRun() {
