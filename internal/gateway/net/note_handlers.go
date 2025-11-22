@@ -213,7 +213,7 @@ func (e *Echo) GetAllNotes(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	idInt := c.Get("idUser")
+	idInt := c.Get("id")
 	idUser, ok := idInt.(string)
 	if !ok && idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
@@ -253,17 +253,19 @@ func (e *Echo) GetAllNotes(c echo.Context) error {
 		log.Error(op, "REDIS ERROR", err)
 	} else {
 		if nl != nil {
-			nlPad := make([]*brzrpc.NotePart, end-start)
-			for i, n := range nl.GetItems() {
-				if i < start {
-					continue
+			if len(nl.GetItems()) != 0 {
+				nlPad := make([]*brzrpc.NotePart, end-start)
+				for i, n := range nl.GetItems() {
+					if i < start {
+						continue
+					}
+					if i >= end {
+						break
+					}
+					nlPad = append(nlPad, n)
 				}
-				if i >= end {
-					break
-				}
-				nlPad = append(nlPad, n)
+				return c.JSON(http.StatusOK, nlPad)
 			}
-			return c.JSON(http.StatusOK, nlPad)
 		}
 	}
 	//---------------REDIS---------------

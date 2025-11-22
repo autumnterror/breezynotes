@@ -27,7 +27,7 @@ func (e *Echo) CleanTrash(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	idInt := c.Get("idUser")
+	idInt := c.Get("id")
 	idUser, ok := idInt.(string)
 	if !ok && idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
@@ -210,7 +210,7 @@ func (e *Echo) GetNotesFromTrash(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	idInt := c.Get("idUser")
+	idInt := c.Get("id")
 	idUser, ok := idInt.(string)
 	if !ok && idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
@@ -223,7 +223,9 @@ func (e *Echo) GetNotesFromTrash(c echo.Context) error {
 		log.Error(op, "REDIS ERROR", err)
 	} else {
 		if ntsT != nil {
-			return c.JSON(http.StatusOK, ntsT)
+			if len(ntsT.GetItems()) != 0 {
+				return c.JSON(http.StatusOK, ntsT)
+			}
 		}
 	}
 

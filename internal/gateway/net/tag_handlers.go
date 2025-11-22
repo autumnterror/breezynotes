@@ -330,7 +330,7 @@ func (e *Echo) GetTagsByUser(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	idInt := c.Get("idUser")
+	idInt := c.Get("id")
 	idUser, ok := idInt.(string)
 	if !ok && idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
@@ -343,7 +343,9 @@ func (e *Echo) GetTagsByUser(c echo.Context) error {
 		log.Error(op, "REDIS ERROR", err)
 	} else {
 		if tgs != nil {
-			return c.JSON(http.StatusOK, tgs)
+			if len(tgs.GetItems()) != 0 {
+				return c.JSON(http.StatusOK, tgs)
+			}
 		}
 	}
 
