@@ -3,10 +3,12 @@ package grpc
 import (
 	"context"
 	"errors"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo/blocks"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
+	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/autumnterror/breezynotes/views"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

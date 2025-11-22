@@ -1,6 +1,22 @@
 version: 3
 
 tasks:
+  pull all:
+    aliases:
+      - pull-all
+    cmds:
+      - docker pull zitrax78/breezynotes-gateway
+      - docker pull zitrax78/breezynotes-auth
+      - docker pull zitrax78/breezynotes-blocknote
+      - docker pull zitrax78/breezynotes-redis
+  push all:
+    aliases:
+      - push-all
+    cmds:
+      - docker push zitrax78/breezynotes-gateway
+      - docker push zitrax78/breezynotes-auth
+      - docker push zitrax78/breezynotes-blocknote
+      - docker push zitrax78/breezynotes-redis
   build all:
     aliases:
       - build-all
@@ -9,6 +25,14 @@ tasks:
       - docker build -t zitrax78/breezynotes-auth --file ./build/auth/dockerfile .
       - docker build -t zitrax78/breezynotes-blocknote --file ./build/blocknote/dockerfile .
       - docker build -t zitrax78/breezynotes-redis --file ./build/redis/dockerfile .
+  build platform:
+    aliases:
+      - build-all-p
+    cmds:
+      - docker build --platform linux/amd64 -t zitrax78/breezynotes-gateway --file ./build/gateway/dockerfile .
+      - docker build --platform linux/amd64 -t zitrax78/breezynotes-auth --file ./build/auth/dockerfile .
+      - docker build --platform linux/amd64 -t zitrax78/breezynotes-blocknote --file ./build/blocknote/dockerfile .
+      - docker build --platform linux/amd64 -t zitrax78/breezynotes-redis --file ./build/redis/dockerfile .
   build gateway:
     aliases:
       - build-gateway
@@ -87,10 +111,10 @@ tasks:
     aliases:
       - run-all
     cmds:
-      -  go run ./cmd/blocknote --cfg ./local-config/blocknote.yaml
-      -  go run ./cmd/redis --cfg ./local-config/redis.yaml
-      -  go run ./cmd/gateway --cfg ./local-config/gateway.yaml
-      -  go run ./cmd/auth --cfg ./local-config/auth.yaml
+      - go run ./cmd/blocknote --cfg ./local-config/blocknote.yaml
+      - go run ./cmd/redis --cfg ./local-config/redis.yaml
+      - go run ./cmd/gateway --cfg ./local-config/gateway.yaml
+      - go run ./cmd/auth --cfg ./local-config/auth.yaml
 
   docx:
     aliases:
