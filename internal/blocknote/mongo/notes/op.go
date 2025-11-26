@@ -39,16 +39,9 @@ func (a *API) Get(ctx context.Context, id string) (*brzrpc.Note, error) {
 	return views.FromNoteDb(&n), nil
 }
 
-// GetNoteListByUser use func a.blockAPI.GetAsFirst return notes in [start, end)
-func (a *API) GetNoteListByUser(ctx context.Context, id string, start, end int) (*brzrpc.NoteParts, error) {
+// GetNoteListByUser use func a.blockAPI.GetAsFirst
+func (a *API) GetNoteListByUser(ctx context.Context, id string) (*brzrpc.NoteParts, error) {
 	const op = "notes.GetNoteListByUser"
-
-	if end <= start {
-		return &brzrpc.NoteParts{Items: []*brzrpc.NotePart{}}, nil
-	}
-	if start < 0 {
-		return nil, fmt.Errorf("bad start")
-	}
 
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
@@ -64,13 +57,6 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string, start, end int) 
 	}
 	idx := 0
 	for cur.Next(ctx) {
-		if idx < start {
-			idx++
-			continue
-		}
-		if idx >= end {
-			break
-		}
 		var n views.NoteDb
 		if err = cur.Decode(&n); err != nil {
 			return nts, format.Error(op, err)
@@ -97,16 +83,9 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string, start, end int) 
 	return nts, nil
 }
 
-// GetNoteListByTag use func a.blockAPI.GetAsFirst return notes in [start, end)
-func (a *API) GetNoteListByTag(ctx context.Context, id, idUser string, start, end int) (*brzrpc.NoteParts, error) {
+// GetNoteListByTag use func a.blockAPI.GetAsFirst
+func (a *API) GetNoteListByTag(ctx context.Context, id, idUser string) (*brzrpc.NoteParts, error) {
 	const op = "notes.GetNoteListByUser"
-
-	if end <= start {
-		return &brzrpc.NoteParts{Items: []*brzrpc.NotePart{}}, nil
-	}
-	if start < 0 {
-		return nil, fmt.Errorf("bad start")
-	}
 
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
@@ -123,13 +102,6 @@ func (a *API) GetNoteListByTag(ctx context.Context, id, idUser string, start, en
 
 	idx := 0
 	for cur.Next(ctx) {
-		if idx < start {
-			idx++
-			continue
-		}
-		if idx >= end {
-			break
-		}
 
 		var n views.NoteDb
 		if err = cur.Decode(&n); err != nil {

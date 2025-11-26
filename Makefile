@@ -23,4 +23,13 @@ test-psql:
 	go test ./internal/auth/psql -v
 
 test-all:
-	go test ./internal/blocknote/mongo/blocks ./internal/blocknote/mongo/notes ./internal/blocknote/mongo/tags  ./internal/auth/psql ./internal/auth/jwt
+	go test \
+	    ./internal/blocknote/mongo/blocks \
+		./internal/blocknote/mongo/notes \
+		./internal/blocknote/mongo/tags  \
+		./internal/auth/psql \
+		./internal/auth/jwt \
+		./internal/redis/redis \
+		./pkg/pkgs/default/textblock \
+		./test \
+		./views

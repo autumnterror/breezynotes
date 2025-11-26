@@ -2,9 +2,10 @@ package notes
 
 import (
 	"context"
+	"testing"
+
 	"github.com/autumnterror/breezynotes/pkg/pkgs"
 	"github.com/autumnterror/breezynotes/pkg/pkgs/default/textblock"
-	"testing"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/config"
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
@@ -21,20 +22,20 @@ func TestWithBlocks(t *testing.T) {
 		m := mongo.MustConnect(config.Test())
 		b := blocks.NewApi(m)
 		a := NewApi(m, b)
-		id := "test_with_blocks"
+		idNote := "test_with_blocks_note"
 		t.Cleanup(func() {
-			assert.NoError(t, a.Delete(context.TODO(), id))
-			_, err := a.Get(context.TODO(), id)
+			assert.NoError(t, a.Delete(context.TODO(), idNote))
+			_, err := a.Get(context.TODO(), idNote)
 			assert.Error(t, err)
 
-			nts, err := a.getAllByUser(context.TODO(), id)
+			nts, err := a.getAllByUser(context.TODO(), idNote)
 			assert.NoError(t, err)
 			assert.Equal(t, 0, len(nts.Items))
 
 			assert.NoError(t, m.Disconnect())
 		})
 		assert.NoError(t, a.Create(context.TODO(), &brzrpc.Note{
-			Id:        id,
+			Id:        idNote,
 			Title:     "test",
 			CreatedAt: 0,
 			UpdatedAt: 0,
@@ -45,7 +46,7 @@ func TestWithBlocks(t *testing.T) {
 				Emoji:  "test",
 				UserId: "test",
 			},
-			Author: "test_auth_TestCrudGood",
+			Author: "test_auth_with_blocks",
 			Editors: []string{
 				"test1ed", "test2ed",
 			},
@@ -54,14 +55,14 @@ func TestWithBlocks(t *testing.T) {
 			},
 			Blocks: []string{},
 		}))
-		idBlock1, err := b.Create(context.TODO(), "text", id, map[string]any{
+		idBlock1, err := b.Create(context.TODO(), "text", idNote, map[string]any{
 			"text": []any{
 				map[string]any{"style": "default", "text": "test1"},
 				map[string]any{"style": "bald", "text": " test2"},
 			},
 		})
 		assert.NoError(t, err)
-		idBlock2, err := b.Create(context.TODO(), "text", id, map[string]any{
+		idBlock2, err := b.Create(context.TODO(), "text", idNote, map[string]any{
 			"text": []any{
 				map[string]any{"style": "default", "text": "test3"},
 				map[string]any{"style": "bald", "text": " test4"},
@@ -70,29 +71,25 @@ func TestWithBlocks(t *testing.T) {
 
 		assert.NoError(t, err)
 
-		assert.NoError(t, a.InsertBlock(context.TODO(), id, idBlock1, 0))
-		assert.NoError(t, a.InsertBlock(context.TODO(), id, idBlock2, 0))
+		assert.NoError(t, a.InsertBlock(context.TODO(), idNote, idBlock1, 0))
+		assert.NoError(t, a.InsertBlock(context.TODO(), idNote, idBlock2, 0))
 
-		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
-			log.Green("get after add insert ", n)
+		if n, err := a.Get(context.TODO(), idNote); assert.NoError(t, err) {
+			log.Green("get after insert blocks ", n)
 			assert.Equal(t, 2, len(n.Blocks))
 		}
 
-		if nts, err := a.GetNoteListByTag(context.TODO(), "test_tag", "test_auth_TestCrudGood", 0, 2); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
+		if nts, err := a.GetNoteListByTag(context.TODO(), "test_tag", "test_auth_with_blocks"); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
 			log.Green("get by tag ", nts)
 		}
 
-		if nts, err := a.GetNoteListByTag(context.TODO(), "test_tag", "test_auth_TestCrudGood", 0, 0); assert.NoError(t, err) && assert.Equal(t, 0, len(nts.Items)) {
-		}
-
-		if nts, err := a.GetNoteListByUser(context.TODO(), "test_auth_TestCrudGood", 0, 2); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
+		if nts, err := a.GetNoteListByUser(context.TODO(), "test_auth_with_blocks"); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
 			log.Green("get by user ", nts)
 			if assert.Greater(t, len(nts.GetItems()), 0) {
 				assert.Equal(t, "test3 test4", nts.GetItems()[0].GetFirstBlock())
 			}
 		}
-		if nts, err := a.GetNoteListByUser(context.TODO(), "test_auth_TestCrudGood", 0, 0); assert.NoError(t, err) && assert.Equal(t, 0, len(nts.Items)) {
-		}
+
 	})
 }
 
@@ -191,9 +188,9 @@ func TestCrudNotExist(t *testing.T) {
 
 		if _, err := a.Get(context.TODO(), id); assert.ErrorIs(t, err, mongo.ErrNotFound) {
 		}
-		if n, err := a.GetNoteListByUser(context.TODO(), id, 0, 100); assert.NoError(t, err) && assert.Equal(t, 0, len(n.GetItems())) {
+		if n, err := a.GetNoteListByUser(context.TODO(), id); assert.NoError(t, err) && assert.Equal(t, 0, len(n.GetItems())) {
 		}
-		if n, err := a.GetNoteListByTag(context.TODO(), id, id, 0, 100); assert.NoError(t, err) && assert.Equal(t, 0, len(n.GetItems())) {
+		if n, err := a.GetNoteListByTag(context.TODO(), id, id); assert.NoError(t, err) && assert.Equal(t, 0, len(n.GetItems())) {
 		}
 		assert.ErrorIs(t, a.UpdateTitle(context.TODO(), id, "new_title"), mongo.ErrNotFound)
 		assert.ErrorIs(t, a.UpdateUpdatedAt(context.TODO(), id), mongo.ErrNotFound)

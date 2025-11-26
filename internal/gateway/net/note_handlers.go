@@ -270,10 +270,8 @@ func (e *Echo) GetAllNotes(c echo.Context) error {
 	}
 	//---------------REDIS---------------
 
-	notes, err := api.GetAllNotes(ctx, &brzrpc.GetNotesRequestPagination{
-		IdUser: idUser,
-		Start:  int32(start),
-		End:    int32(end),
+	notes, err := api.GetAllNotes(ctx, &brzrpc.Id{
+		Id: idUser,
 	})
 	if err != nil {
 		st, ok := status.FromError(err)
@@ -293,9 +291,23 @@ func (e *Echo) GetAllNotes(c echo.Context) error {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
+	nlPad := make([]*brzrpc.NotePart, end-start)
+	for i, n := range notes.GetItems() {
+		if i < start {
+			continue
+		}
+		if i >= end {
+			break
+		}
+		nlPad = append(nlPad, n)
+	}
+	if len(nlPad) == 0 {
+		nlPad = []*brzrpc.NotePart{}
+	}
+
 	log.Success(op, "")
 
-	return c.JSON(http.StatusOK, notes)
+	return c.JSON(http.StatusOK, nlPad)
 }
 
 // GetNotesByTag godoc
@@ -356,11 +368,9 @@ func (e *Echo) GetNotesByTag(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	notes, err := api.GetNotesByTag(ctx, &brzrpc.GetNotesByTagRequestPagination{
+	notes, err := api.GetNotesByTag(ctx, &brzrpc.GetNotesByTagRequest{
 		IdTag:  id,
 		IdUser: idUser,
-		Start:  int32(start),
-		End:    int32(end),
 	})
 	if err != nil {
 		st, ok := status.FromError(err)
@@ -376,9 +386,24 @@ func (e *Echo) GetNotesByTag(c echo.Context) error {
 		}
 	}
 
+	nlPad := make([]*brzrpc.NotePart, end-start)
+	for i, n := range notes.GetItems() {
+		if i < start {
+			continue
+		}
+		if i >= end {
+			break
+		}
+		nlPad = append(nlPad, n)
+	}
+
+	if len(nlPad) == 0 {
+		nlPad = []*brzrpc.NotePart{}
+	}
+
 	log.Success(op, "")
 
-	return c.JSON(http.StatusOK, notes)
+	return c.JSON(http.StatusOK, nlPad)
 }
 
 // CreateNote godoc

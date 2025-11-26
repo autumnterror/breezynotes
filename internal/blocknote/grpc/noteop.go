@@ -3,8 +3,9 @@ package grpc
 import (
 	"context"
 	"errors"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"time"
+
+	"github.com/autumnterror/breezynotes/pkg/utils/format"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
 	"github.com/autumnterror/breezynotes/pkg/log"
@@ -90,19 +91,15 @@ func (s *ServerAPI) GetNote(ctx context.Context, req *brzrpc.Id) (*brzrpc.Note, 
 	return res.(*brzrpc.Note), nil
 }
 
-func (s *ServerAPI) GetAllNotes(ctx context.Context, req *brzrpc.GetNotesRequestPagination) (*brzrpc.NoteParts, error) {
+func (s *ServerAPI) GetAllNotes(ctx context.Context, req *brzrpc.Id) (*brzrpc.NoteParts, error) {
 	const op = "block.note.grpc.GetAllNotes"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	if req.GetStart() < 0 {
-		return nil, status.Error(codes.InvalidArgument, "start<0")
-	}
-
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		n, err := s.noteAPI.GetNoteListByUser(ctx, req.GetIdUser(), int(req.GetStart()), int(req.GetEnd()))
+		n, err := s.noteAPI.GetNoteListByUser(ctx, req.GetId())
 		if err != nil {
 			log.Warn(op, "", err)
 			res <- views.ResRPC{
@@ -124,19 +121,15 @@ func (s *ServerAPI) GetAllNotes(ctx context.Context, req *brzrpc.GetNotesRequest
 	return res.(*brzrpc.NoteParts), nil
 }
 
-func (s *ServerAPI) GetNotesByTag(ctx context.Context, req *brzrpc.GetNotesByTagRequestPagination) (*brzrpc.NoteParts, error) {
+func (s *ServerAPI) GetNotesByTag(ctx context.Context, req *brzrpc.GetNotesByTagRequest) (*brzrpc.NoteParts, error) {
 	const op = "block.note.grpc.GetNotesByTag"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	if req.GetStart() < 0 {
-		return nil, status.Error(codes.InvalidArgument, "start<0")
-	}
-
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		n, err := s.noteAPI.GetNoteListByTag(ctx, req.GetIdTag(), req.GetIdUser(), int(req.GetStart()), int(req.GetEnd()))
+		n, err := s.noteAPI.GetNoteListByTag(ctx, req.GetIdTag(), req.GetIdUser())
 		if err != nil {
 			log.Warn(op, "", err)
 			res <- views.ResRPC{

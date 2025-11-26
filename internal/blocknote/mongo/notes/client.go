@@ -3,9 +3,10 @@ package notes
 import (
 	"context"
 	"errors"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo/blocks"
-	"github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
+	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 )
 
 type API struct {
@@ -26,8 +27,8 @@ type Repo interface {
 
 	Get(ctx context.Context, id string) (*brzrpc.Note, error)
 	//getAllByUser(ctx context.Context, id string) (*brzrpc.Notes, error)
-	GetNoteListByUser(ctx context.Context, id string, start, end int) (*brzrpc.NoteParts, error)
-	GetNoteListByTag(ctx context.Context, id, idUser string, start, end int) (*brzrpc.NoteParts, error)
+	GetNoteListByUser(ctx context.Context, id string) (*brzrpc.NoteParts, error)
+	GetNoteListByTag(ctx context.Context, id, idUser string) (*brzrpc.NoteParts, error)
 	Create(ctx context.Context, n *brzrpc.Note) error
 	Insert(ctx context.Context, n *brzrpc.Note) error
 	Delete(ctx context.Context, id string) error
