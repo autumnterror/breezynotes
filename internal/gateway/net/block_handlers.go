@@ -39,7 +39,7 @@ func (e *Echo) GetBlock(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
 	}
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
@@ -48,7 +48,7 @@ func (e *Echo) GetBlock(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	block, err := api.GetBlock(ctx, &brzrpc.Id{Id: id})
+	block, err := api.GetBlock(ctx, &brzrpc.BlockId{BlockId: id})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -65,7 +65,7 @@ func (e *Echo) GetBlock(c echo.Context) error {
 		}
 	}
 
-	if note, err := api.GetNote(ctx, &brzrpc.Id{Id: block.GetNoteId()}); err != nil {
+	if note, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: block.GetNoteId()}); err != nil {
 		if note.GetAuthor() != idUser || alg.IsIn(idUser, note.GetEditors()) || alg.IsIn(idUser, note.GetReaders()) {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
@@ -99,7 +99,7 @@ func (e *Echo) CreateBlock(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
 	}
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
@@ -108,7 +108,7 @@ func (e *Echo) CreateBlock(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if n, err := api.GetNote(ctx, &brzrpc.Id{Id: r.GetNoteId()}); err == nil {
+	if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: r.GetNoteId()}); err == nil {
 		if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
@@ -136,6 +136,10 @@ func (e *Echo) CreateBlock(c echo.Context) error {
 			log.Error(op, "create block error", err)
 			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "create block error"})
 		}
+	}
+
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.GetNoteId()}); err != nil {
+		log.Error(op, "REDIS ERROR", err)
 	}
 
 	log.Success(op, "")
@@ -167,7 +171,7 @@ func (e *Echo) OpBlock(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
 	}
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
@@ -176,8 +180,8 @@ func (e *Echo) OpBlock(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if block, err := api.GetBlock(ctx, &brzrpc.Id{Id: r.GetId()}); err != nil {
-		if n, err := api.GetNote(ctx, &brzrpc.Id{Id: block.GetNoteId()}); err == nil {
+	if block, err := api.GetBlock(ctx, &brzrpc.BlockId{BlockId: r.GetId()}); err != nil {
+		if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: block.GetNoteId()}); err == nil {
 			if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) {
 				return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 			}
@@ -203,6 +207,10 @@ func (e *Echo) OpBlock(c echo.Context) error {
 			log.Error(op, "op block error", err)
 			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "op block error"})
 		}
+	}
+
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.GetId()}); err != nil {
+		log.Error(op, "REDIS ERROR", err)
 	}
 
 	log.Success(op, "")
@@ -234,7 +242,7 @@ func (e *Echo) ChangeTypeBlock(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
 	}
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
@@ -243,8 +251,8 @@ func (e *Echo) ChangeTypeBlock(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if block, err := api.GetBlock(ctx, &brzrpc.Id{Id: r.GetId()}); err != nil {
-		if n, err := api.GetNote(ctx, &brzrpc.Id{Id: block.GetNoteId()}); err == nil {
+	if block, err := api.GetBlock(ctx, &brzrpc.BlockId{BlockId: r.GetId()}); err != nil {
+		if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: block.GetNoteId()}); err == nil {
 			if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) {
 				return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 			}
@@ -270,6 +278,10 @@ func (e *Echo) ChangeTypeBlock(c echo.Context) error {
 			log.Error(op, "change type block error", err)
 			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "change type block error"})
 		}
+	}
+
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.GetId()}); err != nil {
+		log.Error(op, "REDIS ERROR", err)
 	}
 
 	log.Success(op, "")
@@ -301,7 +313,7 @@ func (e *Echo) ChangeBlockOrder(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
 	}
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
@@ -310,7 +322,7 @@ func (e *Echo) ChangeBlockOrder(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if n, err := api.GetNote(ctx, &brzrpc.Id{Id: r.GetId()}); err == nil {
+	if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: r.GetId()}); err == nil {
 		if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
@@ -334,6 +346,10 @@ func (e *Echo) ChangeBlockOrder(c echo.Context) error {
 		}
 	}
 
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.GetId()}); err != nil {
+		log.Error(op, "REDIS ERROR", err)
+	}
+
 	log.Success(op, "")
 
 	return c.NoContent(http.StatusOK)
@@ -345,7 +361,8 @@ func (e *Echo) ChangeBlockOrder(c echo.Context) error {
 // @Tags block
 // @Accept json
 // @Produce json
-// @Param id query string true "Block ID"
+// @Param block_id query string true "Block ID"
+// @Param note_id query string true "Note ID"
 // @Success 200
 // @Failure 400 {object} views.SWGError
 // @Failure 404 {object} views.SWGError
@@ -357,12 +374,16 @@ func (e *Echo) DeleteBlock(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	id := c.QueryParam("id")
-	if id == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+	blockId := c.QueryParam("block_id")
+	if blockId == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "no block id"})
+	}
+	noteId := c.QueryParam("note_id")
+	if blockId == "" {
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "no note id"})
 	}
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
@@ -371,18 +392,19 @@ func (e *Echo) DeleteBlock(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if block, err := api.GetBlock(ctx, &brzrpc.Id{Id: id}); err != nil {
-		if n, err := api.GetNote(ctx, &brzrpc.Id{Id: block.GetNoteId()}); err == nil {
-			if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) {
-				return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
-			}
-		} else {
-			log.Error(op, "get note", err)
-			return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad note id"})
+	if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: noteId}); err == nil {
+		if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) {
+			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
+	} else {
+		log.Error(op, "get note", err)
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad note blockId"})
 	}
 
-	_, err := api.DeleteBlock(ctx, &brzrpc.Id{Id: id})
+	_, err := api.DeleteBlock(ctx, &brzrpc.NoteBlockId{
+		NoteId:  noteId,
+		BlockId: blockId,
+	})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -398,6 +420,10 @@ func (e *Echo) DeleteBlock(c echo.Context) error {
 			log.Error(op, "delete block error", err)
 			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "delete block error"})
 		}
+	}
+
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: noteId}); err != nil {
+		log.Error(op, "REDIS ERROR", err)
 	}
 
 	log.Success(op, "")

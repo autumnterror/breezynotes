@@ -120,7 +120,7 @@ func (s *ServerAPI) UpdateTagEmoji(ctx context.Context, req *brzrpc.UpdateTagEmo
 
 	return nil, nil
 }
-func (s *ServerAPI) DeleteTag(ctx context.Context, req *brzrpc.Id) (*emptypb.Empty, error) {
+func (s *ServerAPI) DeleteTag(ctx context.Context, req *brzrpc.TagId) (*emptypb.Empty, error) {
 	const op = "blocknote.grpc.DeleteTag"
 	log.Info(op, "")
 
@@ -128,7 +128,7 @@ func (s *ServerAPI) DeleteTag(ctx context.Context, req *brzrpc.Id) (*emptypb.Emp
 	defer done()
 
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.tagAPI.Delete(ctx, req.GetId()); err != nil {
+		if err := s.tagAPI.Delete(ctx, req.GetTagId()); err != nil {
 			log.Error(op, "", err)
 			res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, "check logs")}
 			return
@@ -144,7 +144,7 @@ func (s *ServerAPI) DeleteTag(ctx context.Context, req *brzrpc.Id) (*emptypb.Emp
 	return nil, nil
 }
 
-func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc.Id) (*brzrpc.Tags, error) {
+func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc.UserId) (*brzrpc.Tags, error) {
 	const op = "blocknote.grpc.GetTagsByUser"
 	log.Info(op, "")
 
@@ -152,7 +152,7 @@ func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc.Id) (*brzrpc.
 	defer done()
 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		tgs, err := s.tagAPI.GetAllById(ctx, req.GetId())
+		tgs, err := s.tagAPI.GetAllById(ctx, req.GetUserId())
 		if err != nil {
 			log.Error(op, "", err)
 			res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, "check logs")}
@@ -169,7 +169,7 @@ func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc.Id) (*brzrpc.
 	return res.(*brzrpc.Tags), nil
 }
 
-func (s *ServerAPI) GetTag(ctx context.Context, req *brzrpc.Id) (*brzrpc.Tag, error) {
+func (s *ServerAPI) GetTag(ctx context.Context, req *brzrpc.TagId) (*brzrpc.Tag, error) {
 	const op = "blocknote.grpc.GetTag"
 	log.Info(op, "")
 
@@ -177,7 +177,7 @@ func (s *ServerAPI) GetTag(ctx context.Context, req *brzrpc.Id) (*brzrpc.Tag, er
 	defer done()
 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		tg, err := s.tagAPI.Get(ctx, req.GetId())
+		tg, err := s.tagAPI.Get(ctx, req.GetTagId())
 		if err != nil {
 			log.Error(op, "", err)
 			res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, "check logs")}

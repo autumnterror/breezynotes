@@ -23,6 +23,8 @@ func ValidateID() echo.MiddlewareFunc {
 	}
 }
 
+const IdFromContext = "idUserCtx"
+
 func (e *Echo) GetUserId() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -37,7 +39,7 @@ func (e *Echo) GetUserId() echo.MiddlewareFunc {
 				return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad access_token"})
 			}
 
-			c.Set("id", u.GetId())
+			c.Set(IdFromContext, u.GetId())
 
 			return next(c)
 		}

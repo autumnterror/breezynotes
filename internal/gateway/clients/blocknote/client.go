@@ -1,6 +1,8 @@
 package blocknote
 
 import (
+	"time"
+
 	"github.com/autumnterror/breezynotes/internal/gateway/config"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
@@ -10,8 +12,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/keepalive"
-	"time"
 )
 
 type Client struct {
@@ -36,11 +36,12 @@ func New(
 			grpcretry.UnaryClientInterceptor(retryOpts...),
 		),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithKeepaliveParams(keepalive.ClientParameters{
-			Time:                5 * time.Minute,
-			Timeout:             11 * time.Second,
-			PermitWithoutStream: true,
-		}),
+		// Keepalive disabled for now; re-enable if external networks start dropping idle conns.
+		// grpc.WithKeepaliveParams(keepalive.ClientParameters{
+		// 	Time:                5 * time.Minute,
+		// 	Timeout:             11 * time.Second,
+		// 	PermitWithoutStream: true,
+		// }),
 	)
 	if err != nil {
 		return nil, format.Error(op, err)

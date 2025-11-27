@@ -5,10 +5,55 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9859957d-2c2c-4239-80b4-4d74a8eeb2c2" name="Changes" comment="add blocknote funcs">
+      <change afterPath="$PROJECT_DIR$/internal/blocknote/mongo/notes/block_op.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/blocknote/mongo/notes/get_op.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/blocknote/mongo/notes/tag_op.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/internal/blocknote/mongo/notes/update_op.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/docs.go" beforeDir="false" afterPath="$PROJECT_DIR$/docs/docs.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/swagger.json" beforeDir="false" afterPath="$PROJECT_DIR$/docs/swagger.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/swagger.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docs/swagger.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/html/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/example/html/script.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/html/swagger.json" beforeDir="false" afterPath="$PROJECT_DIR$/example/html/swagger.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/auth/grpc/op.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/auth/grpc/op.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/auth/grpc/tokenop.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/auth/grpc/tokenop.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/auth/grpc/userop.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/auth/grpc/userop.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/auth/psql/users_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/auth/psql/users_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/blocknote/grpc/noteop.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/grpc/noteop.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/blocknote/grpc/opblock.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/grpc/opblock.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/blocknote/grpc/optrash.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/grpc/optrash.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/blocknote/grpc/tagop.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/grpc/tagop.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/blocknote/mongo/notes/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/mongo/notes/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/blocknote/mongo/notes/op.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/mongo/notes/op.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/blocknote/mongo/notes/op_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/mongo/notes/op_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/blocknote/mongo/tags/op.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/blocknote/mongo/tags/op.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/gateway/clients/auth/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/clients/auth/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/gateway/clients/blocknote/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/clients/blocknote/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/gateway/clients/redis/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/clients/redis/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/gateway/net/auth_handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/net/auth_handlers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/gateway/net/block_handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/net/block_handlers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/gateway/net/handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/net/handlers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/gateway/net/mw.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/net/mw.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/gateway/net/note_handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/net/note_handlers.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/gateway/net/tag_handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/net/tag_handlers.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/gateway/net/trash_handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/net/trash_handlers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/gateway/net/user_handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/gateway/net/user_handlers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/redis/grpc/noteop.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/redis/grpc/noteop.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/redis/grpc/tagop.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/redis/grpc/tagop.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/pkgs/default/textblock/pub_op.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/pkgs/default/textblock/pub_op.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/protos/proto/domain.proto" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/domain.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/protos/proto/gen/auth.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/gen/auth.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/protos/proto/gen/auth_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/gen/auth_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/protos/proto/gen/domain.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/gen/domain.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/protos/proto/gen/notes.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/gen/notes.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/protos/proto/gen/notes_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/gen/notes_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/protos/proto/gen/redis.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/gen/redis.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/protos/proto/gen/redis_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/gen/redis_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/protos/proto/notes.proto" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/notes.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/protos/proto/redis.proto" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protos/proto/redis.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/test_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/test/test_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/swgviews.go" beforeDir="false" afterPath="$PROJECT_DIR$/views/swgviews.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/views.go" beforeDir="false" afterPath="$PROJECT_DIR$/views/views.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,7 +102,7 @@
     "git-widget-placeholder": "main",
     "go.import.settings.migrated": "true",
     "go.sdk.automatically.set": "true",
-    "last_opened_file_path": "D:/progers/GLOBAL_PROJECTS/breezynotes/internal/redis/redis",
+    "last_opened_file_path": "D:/progers/GLOBAL_PROJECTS/breezynotes/example",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
@@ -72,11 +117,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\example" />
       <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\internal\blocknote\mongo\blocks" />
       <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\migrations" />
       <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\internal\redis\grpc" />
       <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\internal\blocknote\grpc" />
-      <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\internal\auth\grpc" />
     </key>
     <key name="GoExtractInterfaceDialog.RECENT_KEY">
       <recent name="$PROJECT_DIR$/internal/redis/redis" />
@@ -85,11 +130,11 @@
       <recent name="$PROJECT_DIR$/internal/auth/jwt" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\example\html" />
       <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes" />
       <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\views" />
       <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\pkg\pkgs\default\textblock\benchmark" />
       <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\pkg\pkgs\default" />
-      <recent name="D:\progers\GLOBAL_PROJECTS\breezynotes\script" />
     </key>
   </component>
   <component name="RunManager" selected="Makefile Target.test-textblock-bm">

@@ -47,7 +47,7 @@ func (s *ServerAPI) Auth(ctx context.Context, r *brzrpc.AuthRequest) (*brzrpc.Us
 		return nil, format.Error(op, err)
 	}
 
-	return &brzrpc.UserId{Id: res.(string)}, nil
+	return &brzrpc.UserId{UserId: res.(string)}, nil
 }
 
 func (s *ServerAPI) Healthz(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {

@@ -229,7 +229,14 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Block ID",
-                        "name": "id",
+                        "name": "block_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Note ID",
+                        "name": "note_id",
                         "in": "query",
                         "required": true
                     }
@@ -697,7 +704,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.TagToNoteRequest"
+                            "$ref": "#/definitions/brzrpc.NoteTagId"
                         }
                     }
                 ],
@@ -744,7 +751,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.TagToNoteRequest"
+                            "$ref": "#/definitions/brzrpc.NoteTagId"
                         }
                     }
                 ],
@@ -875,7 +882,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.Tags"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/brzrpc.Tag"
+                            }
                         }
                     },
                     "400": {
@@ -1613,6 +1623,17 @@ const docTemplate = `{
                 }
             }
         },
+        "brzrpc.NoteTagId": {
+            "type": "object",
+            "properties": {
+                "noteId": {
+                    "type": "string"
+                },
+                "tagId": {
+                    "type": "string"
+                }
+            }
+        },
         "brzrpc.Tag": {
             "type": "object",
             "properties": {
@@ -1630,28 +1651,6 @@ const docTemplate = `{
                 },
                 "userId": {
                     "type": "string"
-                }
-            }
-        },
-        "brzrpc.TagToNoteRequest": {
-            "type": "object",
-            "properties": {
-                "note_id": {
-                    "type": "string"
-                },
-                "tag_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "brzrpc.Tags": {
-            "type": "object",
-            "properties": {
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/brzrpc.Tag"
-                    }
                 }
             }
         },

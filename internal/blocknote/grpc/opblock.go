@@ -17,7 +17,7 @@ import (
 
 // UNIFIED
 
-func (s *ServerAPI) DeleteBlock(ctx context.Context, req *brzrpc.Id) (*emptypb.Empty, error) {
+func (s *ServerAPI) DeleteBlock(ctx context.Context, req *brzrpc.NoteBlockId) (*emptypb.Empty, error) {
 	const op = "block.note.grpc.DeleteBlock"
 	log.Info(op, "")
 
@@ -25,7 +25,23 @@ func (s *ServerAPI) DeleteBlock(ctx context.Context, req *brzrpc.Id) (*emptypb.E
 	defer done()
 
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.blocksAPI.Delete(ctx, req.GetId()); err != nil {
+		if err := s.blocksAPI.Delete(ctx, req.GetBlockId()); err != nil {
+			log.Warn(op, "", err)
+			switch {
+			case errors.Is(err, mongo.ErrNotFound):
+				res <- views.ResRPC{
+					Res: nil,
+					Err: status.Error(codes.NotFound, err.Error()),
+				}
+			default:
+				res <- views.ResRPC{
+					Res: nil,
+					Err: status.Error(codes.Internal, err.Error()),
+				}
+			}
+			return
+		}
+		if err := s.noteAPI.DeleteBlock(ctx, req.GetNoteId(), req.GetBlockId()); err != nil {
 			log.Warn(op, "", err)
 			switch {
 			case errors.Is(err, mongo.ErrNotFound):
@@ -54,7 +70,7 @@ func (s *ServerAPI) DeleteBlock(ctx context.Context, req *brzrpc.Id) (*emptypb.E
 
 	return nil, nil
 }
-func (s *ServerAPI) GetBlock(ctx context.Context, req *brzrpc.Id) (*brzrpc.Block, error) {
+func (s *ServerAPI) GetBlock(ctx context.Context, req *brzrpc.BlockId) (*brzrpc.Block, error) {
 	const op = "block.note.grpc.GetBlock"
 	log.Info(op, "")
 
@@ -62,7 +78,7 @@ func (s *ServerAPI) GetBlock(ctx context.Context, req *brzrpc.Id) (*brzrpc.Block
 	defer done()
 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		b, err := s.blocksAPI.Get(ctx, req.GetId())
+		b, err := s.blocksAPI.Get(ctx, req.GetBlockId())
 		if err != nil {
 			switch {
 			case errors.Is(err, mongo.ErrNotFound):
@@ -186,7 +202,7 @@ func (s *ServerAPI) OpBlock(ctx context.Context, req *brzrpc.OpBlockRequest) (*e
 	return nil, nil
 }
 
-func (s *ServerAPI) GetBlockAsFirst(ctx context.Context, req *brzrpc.Id) (*brzrpc.StringResponse, error) {
+func (s *ServerAPI) GetBlockAsFirst(ctx context.Context, req *brzrpc.BlockId) (*brzrpc.StringResponse, error) {
 	const op = "block.note.grpc.GetBlockAsFirst"
 	log.Info(op, "")
 
@@ -194,7 +210,7 @@ func (s *ServerAPI) GetBlockAsFirst(ctx context.Context, req *brzrpc.Id) (*brzrp
 	defer done()
 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		bs, err := s.blocksAPI.GetAsFirst(ctx, req.GetId())
+		bs, err := s.blocksAPI.GetAsFirst(ctx, req.GetBlockId())
 		if err != nil {
 			log.Warn(op, "", err)
 			switch {

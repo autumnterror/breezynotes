@@ -57,6 +57,13 @@ definitions:
           $ref: '#/definitions/brzrpc.NotePart'
         type: array
     type: object
+  brzrpc.NoteTagId:
+    properties:
+      noteId:
+        type: string
+      tagId:
+        type: string
+    type: object
   brzrpc.Tag:
     properties:
       color:
@@ -69,20 +76,6 @@ definitions:
         type: string
       userId:
         type: string
-    type: object
-  brzrpc.TagToNoteRequest:
-    properties:
-      note_id:
-        type: string
-      tag_id:
-        type: string
-    type: object
-  brzrpc.Tags:
-    properties:
-      items:
-        items:
-          $ref: '#/definitions/brzrpc.Tag'
-        type: array
     type: object
   brzrpc.Token:
     properties:
@@ -379,7 +372,12 @@ paths:
       parameters:
       - description: Block ID
         in: query
-        name: id
+        name: block_id
+        required: true
+        type: string
+      - description: Note ID
+        in: query
+        name: note_id
         required: true
         type: string
       produces:
@@ -717,7 +715,7 @@ paths:
         name: AddTagToNoteRequest
         required: true
         schema:
-          $ref: '#/definitions/brzrpc.TagToNoteRequest'
+          $ref: '#/definitions/brzrpc.NoteTagId'
       produces:
       - application/json
       responses:
@@ -748,7 +746,7 @@ paths:
         name: AddTagToNoteRequest
         required: true
         schema:
-          $ref: '#/definitions/brzrpc.TagToNoteRequest'
+          $ref: '#/definitions/brzrpc.NoteTagId'
       produces:
       - application/json
       responses:
@@ -836,7 +834,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/brzrpc.Tags'
+            items:
+              $ref: '#/definitions/brzrpc.Tag'
+            type: array
         "400":
           description: Bad Request
           schema:

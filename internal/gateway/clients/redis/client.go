@@ -10,7 +10,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/keepalive"
 	"time"
 )
 
@@ -36,11 +35,12 @@ func New(
 			grpcretry.UnaryClientInterceptor(retryOpts...),
 		),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithKeepaliveParams(keepalive.ClientParameters{
-			Time:                5 * time.Minute,
-			Timeout:             11 * time.Second,
-			PermitWithoutStream: true,
-		}),
+		// Keepalive disabled for now; re-enable if external networks start dropping idle conns.
+		// grpc.WithKeepaliveParams(keepalive.ClientParameters{
+		// 	Time:                5 * time.Minute,
+		// 	Timeout:             11 * time.Second,
+		// 	PermitWithoutStream: true,
+		// }),
 	)
 	if err != nil {
 		return nil, format.Error(op, err)

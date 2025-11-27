@@ -20,15 +20,29 @@ message Tokens {
   int64 expRefresh = 4;
 }
 
-message UserId { string id = 1; }
+message UserId { string userId = 1; }
+message NoteId { string noteId = 1; }
+message BlockId { string blockId = 1; }
+message TagId { string tagId = 1; }
+
 message Id { string id = 1; }
-
-
-enum Roles {
-  ROLE_UNSPECIFIED = 0;
-  EDITOR = 1;
-  READER = 2;
+message UserNoteId {
+  string userId = 1;
+  string noteId = 2;
 }
+message NoteBlockId {
+  string noteId = 1;
+  string blockId = 2;
+}
+message UserTagId {
+  string tagId = 1;
+  string userId = 2;
+}
+message NoteTagId {
+  string noteId = 1;
+  string tagId = 2;
+}
+
 
 
 message User {
@@ -97,6 +111,13 @@ message Blocks { repeated Block items = 1; }
 message Notes { repeated Note items = 1; }
 message NoteParts { repeated NotePart items = 1; }
 message Tags { repeated Tag items = 1; }
+
+//
+enum Roles {
+  ROLE_UNSPECIFIED = 0;
+  EDITOR = 1;
+  READER = 2;
+}
 
 
 //enum Color {

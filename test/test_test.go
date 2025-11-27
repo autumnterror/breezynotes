@@ -131,3 +131,10 @@ func TestArray(t *testing.T) {
 	assert.Equal(t, idx, -1)
 
 }
+
+func TestName(t *testing.T) {
+	a := make(chan *int, 1)
+	b := 1
+	a <- &b
+
+}

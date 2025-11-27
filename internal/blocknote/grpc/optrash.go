@@ -19,7 +19,7 @@ func (s *ServerAPI) CleanTrash(ctx context.Context, req *brzrpc.UserId) (*emptyp
 	defer done()
 
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.noteAPI.CleanTrash(ctx, req.GetId()); err != nil {
+		if err := s.noteAPI.CleanTrash(ctx, req.GetUserId()); err != nil {
 			log.Warn(op, "", err)
 			res <- views.ResRPC{
 				Res: nil,
@@ -40,7 +40,7 @@ func (s *ServerAPI) CleanTrash(ctx context.Context, req *brzrpc.UserId) (*emptyp
 	return nil, nil
 }
 
-func (s *ServerAPI) NoteToTrash(ctx context.Context, req *brzrpc.Id) (*emptypb.Empty, error) {
+func (s *ServerAPI) NoteToTrash(ctx context.Context, req *brzrpc.NoteId) (*emptypb.Empty, error) {
 	const op = "block.note.grpc.ToTrash"
 	log.Info(op, "")
 
@@ -48,7 +48,7 @@ func (s *ServerAPI) NoteToTrash(ctx context.Context, req *brzrpc.Id) (*emptypb.E
 	defer done()
 
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.noteAPI.ToTrash(ctx, req.GetId()); err != nil {
+		if err := s.noteAPI.ToTrash(ctx, req.GetNoteId()); err != nil {
 			log.Warn(op, "", err)
 			res <- views.ResRPC{
 				Res: nil,
@@ -68,7 +68,7 @@ func (s *ServerAPI) NoteToTrash(ctx context.Context, req *brzrpc.Id) (*emptypb.E
 
 	return nil, nil
 }
-func (s *ServerAPI) NoteFromTrash(ctx context.Context, req *brzrpc.Id) (*emptypb.Empty, error) {
+func (s *ServerAPI) NoteFromTrash(ctx context.Context, req *brzrpc.NoteId) (*emptypb.Empty, error) {
 	const op = "block.note.grpc.FromTrash"
 	log.Info(op, "")
 
@@ -76,7 +76,7 @@ func (s *ServerAPI) NoteFromTrash(ctx context.Context, req *brzrpc.Id) (*emptypb
 	defer done()
 
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.noteAPI.FromTrash(ctx, req.GetId()); err != nil {
+		if err := s.noteAPI.FromTrash(ctx, req.GetNoteId()); err != nil {
 			log.Warn(op, "", err)
 			res <- views.ResRPC{
 				Res: nil,
@@ -97,7 +97,7 @@ func (s *ServerAPI) NoteFromTrash(ctx context.Context, req *brzrpc.Id) (*emptypb
 	return nil, nil
 }
 
-func (s *ServerAPI) FindNoteInTrash(ctx context.Context, req *brzrpc.Id) (*brzrpc.Note, error) {
+func (s *ServerAPI) FindNoteInTrash(ctx context.Context, req *brzrpc.NoteId) (*brzrpc.Note, error) {
 	const op = "block.note.grpc.FindNoteInTrash"
 	log.Info(op, "")
 
@@ -105,7 +105,7 @@ func (s *ServerAPI) FindNoteInTrash(ctx context.Context, req *brzrpc.Id) (*brzrp
 	defer done()
 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		n, err := s.noteAPI.FindFromTrash(ctx, req.GetId())
+		n, err := s.noteAPI.FindFromTrash(ctx, req.GetNoteId())
 		if err != nil {
 			log.Warn(op, "", err)
 			res <- views.ResRPC{
@@ -127,7 +127,7 @@ func (s *ServerAPI) FindNoteInTrash(ctx context.Context, req *brzrpc.Id) (*brzrp
 	return res.(*brzrpc.Note), nil
 }
 
-func (s *ServerAPI) GetNotesFromTrash(ctx context.Context, req *brzrpc.Id) (*brzrpc.NoteParts, error) {
+func (s *ServerAPI) GetNotesFromTrash(ctx context.Context, req *brzrpc.UserId) (*brzrpc.NoteParts, error) {
 	const op = "block.note.grpc.GetNotesFromTrash"
 	log.Info(op, "")
 
@@ -135,7 +135,7 @@ func (s *ServerAPI) GetNotesFromTrash(ctx context.Context, req *brzrpc.Id) (*brz
 	defer done()
 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		nts, err := s.noteAPI.GetNotesFromTrash(ctx, req.GetId())
+		nts, err := s.noteAPI.GetNotesFromTrash(ctx, req.GetUserId())
 		if err != nil {
 			log.Warn(op, "", err)
 			res <- views.ResRPC{

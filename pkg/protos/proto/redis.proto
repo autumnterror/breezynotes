@@ -15,10 +15,7 @@ message NoteByUser { string user_id = 1; NoteWithBlocks note = 2; }
 message TagsByUser { string user_id = 1; repeated Tag items = 2; }
 message BlocksOnNote { string note_id = 1; repeated Block items = 2; }
 
-message UserNoteId {
-  string userId = 1;
-  string noteId = 2;
-}
+
 
 service RedisService {
   rpc GetNoteByUser(UserNoteId) returns (NoteWithBlocks);

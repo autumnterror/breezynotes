@@ -79,6 +79,12 @@ func TestWithBlocks(t *testing.T) {
 			assert.Equal(t, 2, len(n.Blocks))
 		}
 
+		assert.NoError(t, a.DeleteBlock(context.TODO(), idNote, idBlock1))
+		if n, err := a.Get(context.TODO(), idNote); assert.NoError(t, err) {
+			log.Green("get after delete block ", n)
+			assert.Equal(t, 1, len(n.Blocks))
+		}
+
 		if nts, err := a.GetNoteListByTag(context.TODO(), "test_tag", "test_auth_with_blocks"); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Items)) {
 			log.Green("get by tag ", nts)
 		}

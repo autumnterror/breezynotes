@@ -28,7 +28,7 @@ func (e *Echo) CleanTrash(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok && idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
@@ -37,7 +37,7 @@ func (e *Echo) CleanTrash(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	_, err := api.CleanTrash(ctx, &brzrpc.UserId{Id: idUser})
+	_, err := api.CleanTrash(ctx, &brzrpc.UserId{UserId: idUser})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -52,7 +52,7 @@ func (e *Echo) CleanTrash(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc.UserId{Id: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
@@ -84,7 +84,7 @@ func (e *Echo) NoteToTrash(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
 	}
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
@@ -94,7 +94,7 @@ func (e *Echo) NoteToTrash(c echo.Context) error {
 	defer done()
 
 	//AUTHORIZE
-	if n, err := api.GetNote(ctx, &brzrpc.Id{Id: id}); err == nil {
+	if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: id}); err == nil {
 		if n.GetAuthor() != idUser {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "not author"})
 		}
@@ -104,7 +104,7 @@ func (e *Echo) NoteToTrash(c echo.Context) error {
 	}
 	//AUTHORIZE
 
-	_, err := api.NoteToTrash(ctx, &brzrpc.Id{Id: id})
+	_, err := api.NoteToTrash(ctx, &brzrpc.NoteId{NoteId: id})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -119,7 +119,7 @@ func (e *Echo) NoteToTrash(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc.UserId{Id: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
@@ -151,7 +151,7 @@ func (e *Echo) NoteFromTrash(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
 	}
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
@@ -161,7 +161,7 @@ func (e *Echo) NoteFromTrash(c echo.Context) error {
 	defer done()
 
 	//AUTHORIZE
-	if n, err := api.FindNoteInTrash(ctx, &brzrpc.Id{Id: id}); err == nil {
+	if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: id}); err == nil {
 		if n.GetAuthor() != idUser {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "not author"})
 		}
@@ -171,7 +171,7 @@ func (e *Echo) NoteFromTrash(c echo.Context) error {
 	}
 	//AUTHORIZE
 
-	_, err := api.NoteFromTrash(ctx, &brzrpc.Id{Id: id})
+	_, err := api.NoteFromTrash(ctx, &brzrpc.NoteId{NoteId: id})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -186,7 +186,7 @@ func (e *Echo) NoteFromTrash(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc.UserId{Id: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
@@ -211,7 +211,7 @@ func (e *Echo) GetNotesFromTrash(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok && idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
@@ -220,17 +220,20 @@ func (e *Echo) GetNotesFromTrash(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if ntsT, err := e.rdsAPI.API.GetNotesFromTrashByUser(ctx, &brzrpc.UserId{Id: idUser}); err != nil {
+	if ntsT, err := e.rdsAPI.API.GetNotesFromTrashByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	} else {
 		if ntsT != nil {
-			if len(ntsT.GetItems()) != 0 {
-				return c.JSON(http.StatusOK, ntsT)
+			if ntsT.GetItems() != nil {
+				if len(ntsT.GetItems()) != 0 {
+					log.Blue("read from cache")
+					return c.JSON(http.StatusOK, ntsT)
+				}
 			}
 		}
 	}
 
-	nts, err := api.GetNotesFromTrash(ctx, &brzrpc.Id{Id: idUser})
+	nts, err := api.GetNotesFromTrash(ctx, &brzrpc.UserId{UserId: idUser})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -249,64 +252,14 @@ func (e *Echo) GetNotesFromTrash(c echo.Context) error {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
-	if len(nts.Items) == 0 {
-		nts.Items = []*brzrpc.NotePart{}
-	}
-
 	log.Success(op, "")
+
+	if nts.GetItems() == nil {
+		return c.JSON(http.StatusOK, []brzrpc.NotePart{})
+	}
+	if len(nts.GetItems()) == 0 {
+		return c.JSON(http.StatusOK, []brzrpc.NotePart{})
+	}
 
 	return c.JSON(http.StatusOK, nts)
 }
-
-// FindNoteInTrash godoc
-// @Summary Find note in trash
-// @Description Checks if note exists in trash
-// @Tags trash
-// @Accept json
-// @Produce json
-// @Param Id body brzrpc.Id true "Note ID"
-// @Success 200
-// @Failure 400 {object} views.SWGError
-// @Failure 404 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
-// @Router /api/trash/note/find [post]
-//func (e *Echo) FindNoteInTrash(c echo.Context) error {
-//	const op = "gateway.net.FindNoteInTrash"
-//	log.Info(op, "")
-//
-//	api := e.bnAPI.API
-//
-//	var r brzrpc.Id
-//	if err := c.Bind(&r); err != nil {
-//		log.Error(op, "find note in trash bind", err)
-//		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
-//	}
-//
-//	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
-//	defer done()
-//
-//	_, err := api.FindNoteInTrash(ctx, &r)
-//	if err != nil {
-//		st, ok := status.FromError(err)
-//		if !ok {
-//			log.Error(op, "find note in trash error", err)
-//			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "find note in trash error"})
-//		}
-//
-//		switch st.Code() {
-//		case codes.NotFound:
-//			log.Warn(op, "note not found", err)
-//			return c.JSON(http.StatusNotFound, views.SWGError{Error: "note not found"})
-//		case codes.InvalidArgument:
-//			log.Warn(op, "bad argument", err)
-//			return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad argument"})
-//		default:
-//			log.Error(op, "find note in trash error", err)
-//			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "find note in trash error"})
-//		}
-//	}
-//
-//	log.Success(op, "")
-//
-//	return c.NoContent(http.StatusOK)
-//}

@@ -76,7 +76,7 @@ func (e *Echo) DeleteUser(c echo.Context) error {
 	const op = "gateway.net.DeleteUser"
 	log.Info(op, "")
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
@@ -87,7 +87,7 @@ func (e *Echo) DeleteUser(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
 	defer cancel()
 
-	_, err := auth.DeleteUser(ctx, &brzrpc.UserId{Id: idUser})
+	_, err := auth.DeleteUser(ctx, &brzrpc.UserId{UserId: idUser})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -126,7 +126,7 @@ func (e *Echo) UpdateAbout(c echo.Context) error {
 	const op = "gateway.net.UpdateAbout"
 	log.Info(op, "")
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
@@ -185,7 +185,7 @@ func (e *Echo) UpdateEmail(c echo.Context) error {
 	const op = "gateway.net.UpdateEmail"
 	log.Info(op, "")
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
@@ -244,7 +244,7 @@ func (e *Echo) UpdatePhoto(c echo.Context) error {
 	const op = "gateway.net.UpdatePhoto"
 	log.Info(op, "")
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
@@ -304,7 +304,7 @@ func (e *Echo) ChangePassword(c echo.Context) error {
 	const op = "gateway.net.ChangePassword"
 	log.Info(op, "")
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})

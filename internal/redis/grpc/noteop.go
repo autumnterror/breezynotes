@@ -79,12 +79,12 @@ func (s *ServerAPI) GetNoteListByUser(ctx context.Context, req *brzrpc.UserId) (
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	if !s.ensureCreate(ctx, req.GetId()) {
+	if !s.ensureCreate(ctx, req.GetUserId()) {
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		nts, err := s.rds.GetSessionNoteList(ctx, req.GetId())
+		nts, err := s.rds.GetSessionNoteList(ctx, req.GetUserId())
 		if err != nil {
 			switch {
 			default:
@@ -115,12 +115,12 @@ func (s *ServerAPI) GetNotesFromTrashByUser(ctx context.Context, req *brzrpc.Use
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	if !s.ensureCreate(ctx, req.GetId()) {
+	if !s.ensureCreate(ctx, req.GetUserId()) {
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		nts, err := s.rds.GetSessionNoteTrash(ctx, req.GetId())
+		nts, err := s.rds.GetSessionNoteTrash(ctx, req.GetUserId())
 		if err != nil {
 			switch {
 			default:
@@ -339,12 +339,12 @@ func (s *ServerAPI) RmNotesFromTrashByUser(ctx context.Context, req *brzrpc.User
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	if !s.ensureCreate(ctx, req.GetId()) {
+	if !s.ensureCreate(ctx, req.GetUserId()) {
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		err := s.rds.SetSessionNoteTrash(ctx, req.GetId(), nil)
+		err := s.rds.SetSessionNoteTrash(ctx, req.GetUserId(), nil)
 		if err != nil {
 			switch {
 			default:
@@ -377,12 +377,12 @@ func (s *ServerAPI) RmNoteListByUser(ctx context.Context, req *brzrpc.UserId) (*
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	if !s.ensureCreate(ctx, req.GetId()) {
+	if !s.ensureCreate(ctx, req.GetUserId()) {
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		err := s.rds.SetSessionNoteList(ctx, req.GetId(), nil)
+		err := s.rds.SetSessionNoteList(ctx, req.GetUserId(), nil)
 		if err != nil {
 			switch {
 			default:

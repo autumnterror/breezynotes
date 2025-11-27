@@ -31,7 +31,7 @@ func (e *Echo) CreateTag(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
@@ -69,7 +69,7 @@ func (e *Echo) CreateTag(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{Id: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
@@ -96,7 +96,7 @@ func (e *Echo) UpdateTagTitle(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
@@ -110,6 +110,15 @@ func (e *Echo) UpdateTagTitle(c echo.Context) error {
 
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
+
+	if t, err := api.GetTag(ctx, &brzrpc.TagId{TagId: r.GetId()}); err != nil {
+		if t.GetUserId() != idUser {
+			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
+		}
+	} else {
+		log.Error(op, "get tag", err)
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad tag id"})
+	}
 
 	_, err := api.UpdateTagTitle(ctx, &r)
 	if err != nil {
@@ -129,7 +138,7 @@ func (e *Echo) UpdateTagTitle(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{Id: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
@@ -156,7 +165,7 @@ func (e *Echo) UpdateTagColor(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
@@ -170,6 +179,15 @@ func (e *Echo) UpdateTagColor(c echo.Context) error {
 
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
+
+	if t, err := api.GetTag(ctx, &brzrpc.TagId{TagId: r.GetId()}); err != nil {
+		if t.GetUserId() != idUser {
+			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
+		}
+	} else {
+		log.Error(op, "get tag", err)
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad tag id"})
+	}
 
 	_, err := api.UpdateTagColor(ctx, &r)
 	if err != nil {
@@ -189,7 +207,7 @@ func (e *Echo) UpdateTagColor(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{Id: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
@@ -216,7 +234,7 @@ func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
@@ -230,6 +248,15 @@ func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
+
+	if t, err := api.GetTag(ctx, &brzrpc.TagId{TagId: r.GetId()}); err != nil {
+		if t.GetUserId() != idUser {
+			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
+		}
+	} else {
+		log.Error(op, "get tag", err)
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad tag id"})
+	}
 
 	_, err := api.UpdateTagEmoji(ctx, &r)
 	if err != nil {
@@ -249,7 +276,7 @@ func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{Id: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
@@ -257,8 +284,6 @@ func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 
 	return c.NoContent(http.StatusOK)
 }
-
-//TODO auth
 
 // DeleteTag godoc
 // @Summary Delete tag
@@ -277,7 +302,7 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok || idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
@@ -291,7 +316,16 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	_, err := api.DeleteTag(ctx, &brzrpc.Id{Id: id})
+	if t, err := api.GetTag(ctx, &brzrpc.TagId{TagId: id}); err != nil {
+		if t.GetUserId() != idUser {
+			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
+		}
+	} else {
+		log.Error(op, "get tag", err)
+		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad tag id"})
+	}
+
+	_, err := api.DeleteTag(ctx, &brzrpc.TagId{TagId: id})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -306,7 +340,7 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{Id: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
@@ -321,7 +355,7 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 // @Tags tag
 // @Accept json
 // @Produce json
-// @Success 200 {object} brzrpc.Tags
+// @Success 200 {object} []brzrpc.Tag
 // @Failure 400 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
 // @Router /api/tags/by-user [get]
@@ -331,7 +365,7 @@ func (e *Echo) GetTagsByUser(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	idInt := c.Get("id")
+	idInt := c.Get(IdFromContext)
 	idUser, ok := idInt.(string)
 	if !ok && idUser == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
@@ -340,17 +374,18 @@ func (e *Echo) GetTagsByUser(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if tgs, err := e.rdsAPI.API.GetTagsByUser(ctx, &brzrpc.UserId{Id: idUser}); err != nil {
+	if tgs, err := e.rdsAPI.API.GetTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	} else {
 		if tgs != nil {
 			if len(tgs.GetItems()) != 0 {
-				return c.JSON(http.StatusOK, tgs)
+				log.Blue("read from cache")
+				return c.JSON(http.StatusOK, tgs.GetItems())
 			}
 		}
 	}
 
-	tags, err := api.GetTagsByUser(ctx, &brzrpc.Id{Id: idUser})
+	tags, err := api.GetTagsByUser(ctx, &brzrpc.UserId{UserId: idUser})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -373,5 +408,5 @@ func (e *Echo) GetTagsByUser(c echo.Context) error {
 	}
 	log.Success(op, "")
 
-	return c.JSON(http.StatusOK, tags)
+	return c.JSON(http.StatusOK, tags.GetItems())
 }

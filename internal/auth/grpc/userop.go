@@ -23,7 +23,7 @@ func (s *ServerAPI) DeleteUser(ctx context.Context, r *brzrpc.UserId) (*emptypb.
 	defer done()
 
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.UserAPI.Delete(ctx, r.GetId()); err != nil {
+		if err := s.UserAPI.Delete(ctx, r.GetUserId()); err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):
 				log.Warn(op, "", err)

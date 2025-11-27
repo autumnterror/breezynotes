@@ -53,7 +53,7 @@ func (s *ServerAPI) ChangeTitleNote(ctx context.Context, req *brzrpc.ChangeTitle
 	return nil, nil
 }
 
-func (s *ServerAPI) GetNote(ctx context.Context, req *brzrpc.Id) (*brzrpc.Note, error) {
+func (s *ServerAPI) GetNote(ctx context.Context, req *brzrpc.NoteId) (*brzrpc.Note, error) {
 	const op = "block.note.grpc.Get"
 	log.Info(op, "")
 
@@ -61,7 +61,7 @@ func (s *ServerAPI) GetNote(ctx context.Context, req *brzrpc.Id) (*brzrpc.Note, 
 	defer done()
 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		n, err := s.noteAPI.Get(ctx, req.GetId())
+		n, err := s.noteAPI.Get(ctx, req.GetNoteId())
 		if err != nil {
 			switch {
 			case errors.Is(err, mongo.ErrNotFound):
@@ -91,7 +91,7 @@ func (s *ServerAPI) GetNote(ctx context.Context, req *brzrpc.Id) (*brzrpc.Note, 
 	return res.(*brzrpc.Note), nil
 }
 
-func (s *ServerAPI) GetAllNotes(ctx context.Context, req *brzrpc.Id) (*brzrpc.NoteParts, error) {
+func (s *ServerAPI) GetAllNotes(ctx context.Context, req *brzrpc.UserId) (*brzrpc.NoteParts, error) {
 	const op = "block.note.grpc.GetAllNotes"
 	log.Info(op, "")
 
@@ -99,7 +99,7 @@ func (s *ServerAPI) GetAllNotes(ctx context.Context, req *brzrpc.Id) (*brzrpc.No
 	defer done()
 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		n, err := s.noteAPI.GetNoteListByUser(ctx, req.GetId())
+		n, err := s.noteAPI.GetNoteListByUser(ctx, req.GetUserId())
 		if err != nil {
 			log.Warn(op, "", err)
 			res <- views.ResRPC{
@@ -121,7 +121,7 @@ func (s *ServerAPI) GetAllNotes(ctx context.Context, req *brzrpc.Id) (*brzrpc.No
 	return res.(*brzrpc.NoteParts), nil
 }
 
-func (s *ServerAPI) GetNotesByTag(ctx context.Context, req *brzrpc.GetNotesByTagRequest) (*brzrpc.NoteParts, error) {
+func (s *ServerAPI) GetNotesByTag(ctx context.Context, req *brzrpc.UserTagId) (*brzrpc.NoteParts, error) {
 	const op = "block.note.grpc.GetNotesByTag"
 	log.Info(op, "")
 
@@ -129,7 +129,7 @@ func (s *ServerAPI) GetNotesByTag(ctx context.Context, req *brzrpc.GetNotesByTag
 	defer done()
 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		n, err := s.noteAPI.GetNoteListByTag(ctx, req.GetIdTag(), req.GetIdUser())
+		n, err := s.noteAPI.GetNoteListByTag(ctx, req.GetTagId(), req.GetUserId())
 		if err != nil {
 			log.Warn(op, "", err)
 			res <- views.ResRPC{
@@ -213,7 +213,7 @@ func (s *ServerAPI) GetAllBlocksInNote(ctx context.Context, req *brzrpc.Strings)
 	return &brzrpc.Blocks{Items: res.([]*brzrpc.Block)}, nil
 }
 
-func (s *ServerAPI) AddTagToNote(ctx context.Context, req *brzrpc.TagToNoteRequest) (*emptypb.Empty, error) {
+func (s *ServerAPI) AddTagToNote(ctx context.Context, req *brzrpc.NoteTagId) (*emptypb.Empty, error) {
 	const op = "block.note.grpc.AddTagToNote"
 	log.Info(op, "")
 
@@ -268,7 +268,7 @@ func (s *ServerAPI) AddTagToNote(ctx context.Context, req *brzrpc.TagToNoteReque
 	return nil, nil
 }
 
-func (s *ServerAPI) RemoveTagFromNote(ctx context.Context, req *brzrpc.TagToNoteRequest) (*emptypb.Empty, error) {
+func (s *ServerAPI) RemoveTagFromNote(ctx context.Context, req *brzrpc.NoteTagId) (*emptypb.Empty, error) {
 	const op = "block.note.grpc.RemoveTagFromNote"
 	log.Info(op, "")
 

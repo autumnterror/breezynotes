@@ -29,13 +29,6 @@ message ChangeTitleNoteRequest {
   string title = 2;
 }
 
-
-
-message TagToNoteRequest {
-  string note_id = 1;
-  string tag_id = 2;
-}
-
 message UpdateTagTitleRequest {
   string id = 1;
   string title = 2;
@@ -72,56 +65,40 @@ message CreateBlockRequest {
   google.protobuf.Struct data = 4;
 }
 
-message GetNotesByTagRequest {
-  string idTag = 1;
-  string idUser = 2;
-}
-message GetNotesByTagRequestPagination {
-  string idTag = 1;
-  string idUser = 2;
-  int32 start = 3;
-  int32 end = 4;
-}
-message GetNotesRequestPagination {
-  string idUser = 1;
-  int32 start = 2;
-  int32 end = 3;
-}
 
 // ===== BlockNote Service =====
 service BlockNoteService {
-  rpc DeleteBlock(Id) returns (google.protobuf.Empty);
+  rpc DeleteBlock(NoteBlockId) returns (google.protobuf.Empty);
   rpc CreateBlock(CreateBlockRequest) returns (Id);
   rpc OpBlock(OpBlockRequest) returns (google.protobuf.Empty);
-  rpc GetBlock(Id) returns (Block);
-  rpc GetBlockAsFirst(Id) returns (StringResponse);
+  rpc GetBlock(BlockId) returns (Block);
+  rpc GetBlockAsFirst(BlockId) returns (StringResponse);
   rpc ChangeBlockOrder(ChangeBlockOrderRequest) returns (google.protobuf.Empty);
   rpc ChangeTypeBlock(ChangeTypeBlockRequest) returns (google.protobuf.Empty);
 
   rpc CleanTrash(UserId) returns (google.protobuf.Empty);
   rpc ChangeTitleNote(ChangeTitleNoteRequest) returns (google.protobuf.Empty);
-  rpc NoteToTrash(Id) returns (google.protobuf.Empty);
-  rpc NoteFromTrash(Id) returns (google.protobuf.Empty);
-  rpc FindNoteInTrash(Id) returns (Note);
+  rpc NoteToTrash(NoteId) returns (google.protobuf.Empty);
+  rpc NoteFromTrash(NoteId) returns (google.protobuf.Empty);
 
-  rpc GetNote(Id) returns (Note);
+  rpc GetNote(NoteId) returns (Note);
   rpc CreateNote(Note) returns (google.protobuf.Empty);
   rpc UpdateNoteTitle(UpdateNoteTitleRequest) returns (google.protobuf.Empty);
 
   rpc GetAllBlocksInNote(Strings) returns (Blocks);
-  rpc GetAllNotes(Id) returns (NoteParts);
-  rpc GetNotesByTag(GetNotesByTagRequest) returns (NoteParts);
-  rpc GetNotesFromTrash(Id) returns (NoteParts);
+  rpc GetAllNotes(UserId) returns (NoteParts);
+  rpc GetNotesByTag(UserTagId) returns (NoteParts);
+  rpc GetNotesFromTrash(UserId) returns (NoteParts);
 
-  rpc AddTagToNote(TagToNoteRequest) returns (google.protobuf.Empty);
-  rpc RemoveTagFromNote(TagToNoteRequest) returns (google.protobuf.Empty);
+  rpc AddTagToNote(NoteTagId) returns (google.protobuf.Empty);
+  rpc RemoveTagFromNote(NoteTagId) returns (google.protobuf.Empty);
   rpc CreateTag(Tag) returns (google.protobuf.Empty);
-  rpc GetTagsByUser(Id) returns (Tags);
-  rpc GetTag(Id) returns (Tag);
+  rpc GetTagsByUser(UserId) returns (Tags);
+  rpc GetTag(TagId) returns (Tag);
   rpc UpdateTagTitle(UpdateTagTitleRequest) returns (google.protobuf.Empty);
   rpc UpdateTagColor(UpdateTagColorRequest) returns (google.protobuf.Empty);
   rpc UpdateTagEmoji(UpdateTagEmojiRequest) returns (google.protobuf.Empty);
-  rpc DeleteTag(Id) returns (google.protobuf.Empty);
+  rpc DeleteTag(TagId) returns (google.protobuf.Empty);
 
   rpc ShareNote(ShareNoteRequest) returns (google.protobuf.Empty);
   rpc ChangeUserRole(ChangeUserRoleRequest) returns (google.protobuf.Empty);

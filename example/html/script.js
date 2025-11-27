@@ -278,6 +278,30 @@ function formatDate(ts) {
   }
 }
 
+// --------- Helpers ---------
+
+function toItemsArray(payload) {
+  if (Array.isArray(payload)) return payload;
+  if (payload && Array.isArray(payload.items)) return payload.items;
+  return [];
+}
+
+const NOTES_PAGE_SIZE = 20;
+const notesPager = {
+  currentTag: "",
+  start: 1,
+  end: NOTES_PAGE_SIZE,
+  hasMore: true,
+  loading: false,
+};
+
+function resetNotesPager(tagId = "") {
+  notesPager.currentTag = tagId || "";
+  notesPager.start = 1;
+  notesPager.end = NOTES_PAGE_SIZE;
+  notesPager.hasMore = true;
+}
+
 // --------- Фильтр по тегу (селект) ---------
 
 function refreshTagFilterOptions() {
@@ -322,6 +346,21 @@ if (notesTagFilterSelect) {
       await loadNotesByTag(id);
     }
   });
+
+  notesTagFilterSelect.addEventListener("change", () => {
+    notesListEl?.scrollTo({ top: 0 });
+  });
+}
+
+if (notesListEl) {
+  notesListEl.addEventListener("scroll", async () => {
+    const nearBottom =
+      notesListEl.scrollTop + notesListEl.clientHeight >=
+      notesListEl.scrollHeight - 60;
+    if (nearBottom) {
+      await loadMoreNotes();
+    }
+  });
 }
 
 // --------- Рендер заметок / корзины ---------
@@ -331,18 +370,25 @@ function hideAllNoteMenus() {
   menus.forEach((m) => m.classList.add("hidden"));
 }
 
-function renderNotesList(notes) {
+function renderNotesList(notes, { append = false } = {}) {
   if (!notesListEl) return;
 
-  notesListEl.innerHTML = "";
+  if (!append) {
+    notesListEl.innerHTML = "";
+  }
 
   if (!notes || notes.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "notes-list-empty";
-    empty.textContent = "Пока нет заметок";
-    notesListEl.appendChild(empty);
+    if (!notesListEl.childElementCount) {
+      const empty = document.createElement("div");
+      empty.className = "notes-list-empty";
+      empty.textContent = "Пока нет заметок";
+      notesListEl.appendChild(empty);
+    }
     return;
   }
+
+  const emptyEl = notesListEl.querySelector(".notes-list-empty");
+  if (emptyEl) emptyEl.remove();
 
   notes.forEach((note) => {
     const item = document.createElement("div");
@@ -493,14 +539,49 @@ function renderTrashList(notes) {
 
 // --------- Загрузка заметок / корзины ---------
 
-async function loadNotes() {
+async function loadNotesPage({ tagId = "", append = false } = {}) {
+  const targetTag = tagId || "";
+  const tagChanged = targetTag !== notesPager.currentTag;
+
+  if (tagChanged || !append) {
+    resetNotesPager(targetTag);
+  } else {
+    if (!notesPager.hasMore || notesPager.loading) return;
+    const nextStart = notesPager.end + 1;
+    notesPager.start = nextStart;
+    notesPager.end = nextStart + NOTES_PAGE_SIZE - 1;
+  }
+
+  if (notesPager.loading) return;
+  notesPager.loading = true;
+
   try {
-    const data = await apiRequest("/api/notes/all", { method: "GET" });
-    const items = data && data.items ? data.items : [];
-    renderNotesList(items);
+    const qs = new URLSearchParams({
+      start: String(notesPager.start),
+      end: String(notesPager.end),
+    });
+    if (targetTag) qs.set("id", targetTag);
+
+    const path = targetTag
+      ? `/api/notes/by-tag?${qs}`
+      : `/api/notes/all?${qs}`;
+
+    const data = await apiRequest(path, { method: "GET" });
+    const items = toItemsArray(data);
+    renderNotesList(items, { append: append && !tagChanged });
+
+    if (items.length < NOTES_PAGE_SIZE) {
+      notesPager.hasMore = false;
+    }
   } catch (err) {
     console.error("Failed to load notes:", err);
+  } finally {
+    notesPager.loading = false;
   }
+}
+
+async function loadNotes() {
+  await loadNotesPage({ tagId: "", append: false });
 }
 
 async function loadNotesByTag(tagId) {
@@ -508,22 +589,18 @@ async function loadNotesByTag(tagId) {
     await loadNotes();
     return;
   }
-  try {
-    const data = await apiRequest(
-      `/api/notes/by-tag?id=${encodeURIComponent(tagId)}`,
-      { method: "GET" }
-    );
-    const items = data && data.items ? data.items : [];
-    renderNotesList(items);
-  } catch (err) {
-    console.error("Failed to load notes by tag:", err);
-  }
+  await loadNotesPage({ tagId, append: false });
+}
+
+async function loadMoreNotes() {
+  const tagId = notesTagFilterSelect?.value || "";
+  await loadNotesPage({ tagId, append: true });
 }
 
 async function loadTrashNotes() {
   try {
     const data = await apiRequest("/api/trash", { method: "GET" });
-    const items = data && data.items ? data.items : [];
+    const items = toItemsArray(data);
     renderTrashList(items);
   } catch (err) {
     console.error("Failed to load trash:", err);
@@ -673,7 +750,7 @@ function renderTagsList(tags) {
 async function loadTags() {
   try {
     const data = await apiRequest("/api/tags/by-user", { method: "GET" });
-    tagsCache = data && data.items ? data.items : [];
+    tagsCache = toItemsArray(data);
     renderTagsList(tagsCache);
     refreshTagFilterOptions();
   } catch (err) {
@@ -787,9 +864,9 @@ async function handleAddTagToNote(note) {
   }
 
   try {
-    await apiRequest("/api/notes/add-tag", {
+    await apiRequest("/api/notes/tag", {
       method: "POST",
-      body: { note_id: note.id, tag_id: tag.id },
+      body: { noteId: note.id, tagId: tag.id },
     });
     const currentTagId = notesTagFilterSelect?.value;
     if (currentTagId) await loadNotesByTag(currentTagId);

@@ -154,7 +154,7 @@ func (e *Echo) Reg(c echo.Context) error {
 		}
 	}
 
-	tokens, err := auth.GenerateTokens(ctx, &brzrpc.UserId{Id: id})
+	tokens, err := auth.GenerateTokens(ctx, &brzrpc.UserId{UserId: id})
 	if err != nil {
 		log.Error(op, "token generation error", err)
 		return c.JSON(http.StatusBadGateway, views.SWGError{Error: "token generation error"})

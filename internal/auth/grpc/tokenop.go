@@ -24,7 +24,7 @@ func (s *ServerAPI) GenerateAccessToken(ctx context.Context, r *brzrpc.UserId) (
 	defer done()
 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		at, err := s.JwtAPI.GenerateToken(r.GetId(), jwt.TokenTypeAccess)
+		at, err := s.JwtAPI.GenerateToken(r.GetUserId(), jwt.TokenTypeAccess)
 		if err != nil {
 			log.Error(op, "", err)
 			res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, "check logs")}
@@ -47,7 +47,7 @@ func (s *ServerAPI) GenerateRefreshToken(ctx context.Context, r *brzrpc.UserId) 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		rt, err := s.JwtAPI.GenerateToken(r.GetId(), jwt.TokenTypeRefresh)
+		rt, err := s.JwtAPI.GenerateToken(r.GetUserId(), jwt.TokenTypeRefresh)
 		if err != nil {
 			log.Error(op, "", err)
 			res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, "check logs")}

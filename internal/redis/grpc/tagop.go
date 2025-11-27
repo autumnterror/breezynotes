@@ -18,12 +18,12 @@ func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc.UserId) (*brz
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	if !s.ensureCreate(ctx, req.GetId()) {
+	if !s.ensureCreate(ctx, req.GetUserId()) {
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		tgs, err := s.rds.GetSessionTags(ctx, req.GetId())
+		tgs, err := s.rds.GetSessionTags(ctx, req.GetUserId())
 		if err != nil {
 			switch {
 			default:
@@ -93,12 +93,12 @@ func (s *ServerAPI) RmTagsByUser(ctx context.Context, req *brzrpc.UserId) (*empt
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	if !s.ensureCreate(ctx, req.GetId()) {
+	if !s.ensureCreate(ctx, req.GetUserId()) {
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
 	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		err := s.rds.SetSessionTags(ctx, req.GetId(), nil)
+		err := s.rds.SetSessionTags(ctx, req.GetUserId(), nil)
 		if err != nil {
 			switch {
 			default:
