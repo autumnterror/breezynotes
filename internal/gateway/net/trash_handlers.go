@@ -161,7 +161,7 @@ func (e *Echo) NoteFromTrash(c echo.Context) error {
 	defer done()
 
 	//AUTHORIZE
-	if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: id}); err == nil {
+	if n, err := api.FindNoteInTrash(ctx, &brzrpc.NoteId{NoteId: id}); err == nil {
 		if n.GetAuthor() != idUser {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "not author"})
 		}
@@ -201,7 +201,7 @@ func (e *Echo) NoteFromTrash(c echo.Context) error {
 // @Tags trash
 // @Accept json
 // @Produce json
-// @Success 200 {object} brzrpc.NoteParts
+// @Success 200 {object} []brzrpc.NotePart
 // @Failure 400 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
 // @Router /api/trash [get]
@@ -227,7 +227,7 @@ func (e *Echo) GetNotesFromTrash(c echo.Context) error {
 			if ntsT.GetItems() != nil {
 				if len(ntsT.GetItems()) != 0 {
 					log.Blue("read from cache")
-					return c.JSON(http.StatusOK, ntsT)
+					return c.JSON(http.StatusOK, ntsT.GetItems())
 				}
 			}
 		}
@@ -261,5 +261,5 @@ func (e *Echo) GetNotesFromTrash(c echo.Context) error {
 		return c.JSON(http.StatusOK, []brzrpc.NotePart{})
 	}
 
-	return c.JSON(http.StatusOK, nts)
+	return c.JSON(http.StatusOK, nts.GetItems())
 }

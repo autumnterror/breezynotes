@@ -80,6 +80,7 @@ service BlockNoteService {
   rpc ChangeTitleNote(ChangeTitleNoteRequest) returns (google.protobuf.Empty);
   rpc NoteToTrash(NoteId) returns (google.protobuf.Empty);
   rpc NoteFromTrash(NoteId) returns (google.protobuf.Empty);
+  rpc FindNoteInTrash(NoteId) returns (Note);
 
   rpc GetNote(NoteId) returns (Note);
   rpc CreateNote(Note) returns (google.protobuf.Empty);

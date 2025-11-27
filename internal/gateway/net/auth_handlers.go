@@ -2,6 +2,9 @@ package net
 
 import (
 	"context"
+	"net/http"
+	"time"
+
 	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/uid"
@@ -10,8 +13,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"net/http"
-	"time"
 )
 
 // Auth godoc

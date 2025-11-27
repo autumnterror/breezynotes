@@ -2,6 +2,7 @@ package notes
 
 import (
 	"context"
+
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/autumnterror/breezynotes/views"
@@ -118,7 +119,7 @@ func (a *API) FromTrash(ctx context.Context, id string) error {
 
 // FindFromTrash return note by id from Trash
 func (a *API) FindFromTrash(ctx context.Context, id string) (*brzrpc.Note, error) {
-	const op = "notes.Get"
+	const op = "notes.FindFromTrash"
 
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()

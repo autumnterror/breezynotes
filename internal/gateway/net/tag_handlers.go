@@ -111,7 +111,7 @@ func (e *Echo) UpdateTagTitle(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if t, err := api.GetTag(ctx, &brzrpc.TagId{TagId: r.GetId()}); err != nil {
+	if t, err := api.GetTag(ctx, &brzrpc.TagId{TagId: r.GetId()}); err == nil {
 		if t.GetUserId() != idUser {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
@@ -180,7 +180,7 @@ func (e *Echo) UpdateTagColor(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if t, err := api.GetTag(ctx, &brzrpc.TagId{TagId: r.GetId()}); err != nil {
+	if t, err := api.GetTag(ctx, &brzrpc.TagId{TagId: r.GetId()}); err == nil {
 		if t.GetUserId() != idUser {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
@@ -249,7 +249,7 @@ func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if t, err := api.GetTag(ctx, &brzrpc.TagId{TagId: r.GetId()}); err != nil {
+	if t, err := api.GetTag(ctx, &brzrpc.TagId{TagId: r.GetId()}); err == nil {
 		if t.GetUserId() != idUser {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
@@ -316,7 +316,7 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if t, err := api.GetTag(ctx, &brzrpc.TagId{TagId: id}); err != nil {
+	if t, err := api.GetTag(ctx, &brzrpc.TagId{TagId: id}); err == nil {
 		if t.GetUserId() != idUser {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
