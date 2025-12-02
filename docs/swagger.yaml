@@ -50,13 +50,6 @@ definitions:
       updated_at:
         type: integer
     type: object
-  brzrpc.NoteParts:
-    properties:
-      items:
-        items:
-          $ref: '#/definitions/brzrpc.NotePart'
-        type: array
-    type: object
   brzrpc.NoteTagId:
     properties:
       noteId:
@@ -133,9 +126,15 @@ definitions:
     type: object
   views.ChangePasswordRequest:
     properties:
+      email:
+        type: string
+      login:
+        type: string
       new_password:
         type: string
       new_password_2:
+        type: string
+      old_password:
         type: string
     type: object
   views.NoteReq:
@@ -389,6 +388,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/views.SWGError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/views.SWGError'
         "404":
           description: Not Found
           schema:
@@ -422,6 +425,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/views.SWGError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/views.SWGError'
         "502":
           description: Bad Gateway
           schema:
@@ -450,8 +457,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/views.SWGError'
-        "404":
-          description: Not Found
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/views.SWGError'
         "502":
@@ -482,8 +489,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/views.SWGError'
-        "404":
-          description: Not Found
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/views.SWGError'
         "502":
@@ -514,8 +521,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/views.SWGError'
-        "404":
-          description: Not Found
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/views.SWGError'
         "502":
@@ -525,7 +532,7 @@ paths:
       summary: Change block type
       tags:
       - block
-  /api/health:
+  /api/healthz:
     get:
       produces:
       - application/json
@@ -534,10 +541,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/views.SWGMessage'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/views.SWGMessage'
       summary: check health of gateway
       tags:
       - healthz
-  /api/notes:
+  /api/note:
     get:
       consumes:
       - application/json
@@ -557,6 +568,10 @@ paths:
             $ref: '#/definitions/views.SWGNoteWithBlocks'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/views.SWGError'
         "404":
@@ -599,7 +614,7 @@ paths:
       summary: Create note
       tags:
       - note
-  /api/notes/all:
+  /api/note/all:
     get:
       consumes:
       - application/json
@@ -621,7 +636,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/brzrpc.NoteParts'
+            items:
+              $ref: '#/definitions/brzrpc.NotePart'
+            type: array
         "400":
           description: Bad Request
           schema:
@@ -633,7 +650,7 @@ paths:
       summary: Get all notes of user
       tags:
       - note
-  /api/notes/by-tag:
+  /api/note/by-tag:
     get:
       consumes:
       - application/json
@@ -660,7 +677,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/brzrpc.NoteParts'
+            items:
+              $ref: '#/definitions/brzrpc.NotePart'
+            type: array
         "400":
           description: Bad Request
           schema:
@@ -672,39 +691,58 @@ paths:
       summary: Get notes by tag
       tags:
       - note
-  /api/notes/change-title:
-    patch:
+  /api/note/find:
+    get:
       consumes:
       - application/json
-      description: Changes title of existing note
+      description: if not fiend title get all block as first and fiend sames
       parameters:
-      - description: Note ID and new title
-        in: body
-        name: ChangeTitleNoteRequest
+      - description: start > 0
+        in: query
+        name: start
         required: true
-        schema:
-          $ref: '#/definitions/brzrpc.ChangeTitleNoteRequest'
+        type: integer
+      - description: end
+        in: query
+        name: end
+        required: true
+        type: integer
+      - description: prompt
+        in: query
+        name: prompt
+        required: true
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
+          schema:
+            items:
+              $ref: '#/definitions/brzrpc.NotePart'
+            type: array
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/views.SWGError'
-        "404":
-          description: Not Found
+        "408":
+          description: Request Timeout
+          schema:
+            items:
+              $ref: '#/definitions/brzrpc.NotePart'
+            type: array
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/views.SWGError'
         "502":
           description: Bad Gateway
           schema:
             $ref: '#/definitions/views.SWGError'
-      summary: Change note title
+      summary: search note by title or blocks inside
       tags:
       - note
-  /api/notes/tag:
+  /api/note/tag:
     delete:
       consumes:
       - application/json
@@ -725,8 +763,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/views.SWGError'
-        "404":
-          description: Not Found
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/views.SWGError'
         "502":
@@ -756,8 +794,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/views.SWGError'
-        "404":
-          description: Not Found
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/views.SWGError'
         "502":
@@ -767,7 +805,43 @@ paths:
       summary: Add tag to note
       tags:
       - note
-  /api/tags:
+  /api/note/title:
+    patch:
+      consumes:
+      - application/json
+      description: Changes title of existing note
+      parameters:
+      - description: Note ID and new title
+        in: body
+        name: ChangeTitleNoteRequest
+        required: true
+        schema:
+          $ref: '#/definitions/brzrpc.ChangeTitleNoteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/views.SWGError'
+      summary: Change note title
+      tags:
+      - note
+  /api/tag:
     delete:
       consumes:
       - application/json
@@ -785,6 +859,10 @@ paths:
           description: OK
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/views.SWGError'
         "502":
@@ -823,7 +901,7 @@ paths:
       summary: Create tag
       tags:
       - tag
-  /api/tags/by-user:
+  /api/tag/by-user:
     get:
       consumes:
       - application/json
@@ -848,8 +926,8 @@ paths:
       summary: Get tags by user
       tags:
       - tag
-  /api/tags/color:
-    put:
+  /api/tag/color:
+    patch:
       consumes:
       - application/json
       description: Updates color of tag
@@ -869,6 +947,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/views.SWGError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/views.SWGError'
         "404":
           description: Not Found
           schema:
@@ -880,8 +962,8 @@ paths:
       summary: Update tag color
       tags:
       - tag
-  /api/tags/emoji:
-    put:
+  /api/tag/emoji:
+    patch:
       consumes:
       - application/json
       description: Updates emoji of tag
@@ -901,6 +983,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/views.SWGError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/views.SWGError'
         "404":
           description: Not Found
           schema:
@@ -912,8 +998,8 @@ paths:
       summary: Update tag emoji
       tags:
       - tag
-  /api/tags/title:
-    put:
+  /api/tag/title:
+    patch:
       consumes:
       - application/json
       description: Updates title of tag
@@ -931,6 +1017,10 @@ paths:
           description: OK
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/views.SWGError'
         "404":
@@ -975,7 +1065,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/brzrpc.NoteParts'
+            items:
+              $ref: '#/definitions/brzrpc.NotePart'
+            type: array
         "400":
           description: Bad Request
           schema:
@@ -1007,8 +1099,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/views.SWGError'
-        "404":
-          description: Not Found
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/views.SWGError'
         "502":
@@ -1038,8 +1130,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/views.SWGError'
-        "404":
-          description: Not Found
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/views.SWGError'
         "502":
@@ -1067,6 +1159,10 @@ paths:
             $ref: '#/definitions/views.SWGError'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/views.SWGError'
         "502":
@@ -1133,6 +1229,10 @@ paths:
             $ref: '#/definitions/views.SWGError'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/views.SWGError'
+        "410":
+          description: Gone
           schema:
             $ref: '#/definitions/views.SWGError'
         "502":

@@ -2,7 +2,20 @@
 
 let API_BASE = "http://127.0.0.1:8080";
 
-async function apiRequest(path, { method = "GET", body } = {}) {
+async function refreshToken() {
+  const url = API_BASE + "/api/auth/token";
+  try {
+    const res = await fetch(url, { method: "GET", credentials: "include" });
+    if (!res.ok) {
+      throw new Error(`Refresh failed with status ${res.status}`);
+    }
+  } catch (err) {
+    console.error("Token refresh error:", err);
+    throw err;
+  }
+}
+
+async function apiRequest(path, { method = "GET", body, retryOnAuth = true } = {}) {
   const url = API_BASE + path;
 
   const options = {
@@ -22,6 +35,15 @@ async function apiRequest(path, { method = "GET", body } = {}) {
   } catch (err) {
     console.error("Network error:", err);
     throw err;
+  }
+
+  if (res.status === 401 && retryOnAuth) {
+    try {
+      await refreshToken();
+      return apiRequest(path, { method, body, retryOnAuth: false });
+    } catch (_) {
+      // fall through to error handling below
+    }
   }
 
   const text = await res.text();
@@ -95,6 +117,7 @@ const notesListEl = document.getElementById("notes-list");
 const addNoteBtn = document.getElementById("add-note-btn");
 const openTrashBtn = document.getElementById("open-trash-btn");
 const notesTagFilterSelect = document.getElementById("notes-tag-filter");
+const notesMainEl = document.querySelector("#view-notes .notes-main");
 
 const trashListEl = document.getElementById("trash-list");
 const backToNotesBtn = document.getElementById("back-to-notes-btn");
@@ -125,6 +148,11 @@ let currentAuthMode = "login";
 let isAuthenticated = false;
 let tagsCache = [];
 let currentUser = null;
+let selectedNoteId = null;
+let selectedNoteData = null;
+let restoredNoteFromStorage = false;
+
+const SELECTED_NOTE_STORAGE_KEY = "bn_selected_note_id";
 
 // --------- Вспомогательные функции ---------
 
@@ -286,19 +314,32 @@ function toItemsArray(payload) {
   return [];
 }
 
+function setSelectedNoteId(noteId) {
+  selectedNoteId = noteId || null;
+  if (noteId) {
+    try {
+      localStorage.setItem(SELECTED_NOTE_STORAGE_KEY, noteId);
+    } catch (_) {}
+  } else {
+    try {
+      localStorage.removeItem(SELECTED_NOTE_STORAGE_KEY);
+    } catch (_) {}
+  }
+}
+
 const NOTES_PAGE_SIZE = 20;
 const notesPager = {
   currentTag: "",
-  start: 1,
-  end: NOTES_PAGE_SIZE,
+  start: 0,
+  end: NOTES_PAGE_SIZE - 1,
   hasMore: true,
   loading: false,
 };
 
 function resetNotesPager(tagId = "") {
   notesPager.currentTag = tagId || "";
-  notesPager.start = 1;
-  notesPager.end = NOTES_PAGE_SIZE;
+  notesPager.start = 0;
+  notesPager.end = NOTES_PAGE_SIZE - 1;
   notesPager.hasMore = true;
 }
 
@@ -399,12 +440,16 @@ function renderNotesList(notes, { append = false } = {}) {
 
     const content = document.createElement("div");
     content.className = "note-content";
-
+  
     const title = document.createElement("div");
     title.className = "note-title";
     title.textContent = note.title || "Без названия";
     content.appendChild(title);
 
+    const fb = document.createElement("div");
+    fb.className = "note-fb";
+    fb.textContent = note.first_block || "Без названия";
+    content.appendChild(fb);
     if (note.tag) {
       const tagPill = document.createElement("div");
       tagPill.className = "note-tag-pill";
@@ -464,6 +509,19 @@ function renderNotesList(notes, { append = false } = {}) {
     menu.appendChild(toTrashBtn);
     menu.appendChild(addTagBtnInline);
 
+    const renameBtn = document.createElement("button");
+    renameBtn.type = "button";
+    renameBtn.className = "btn-ghost small";
+    renameBtn.textContent = "Переименовать";
+    renameBtn.disabled = !note || !note.id;
+    renameBtn.addEventListener("click", async (event) => {
+      event.stopPropagation();
+      await renameNote(note);
+      hideAllNoteMenus();
+    });
+
+    menu.appendChild(renameBtn);
+
     menuBtn.addEventListener("click", (event) => {
       event.stopPropagation();
       const isHidden = menu.classList.contains("hidden");
@@ -473,6 +531,7 @@ function renderNotesList(notes, { append = false } = {}) {
 
     item.addEventListener("click", () => {
       hideAllNoteMenus();
+      openNote(note);
     });
 
     item.appendChild(row);
@@ -480,6 +539,219 @@ function renderNotesList(notes, { append = false } = {}) {
 
     notesListEl.appendChild(item);
   });
+}
+
+function showNoteLoading() {
+  if (!notesMainEl) return;
+  notesMainEl.innerHTML = "";
+  const placeholder = document.createElement("div");
+  placeholder.className = "notes-main-placeholder";
+  placeholder.textContent = "Загрузка заметки...";
+  notesMainEl.appendChild(placeholder);
+}
+
+function renderNoteDetails(note) {
+  if (!notesMainEl) return;
+  notesMainEl.innerHTML = "";
+  selectedNoteData = note || null;
+
+  if (!note) {
+    const placeholder = document.createElement("div");
+    placeholder.className = "notes-main-placeholder";
+    placeholder.innerHTML = "<p>Выбери заметку слева или создай новую.</p>";
+    notesMainEl.appendChild(placeholder);
+    return;
+  }
+
+  const card = document.createElement("div");
+  card.className = "note-detail";
+
+  const titleEl = document.createElement("div");
+  titleEl.className = "note-detail-title";
+  titleEl.textContent = note.title || "Без названия";
+  card.appendChild(titleEl);
+
+  const metaEl = document.createElement("div");
+  metaEl.className = "note-detail-meta";
+  const updated = formatDate(note.updated_at || note.created_at);
+  metaEl.textContent = updated ? `Обновлено: ${updated}` : "";
+  card.appendChild(metaEl);
+
+  // Создание текстового блока
+  const createBlockBox = document.createElement("div");
+  createBlockBox.className = "note-detail-create";
+
+  const createTitle = document.createElement("div");
+  createTitle.className = "note-detail-heading";
+  createTitle.textContent = "Создать текстовый блок";
+  createBlockBox.appendChild(createTitle);
+
+  const textInput = document.createElement("textarea");
+  textInput.className = "note-detail-block-input";
+  textInput.rows = 3;
+  textInput.placeholder =
+    "Текст нового блока (если пусто — вставлю пример с жирным словом)";
+  createBlockBox.appendChild(textInput);
+
+  const createBtn = document.createElement("button");
+  createBtn.type = "button";
+  createBtn.className = "btn-primary small";
+  createBtn.textContent = "Добавить блок";
+  createBtn.addEventListener("click", async () => {
+    const text = textInput.value.trim();
+    await createTextBlock(note.id, text);
+  });
+  createBlockBox.appendChild(createBtn);
+
+  card.appendChild(createBlockBox);
+
+  const heading = document.createElement("div");
+  heading.className = "note-detail-heading";
+  heading.textContent = "Blocks";
+  card.appendChild(heading);
+
+  const blocksContainer = document.createElement("div");
+  blocksContainer.className = "note-detail-blocks";
+
+  if (note.blocks === null || note.blocks === undefined) {
+    const info = document.createElement("div");
+    info.textContent = "null";
+    blocksContainer.appendChild(info);
+  } else if (Array.isArray(note.blocks) && note.blocks.length > 0) {
+    note.blocks.forEach((block, idx) => {
+      const blockBox = document.createElement("div");
+      blockBox.className = "note-block-card";
+      const order = idx;
+      const blockTitle = document.createElement("div");
+      blockTitle.className = "note-block-title";
+      blockTitle.textContent = `Block #${idx + 1} (type: ${
+        block.type || "?"
+      }, order: ${order ?? "?"})`;
+      blockBox.appendChild(blockTitle);
+
+      const pre = document.createElement("pre");
+      pre.className = "note-block-pre";
+      pre.textContent = JSON.stringify(block, null, 2);
+      blockBox.appendChild(pre);
+
+      const actions = document.createElement("div");
+      actions.className = "note-block-actions";
+
+      const startInput = document.createElement("input");
+      startInput.type = "number";
+      startInput.min = "0";
+      startInput.value = "0";
+      startInput.className = "note-block-field";
+      startInput.placeholder = "start";
+
+      const endInput = document.createElement("input");
+      endInput.type = "number";
+      endInput.min = "0";
+      endInput.value = "2";
+      endInput.className = "note-block-field";
+      endInput.placeholder = "end";
+
+      const styleInput = document.createElement("input");
+      styleInput.type = "text";
+      styleInput.value = "bold";
+      styleInput.className = "note-block-field";
+      styleInput.placeholder = "style";
+
+      const applyBtn = document.createElement("button");
+      applyBtn.type = "button";
+      applyBtn.className = "btn-outline small";
+      applyBtn.textContent = "Применить стиль";
+      applyBtn.addEventListener("click", async () => {
+        await applyStyleToBlock(block.id, {
+          start: Number(startInput.value) || 0,
+          end: Number(endInput.value) || 0,
+          style: styleInput.value || "bold",
+        });
+      });
+
+      const orderBox = document.createElement("div");
+      orderBox.className = "note-block-order";
+
+      const upBtn = document.createElement("button");
+      upBtn.type = "button";
+      upBtn.className = "btn-ghost small";
+      upBtn.textContent = "Выше";
+      upBtn.disabled = order === undefined || order === null;
+      upBtn.addEventListener("click", async () => {
+        console.log("Change order up", note.id, order, order - 1);
+        await changeBlockOrder(note.id, order, order - 1);
+      });
+
+      const downBtn = document.createElement("button");
+      downBtn.type = "button";
+      downBtn.className = "btn-ghost small";
+      downBtn.textContent = "Ниже";
+      downBtn.disabled = order === undefined || order === null;
+      downBtn.addEventListener("click", async () => {
+        console.log("Change order down", note.id, order, order + 1);
+        await changeBlockOrder(note.id, order, order + 1);
+      });
+
+      orderBox.appendChild(upBtn);
+      orderBox.appendChild(downBtn);
+
+      const typeInput = document.createElement("input");
+      typeInput.type = "text";
+      typeInput.value = block.type || "";
+      typeInput.className = "note-block-field";
+      typeInput.placeholder = "type";
+
+      const typeBtn = document.createElement("button");
+      typeBtn.type = "button";
+      typeBtn.className = "btn-ghost small";
+      typeBtn.textContent = "Сменить тип";
+      typeBtn.addEventListener("click", async () => {
+        await changeBlockType(block.id, typeInput.value || "text");
+      });
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.type = "button";
+      deleteBtn.className = "btn-outline small";
+      deleteBtn.textContent = "Удалить";
+      deleteBtn.addEventListener("click", async () => {
+        await deleteBlock(block.id, note.id);
+      });
+
+      actions.appendChild(startInput);
+      actions.appendChild(endInput);
+      actions.appendChild(styleInput);
+      actions.appendChild(applyBtn);
+      actions.appendChild(orderBox);
+      actions.appendChild(typeInput);
+      actions.appendChild(typeBtn);
+      actions.appendChild(deleteBtn);
+
+      blockBox.appendChild(actions);
+      blocksContainer.appendChild(blockBox);
+    });
+  } else if (Array.isArray(note.blocks) && note.blocks.length === 0) {
+    const info = document.createElement("div");
+    info.textContent = "[]";
+    blocksContainer.appendChild(info);
+  } else {
+    const info = document.createElement("div");
+    info.textContent = String(note.blocks);
+    blocksContainer.appendChild(info);
+  }
+
+  card.appendChild(blocksContainer);
+
+  notesMainEl.appendChild(card);
+}
+
+function renderNoteError() {
+  if (!notesMainEl) return;
+  notesMainEl.innerHTML = "";
+  selectedNoteData = null;
+  const errorEl = document.createElement("div");
+  errorEl.className = "notes-main-placeholder";
+  errorEl.textContent = "Не удалось загрузить заметку.";
+  notesMainEl.appendChild(errorEl);
 }
 
 function renderTrashList(notes) {
@@ -511,7 +783,18 @@ function renderTrashList(notes) {
     const updated = formatDate(note.updated_at || note.created_at);
     meta.textContent = updated ? `Обновлено: ${updated}` : "";
 
+    const firstBlock = document.createElement("div");
+    firstBlock.className = "note-first-block";
+    const fb = note.first_block;
+    firstBlock.textContent =
+      typeof fb === "string" && fb.trim()
+        ? fb
+        : fb === null
+        ? "first_block: null"
+        : "first_block: —";
+
     content.appendChild(title);
+    content.appendChild(firstBlock);
     content.appendChild(meta);
 
     const actions = document.createElement("div");
@@ -539,12 +822,16 @@ function renderTrashList(notes) {
 
 // --------- Загрузка заметок / корзины ---------
 
-async function loadNotesPage({ tagId = "", append = false } = {}) {
+async function loadNotesPage({ tagId = "", append = false, keepSelection = false } = {}) {
   const targetTag = tagId || "";
   const tagChanged = targetTag !== notesPager.currentTag;
 
   if (tagChanged || !append) {
     resetNotesPager(targetTag);
+    if (!keepSelection) {
+      setSelectedNoteId(null);
+      renderNoteDetails(null);
+    }
   } else {
     if (!notesPager.hasMore || notesPager.loading) return;
     const nextStart = notesPager.end + 1;
@@ -563,12 +850,23 @@ async function loadNotesPage({ tagId = "", append = false } = {}) {
     if (targetTag) qs.set("id", targetTag);
 
     const path = targetTag
-      ? `/api/notes/by-tag?${qs}`
-      : `/api/notes/all?${qs}`;
+      ? `/api/note/by-tag?${qs}`
+      : `/api/note/all?${qs}`;
 
     const data = await apiRequest(path, { method: "GET" });
     const items = toItemsArray(data);
     renderNotesList(items, { append: append && !tagChanged });
+
+    if (!append && !restoredNoteFromStorage) {
+      let storedId = null;
+      try {
+        storedId = localStorage.getItem(SELECTED_NOTE_STORAGE_KEY);
+      } catch (_) {}
+      if (storedId) {
+        restoredNoteFromStorage = true;
+        await openNote({ id: storedId });
+      }
+    }
 
     if (items.length < NOTES_PAGE_SIZE) {
       notesPager.hasMore = false;
@@ -597,6 +895,30 @@ async function loadMoreNotes() {
   await loadNotesPage({ tagId, append: true });
 }
 
+async function refreshNotesList() {
+  const tagId = notesTagFilterSelect?.value || "";
+  await loadNotesPage({ tagId, append: false, keepSelection: true });
+}
+
+async function openNote(note) {
+  if (!note || !note.id) return;
+  setSelectedNoteId(note.id);
+  showNoteLoading();
+
+  try {
+    const data = await apiRequest(`/api/note?id=${encodeURIComponent(note.id)}`, {
+      method: "GET",
+    });
+    if (selectedNoteId !== note.id) return;
+    renderNoteDetails(data);
+  } catch (err) {
+    console.error("Failed to load note detail:", err);
+    if (selectedNoteId === note.id) {
+      renderNoteError();
+    }
+  }
+}
+
 async function loadTrashNotes() {
   try {
     const data = await apiRequest("/api/trash", { method: "GET" });
@@ -604,6 +926,148 @@ async function loadTrashNotes() {
     renderTrashList(items);
   } catch (err) {
     console.error("Failed to load trash:", err);
+  }
+}
+
+async function renameNote(note) {
+  if (!note || !note.id) return;
+  const currentTitle = note.title || "";
+  const newTitle = prompt("Новое название заметки:", currentTitle);
+  if (newTitle === null) return;
+  const title = newTitle.trim();
+  if (!title) {
+    alert("Название не может быть пустым");
+    return;
+  }
+
+  try {
+    await apiRequest("/api/note/title", {
+      method: "PATCH",
+      body: { id: note.id, title },
+    });
+
+    await refreshNotesList();
+
+    if (selectedNoteId === note.id) {
+      await openNote({ id: note.id });
+    }
+  } catch (err) {
+    console.error("Failed to rename note:", err);
+  }
+}
+
+async function createTextBlock(noteId, text) {
+  if (!noteId) return;
+  const blocks = Array.isArray(selectedNoteData?.blocks)
+    ? selectedNoteData.blocks
+    : [];
+  const pos = blocks.length;
+  const baseText =
+    text ||
+    "Новый текстовый блок — здесь пример длинной строки, чтобы проверить разметку.";
+  const payload = {
+    type: "text",
+    noteid: noteId,
+    pos,
+    data: {
+      text: [
+        { style: "default", text: baseText },
+      ],
+    },
+  };
+
+  try {
+    await apiRequest("/api/block", { method: "POST", body: payload });
+    await openNote({ id: noteId });
+    await refreshNotesList();
+  } catch (err) {
+    console.error("Failed to create block:", err);
+  }
+}
+
+async function applyStyleToBlock(blockId, styleData) {
+  if (!blockId) return;
+  const payload = {
+    id: blockId,
+    op: "apply_style",
+    data: {
+      start: styleData.start ?? 0,
+      end: styleData.end ?? 0,
+      style: styleData.style || "bold",
+    },
+  };
+
+  try {
+    await apiRequest("/api/block/op", { method: "POST", body: payload });
+    if (selectedNoteId) {
+      await openNote({ id: selectedNoteId });
+    }
+    await refreshNotesList();
+  } catch (err) {
+    console.error("Failed to apply style to block:", err);
+  }
+}
+
+async function changeBlockOrder(noteId, oldOrder, newOrder) {
+  const targetNoteId = noteId || selectedNoteId;
+  if (
+    !targetNoteId ||
+    oldOrder === undefined ||
+    oldOrder === null ||
+    newOrder === undefined ||
+    newOrder === null
+  ) {
+    return;
+  }
+  const oldInt = Number(oldOrder);
+  const newInt = Math.max(0, Number(newOrder));
+  if (Number.isNaN(oldInt) || Number.isNaN(newInt)) return;
+  const payload = { id: targetNoteId, old_order: oldInt, new_order: newInt };
+
+  try {
+    await apiRequest("/api/block/order", { method: "PATCH", body: payload });
+    if (selectedNoteId) {
+      await openNote({ id: selectedNoteId });
+    }
+    await refreshNotesList();
+  } catch (err) {
+    console.error("Failed to change block order:", err);
+  }
+}
+
+async function changeBlockType(blockId, newType) {
+  if (!blockId || !newType) return;
+  const payload = { id: blockId, new_type: newType };
+
+  try {
+    await apiRequest("/api/block/type", { method: "PATCH", body: payload });
+    if (selectedNoteId) {
+      await openNote({ id: selectedNoteId });
+    }
+    await refreshNotesList();
+  } catch (err) {
+    console.error("Failed to change block type:", err);
+  }
+}
+
+async function deleteBlock(blockId, noteId) {
+  if (!blockId) return;
+  const targetNoteId = noteId || selectedNoteId;
+  if (!targetNoteId) return;
+
+  try {
+    await apiRequest(
+      `/api/block?block_id=${encodeURIComponent(
+        blockId
+      )}&note_id=${encodeURIComponent(targetNoteId)}`,
+      { method: "DELETE" }
+    );
+    if (selectedNoteId === targetNoteId) {
+      await openNote({ id: targetNoteId });
+    }
+    await refreshNotesList();
+  } catch (err) {
+    console.error("Failed to delete block:", err);
   }
 }
 
@@ -653,7 +1117,7 @@ if (addNoteBtn) {
   addNoteBtn.addEventListener("click", async () => {
     addNoteBtn.disabled = true;
     try {
-      await apiRequest("/api/notes", {
+      await apiRequest("/api/note", {
         method: "POST",
         body: { title: "новая заметка" },
       });
@@ -749,7 +1213,7 @@ function renderTagsList(tags) {
 
 async function loadTags() {
   try {
-    const data = await apiRequest("/api/tags/by-user", { method: "GET" });
+    const data = await apiRequest("/api/tag/by-user", { method: "GET" });
     tagsCache = toItemsArray(data);
     renderTagsList(tagsCache);
     refreshTagFilterOptions();
@@ -767,7 +1231,7 @@ async function createTag() {
     prompt("Цвет тега (hex или имя, можно пусто):", "#ff9fd1") || "";
 
   try {
-    await apiRequest("/api/tags", {
+    await apiRequest("/api/tag", {
       method: "POST",
       body: { title, emoji, color },
     });
@@ -795,21 +1259,21 @@ async function editTag(tag) {
 
   try {
     if (newTitle !== null && newTitle !== "" && newTitle !== tag.title) {
-      await apiRequest("/api/tags/title", {
+      await apiRequest("/api/tag/title", {
         method: "PUT",
         body: { id: tag.id, title: newTitle },
       });
     }
 
     if (newEmoji !== null && newEmoji !== "" && newEmoji !== tag.emoji) {
-      await apiRequest("/api/tags/emoji", {
+      await apiRequest("/api/tag/emoji", {
         method: "PUT",
         body: { id: tag.id, emoji: newEmoji },
       });
     }
 
     if (newColor !== null && newColor !== "" && newColor !== tag.color) {
-      await apiRequest("/api/tags/color", {
+      await apiRequest("/api/tag/color", {
         method: "PUT",
         body: { id: tag.id, color: newColor },
       });
@@ -864,7 +1328,7 @@ async function handleAddTagToNote(note) {
   }
 
   try {
-    await apiRequest("/api/notes/tag", {
+    await apiRequest("/api/note/tag", {
       method: "POST",
       body: { noteId: note.id, tagId: tag.id },
     });

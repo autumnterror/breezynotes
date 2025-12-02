@@ -18,11 +18,6 @@ type UserRegister struct {
 
 type NoteReq struct {
 	Title string `json:"title,omitempty"`
-	//TagId   string   `json:"tag,omitempty"`
-	//Editors []string `json:"editors,omitempty"`
-	//Readers []string `json:"readers,omitempty"`
-	//Blocks  []string `json:"blocks,omitempty"`
-	//Status  int      `json:"status"`
 }
 
 type NoteWithBlocks struct {
@@ -55,6 +50,9 @@ type UpdatePhotoRequest struct {
 }
 
 type ChangePasswordRequest struct {
+	Login        string `json:"login"`
+	Email        string `json:"email"`
+	OldPassword  string `json:"old_password"`
 	NewPassword  string `json:"new_password"`
 	NewPassword2 string `json:"new_password_2"`
 }

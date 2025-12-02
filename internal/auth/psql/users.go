@@ -202,11 +202,11 @@ func (d *Driver) Delete(ctx context.Context, id string) error {
 func (d *Driver) GetInfo(ctx context.Context, id string) (*brzrpc.User, error) {
 	const op = "psql.users.GetInfo"
 	query := `
-		SELECT login,email,about FROM users
+		SELECT login,email,about, photo FROM users
 		WHERE id = $1
 	`
 	var u brzrpc.User
-	if err := d.driver.QueryRowContext(ctx, query, id).Scan(&u.Login, &u.Email, &u.About); err != nil {
+	if err := d.driver.QueryRowContext(ctx, query, id).Scan(&u.Login, &u.Email, &u.About, &u.Photo); err != nil {
 		return nil, format.Error(op, err)
 	}
 	u.Id = id

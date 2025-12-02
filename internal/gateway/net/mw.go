@@ -36,7 +36,7 @@ func (e *Echo) GetUserId() echo.MiddlewareFunc {
 			}
 			u, err := e.authAPI.API.GetIdFromToken(ctx, &brzrpc.Token{Value: at.Value})
 			if err != nil || u.GetId() == "" {
-				return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad access_token"})
+				return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad access_token"})
 			}
 
 			c.Set(IdFromContext, u.GetId())

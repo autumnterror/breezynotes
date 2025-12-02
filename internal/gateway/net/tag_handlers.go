@@ -24,17 +24,16 @@ import (
 // @Success 201 {object} brzrpc.Id
 // @Failure 400 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/tags [post]
+// @Router /api/tag [post]
 func (e *Echo) CreateTag(c echo.Context) error {
 	const op = "gateway.net.CreateTag"
 	log.Info(op, "")
 
 	api := e.bnAPI.API
 
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok || idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	var r views.TagReq
@@ -87,19 +86,19 @@ func (e *Echo) CreateTag(c echo.Context) error {
 // @Param UpdateTagTitleRequest body brzrpc.UpdateTagTitleRequest true "Tag ID and title"
 // @Success 200
 // @Failure 400 {object} views.SWGError
+// @Failure 401 {object} views.SWGError
 // @Failure 404 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/tags/title [put]
+// @Router /api/tag/title [patch]
 func (e *Echo) UpdateTagTitle(c echo.Context) error {
 	const op = "gateway.net.UpdateTagTitle"
 	log.Info(op, "")
 
 	api := e.bnAPI.API
 
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok || idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	var r brzrpc.UpdateTagTitleRequest
@@ -156,19 +155,19 @@ func (e *Echo) UpdateTagTitle(c echo.Context) error {
 // @Param UpdateTagColorRequest body brzrpc.UpdateTagColorRequest true "Tag ID and color"
 // @Success 200
 // @Failure 400 {object} views.SWGError
+// @Failure 401 {object} views.SWGError
 // @Failure 404 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/tags/color [put]
+// @Router /api/tag/color [patch]
 func (e *Echo) UpdateTagColor(c echo.Context) error {
 	const op = "gateway.net.UpdateTagColor"
 	log.Info(op, "")
 
 	api := e.bnAPI.API
 
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok || idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	var r brzrpc.UpdateTagColorRequest
@@ -225,19 +224,19 @@ func (e *Echo) UpdateTagColor(c echo.Context) error {
 // @Param UpdateTagEmojiRequest body brzrpc.UpdateTagEmojiRequest true "Tag ID and emoji"
 // @Success 200
 // @Failure 400 {object} views.SWGError
+// @Failure 401 {object} views.SWGError
 // @Failure 404 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/tags/emoji [put]
+// @Router /api/tag/emoji [patch]
 func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 	const op = "gateway.net.UpdateTagEmoji"
 	log.Info(op, "")
 
 	api := e.bnAPI.API
 
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok || idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	var r brzrpc.UpdateTagEmojiRequest
@@ -294,18 +293,18 @@ func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 // @Param id query string true "Tag ID"
 // @Success 200
 // @Failure 400 {object} views.SWGError
+// @Failure 401 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/tags [delete]
+// @Router /api/tag [delete]
 func (e *Echo) DeleteTag(c echo.Context) error {
 	const op = "gateway.net.DeleteTag"
 	log.Info(op, "")
 
 	api := e.bnAPI.API
 
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok || idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	id := c.QueryParam("id")
@@ -358,17 +357,16 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 // @Success 200 {object} []brzrpc.Tag
 // @Failure 400 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/tags/by-user [get]
+// @Router /api/tag/by-user [get]
 func (e *Echo) GetTagsByUser(c echo.Context) error {
 	const op = "gateway.net.GetTagsByUser"
 	log.Info(op, "")
 
 	api := e.bnAPI.API
 
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok && idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)

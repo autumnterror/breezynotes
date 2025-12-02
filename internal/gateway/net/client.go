@@ -50,9 +50,10 @@ func New(
 
 	//e.echo.Use(middleware.Logger(), middleware.Recover())
 	//e.echo.Static("/", "./example/html")
+
 	api := e.echo.Group("/api", ValidateID(), e.GetUserId())
 	{
-		api.GET("/health", e.Healthz)
+		api.GET("/healthz", e.Healthz)
 
 		auth := api.Group("/auth")
 		{
@@ -70,14 +71,15 @@ func New(
 			user.PATCH("/pw", e.ChangePassword)
 		}
 
-		notes := api.Group("/notes")
+		notes := api.Group("/note")
 		{
 			notes.GET("", e.GetNote)
+			notes.GET("/find", e.Search)
 			notes.POST("", e.CreateNote)
 
 			notes.GET("/all", e.GetAllNotes)
 			notes.GET("/by-tag", e.GetNotesByTag)
-			notes.PATCH("/change-title", e.ChangeTitleNote)
+			notes.PATCH("/title", e.ChangeTitleNote)
 
 			notes.POST("/tag", e.AddTagToNote)
 			notes.DELETE("/tag", e.RmTagFromNote)
@@ -103,15 +105,15 @@ func New(
 			trash.GET("", e.GetNotesFromTrash)
 		}
 
-		tags := api.Group("/tags")
+		tags := api.Group("/tag")
 		{
 			tags.GET("/by-user", e.GetTagsByUser)
 
 			tags.POST("", e.CreateTag)
 
-			tags.PUT("/title", e.UpdateTagTitle)
-			tags.PUT("/color", e.UpdateTagColor)
-			tags.PUT("/emoji", e.UpdateTagEmoji)
+			tags.PATCH("/title", e.UpdateTagTitle)
+			tags.PATCH("/color", e.UpdateTagColor)
+			tags.PATCH("/emoji", e.UpdateTagEmoji)
 
 			tags.DELETE("", e.DeleteTag)
 		}

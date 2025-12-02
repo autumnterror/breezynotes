@@ -13,6 +13,7 @@ import (
 
 func main() {
 	const op = "cmd.auth"
+
 	cfg := config.MustSetup()
 
 	j := jwt.NewWithConfig(cfg)

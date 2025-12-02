@@ -1,10 +1,10 @@
 package config
 
 import (
-	"flag"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/spf13/viper"
 	"log"
+	"os"
 )
 
 type Config struct {
@@ -26,9 +26,12 @@ func MustSetup() *Config {
 // setup create config structure
 func setup() (*Config, error) {
 	const op = "config.setup"
-	configPath := flag.String("config", "./local-config/gateway.yaml", "path to config file")
-	flag.Parse()
-	viper.SetConfigFile(*configPath)
+	configPath := os.Getenv("CONFIG_PATH")
+	if configPath == "" {
+		configPath = "./local-config/redis.yaml"
+	}
+
+	viper.SetConfigFile(configPath)
 
 	var cfg struct {
 		RedisAddr   string `mapstructure:"redis_addr"`

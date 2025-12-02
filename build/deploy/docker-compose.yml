@@ -9,7 +9,7 @@ services:
     volumes:
       - ./configs:/app/configs
     environment:
-      CONFIG_FILE: prod-gateway.yaml
+      CONFIG_PATH: configs/prod-gateway.yaml
     restart: unless-stopped
     networks:
       - auth
@@ -24,7 +24,7 @@ services:
     volumes:
       - ./configs:/app/configs
     environment:
-      CONFIG_FILE: prod-auth.yaml
+      CONFIG_PATH: configs/prod-auth.yaml
     restart: unless-stopped
     networks:
       - auth
@@ -37,7 +37,7 @@ services:
     volumes:
       - ./configs:/app/configs
     environment:
-      CONFIG_FILE: prod-blocknote.yaml
+      CONFIG_PATH: configs/prod-blocknote.yaml
     restart: unless-stopped
     networks:
       - notes
@@ -50,7 +50,7 @@ services:
     volumes:
       - ./configs:/app/configs
     environment:
-      CONFIG_FILE: prod-redis.yaml
+      CONFIG_PATH: configs/prod-redis.yaml
     restart: unless-stopped
     networks:
       - redisnet

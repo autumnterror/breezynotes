@@ -25,7 +25,7 @@ func (a *API) UpdateUpdatedAt(ctx context.Context, id string) error {
 			},
 			bson.M{
 				"$set": bson.M{
-					"updatedAt": time.Now().UTC().Unix(),
+					"updated_at": time.Now().UTC().Unix(),
 				},
 			},
 		)

@@ -205,6 +205,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/views.SWGError"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
@@ -247,6 +253,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/views.SWGError"
                         }
@@ -300,8 +312,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/views.SWGError"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/views.SWGError"
                         }
@@ -349,8 +361,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/views.SWGError"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/views.SWGError"
                         }
@@ -398,8 +410,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/views.SWGError"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/views.SWGError"
                         }
@@ -413,7 +425,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/health": {
+        "/api/healthz": {
             "get": {
                 "produces": [
                     "application/json"
@@ -428,11 +440,17 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/views.SWGMessage"
                         }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGMessage"
+                        }
                     }
                 }
             }
         },
-        "/api/notes": {
+        "/api/note": {
             "get": {
                 "description": "Returns note by ID",
                 "consumes": [
@@ -463,6 +481,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/views.SWGError"
                         }
@@ -526,7 +550,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/notes/all": {
+        "/api/note/all": {
             "get": {
                 "description": "Returns all notes by user ID",
                 "consumes": [
@@ -559,7 +583,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.NoteParts"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/brzrpc.NotePart"
+                            }
                         }
                     },
                     "400": {
@@ -577,7 +604,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/notes/by-tag": {
+        "/api/note/by-tag": {
             "get": {
                 "description": "Returns all notes that contain given tag",
                 "consumes": [
@@ -617,7 +644,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.NoteParts"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/brzrpc.NotePart"
+                            }
                         }
                     },
                     "400": {
@@ -635,9 +665,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/notes/change-title": {
-            "patch": {
-                "description": "Changes title of existing note",
+        "/api/note/find": {
+            "get": {
+                "description": "if not fiend title get all block as first and fiend sames",
                 "consumes": [
                     "application/json"
                 ],
@@ -647,21 +677,39 @@ const docTemplate = `{
                 "tags": [
                     "note"
                 ],
-                "summary": "Change note title",
+                "summary": "search note by title or blocks inside",
                 "parameters": [
                     {
-                        "description": "Note ID and new title",
-                        "name": "ChangeTitleNoteRequest",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/brzrpc.ChangeTitleNoteRequest"
-                        }
+                        "type": "integer",
+                        "description": "start \u003e 0",
+                        "name": "start",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "end",
+                        "name": "end",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "prompt",
+                        "name": "prompt",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/brzrpc.NotePart"
+                            }
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -669,8 +717,17 @@ const docTemplate = `{
                             "$ref": "#/definitions/views.SWGError"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "408": {
+                        "description": "Request Timeout",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/brzrpc.NotePart"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/views.SWGError"
                         }
@@ -684,7 +741,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/notes/tag": {
+        "/api/note/tag": {
             "post": {
                 "description": "Attaches tag to note",
                 "consumes": [
@@ -718,8 +775,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/views.SWGError"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/views.SWGError"
                         }
@@ -765,6 +822,61 @@ const docTemplate = `{
                             "$ref": "#/definitions/views.SWGError"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/note/title": {
+            "patch": {
+                "description": "Changes title of existing note",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "note"
+                ],
+                "summary": "Change note title",
+                "parameters": [
+                    {
+                        "description": "Note ID and new title",
+                        "name": "ChangeTitleNoteRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/brzrpc.ChangeTitleNoteRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
@@ -780,7 +892,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/tags": {
+        "/api/tag": {
             "post": {
                 "description": "Creates new tag",
                 "consumes": [
@@ -856,6 +968,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/views.SWGError"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
@@ -865,7 +983,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/tags/by-user": {
+        "/api/tag/by-user": {
             "get": {
                 "description": "Returns all tags for user",
                 "consumes": [
@@ -903,8 +1021,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/tags/color": {
-            "put": {
+        "/api/tag/color": {
+            "patch": {
                 "description": "Updates color of tag",
                 "consumes": [
                     "application/json"
@@ -937,6 +1055,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/views.SWGError"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
@@ -952,8 +1076,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/tags/emoji": {
-            "put": {
+        "/api/tag/emoji": {
+            "patch": {
                 "description": "Updates emoji of tag",
                 "consumes": [
                     "application/json"
@@ -986,6 +1110,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/views.SWGError"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
@@ -1001,8 +1131,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/tags/title": {
-            "put": {
+        "/api/tag/title": {
+            "patch": {
                 "description": "Updates title of tag",
                 "consumes": [
                     "application/json"
@@ -1031,6 +1161,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/views.SWGError"
                         }
@@ -1067,7 +1203,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.NoteParts"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/brzrpc.NotePart"
+                            }
                         }
                     },
                     "400": {
@@ -1147,8 +1286,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/views.SWGError"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/views.SWGError"
                         }
@@ -1194,8 +1333,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/views.SWGError"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/views.SWGError"
                         }
@@ -1237,6 +1376,12 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/views.SWGError"
                         }
@@ -1336,6 +1481,12 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/views.SWGError"
+                        }
+                    },
+                    "410": {
+                        "description": "Gone",
                         "schema": {
                             "$ref": "#/definitions/views.SWGError"
                         }
@@ -1612,17 +1763,6 @@ const docTemplate = `{
                 }
             }
         },
-        "brzrpc.NoteParts": {
-            "type": "object",
-            "properties": {
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/brzrpc.NotePart"
-                    }
-                }
-            }
-        },
         "brzrpc.NoteTagId": {
             "type": "object",
             "properties": {
@@ -1741,10 +1881,19 @@ const docTemplate = `{
         "views.ChangePasswordRequest": {
             "type": "object",
             "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "login": {
+                    "type": "string"
+                },
                 "new_password": {
                     "type": "string"
                 },
                 "new_password_2": {
+                    "type": "string"
+                },
+                "old_password": {
                     "type": "string"
                 }
             }

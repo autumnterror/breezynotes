@@ -21,6 +21,7 @@ import (
 // @Success 200 {object} brzrpc.User
 // @Failure 400 {object} views.SWGError
 // @Failure 401 {object} views.SWGError
+// @Failure 410 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
 // @Router /api/user/data [get]
 func (e *Echo) GetUserData(c echo.Context) error {
@@ -58,6 +59,7 @@ func (e *Echo) GetUserData(c echo.Context) error {
 		}
 	}
 	u.Password = ""
+	log.Success(op, "")
 	return c.JSON(http.StatusOK, u)
 }
 
@@ -70,16 +72,16 @@ func (e *Echo) GetUserData(c echo.Context) error {
 // @Failure 400 {object} views.SWGError
 // @Failure 401 {object} views.SWGError
 // @Failure 404 {object} views.SWGError
+// @Failure 500 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
 // @Router /api/user [delete]
 func (e *Echo) DeleteUser(c echo.Context) error {
 	const op = "gateway.net.DeleteUser"
 	log.Info(op, "")
 
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok || idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	auth := e.authAPI.API
@@ -104,7 +106,7 @@ func (e *Echo) DeleteUser(c echo.Context) error {
 			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "delete failed"})
 		}
 	}
-
+	log.Success(op, "")
 	return c.NoContent(http.StatusOK)
 }
 
@@ -126,14 +128,14 @@ func (e *Echo) UpdateAbout(c echo.Context) error {
 	const op = "gateway.net.UpdateAbout"
 	log.Info(op, "")
 
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok || idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	var req views.UpdateAboutRequest
 	if err := c.Bind(&req); err != nil {
+		log.Error(op, "UpdateAbout bind", err)
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "invalid request body"})
 	}
 
@@ -163,7 +165,7 @@ func (e *Echo) UpdateAbout(c echo.Context) error {
 			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "update about failed"})
 		}
 	}
-
+	log.Success(op, "")
 	return c.NoContent(http.StatusOK)
 }
 
@@ -185,14 +187,14 @@ func (e *Echo) UpdateEmail(c echo.Context) error {
 	const op = "gateway.net.UpdateEmail"
 	log.Info(op, "")
 
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok || idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	var req brzrpc.UpdateEmailRequest
 	if err := c.Bind(&req); err != nil || req.NewEmail == "" {
+		log.Error(op, "UpdateEmail bind", err)
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "invalid request body"})
 	}
 
@@ -222,7 +224,7 @@ func (e *Echo) UpdateEmail(c echo.Context) error {
 			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "update email failed"})
 		}
 	}
-
+	log.Success(op, "")
 	return c.NoContent(http.StatusOK)
 }
 
@@ -244,14 +246,14 @@ func (e *Echo) UpdatePhoto(c echo.Context) error {
 	const op = "gateway.net.UpdatePhoto"
 	log.Info(op, "")
 
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok || idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	var req views.UpdatePhotoRequest
 	if err := c.Bind(&req); err != nil || req.NewPhoto == "" {
+		log.Error(op, "UpdatePhoto bind", err)
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "invalid request body"})
 	}
 
@@ -282,7 +284,7 @@ func (e *Echo) UpdatePhoto(c echo.Context) error {
 			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "update photo failed"})
 		}
 	}
-
+	log.Success(op, "")
 	return c.NoContent(http.StatusOK)
 }
 
@@ -304,14 +306,14 @@ func (e *Echo) ChangePassword(c echo.Context) error {
 	const op = "gateway.net.ChangePassword"
 	log.Info(op, "")
 
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok || idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	var req views.ChangePasswordRequest
-	if err := c.Bind(&req); err != nil || req.NewPassword == "" {
+	if err := c.Bind(&req); err != nil {
+		log.Error(op, "ChangePassword bind", err)
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "invalid request body"})
 	}
 
@@ -322,12 +324,41 @@ func (e *Echo) ChangePassword(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "password not in policy"})
 	}
 
-	auth := e.authAPI.API
+	api := e.authAPI.API
 
 	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
 	defer cancel()
 
-	_, err := auth.ChangePasswd(ctx, &brzrpc.ChangePasswordRequest{
+	id, err := api.Auth(ctx, &brzrpc.AuthRequest{
+		Email:    req.Email,
+		Login:    req.Login,
+		Password: req.OldPassword,
+	})
+	if err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "authentication error", err)
+			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "authentication error"})
+		}
+
+		switch st.Code() {
+		case codes.Unauthenticated:
+			log.Warn(op, "wrong login or password", err)
+			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "wrong login or password"})
+		case codes.InvalidArgument:
+			log.Warn(op, "bad argument", err)
+			return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad argument"})
+		default:
+			log.Error(op, "auth req", err)
+			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "authentication error"})
+		}
+	}
+
+	if id.GetUserId() != idUser {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
+	}
+
+	_, err = api.ChangePasswd(ctx, &brzrpc.ChangePasswordRequest{
 		Id:          idUser,
 		NewPassword: req.NewPassword,
 	})
@@ -348,6 +379,6 @@ func (e *Echo) ChangePassword(c echo.Context) error {
 			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "change password failed"})
 		}
 	}
-
+	log.Success(op, "")
 	return c.NoContent(http.StatusOK)
 }

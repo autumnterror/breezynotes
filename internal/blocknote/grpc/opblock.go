@@ -189,6 +189,16 @@ func (s *ServerAPI) OpBlock(ctx context.Context, req *brzrpc.OpBlockRequest) (*e
 
 			return
 		}
+
+		if b, err := s.blocksAPI.Get(ctx, req.GetId()); err == nil {
+			if err := s.noteAPI.UpdateUpdatedAt(ctx, b.GetNoteId()); err != nil {
+				res <- views.ResRPC{
+					Res: nil,
+					Err: status.Error(codes.Internal, err.Error()),
+				}
+			}
+		}
+
 		res <- views.ResRPC{
 			Res: nil,
 			Err: nil,

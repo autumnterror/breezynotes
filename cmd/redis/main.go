@@ -13,6 +13,7 @@ import (
 
 func main() {
 	const op = "cmd.redis"
+
 	cfg := config.MustSetup()
 
 	a := grpc.New(cfg, redis.New(cfg))

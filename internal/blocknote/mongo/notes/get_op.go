@@ -43,7 +43,8 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string) (*brzrpc.NotePar
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
-	cur, err := a.Notes().Find(ctx, bson.M{"author": id}, options.Find().SetSort(bson.M{"updatedAt": -1}))
+	cur, err := a.Notes().Find(ctx, bson.M{"author": id}, options.Find().SetSort(bson.M{"updated_at": -1}))
+
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
@@ -52,7 +53,7 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string) (*brzrpc.NotePar
 	nts := &brzrpc.NoteParts{
 		Items: []*brzrpc.NotePart{},
 	}
-	idx := 0
+
 	for cur.Next(ctx) {
 		var n views.NoteDb
 		if err = cur.Decode(&n); err != nil {
@@ -74,7 +75,7 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string) (*brzrpc.NotePar
 			FirstBlock: fb,
 			UpdatedAt:  n.UpdatedAt,
 		})
-		idx++
+
 	}
 
 	return nts, nil
@@ -87,7 +88,7 @@ func (a *API) GetNoteListByTag(ctx context.Context, id, idUser string) (*brzrpc.
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
-	cur, err := a.Notes().Find(ctx, bson.M{"tag._id": id, "author": idUser}, options.Find().SetSort(bson.M{"updatedAt": -1}))
+	cur, err := a.Notes().Find(ctx, bson.M{"tag._id": id, "author": idUser}, options.Find().SetSort(bson.M{"updated_at": -1}))
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
@@ -131,7 +132,7 @@ func (a *API) getAllByUser(ctx context.Context, id string) (*brzrpc.Notes, error
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
-	cur, err := a.Notes().Find(ctx, bson.M{"author": id}, options.Find().SetSort(bson.M{"updatedAt": -1}))
+	cur, err := a.Notes().Find(ctx, bson.M{"author": id}, options.Find().SetSort(bson.M{"updated_at": -1}))
 	if err != nil {
 		return nil, format.Error(op, err)
 	}

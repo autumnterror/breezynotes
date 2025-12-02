@@ -31,6 +31,7 @@ import (
 // @schemes http
 func main() {
 	const op = "cmd.gateway"
+
 	cfg := config.MustSetup()
 
 	g, _ := errgroup.WithContext(context.Background())

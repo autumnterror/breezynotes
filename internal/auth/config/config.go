@@ -1,11 +1,11 @@
 package config
 
 import (
-	"flag"
 	"fmt"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/spf13/viper"
 	"log"
+	"os"
 	"time"
 )
 
@@ -29,9 +29,13 @@ func MustSetup() *Config {
 // setup create config structure
 func setup() (*Config, error) {
 	const op = "config.setup"
-	configPath := flag.String("config", "./local-config/auth.yaml", "path to config file")
-	flag.Parse()
-	viper.SetConfigFile(*configPath)
+
+	configPath := os.Getenv("CONFIG_PATH")
+	if configPath == "" {
+		configPath = "./local-config/auth.yaml"
+	}
+
+	viper.SetConfigFile(configPath)
 
 	var cfg struct {
 		Db                   string

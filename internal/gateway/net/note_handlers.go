@@ -3,7 +3,6 @@ package net
 import (
 	"context"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -27,9 +26,10 @@ import (
 // @Param ChangeTitleNoteRequest body brzrpc.ChangeTitleNoteRequest true "Note ID and new title"
 // @Success 200
 // @Failure 400 {object} views.SWGError
+// @Failure 401 {object} views.SWGError
 // @Failure 404 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/notes/change-title [patch]
+// @Router /api/note/title [patch]
 func (e *Echo) ChangeTitleNote(c echo.Context) error {
 	const op = "gateway.net.ChangeTitleNote"
 	log.Info(op, "")
@@ -42,10 +42,9 @@ func (e *Echo) ChangeTitleNote(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
 	}
 
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok || idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
@@ -100,9 +99,10 @@ func (e *Echo) ChangeTitleNote(c echo.Context) error {
 // @Param id query string true "Note ID"
 // @Success 200 {object} views.SWGNoteWithBlocks
 // @Failure 400 {object} views.SWGError
+// @Failure 401 {object} views.SWGError
 // @Failure 404 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/notes [get]
+// @Router /api/note [get]
 func (e *Echo) GetNote(c echo.Context) error {
 	const op = "gateway.net.GetNote"
 	log.Info(op, "")
@@ -114,10 +114,9 @@ func (e *Echo) GetNote(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
 	}
 
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok || idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
@@ -209,46 +208,29 @@ func (e *Echo) GetNote(c echo.Context) error {
 // @Produce json
 // @Param start query int true  "start > 0"
 // @Param end query int true  "end"
-// @Success 200 {object} brzrpc.NoteParts
+// @Success 200 {object} []brzrpc.NotePart
 // @Failure 400 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/notes/all [get]
+// @Router /api/note/all [get]
 func (e *Echo) GetAllNotes(c echo.Context) error {
 	const op = "gateway.net.GetAllNotes"
 	log.Info(op, "")
 
 	api := e.bnAPI.API
 
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok && idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad idUser from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
-	s := c.QueryParam("start")
-	if s == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad start"})
-	}
-	en := c.QueryParam("end")
-	if en == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad end"})
-	}
-
-	start, err := strconv.Atoi(s)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "start must be int"})
-	}
-	end, err := strconv.Atoi(en)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "end must be int"})
-	}
-
-	if start > end {
-		return c.JSON(http.StatusOK, brzrpc.NoteParts{Items: []*brzrpc.NotePart{}})
-	}
-
-	if start < 0 {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "start < 0!"})
+	start, end, resPag := getPagination(c)
+	if resPag != nil {
+		if r, ok := resPag.(views.SWGError); ok {
+			return c.JSON(http.StatusBadRequest, r)
+		}
+		if r, ok := resPag.(*brzrpc.NoteParts); ok {
+			return c.JSON(http.StatusOK, r)
+		}
 	}
 
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
@@ -261,16 +243,14 @@ func (e *Echo) GetAllNotes(c echo.Context) error {
 		if nl != nil {
 			if nl.GetItems() != nil {
 				if len(nl.GetItems()) != 0 {
-					nlPad := make([]*brzrpc.NotePart, end-start)
-					for i, n := range nl.GetItems() {
-						if i < start {
-							continue
-						}
-						if i >= end {
-							break
-						}
-						nlPad = append(nlPad, n)
+					items := nl.GetItems()
+					if start >= len(items) {
+						return c.JSON(http.StatusOK, []*brzrpc.NotePart{})
 					}
+					if end > len(items) {
+						end = len(items)
+					}
+					nlPad := items[start:end]
 					log.Blue("read from cache")
 					return c.JSON(http.StatusOK, nlPad)
 				}
@@ -323,10 +303,10 @@ func (e *Echo) GetAllNotes(c echo.Context) error {
 // @Param id query string true  "Tag ID"
 // @Param start query int true  "start > 0"
 // @Param end query int true  "end"
-// @Success 200 {object} brzrpc.NoteParts
+// @Success 200 {object} []brzrpc.NotePart
 // @Failure 400 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/notes/by-tag [get]
+// @Router /api/note/by-tag [get]
 func (e *Echo) GetNotesByTag(c echo.Context) error {
 	const op = "gateway.net.GetNotesByTag"
 	log.Info(op, "")
@@ -337,36 +317,20 @@ func (e *Echo) GetNotesByTag(c echo.Context) error {
 	if id == "" {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id"})
 	}
-	s := c.QueryParam("start")
-	if s == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad start"})
-	}
-	en := c.QueryParam("end")
-	if en == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad end"})
+
+	start, end, resPag := getPagination(c)
+	if resPag != nil {
+		if r, ok := resPag.(views.SWGError); ok {
+			return c.JSON(http.StatusBadRequest, r)
+		}
+		if r, ok := resPag.(*brzrpc.NoteParts); ok {
+			return c.JSON(http.StatusOK, r)
+		}
 	}
 
-	start, err := strconv.Atoi(s)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "start must be int"})
-	}
-	end, err := strconv.Atoi(en)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "end must be int"})
-	}
-
-	if start > end {
-		return c.JSON(http.StatusOK, brzrpc.NoteParts{Items: []*brzrpc.NotePart{}})
-	}
-
-	if start < 0 {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "start < 0!"})
-	}
-
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok || idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
@@ -415,17 +379,16 @@ func (e *Echo) GetNotesByTag(c echo.Context) error {
 // @Failure 400 {object} views.SWGError
 // @Failure 400 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/notes [post]
+// @Router /api/note [post]
 func (e *Echo) CreateNote(c echo.Context) error {
 	const op = "gateway.net.CreateNote"
 	log.Info(op, "")
 
 	api := e.bnAPI.API
 
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok || idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	var r views.NoteReq
@@ -481,19 +444,18 @@ func (e *Echo) CreateNote(c echo.Context) error {
 // @Param AddTagToNoteRequest body brzrpc.NoteTagId true "Note ID and Tag ID"
 // @Success 200
 // @Failure 400 {object} views.SWGError
-// @Failure 404 {object} views.SWGError
+// @Failure 401 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/notes/tag [post]
+// @Router /api/note/tag [post]
 func (e *Echo) AddTagToNote(c echo.Context) error {
 	const op = "gateway.net.AddTagToNote"
 	log.Info(op, "")
 
 	api := e.bnAPI.API
 
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok || idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	var r brzrpc.NoteTagId
@@ -552,19 +514,18 @@ func (e *Echo) AddTagToNote(c echo.Context) error {
 // @Param AddTagToNoteRequest body brzrpc.NoteTagId true "Note ID and Tag ID"
 // @Success 200
 // @Failure 400 {object} views.SWGError
-// @Failure 404 {object} views.SWGError
+// @Failure 401 {object} views.SWGError
 // @Failure 502 {object} views.SWGError
-// @Router /api/notes/tag [delete]
+// @Router /api/note/tag [delete]
 func (e *Echo) RmTagFromNote(c echo.Context) error {
-	const op = "gateway.net.AddTagToNote"
+	const op = "gateway.net.RmTagFromNote"
 	log.Info(op, "")
 
 	api := e.bnAPI.API
 
-	idInt := c.Get(IdFromContext)
-	idUser, ok := idInt.(string)
-	if !ok || idUser == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id from access token"})
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
 	var r brzrpc.NoteTagId

@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"slices"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -132,9 +133,7 @@ func TestArray(t *testing.T) {
 
 }
 
-func TestName(t *testing.T) {
-	a := make(chan *int, 1)
-	b := 1
-	a <- &b
-
+func TestTestTest(t *testing.T) {
+	pr := "ЫыьЬ HhYy"
+	log.Blue("", strings.ToLower(pr))
 }

@@ -455,6 +455,12 @@ input:focus {
   color: #4b1f3f;
 }
 
+.note-fb {
+  font-size: 12px;
+  font-weight: 200;
+  color: #4b2441;
+}
+
 .note-tag-pill {
   display: inline-flex;
   align-items: center;
@@ -475,6 +481,14 @@ input:focus {
   margin-top: 2px;
   font-size: 11px;
   color: #b2608e;
+}
+
+.note-first-block {
+  font-size: 12px;
+  color: #4b1f3f;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  line-height: 1.35;
 }
 
 .note-menu-btn {
@@ -517,14 +531,111 @@ input:focus {
   border: 1px solid rgba(255, 182, 193, 0.9);
   padding: 16px 14px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
+  overflow: auto;
 }
 
 .notes-main-placeholder {
   text-align: center;
   font-size: 14px;
   color: #7a355e;
+}
+
+.note-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.note-detail-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.note-detail-meta {
+  font-size: 12px;
+  color: #7a355e;
+}
+
+.note-detail-heading {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4b1f3f;
+}
+
+.note-detail-blocks {
+  width: 100%;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.note-detail-create {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px dashed rgba(255, 182, 193, 0.9);
+  border-radius: 10px;
+  background: #fff9fd;
+}
+
+.note-detail-block-input {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 182, 193, 0.9);
+  padding: 8px 10px;
+  font-size: 13px;
+  resize: vertical;
+  min-height: 70px;
+}
+
+.note-block-card {
+  background: #fff6fb;
+  border: 1px solid rgba(255, 182, 193, 0.9);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.note-block-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4b1f3f;
+}
+
+.note-block-pre {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 13px;
+  color: #3a1632;
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.note-block-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.note-block-field {
+  width: 70px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 182, 193, 0.9);
+  font-size: 13px;
+}
+
+.note-block-order {
+  display: flex;
+  gap: 4px;
 }
 
 /* Tags view */
