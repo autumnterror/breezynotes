@@ -20,7 +20,7 @@ type Repo interface {
 }
 
 func (a *API) Get(ctx context.Context, id string) (*brzrpc.Tag, error) {
-	const op = "tags.Get"
+	const op = "tags.GetNote"
 
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()

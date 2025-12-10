@@ -208,7 +208,7 @@ func (e *Echo) NoteFromTrash(c echo.Context) error {
 }
 
 // GetNotesFromTrash godoc
-// @Summary Get notes from trash
+// @Summary GetNote notes from trash
 // @Description Returns notes from trash by user ID
 // @Tags trash
 // @Accept json

@@ -462,7 +462,7 @@ const docTemplate = `{
                 "tags": [
                     "note"
                 ],
-                "summary": "Get note",
+                "summary": "GetNote note",
                 "parameters": [
                     {
                         "type": "string",
@@ -562,7 +562,7 @@ const docTemplate = `{
                 "tags": [
                     "note"
                 ],
-                "summary": "Get all notes of user",
+                "summary": "GetNote all notes of user",
                 "parameters": [
                     {
                         "type": "integer",
@@ -616,7 +616,7 @@ const docTemplate = `{
                 "tags": [
                     "note"
                 ],
-                "summary": "Get notes by tag",
+                "summary": "GetNote notes by tag",
                 "parameters": [
                     {
                         "type": "string",
@@ -995,7 +995,7 @@ const docTemplate = `{
                 "tags": [
                     "tag"
                 ],
-                "summary": "Get tags by user",
+                "summary": "GetNote tags by user",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1198,7 +1198,7 @@ const docTemplate = `{
                 "tags": [
                     "trash"
                 ],
-                "summary": "Get notes from trash",
+                "summary": "GetNote notes from trash",
                 "responses": {
                     "200": {
                         "description": "OK",

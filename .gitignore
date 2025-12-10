@@ -12,3 +12,5 @@ go.work.sum
 config-test.go
 /html/
 /.idea
+.idea/workspace.xml
+/.idea

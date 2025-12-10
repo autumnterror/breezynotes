@@ -91,7 +91,7 @@ func (e *Echo) ChangeTitleNote(c echo.Context) error {
 }
 
 // GetNote godoc
-// @Summary Get note
+// @Summary GetNote note
 // @Description Returns note by ID
 // @Tags note
 // @Accept json
@@ -201,7 +201,7 @@ func (e *Echo) GetNote(c echo.Context) error {
 }
 
 // GetAllNotes godoc
-// @Summary Get all notes of user
+// @Summary GetNote all notes of user
 // @Description Returns all notes by user ID
 // @Tags note
 // @Accept json
@@ -295,7 +295,7 @@ func (e *Echo) GetAllNotes(c echo.Context) error {
 }
 
 // GetNotesByTag godoc
-// @Summary Get notes by tag
+// @Summary GetNote notes by tag
 // @Description Returns all notes that contain given tag
 // @Tags note
 // @Accept json

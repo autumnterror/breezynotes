@@ -349,7 +349,7 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 }
 
 // GetTagsByUser godoc
-// @Summary Get tags by user
+// @Summary GetNote tags by user
 // @Description Returns all tags for user
 // @Tags tag
 // @Accept json

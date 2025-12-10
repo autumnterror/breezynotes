@@ -25,7 +25,7 @@ type Repo interface {
 	FromTrash(ctx context.Context, id string) error
 	FindFromTrash(ctx context.Context, id string) (*brzrpc.Note, error)
 
-	Get(ctx context.Context, id string) (*brzrpc.Note, error)
+	GetNote(ctx context.Context, id string) (*brzrpc.Note, error)
 
 	GetNoteListByUser(ctx context.Context, id string) (*brzrpc.NoteParts, error)
 	GetNoteListByTag(ctx context.Context, id, idUser string) (*brzrpc.NoteParts, error)
@@ -50,7 +50,7 @@ var (
 )
 
 func (a *API) Healthz(ctx context.Context) error {
-	var result map[string]interface{}
+	var result map[string]any
 
 	err := a.Blocks().Database().RunCommand(ctx, map[string]interface{}{"ping": 1}).Decode(&result)
 	if err != nil {

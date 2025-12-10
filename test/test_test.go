@@ -1,13 +1,16 @@
 package test
 
 import (
+	"fmt"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"slices"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -136,4 +139,17 @@ func TestArray(t *testing.T) {
 func TestTestTest(t *testing.T) {
 	pr := "ЫыьЬ HhYy"
 	log.Blue("", strings.ToLower(pr))
+}
+
+func TestBCrypt(t *testing.T) {
+	password := []byte("some-password")
+	for cost := 8; cost <= 14; cost++ {
+		start := time.Now()
+		_, err := bcrypt.GenerateFromPassword(password, cost)
+		if err != nil {
+			panic(err)
+		}
+		elapsed := time.Since(start)
+		fmt.Printf("cost=%d -> %v\n", cost, elapsed)
+	}
 }

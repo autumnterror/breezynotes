@@ -56,7 +56,7 @@ func (a *API) ChangeBlockOrder(ctx context.Context, noteID string, oldOrder, new
 		return nil
 	}
 
-	n, err := a.Get(ctx, noteID)
+	n, err := a.GetNote(ctx, noteID)
 	if err != nil {
 		return fmt.Errorf("%s: get note failed: %w", op, err)
 	}

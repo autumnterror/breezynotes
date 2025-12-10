@@ -73,7 +73,7 @@ func (a *API) ToTrash(ctx context.Context, id string) error {
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
-	n, err := a.Get(ctx, id)
+	n, err := a.GetNote(ctx, id)
 	if err != nil {
 		return format.Error(op, err)
 	}

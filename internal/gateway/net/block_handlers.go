@@ -17,7 +17,7 @@ import (
 )
 
 // GetBlock godoc
-// @Summary Get block
+// @Summary GetNote block
 // @Description Returns block by ID
 // @Tags block
 // @Accept json

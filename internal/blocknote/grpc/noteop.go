@@ -54,14 +54,14 @@ func (s *ServerAPI) ChangeTitleNote(ctx context.Context, req *brzrpc.ChangeTitle
 }
 
 func (s *ServerAPI) GetNote(ctx context.Context, req *brzrpc.NoteId) (*brzrpc.Note, error) {
-	const op = "block.note.grpc.Get"
+	const op = "block.note.grpc.GetNote"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
 	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		n, err := s.noteAPI.Get(ctx, req.GetNoteId())
+		n, err := s.noteAPI.GetNote(ctx, req.GetNoteId())
 		if err != nil {
 			switch {
 			case errors.Is(err, mongo.ErrNotFound):

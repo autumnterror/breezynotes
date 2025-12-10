@@ -12,9 +12,9 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-// Get return note by id can return mongo.ErrNotFound
-func (a *API) Get(ctx context.Context, id string) (*brzrpc.Note, error) {
-	const op = "notes.Get"
+// GetNote return note by id can return mongo.ErrNotFound
+func (a *API) GetNote(ctx context.Context, id string) (*brzrpc.Note, error) {
+	const op = "notes.GetNote"
 
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
@@ -127,7 +127,7 @@ func (a *API) GetNoteListByTag(ctx context.Context, id, idUser string) (*brzrpc.
 
 // GetAllByUser return note by id author
 func (a *API) getAllByUser(ctx context.Context, id string) (*brzrpc.Notes, error) {
-	const op = "notes.Get"
+	const op = "notes.GetNote"
 
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()

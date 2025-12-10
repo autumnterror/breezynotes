@@ -25,7 +25,7 @@ func TestWithBlocks(t *testing.T) {
 		idNote := "test_with_blocks_note"
 		t.Cleanup(func() {
 			assert.NoError(t, a.Delete(context.TODO(), idNote))
-			_, err := a.Get(context.TODO(), idNote)
+			_, err := a.GetNote(context.TODO(), idNote)
 			assert.Error(t, err)
 
 			nts, err := a.getAllByUser(context.TODO(), idNote)
@@ -74,13 +74,13 @@ func TestWithBlocks(t *testing.T) {
 		assert.NoError(t, a.InsertBlock(context.TODO(), idNote, idBlock1, 0))
 		assert.NoError(t, a.InsertBlock(context.TODO(), idNote, idBlock2, 0))
 
-		if n, err := a.Get(context.TODO(), idNote); assert.NoError(t, err) {
+		if n, err := a.GetNote(context.TODO(), idNote); assert.NoError(t, err) {
 			log.Green("get after insert blocks ", n)
 			assert.Equal(t, 2, len(n.Blocks))
 		}
 
 		assert.NoError(t, a.DeleteBlock(context.TODO(), idNote, idBlock1))
-		if n, err := a.Get(context.TODO(), idNote); assert.NoError(t, err) {
+		if n, err := a.GetNote(context.TODO(), idNote); assert.NoError(t, err) {
 			log.Green("get after delete block ", n)
 			assert.Equal(t, 1, len(n.Blocks))
 		}
@@ -108,7 +108,7 @@ func TestCrudGood(t *testing.T) {
 		id := "testIDGood"
 		t.Cleanup(func() {
 			assert.NoError(t, a.Delete(context.TODO(), id))
-			_, err := a.Get(context.TODO(), id)
+			_, err := a.GetNote(context.TODO(), id)
 			assert.Error(t, err)
 
 			nts, err := a.getAllByUser(context.TODO(), id)
@@ -142,7 +142,7 @@ func TestCrudGood(t *testing.T) {
 			},
 		}))
 
-		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
+		if n, err := a.GetNote(context.TODO(), id); assert.NoError(t, err) {
 			log.Green("get after create ", n)
 		}
 
@@ -151,12 +151,12 @@ func TestCrudGood(t *testing.T) {
 		}
 
 		assert.NoError(t, a.UpdateTitle(context.TODO(), id, "new_title"))
-		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
+		if n, err := a.GetNote(context.TODO(), id); assert.NoError(t, err) {
 			log.Green("get after update title ", n)
 		}
 
 		assert.NoError(t, a.UpdateUpdatedAt(context.TODO(), id))
-		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
+		if n, err := a.GetNote(context.TODO(), id); assert.NoError(t, err) {
 			log.Green("get after update updated ", n)
 		}
 
@@ -168,13 +168,13 @@ func TestCrudGood(t *testing.T) {
 			Emoji:  "newEmoji",
 			UserId: "newUserId",
 		}))
-		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
+		if n, err := a.GetNote(context.TODO(), id); assert.NoError(t, err) {
 			log.Green("get after add tag ", n)
 			assert.Equal(t, "newIdTag", n.Tag.Id)
 		}
 
 		assert.NoError(t, a.RemoveTagFromNote(context.TODO(), id, idTag))
-		if n, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
+		if n, err := a.GetNote(context.TODO(), id); assert.NoError(t, err) {
 			log.Green("get after remove tag ", n)
 			assert.Nil(t, n.Tag)
 		}
@@ -192,7 +192,7 @@ func TestCrudNotExist(t *testing.T) {
 			assert.NoError(t, m.Disconnect())
 		})
 
-		if _, err := a.Get(context.TODO(), id); assert.ErrorIs(t, err, mongo.ErrNotFound) {
+		if _, err := a.GetNote(context.TODO(), id); assert.ErrorIs(t, err, mongo.ErrNotFound) {
 		}
 		if n, err := a.GetNoteListByUser(context.TODO(), id); assert.NoError(t, err) && assert.Equal(t, 0, len(n.GetItems())) {
 		}
@@ -241,7 +241,7 @@ func TestTrashCycle(t *testing.T) {
 
 		assert.NoError(t, a.ToTrash(context.TODO(), id))
 
-		_, err := a.Get(context.TODO(), id)
+		_, err := a.GetNote(context.TODO(), id)
 		assert.Error(t, err)
 
 		if nts, err := a.GetNotesFromTrash(context.TODO(), "testAuthor"); assert.NoError(t, err) {
@@ -250,7 +250,7 @@ func TestTrashCycle(t *testing.T) {
 
 		assert.NoError(t, a.FromTrash(context.TODO(), id))
 
-		_, err = a.Get(context.TODO(), id)
+		_, err = a.GetNote(context.TODO(), id)
 		assert.NoError(t, err)
 
 		assert.NoError(t, a.ToTrash(context.TODO(), id))
@@ -313,17 +313,17 @@ func TestBlockOrder(t *testing.T) {
 		}))
 		assert.NoError(t, a.ChangeBlockOrder(context.TODO(), id, 4, 3))
 
-		if note, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
+		if note, err := a.GetNote(context.TODO(), id); assert.NoError(t, err) {
 			log.Println(note.Blocks)
 			assert.Equal(t, wanted1, note.Blocks)
 		}
 		assert.NoError(t, a.ChangeBlockOrder(context.TODO(), id, 5, 1))
-		if note, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
+		if note, err := a.GetNote(context.TODO(), id); assert.NoError(t, err) {
 			log.Println(note.Blocks)
 			assert.Equal(t, wanted2, note.Blocks)
 		}
 		assert.NoError(t, a.ChangeBlockOrder(context.TODO(), id, 0, 6))
-		if note, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
+		if note, err := a.GetNote(context.TODO(), id); assert.NoError(t, err) {
 			log.Println(note.Blocks)
 			assert.Equal(t, wanted3, note.Blocks)
 		}
@@ -356,7 +356,7 @@ func TestBlockOrder2(t *testing.T) {
 		}))
 		assert.NoError(t, a.ChangeBlockOrder(context.TODO(), id, 1, 0))
 
-		if note, err := a.Get(context.TODO(), id); assert.NoError(t, err) {
+		if note, err := a.GetNote(context.TODO(), id); assert.NoError(t, err) {
 			log.Println(note.Blocks)
 			assert.Equal(t, wanted1, note.Blocks)
 		}

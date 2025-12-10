@@ -45,7 +45,7 @@ func (a *API) Delete(ctx context.Context, id string) error {
 }
 
 func (a *API) Get(ctx context.Context, id string) (*brzrpc.Block, error) {
-	const op = "blocks.Get"
+	const op = "blocks.GetNote"
 	ctx, done := context.WithTimeout(ctx, views.WaitTime)
 	defer done()
 
