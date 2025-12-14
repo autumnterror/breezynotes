@@ -1,14 +1,10 @@
 #!/bin/bash
+
+docker compose down
+
 docker pull zitrax78/breezynotes-gateway
 docker pull zitrax78/breezynotes-auth
 docker pull zitrax78/breezynotes-blocknote
 docker pull zitrax78/breezynotes-redis
 
-docker compose -f docker-compose.yml up -d
-
-sleep 10
-CONFIG_PATH=.\configs\migrator.yaml
-export CONFIG_PATH
-.\migrator.exe --type up
-unset CONFIG_PATH
-
+docker compose up -d

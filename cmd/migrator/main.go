@@ -5,24 +5,27 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"log"
+
 	"github.com/autumnterror/breezynotes/internal/auth/config"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"log"
 )
 
 func main() {
 	typeMigration := flag.String("type", "up", "type of migration action")
 	flag.Parse()
+	pathMigration := flag.String("path", "migrations", "path to migration files")
+	flag.Parse()
 
-	if err := executeMigrate(*typeMigration); err != nil {
+	if err := executeMigrate(*typeMigration, *pathMigration); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func executeMigrate(TYPE string) error {
+func executeMigrate(TYPE string, path string) error {
 	const op = "migrator.executeMigrate"
 
 	cfg := config.MustSetup()
@@ -42,7 +45,7 @@ func executeMigrate(TYPE string) error {
 		return format.Error(op, err)
 	}
 	m, err := migrate.NewWithDatabaseInstance(
-		"file://migrations",
+		fmt.Sprintf("file://%s", path),
 		"postgres", driver)
 	if err != nil {
 		return format.Error(op, err)

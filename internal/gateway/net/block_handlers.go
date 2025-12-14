@@ -66,7 +66,7 @@ func (e *Echo) GetBlock(c echo.Context) error {
 	}
 
 	if note, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: block.GetNoteId()}); err == nil {
-		if note.GetAuthor() != idUser || alg.IsIn(idUser, note.GetEditors()) || alg.IsIn(idUser, note.GetReaders()) {
+		if note.GetAuthor() != idUser || !alg.IsIn(idUser, note.GetEditors()) || !alg.IsIn(idUser, note.GetReaders()) {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
 	}
@@ -109,7 +109,7 @@ func (e *Echo) CreateBlock(c echo.Context) error {
 	defer done()
 
 	if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: r.GetNoteId()}); err == nil {
-		if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) {
+		if n.GetAuthor() != idUser || !alg.IsIn(idUser, n.GetEditors()) {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
 	} else {
@@ -185,7 +185,7 @@ func (e *Echo) OpBlock(c echo.Context) error {
 
 	if block, err := api.GetBlock(ctx, &brzrpc.BlockId{BlockId: r.GetId()}); err == nil {
 		if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: block.GetNoteId()}); err == nil {
-			if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) {
+			if n.GetAuthor() != idUser || !alg.IsIn(idUser, n.GetEditors()) {
 				return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 			}
 			noteId = n.GetId()
@@ -259,7 +259,7 @@ func (e *Echo) ChangeTypeBlock(c echo.Context) error {
 
 	if block, err := api.GetBlock(ctx, &brzrpc.BlockId{BlockId: r.GetId()}); err == nil {
 		if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: block.GetNoteId()}); err == nil {
-			if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) {
+			if n.GetAuthor() != idUser || !alg.IsIn(idUser, n.GetEditors()) {
 				return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 			}
 		} else {
@@ -331,7 +331,7 @@ func (e *Echo) ChangeBlockOrder(c echo.Context) error {
 	defer done()
 
 	if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: r.GetId()}); err == nil {
-		if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) {
+		if n.GetAuthor() != idUser || !alg.IsIn(idUser, n.GetEditors()) {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
 	} else {
@@ -403,7 +403,7 @@ func (e *Echo) DeleteBlock(c echo.Context) error {
 	defer done()
 
 	if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: noteId}); err == nil {
-		if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) {
+		if n.GetAuthor() != idUser || !alg.IsIn(idUser, n.GetEditors()) {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
 	} else {

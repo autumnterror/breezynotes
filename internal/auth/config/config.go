@@ -1,12 +1,15 @@
 package config
 
 import (
+	"errors"
 	"fmt"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
-	"github.com/spf13/viper"
 	"log"
 	"os"
 	"time"
+
+	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -30,6 +33,10 @@ func MustSetup() *Config {
 func setup() (*Config, error) {
 	const op = "config.setup"
 
+	if err := godotenv.Load(); err != nil {
+		return nil, format.Error(op, err)
+	}
+
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
 		configPath = "./local-config/auth.yaml"
@@ -38,12 +45,8 @@ func setup() (*Config, error) {
 	viper.SetConfigFile(configPath)
 
 	var cfg struct {
-		Db                   string
-		Pw                   string
-		User                 string
 		DataSource           string        `mapstructure:"data_source"`
 		PortPostgres         int           `mapstructure:"port_postgres"`
-		TokenKey             string        `mapstructure:"token_key"`
 		AccessTokenLifeTime  time.Duration `mapstructure:"access_token_life"`
 		RefreshTokenLifeTime time.Duration `mapstructure:"refresh_token_life"`
 		Port                 int
@@ -56,16 +59,23 @@ func setup() (*Config, error) {
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return nil, format.Error(op, err)
 	}
+	user := os.Getenv("POSTGRES_USER")
+	pw := os.Getenv("POSTGRES_PASSWORD")
+	db := os.Getenv("POSTGRES_DB")
+	token := os.Getenv("TOKEN_KEY")
+	if user == "" || pw == "" || db == "" || token == "" {
+		return nil, format.Error(op, errors.New("missing environment variables"))
+	}
 
 	if cfg.Mode == "DEV" {
 		log.Println(format.Struct(cfg), fmt.Sprintf("URI: postgres://%s:%s@%s:%d/%s?sslmode=disable",
-			cfg.User, cfg.Pw, cfg.DataSource, cfg.PortPostgres, cfg.Db))
+			user, pw, cfg.DataSource, cfg.PortPostgres, db))
 	}
 
 	return &Config{
 		Uri: fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-			cfg.User, cfg.Pw, cfg.DataSource, cfg.PortPostgres, cfg.Db),
-		TokenKey:             cfg.TokenKey,
+			user, pw, cfg.DataSource, cfg.PortPostgres, db),
+		TokenKey:             token,
 		AccessTokenLifeTime:  cfg.AccessTokenLifeTime,
 		RefreshTokenLifeTime: cfg.RefreshTokenLifeTime,
 		Port:                 cfg.Port,

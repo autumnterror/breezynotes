@@ -4,12 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strings"
+
 	"github.com/autumnterror/breezynotes/pkg/log"
 	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
-	"strings"
 )
 
 var (
@@ -213,67 +214,3 @@ func (d *Driver) GetInfo(ctx context.Context, id string) (*brzrpc.User, error) {
 
 	return &u, nil
 }
-
-// CheckUserExists checks if a user with given login or email exists.
-// Returns nil if user is found by either field, otherwise returns sql.ErrNoRows.
-//func (d *driver) CheckUserExists(login, email string) error {
-//	const op = "psql.users.CheckUserExists"
-//
-//	var (
-//		query string
-//		args  []any
-//	)
-//
-//	switch {
-//	case login != "" && email != "":
-//		query = `SELECT 1 FROM users WHERE login = $1 OR email = $2 LIMIT 1`
-//		args = []any{login, email}
-//	case login != "":
-//		query = `SELECT 1 FROM users WHERE login = $1 LIMIT 1`
-//		args = []any{login}
-//	case email != "":
-//		query = `SELECT 1 FROM users WHERE email = $1 LIMIT 1`
-//		args = []any{email}
-//	default:
-//		return format.Error(op, errors.New("no input provided"))
-//	}
-//
-//	row := d.driver.QueryRow(query, args...)
-//	var dummy int
-//	if err := row.Scan(&dummy); err != nil {
-//		return format.Error(op, err)
-//	}
-//
-//	return nil
-//}
-
-// Update user. May send sql.ErrNoRows
-//func (d *driver) Update(u *brzrpc.User, id string) error {
-//	const op = "psql.users.Update"
-//
-//	query := `
-//				UPDATE users
-//				SET login = $1, email = $2, about = $3, password = $4, photo = $5
-//				WHERE id = $6
-//			`
-//
-//	hashedPass, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
-//	if err != nil {
-//		return format.Error(op, err)
-//	}
-//
-//	res, err := d.driver.Exec(query, u.GetLogin(), u.GetEmail(), u.GetAbout(), hashedPass, u.GetPhoto(), id)
-//	if err != nil {
-//		return format.Error(op, err)
-//	}
-//
-//	ra, err := res.RowsAffected()
-//	if err != nil {
-//		return format.Error(op, err)
-//	}
-//
-//	if ra == 0 {
-//		return format.Error(op, sql.ErrNoRows)
-//	}
-//	return nil
-//}

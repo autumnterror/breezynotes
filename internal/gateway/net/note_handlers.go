@@ -131,7 +131,7 @@ func (e *Echo) GetNote(c echo.Context) error {
 		}
 	} else {
 		if note != nil {
-			if note.GetAuthor() != idUser || alg.IsIn(idUser, note.GetEditors()) || alg.IsIn(idUser, note.GetReaders()) {
+			if note.GetAuthor() != idUser || !alg.IsIn(idUser, note.GetEditors()) || !alg.IsIn(idUser, note.GetReaders()) {
 				return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 			}
 			log.Blue("read from cache")
@@ -156,7 +156,7 @@ func (e *Echo) GetNote(c echo.Context) error {
 			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get note error"})
 		}
 	}
-	if note.GetAuthor() != idUser || alg.IsIn(idUser, note.GetEditors()) || alg.IsIn(idUser, note.GetReaders()) {
+	if note.GetAuthor() != idUser || !alg.IsIn(idUser, note.GetEditors()) || !alg.IsIn(idUser, note.GetReaders()) {
 		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 	}
 
@@ -468,7 +468,7 @@ func (e *Echo) AddTagToNote(c echo.Context) error {
 	defer done()
 
 	if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: r.GetNoteId()}); err == nil {
-		if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) || alg.IsIn(idUser, n.GetReaders()) {
+		if n.GetAuthor() != idUser || !alg.IsIn(idUser, n.GetEditors()) || !alg.IsIn(idUser, n.GetReaders()) {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
 	} else {
@@ -538,7 +538,7 @@ func (e *Echo) RmTagFromNote(c echo.Context) error {
 	defer done()
 
 	if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: r.GetNoteId()}); err == nil {
-		if n.GetAuthor() != idUser || alg.IsIn(idUser, n.GetEditors()) || alg.IsIn(idUser, n.GetReaders()) {
+		if n.GetAuthor() != idUser || !alg.IsIn(idUser, n.GetEditors()) || !alg.IsIn(idUser, n.GetReaders()) {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
 	} else {

@@ -1,10 +1,13 @@
 package config
 
 import (
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
-	"github.com/spf13/viper"
+	"errors"
 	"log"
 	"os"
+
+	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -26,6 +29,10 @@ func MustSetup() *Config {
 // setup create config structure
 func setup() (*Config, error) {
 	const op = "config.setup"
+	if err := godotenv.Load(); err != nil {
+		return nil, format.Error(op, err)
+	}
+
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
 		configPath = "./local-config/redis.yaml"
@@ -34,11 +41,10 @@ func setup() (*Config, error) {
 	viper.SetConfigFile(configPath)
 
 	var cfg struct {
-		RedisAddr   string `mapstructure:"redis_addr"`
-		RedisPasswd string `mapstructure:"redis_passwd"`
-		RedisDb     int    `mapstructure:"redis_db"`
-		Port        int    `mapstructure:"port"`
-		Mode        string `mapstructure:"mode"`
+		RedisAddr string `mapstructure:"redis_addr"`
+		RedisDb   int    `mapstructure:"redis_db"`
+		Port      int    `mapstructure:"port"`
+		Mode      string `mapstructure:"mode"`
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -48,13 +54,18 @@ func setup() (*Config, error) {
 		return nil, format.Error(op, err)
 	}
 
+	pw := os.Getenv("REDISPASSWD")
+	if pw == "" {
+		return nil, format.Error(op, errors.New("missing environment variables"))
+	}
+
 	if cfg.Mode == "DEV" {
 		log.Println(format.Struct(cfg))
 	}
 
 	return &Config{
 		RedisAddr:   cfg.RedisAddr,
-		RedisPasswd: cfg.RedisPasswd,
+		RedisPasswd: pw,
 		RedisDb:     cfg.RedisDb,
 		Port:        cfg.Port,
 	}, nil
