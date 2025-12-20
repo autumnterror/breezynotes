@@ -61,25 +61,14 @@ mig-down-mac: build-migrator-mac
 
 # Protobuf generation
 gen:
-	protoc --proto_path pkg/protos/proto/ -I proto pkg/protos/proto/auth.proto \
-		--go_out pkg/protos/proto/gen \
+	protoc --proto_path api/proto/ -I proto \
+		auth.proto \
+		notes.proto \
+		redis.proto \
+		domain.proto \
+		--go_out=./api/proto/gen \
 		--go_opt=paths=source_relative \
-		--go-grpc_out=pkg/protos/proto/gen \
-		--go-grpc_opt=paths=source_relative
-	protoc --proto_path pkg/protos/proto/ -I proto pkg/protos/proto/notes.proto \
-		--go_out pkg/protos/proto/gen \
-		--go_opt=paths=source_relative \
-		--go-grpc_out=pkg/protos/proto/gen \
-		--go-grpc_opt=paths=source_relative
-	protoc --proto_path pkg/protos/proto/ -I proto pkg/protos/proto/redis.proto \
-		--go_out pkg/protos/proto/gen \
-		--go_opt=paths=source_relative \
-		--go-grpc_out=pkg/protos/proto/gen \
-		--go-grpc_opt=paths=source_relative
-	protoc --proto_path pkg/protos/proto/ -I proto pkg/protos/proto/domain.proto \
-		--go_out pkg/protos/proto/gen \
-		--go_opt=paths=source_relative \
-		--go-grpc_out=pkg/protos/proto/gen \
+		--go-grpc_out=./api/proto/gen \
 		--go-grpc_opt=paths=source_relative
 
 # Docker Compose operations
@@ -104,10 +93,11 @@ compose-up-db:
 
 compose-down-db:
 	docker compose -f ./build/breezynotes/docker-compose.db.yml down
-
+compose-down-db-v:
+	docker compose -f ./build/breezynotes/docker-compose.db.yml down -v
 # Documentation
 docx:
-	swag init --dir ./cmd/gateway,./internal/gateway/net/,./views,./pkg/protos/proto/gen --output ./docs
+	swag init --dir ./cmd/gateway,./internal/gateway/net/,./views,./api/proto/gen --output ./docs
 
 #test-operations
 test-method:
@@ -131,7 +121,7 @@ test-tags:
 test-jwt:
 	go test ./internal/auth/jwt -v
 test-psql:
-	go test ./internal/auth/psql -v
+	go test ./internal/auth/repository -v
 
 test-all:
 	go test \

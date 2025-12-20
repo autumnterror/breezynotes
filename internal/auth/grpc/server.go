@@ -1,23 +1,19 @@
 package grpc
 
 import (
-	"github.com/autumnterror/breezynotes/internal/auth/config"
-	"github.com/autumnterror/breezynotes/internal/auth/jwt"
-	"github.com/autumnterror/breezynotes/internal/auth/psql"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
+	"github.com/autumnterror/breezynotes/api/proto/gen"
+	"github.com/autumnterror/breezynotes/internal/auth/service"
 	"google.golang.org/grpc"
 	"time"
 )
 
 type ServerAPI struct {
 	brzrpc.UnimplementedAuthServiceServer
-	UserAPI psql.AuthRepo
-	JwtAPI  jwt.WithConfigRepo
-	cfg     *config.Config
+	API *service.AuthService
 }
 
-func Register(server *grpc.Server, API psql.AuthRepo, JwtAPI jwt.WithConfigRepo, cfg *config.Config) {
-	brzrpc.RegisterAuthServiceServer(server, &ServerAPI{UserAPI: API, JwtAPI: JwtAPI, cfg: cfg})
+func Register(server *grpc.Server, s *service.AuthService) {
+	brzrpc.RegisterAuthServiceServer(server, &ServerAPI{API: s})
 }
 
 const (

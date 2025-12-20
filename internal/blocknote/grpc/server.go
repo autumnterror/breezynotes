@@ -1,10 +1,10 @@
 package grpc
 
 import (
+	"github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo/blocks"
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo/notes"
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo/tags"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"google.golang.org/grpc"
 	"time"
 )

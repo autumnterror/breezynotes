@@ -2,8 +2,8 @@ package grpc
 
 import (
 	"context"
+	brzrpc2 "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/log"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/autumnterror/breezynotes/views"
 	"google.golang.org/grpc/codes"
@@ -11,7 +11,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc.UserId) (*brzrpc.Tags, error) {
+func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc2.UserId) (*brzrpc2.Tags, error) {
 	const op = "redis.grpc.GetTagsByUser"
 	log.Info(op, "")
 
@@ -45,10 +45,10 @@ func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc.UserId) (*brz
 		return nil, format.Error(op, err)
 	}
 
-	return &brzrpc.Tags{Items: res.([]*brzrpc.Tag)}, nil
+	return &brzrpc2.Tags{Items: res.([]*brzrpc2.Tag)}, nil
 }
 
-func (s *ServerAPI) SetTagsByUser(ctx context.Context, req *brzrpc.TagsByUser) (*emptypb.Empty, error) {
+func (s *ServerAPI) SetTagsByUser(ctx context.Context, req *brzrpc2.TagsByUser) (*emptypb.Empty, error) {
 	const op = "redis.grpc.SetTagsByUser"
 	log.Info(op, "")
 
@@ -86,7 +86,7 @@ func (s *ServerAPI) SetTagsByUser(ctx context.Context, req *brzrpc.TagsByUser) (
 	return nil, nil
 }
 
-func (s *ServerAPI) RmTagsByUser(ctx context.Context, req *brzrpc.UserId) (*emptypb.Empty, error) {
+func (s *ServerAPI) RmTagsByUser(ctx context.Context, req *brzrpc2.UserId) (*emptypb.Empty, error) {
 	const op = "redis.grpc.RmTagsByUser"
 	log.Info(op, "")
 

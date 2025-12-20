@@ -43,8 +43,6 @@ message NoteTagId {
   string tagId = 2;
 }
 
-
-
 message User {
   string id = 1;
   string login = 2;

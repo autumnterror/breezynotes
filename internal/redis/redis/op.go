@@ -2,7 +2,7 @@ package redis
 
 import (
 	"context"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
+	"github.com/autumnterror/breezynotes/api/proto/gen"
 )
 
 func (s *Client) GetSessionNoteList(ctx context.Context, id string) ([]*brzrpc.NotePart, error) {

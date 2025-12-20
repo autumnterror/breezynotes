@@ -2,6 +2,7 @@ package net
 
 import (
 	"context"
+	brzrpc2 "github.com/autumnterror/breezynotes/api/proto/gen"
 	"net/http"
 	"time"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/autumnterror/breezynotes/pkg/log"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/views"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -48,7 +48,7 @@ func (e *Echo) GetBlock(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	block, err := api.GetBlock(ctx, &brzrpc.BlockId{BlockId: id})
+	block, err := api.GetBlock(ctx, &brzrpc2.BlockId{BlockId: id})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -65,7 +65,7 @@ func (e *Echo) GetBlock(c echo.Context) error {
 		}
 	}
 
-	if note, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: block.GetNoteId()}); err == nil {
+	if note, err := api.GetNote(ctx, &brzrpc2.NoteId{NoteId: block.GetNoteId()}); err == nil {
 		if note.GetAuthor() != idUser || !alg.IsIn(idUser, note.GetEditors()) || !alg.IsIn(idUser, note.GetReaders()) {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
@@ -94,7 +94,7 @@ func (e *Echo) CreateBlock(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	var r brzrpc.CreateBlockRequest
+	var r brzrpc2.CreateBlockRequest
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "create block bind", err)
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
@@ -108,7 +108,7 @@ func (e *Echo) CreateBlock(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: r.GetNoteId()}); err == nil {
+	if n, err := api.GetNote(ctx, &brzrpc2.NoteId{NoteId: r.GetNoteId()}); err == nil {
 		if n.GetAuthor() != idUser || !alg.IsIn(idUser, n.GetEditors()) {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
@@ -138,10 +138,10 @@ func (e *Echo) CreateBlock(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.GetNoteId()}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc2.UserNoteId{UserId: idUser, NoteId: r.GetNoteId()}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 	log.Success(op, "")
@@ -167,7 +167,7 @@ func (e *Echo) OpBlock(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	var r brzrpc.OpBlockRequest
+	var r brzrpc2.OpBlockRequest
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "op block bind", err)
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
@@ -183,8 +183,8 @@ func (e *Echo) OpBlock(c echo.Context) error {
 
 	noteId := ""
 
-	if block, err := api.GetBlock(ctx, &brzrpc.BlockId{BlockId: r.GetId()}); err == nil {
-		if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: block.GetNoteId()}); err == nil {
+	if block, err := api.GetBlock(ctx, &brzrpc2.BlockId{BlockId: r.GetId()}); err == nil {
+		if n, err := api.GetNote(ctx, &brzrpc2.NoteId{NoteId: block.GetNoteId()}); err == nil {
 			if n.GetAuthor() != idUser || !alg.IsIn(idUser, n.GetEditors()) {
 				return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 			}
@@ -213,10 +213,10 @@ func (e *Echo) OpBlock(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: noteId}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc2.UserNoteId{UserId: idUser, NoteId: noteId}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
@@ -243,7 +243,7 @@ func (e *Echo) ChangeTypeBlock(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	var r brzrpc.ChangeTypeBlockRequest
+	var r brzrpc2.ChangeTypeBlockRequest
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "change type block bind", err)
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
@@ -257,8 +257,8 @@ func (e *Echo) ChangeTypeBlock(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if block, err := api.GetBlock(ctx, &brzrpc.BlockId{BlockId: r.GetId()}); err == nil {
-		if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: block.GetNoteId()}); err == nil {
+	if block, err := api.GetBlock(ctx, &brzrpc2.BlockId{BlockId: r.GetId()}); err == nil {
+		if n, err := api.GetNote(ctx, &brzrpc2.NoteId{NoteId: block.GetNoteId()}); err == nil {
 			if n.GetAuthor() != idUser || !alg.IsIn(idUser, n.GetEditors()) {
 				return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 			}
@@ -286,10 +286,10 @@ func (e *Echo) ChangeTypeBlock(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.GetId()}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc2.UserNoteId{UserId: idUser, NoteId: r.GetId()}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
@@ -316,7 +316,7 @@ func (e *Echo) ChangeBlockOrder(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	var r brzrpc.ChangeBlockOrderRequest
+	var r brzrpc2.ChangeBlockOrderRequest
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "change block order bind", err)
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
@@ -330,7 +330,7 @@ func (e *Echo) ChangeBlockOrder(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: r.GetId()}); err == nil {
+	if n, err := api.GetNote(ctx, &brzrpc2.NoteId{NoteId: r.GetId()}); err == nil {
 		if n.GetAuthor() != idUser || !alg.IsIn(idUser, n.GetEditors()) {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
@@ -354,10 +354,10 @@ func (e *Echo) ChangeBlockOrder(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.GetId()}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc2.UserNoteId{UserId: idUser, NoteId: r.GetId()}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 	log.Success(op, "")
@@ -402,7 +402,7 @@ func (e *Echo) DeleteBlock(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: noteId}); err == nil {
+	if n, err := api.GetNote(ctx, &brzrpc2.NoteId{NoteId: noteId}); err == nil {
 		if n.GetAuthor() != idUser || !alg.IsIn(idUser, n.GetEditors()) {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
@@ -411,7 +411,7 @@ func (e *Echo) DeleteBlock(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad note blockId"})
 	}
 
-	_, err := api.DeleteBlock(ctx, &brzrpc.NoteBlockId{
+	_, err := api.DeleteBlock(ctx, &brzrpc2.NoteBlockId{
 		NoteId:  noteId,
 		BlockId: blockId,
 	})
@@ -432,10 +432,10 @@ func (e *Echo) DeleteBlock(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: noteId}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc2.UserNoteId{UserId: idUser, NoteId: noteId}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 	log.Success(op, "")

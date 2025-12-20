@@ -3,8 +3,10 @@ package main
 import (
 	"github.com/autumnterror/breezynotes/internal/auth/config"
 	"github.com/autumnterror/breezynotes/internal/auth/grpc"
+	"github.com/autumnterror/breezynotes/internal/auth/infra/psql"
+	"github.com/autumnterror/breezynotes/internal/auth/infra/psql/psqltx"
 	"github.com/autumnterror/breezynotes/internal/auth/jwt"
-	"github.com/autumnterror/breezynotes/internal/auth/psql"
+	"github.com/autumnterror/breezynotes/internal/auth/service"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	"os"
 	"os/signal"
@@ -20,7 +22,14 @@ func main() {
 
 	db := psql.MustConnect(cfg)
 
-	a := grpc.New(cfg, psql.NewDriver(db.Driver), j)
+	s := service.NewAuthService(
+		psqltx.NewTxRunner(db.Driver),
+		psqltx.NewRepoProvider(db.Driver),
+		j,
+		cfg,
+	)
+
+	a := grpc.New(cfg, s)
 	go a.MustRun()
 
 	sign := wait()

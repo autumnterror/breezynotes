@@ -2,17 +2,10 @@ package grpc
 
 import (
 	"context"
-	"errors"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
-	"time"
-
-	"github.com/autumnterror/breezynotes/internal/auth/jwt"
+	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
+	"github.com/autumnterror/breezynotes/internal/auth/domain"
 	"github.com/autumnterror/breezynotes/pkg/log"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
-	"github.com/autumnterror/breezynotes/views"
-	"golang.org/x/sync/errgroup"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -23,75 +16,50 @@ func (s *ServerAPI) GenerateAccessToken(ctx context.Context, r *brzrpc.UserId) (
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		at, err := s.JwtAPI.GenerateToken(r.GetUserId(), jwt.TokenTypeAccess)
-		if err != nil {
-			log.Error(op, "", err)
-			res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, "check logs")}
-			return
-		}
-
-		res <- views.ResRPC{Res: at, Err: nil}
+	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return s.API.GenerateAccessToken(ctx, r.GetUserId())
 	})
-
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
 
-	return &brzrpc.Token{Value: res.(string), Exp: time.Now().UTC().Add(s.cfg.AccessTokenLifeTime).Unix()}, nil
+	return domain.TokenToRPC(res.(*domain.Token)), nil
 }
+
 func (s *ServerAPI) GenerateRefreshToken(ctx context.Context, r *brzrpc.UserId) (*brzrpc.Token, error) {
 	const op = "auth.grpc.GenerateRefreshToken"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
-	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		rt, err := s.JwtAPI.GenerateToken(r.GetUserId(), jwt.TokenTypeRefresh)
-		if err != nil {
-			log.Error(op, "", err)
-			res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, "check logs")}
-			return
-		}
 
-		res <- views.ResRPC{Res: rt, Err: nil}
+	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return s.API.GenerateRefreshToken(ctx, r.GetUserId())
 	})
-
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
 
-	return &brzrpc.Token{Value: res.(string), Exp: time.Now().UTC().Add(s.cfg.RefreshTokenLifeTime).Unix()}, nil
+	return domain.TokenToRPC(res.(*domain.Token)), nil
 }
+
 func (s *ServerAPI) GenerateTokens(ctx context.Context, r *brzrpc.UserId) (*brzrpc.Tokens, error) {
 	const op = "auth.grpc.GenerateTokens"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
-	var ac, rt *brzrpc.Token
-	var err error
-	g, _ := errgroup.WithContext(ctx)
-	g.Go(func() error {
-		ac, err = s.GenerateAccessToken(ctx, r)
-		return err
+
+	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return s.API.GenerateTokens(ctx, r.GetUserId())
 	})
-	g.Go(func() error {
-		rt, err = s.GenerateRefreshToken(ctx, r)
-		return err
-	})
-	if err := g.Wait(); err != nil {
-		log.Error(op, "", err)
-		return nil, status.Error(codes.Internal, "check logs")
+	if err != nil {
+		return nil, format.Error(op, err)
 	}
 
-	return &brzrpc.Tokens{
-		AccessToken:  ac.Value,
-		RefreshToken: rt.Value,
-		ExpAccess:    time.Now().UTC().Add(s.cfg.AccessTokenLifeTime).Unix(),
-		ExpRefresh:   time.Now().UTC().Add(s.cfg.RefreshTokenLifeTime).Unix(),
-	}, nil
+	return domain.TokensToRPC(res.(*domain.Tokens)), nil
 }
+
 func (s *ServerAPI) Refresh(ctx context.Context, r *brzrpc.Token) (*brzrpc.Token, error) {
 	const op = "auth.grpc.Refresh"
 	log.Info(op, "")
@@ -99,32 +67,16 @@ func (s *ServerAPI) Refresh(ctx context.Context, r *brzrpc.Token) (*brzrpc.Token
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		at, err := s.JwtAPI.Refresh(r.GetValue())
-		if err != nil {
-			switch {
-			case errors.Is(err, jwt.ErrTokenExpired):
-				log.Warn(op, "", err)
-				res <- views.ResRPC{Res: nil, Err: status.Error(codes.Unauthenticated, "refresh token expired")}
-			case errors.Is(err, jwt.ErrWrongType):
-				log.Warn(op, "", err)
-				res <- views.ResRPC{Res: nil, Err: status.Error(codes.InvalidArgument, "refresh token needed")}
-			default:
-				log.Error(op, "", err)
-				res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, "check logs")}
-			}
-			return
-		}
-
-		res <- views.ResRPC{Res: at, Err: nil}
+	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return s.API.Refresh(ctx, r.GetValue())
 	})
-
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
 
-	return &brzrpc.Token{Value: res.(string), Exp: time.Now().UTC().Add(s.cfg.AccessTokenLifeTime).Unix()}, nil
+	return domain.TokenToRPC(res.(*domain.Token)), nil
 }
+
 func (s *ServerAPI) CheckToken(ctx context.Context, r *brzrpc.Token) (*emptypb.Empty, error) {
 	const op = "auth.grpc.CheckToken"
 	log.Info(op, "")
@@ -132,71 +84,25 @@ func (s *ServerAPI) CheckToken(ctx context.Context, r *brzrpc.Token) (*emptypb.E
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		_, err := s.JwtAPI.VerifyToken(r.GetValue())
-		if err != nil {
-			switch {
-			case errors.Is(err, jwt.ErrTokenExpired):
-				log.Warn(op, "", err)
-				res <- views.ResRPC{Res: nil, Err: status.Error(codes.Unauthenticated, "token expired")}
-			default:
-				log.Warn(op, "", err)
-				res <- views.ResRPC{Res: nil, Err: status.Error(codes.InvalidArgument, "token bad")}
-			}
-			return
-		}
-
-		res <- views.ResRPC{Res: nil, Err: nil}
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.API.CheckToken(ctx, r.GetValue())
 	})
-
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
-	return nil, nil
+	return &emptypb.Empty{}, nil
 }
 
 func (s *ServerAPI) GetIdFromToken(ctx context.Context, t *brzrpc.Token) (*brzrpc.Id, error) {
-	const op = "auth.grpc.GetUserDataFromToken"
+	const op = "auth.grpc.GetIdFromToken"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		token, err := s.JwtAPI.VerifyToken(t.GetValue())
-		if err != nil {
-			switch {
-			case errors.Is(err, jwt.ErrTokenExpired):
-				log.Warn(op, "", err)
-				res <- views.ResRPC{Res: nil, Err: status.Error(codes.Unauthenticated, "token expired")}
-			default:
-				log.Warn(op, "", err)
-				res <- views.ResRPC{Res: nil, Err: status.Error(codes.InvalidArgument, err.Error())}
-			}
-			return
-		}
-
-		tp, err := s.JwtAPI.GetTypeFromToken(token)
-		if err != nil {
-			log.Warn(op, "", err)
-			res <- views.ResRPC{Res: nil, Err: status.Error(codes.Unauthenticated, err.Error())}
-			return
-		}
-		if tp != jwt.TokenTypeAccess {
-			res <- views.ResRPC{Res: nil, Err: status.Error(codes.InvalidArgument, "access token needed")}
-			return
-		}
-
-		id, err := s.JwtAPI.GetIdFromToken(token)
-		if err != nil {
-			log.Warn(op, "", err)
-			res <- views.ResRPC{Res: nil, Err: status.Error(codes.Unauthenticated, err.Error())}
-			return
-		}
-
-		res <- views.ResRPC{Res: id, Err: nil}
+	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return s.API.GetIdFromToken(ctx, t.GetValue())
 	})
-
 	if err != nil {
 		return nil, format.Error(op, err)
 	}

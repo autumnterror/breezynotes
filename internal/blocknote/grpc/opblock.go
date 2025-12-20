@@ -3,11 +3,11 @@ package grpc
 import (
 	"context"
 	"errors"
+	brzrpc2 "github.com/autumnterror/breezynotes/api/proto/gen"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo/blocks"
 	"github.com/autumnterror/breezynotes/pkg/log"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/autumnterror/breezynotes/views"
 	"google.golang.org/grpc/codes"
@@ -17,7 +17,7 @@ import (
 
 // UNIFIED
 
-func (s *ServerAPI) DeleteBlock(ctx context.Context, req *brzrpc.NoteBlockId) (*emptypb.Empty, error) {
+func (s *ServerAPI) DeleteBlock(ctx context.Context, req *brzrpc2.NoteBlockId) (*emptypb.Empty, error) {
 	const op = "block.note.grpc.DeleteBlock"
 	log.Info(op, "")
 
@@ -70,7 +70,7 @@ func (s *ServerAPI) DeleteBlock(ctx context.Context, req *brzrpc.NoteBlockId) (*
 
 	return nil, nil
 }
-func (s *ServerAPI) GetBlock(ctx context.Context, req *brzrpc.BlockId) (*brzrpc.Block, error) {
+func (s *ServerAPI) GetBlock(ctx context.Context, req *brzrpc2.BlockId) (*brzrpc2.Block, error) {
 	const op = "block.note.grpc.GetBlock"
 	log.Info(op, "")
 
@@ -105,12 +105,12 @@ func (s *ServerAPI) GetBlock(ctx context.Context, req *brzrpc.BlockId) (*brzrpc.
 		return nil, format.Error(op, err)
 	}
 
-	return res.(*brzrpc.Block), nil
+	return res.(*brzrpc2.Block), nil
 }
 
 //TYPES
 
-func (s *ServerAPI) CreateBlock(ctx context.Context, req *brzrpc.CreateBlockRequest) (*brzrpc.Id, error) {
+func (s *ServerAPI) CreateBlock(ctx context.Context, req *brzrpc2.CreateBlockRequest) (*brzrpc2.Id, error) {
 	const op = "block.note.grpc.createBlock"
 	log.Info(op, "")
 
@@ -162,9 +162,9 @@ func (s *ServerAPI) CreateBlock(ctx context.Context, req *brzrpc.CreateBlockRequ
 		return nil, format.Error(op, err)
 	}
 
-	return &brzrpc.Id{Id: res.(string)}, nil
+	return &brzrpc2.Id{Id: res.(string)}, nil
 }
-func (s *ServerAPI) OpBlock(ctx context.Context, req *brzrpc.OpBlockRequest) (*emptypb.Empty, error) {
+func (s *ServerAPI) OpBlock(ctx context.Context, req *brzrpc2.OpBlockRequest) (*emptypb.Empty, error) {
 	const op = "block.note.grpc.OpBlock"
 	log.Info(op, "")
 
@@ -212,7 +212,7 @@ func (s *ServerAPI) OpBlock(ctx context.Context, req *brzrpc.OpBlockRequest) (*e
 	return nil, nil
 }
 
-func (s *ServerAPI) GetBlockAsFirst(ctx context.Context, req *brzrpc.BlockId) (*brzrpc.StringResponse, error) {
+func (s *ServerAPI) GetBlockAsFirst(ctx context.Context, req *brzrpc2.BlockId) (*brzrpc2.StringResponse, error) {
 	const op = "block.note.grpc.GetBlockAsFirst"
 	log.Info(op, "")
 
@@ -248,10 +248,10 @@ func (s *ServerAPI) GetBlockAsFirst(ctx context.Context, req *brzrpc.BlockId) (*
 		return nil, format.Error(op, err)
 	}
 
-	return &brzrpc.StringResponse{Value: res.(string)}, nil
+	return &brzrpc2.StringResponse{Value: res.(string)}, nil
 }
 
-func (s *ServerAPI) ChangeTypeBlock(ctx context.Context, req *brzrpc.ChangeTypeBlockRequest) (*emptypb.Empty, error) {
+func (s *ServerAPI) ChangeTypeBlock(ctx context.Context, req *brzrpc2.ChangeTypeBlockRequest) (*emptypb.Empty, error) {
 	const op = "block.note.grpc.ChangeTypeBlock"
 	log.Info(op, "")
 

@@ -49,8 +49,8 @@ func setup() (*Config, error) {
 		PortPostgres         int           `mapstructure:"port_postgres"`
 		AccessTokenLifeTime  time.Duration `mapstructure:"access_token_life"`
 		RefreshTokenLifeTime time.Duration `mapstructure:"refresh_token_life"`
-		Port                 int
-		Mode                 string
+		Port                 int           `mapstructure:"port"`
+		Mode                 string        `mapstructure:"mode"`
 	}
 
 	if err := viper.ReadInConfig(); err != nil {

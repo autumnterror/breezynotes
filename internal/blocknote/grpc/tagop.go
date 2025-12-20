@@ -3,9 +3,9 @@ package grpc
 import (
 	"context"
 	"errors"
+	brzrpc2 "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
 	"github.com/autumnterror/breezynotes/pkg/log"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/autumnterror/breezynotes/views"
 	"google.golang.org/grpc/codes"
@@ -13,7 +13,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *ServerAPI) CreateTag(ctx context.Context, t *brzrpc.Tag) (*emptypb.Empty, error) {
+func (s *ServerAPI) CreateTag(ctx context.Context, t *brzrpc2.Tag) (*emptypb.Empty, error) {
 	const op = "blocknote.grpc.CreateTag"
 	log.Info(op, "")
 
@@ -36,7 +36,7 @@ func (s *ServerAPI) CreateTag(ctx context.Context, t *brzrpc.Tag) (*emptypb.Empt
 
 	return nil, nil
 }
-func (s *ServerAPI) UpdateTagTitle(ctx context.Context, req *brzrpc.UpdateTagTitleRequest) (*emptypb.Empty, error) {
+func (s *ServerAPI) UpdateTagTitle(ctx context.Context, req *brzrpc2.UpdateTagTitleRequest) (*emptypb.Empty, error) {
 	const op = "blocknote.grpc.UpdateTagTitle"
 	log.Info(op, "")
 
@@ -64,7 +64,7 @@ func (s *ServerAPI) UpdateTagTitle(ctx context.Context, req *brzrpc.UpdateTagTit
 
 	return nil, nil
 }
-func (s *ServerAPI) UpdateTagColor(ctx context.Context, req *brzrpc.UpdateTagColorRequest) (*emptypb.Empty, error) {
+func (s *ServerAPI) UpdateTagColor(ctx context.Context, req *brzrpc2.UpdateTagColorRequest) (*emptypb.Empty, error) {
 	const op = "blocknote.grpc.UpdateTagColor"
 	log.Info(op, "")
 
@@ -92,7 +92,7 @@ func (s *ServerAPI) UpdateTagColor(ctx context.Context, req *brzrpc.UpdateTagCol
 
 	return nil, nil
 }
-func (s *ServerAPI) UpdateTagEmoji(ctx context.Context, req *brzrpc.UpdateTagEmojiRequest) (*emptypb.Empty, error) {
+func (s *ServerAPI) UpdateTagEmoji(ctx context.Context, req *brzrpc2.UpdateTagEmojiRequest) (*emptypb.Empty, error) {
 	const op = "blocknote.grpc.UpdateTagEmoji"
 	log.Info(op, "")
 
@@ -120,7 +120,7 @@ func (s *ServerAPI) UpdateTagEmoji(ctx context.Context, req *brzrpc.UpdateTagEmo
 
 	return nil, nil
 }
-func (s *ServerAPI) DeleteTag(ctx context.Context, req *brzrpc.TagId) (*emptypb.Empty, error) {
+func (s *ServerAPI) DeleteTag(ctx context.Context, req *brzrpc2.TagId) (*emptypb.Empty, error) {
 	const op = "blocknote.grpc.DeleteTag"
 	log.Info(op, "")
 
@@ -144,7 +144,7 @@ func (s *ServerAPI) DeleteTag(ctx context.Context, req *brzrpc.TagId) (*emptypb.
 	return nil, nil
 }
 
-func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc.UserId) (*brzrpc.Tags, error) {
+func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc2.UserId) (*brzrpc2.Tags, error) {
 	const op = "blocknote.grpc.GetTagsByUser"
 	log.Info(op, "")
 
@@ -166,10 +166,10 @@ func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc.UserId) (*brz
 		return nil, format.Error(op, err)
 	}
 
-	return res.(*brzrpc.Tags), nil
+	return res.(*brzrpc2.Tags), nil
 }
 
-func (s *ServerAPI) GetTag(ctx context.Context, req *brzrpc.TagId) (*brzrpc.Tag, error) {
+func (s *ServerAPI) GetTag(ctx context.Context, req *brzrpc2.TagId) (*brzrpc2.Tag, error) {
 	const op = "blocknote.grpc.GetTag"
 	log.Info(op, "")
 
@@ -191,5 +191,5 @@ func (s *ServerAPI) GetTag(ctx context.Context, req *brzrpc.TagId) (*brzrpc.Tag,
 		return nil, format.Error(op, err)
 	}
 
-	return res.(*brzrpc.Tag), nil
+	return res.(*brzrpc2.Tag), nil
 }

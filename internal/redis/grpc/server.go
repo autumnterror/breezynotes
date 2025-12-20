@@ -1,8 +1,8 @@
 package grpc
 
 import (
+	"github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/redis/redis"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"google.golang.org/grpc"
 )
 

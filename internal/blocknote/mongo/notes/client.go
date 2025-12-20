@@ -3,10 +3,10 @@ package notes
 import (
 	"context"
 	"errors"
+	"github.com/autumnterror/breezynotes/api/proto/gen"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo/blocks"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 )
 
 type API struct {

@@ -2,8 +2,8 @@ package net
 
 import (
 	"context"
+	brzrpc2 "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/log"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/validate"
 	"github.com/autumnterror/breezynotes/views"
 	"github.com/labstack/echo/v4"
@@ -39,7 +39,7 @@ func (e *Echo) GetUserData(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
 	defer cancel()
 
-	u, err := auth.GetUserDataFromToken(ctx, &brzrpc.Token{Value: at.Value})
+	u, err := auth.GetUserDataFromToken(ctx, &brzrpc2.Token{Value: at.Value})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -89,7 +89,7 @@ func (e *Echo) DeleteUser(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
 	defer cancel()
 
-	_, err := auth.DeleteUser(ctx, &brzrpc.UserId{UserId: idUser})
+	_, err := auth.DeleteUser(ctx, &brzrpc2.UserId{UserId: idUser})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -144,7 +144,7 @@ func (e *Echo) UpdateAbout(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
 	defer cancel()
 
-	_, err := auth.UpdateAbout(ctx, &brzrpc.UpdateAboutRequest{
+	_, err := auth.UpdateAbout(ctx, &brzrpc2.UpdateAboutRequest{
 		Id:       idUser,
 		NewAbout: req.NewAbout,
 	})
@@ -192,7 +192,7 @@ func (e *Echo) UpdateEmail(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
-	var req brzrpc.UpdateEmailRequest
+	var req brzrpc2.UpdateEmailRequest
 	if err := c.Bind(&req); err != nil || req.NewEmail == "" {
 		log.Error(op, "UpdateEmail bind", err)
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "invalid request body"})
@@ -203,7 +203,7 @@ func (e *Echo) UpdateEmail(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
 	defer cancel()
 
-	_, err := auth.UpdateEmail(ctx, &brzrpc.UpdateEmailRequest{
+	_, err := auth.UpdateEmail(ctx, &brzrpc2.UpdateEmailRequest{
 		Id:       idUser,
 		NewEmail: req.NewEmail,
 	})
@@ -262,7 +262,7 @@ func (e *Echo) UpdatePhoto(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
 	defer cancel()
 
-	_, err := auth.UpdatePhoto(ctx, &brzrpc.UpdatePhotoRequest{
+	_, err := auth.UpdatePhoto(ctx, &brzrpc2.UpdatePhotoRequest{
 		Id:       idUser,
 		NewPhoto: req.NewPhoto,
 	})
@@ -329,7 +329,7 @@ func (e *Echo) ChangePassword(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
 	defer cancel()
 
-	id, err := api.Auth(ctx, &brzrpc.AuthRequest{
+	id, err := api.Auth(ctx, &brzrpc2.AuthRequest{
 		Email:    req.Email,
 		Login:    req.Login,
 		Password: req.OldPassword,
@@ -358,7 +358,7 @@ func (e *Echo) ChangePassword(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 	}
 
-	_, err = api.ChangePasswd(ctx, &brzrpc.ChangePasswordRequest{
+	_, err = api.ChangePasswd(ctx, &brzrpc2.ChangePasswordRequest{
 		Id:          idUser,
 		NewPassword: req.NewPassword,
 	})

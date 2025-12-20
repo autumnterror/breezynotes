@@ -2,7 +2,7 @@ package net
 
 import (
 	"errors"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
+	"github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/views"
 	"github.com/labstack/echo/v4"
 	"strconv"

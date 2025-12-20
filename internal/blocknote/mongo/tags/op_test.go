@@ -2,10 +2,10 @@ package tags
 
 import (
 	"context"
+	"github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/blocknote/config"
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
 	"github.com/autumnterror/breezynotes/pkg/log"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

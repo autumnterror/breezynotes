@@ -3,8 +3,8 @@ package blocks
 import (
 	"context"
 	"errors"
+	"github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
-	"github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 )
 
 type API struct {
@@ -22,7 +22,7 @@ var (
 
 type Repo interface {
 	Delete(ctx context.Context, id string) error
-	Get(ctx context.Context, id string) (*brzrpc.Block, error)
+	Get(ctx context.Context, id string) (*brzrpc.brzrpc, error)
 
 	OpBlock(ctx context.Context, id, opName string, data map[string]any) error
 	GetAsFirst(ctx context.Context, id string) (string, error)

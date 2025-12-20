@@ -2,11 +2,11 @@ package views
 
 import (
 	"fmt"
+	"github.com/autumnterror/breezynotes/api/proto/gen"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"time"
 
 	"github.com/autumnterror/breezynotes/pkg/log"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 

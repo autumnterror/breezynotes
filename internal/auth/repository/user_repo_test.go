@@ -1,15 +1,16 @@
-package psql
+package repository
 
 import (
 	"context"
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/autumnterror/breezynotes/internal/auth/domain"
+	"github.com/autumnterror/breezynotes/internal/auth/infra/psql"
 	"testing"
 
 	"github.com/autumnterror/breezynotes/internal/auth/config"
 	"github.com/autumnterror/breezynotes/pkg/log"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/autumnterror/breezynotes/pkg/utils/uid"
 	"github.com/stretchr/testify/assert"
@@ -22,7 +23,7 @@ func TestUsersOperations(t *testing.T) {
 	defer cleanup()
 
 	userID := uid.New()
-	user := &brzrpc.User{
+	user := &domain.User{
 		Id:       userID,
 		Login:    "testlogin",
 		Email:    "testemail@example.com",
@@ -33,7 +34,7 @@ func TestUsersOperations(t *testing.T) {
 
 	print := func() {
 		t.Run("getAll", func(t *testing.T) {
-			users, err := repo.GetAll(context.TODO())
+			users, err := repo.getAll(context.TODO())
 			assert.NoError(t, err)
 			fmt.Println("🔍 Current Users in DB:")
 			for _, u := range users {
@@ -90,7 +91,7 @@ func TestUsersOperations(t *testing.T) {
 }
 
 func setupTestTx(t *testing.T) (*Driver, *sql.Tx, func()) {
-	pdb := MustConnect(config.Test())
+	pdb := psql.MustConnect(config.Test())
 
 	tx, err := pdb.Driver.Begin()
 	assert.NoError(t, err)
@@ -107,7 +108,7 @@ func TestCreateDuplicateUser(t *testing.T) {
 	defer cleanup()
 
 	usid := uid.New()
-	user := &brzrpc.User{
+	user := &domain.User{
 		Id:       usid,
 		Login:    "duplicate",
 		Email:    "dup@example.com",
@@ -119,7 +120,7 @@ func TestCreateDuplicateUser(t *testing.T) {
 	user.Id = uid.New()
 	err := repo.Create(context.TODO(), user)
 	assert.Error(t, err)
-	assert.True(t, errors.Is(err, ErrAlreadyExist))
+	assert.True(t, errors.Is(err, domain.ErrAlreadyExists))
 }
 
 func TestUpdateNonExistentUser(t *testing.T) {
@@ -129,7 +130,7 @@ func TestUpdateNonExistentUser(t *testing.T) {
 
 	err := repo.UpdateAbout(context.TODO(), uid.New(), "123")
 	assert.Error(t, err)
-	assert.True(t, errors.Is(err, sql.ErrNoRows))
+	assert.True(t, errors.Is(err, domain.ErrNotFound))
 }
 
 func TestDeleteNonExistentUser(t *testing.T) {
@@ -139,7 +140,7 @@ func TestDeleteNonExistentUser(t *testing.T) {
 
 	err := repo.Delete(context.TODO(), uid.New())
 	assert.Error(t, err)
-	assert.True(t, errors.Is(err, sql.ErrNoRows))
+	assert.True(t, errors.Is(err, domain.ErrNotFound))
 }
 
 func TestGetInfo_InvalidID(t *testing.T) {
@@ -149,7 +150,7 @@ func TestGetInfo_InvalidID(t *testing.T) {
 
 	_, err := repo.GetInfo(context.TODO(), uid.New())
 	assert.Error(t, err)
-	assert.True(t, errors.Is(err, sql.ErrNoRows))
+	assert.True(t, errors.Is(err, domain.ErrNotFound))
 }
 
 func TestAuthLogin(t *testing.T) {
@@ -158,7 +159,7 @@ func TestAuthLogin(t *testing.T) {
 	defer cleanup()
 
 	uid := uid.New()
-	user := &brzrpc.User{
+	user := &domain.User{
 		Id:       uid,
 		Login:    "login",
 		Email:    "login@example.com",
@@ -168,11 +169,11 @@ func TestAuthLogin(t *testing.T) {
 
 	assert.NoError(t, repo.Create(context.TODO(), user))
 
-	_, err := repo.Authentication(context.TODO(), &brzrpc.AuthRequest{
-		Email:    "",
-		Login:    user.GetLogin(),
-		Password: user.GetPassword(),
-	})
+	_, err := repo.Authentication(context.TODO(),
+		"",
+		user.Login,
+		user.Password,
+	)
 
 	assert.NoError(t, err)
 }
@@ -183,7 +184,7 @@ func TestAuthEmail(t *testing.T) {
 	defer cleanup()
 
 	uid := uid.New()
-	user := &brzrpc.User{
+	user := &domain.User{
 		Id:       uid,
 		Login:    "login",
 		Email:    "login@example.com",
@@ -193,11 +194,11 @@ func TestAuthEmail(t *testing.T) {
 
 	assert.NoError(t, repo.Create(context.TODO(), user))
 
-	_, err := repo.Authentication(context.TODO(), &brzrpc.AuthRequest{
-		Email:    user.GetEmail(),
-		Login:    "",
-		Password: user.GetPassword(),
-	})
+	_, err := repo.Authentication(context.TODO(),
+		user.Email,
+		"",
+		user.Password,
+	)
 	assert.NoError(t, err)
 }
 
@@ -207,7 +208,7 @@ func TestAuthWrongInput1(t *testing.T) {
 	defer cleanup()
 
 	uid := uid.New()
-	user := &brzrpc.User{
+	user := &domain.User{
 		Id:       uid,
 		Login:    "login",
 		Email:    "login@example.com",
@@ -217,12 +218,12 @@ func TestAuthWrongInput1(t *testing.T) {
 
 	assert.NoError(t, repo.Create(context.TODO(), user))
 
-	_, err := repo.Authentication(context.TODO(), &brzrpc.AuthRequest{
-		Email:    user.GetEmail(),
-		Login:    "",
-		Password: "",
-	})
-	assert.True(t, errors.Is(err, ErrWrongInput))
+	_, err := repo.Authentication(context.TODO(),
+		user.Email,
+		"",
+		"",
+	)
+	assert.True(t, errors.Is(err, domain.ErrWrongInput))
 }
 
 func TestAuthWrongInput2(t *testing.T) {
@@ -231,7 +232,7 @@ func TestAuthWrongInput2(t *testing.T) {
 	defer cleanup()
 
 	uid := uid.New()
-	user := &brzrpc.User{
+	user := &domain.User{
 		Id:       uid,
 		Login:    "login",
 		Email:    "login@example.com",
@@ -241,12 +242,12 @@ func TestAuthWrongInput2(t *testing.T) {
 
 	assert.NoError(t, repo.Create(context.TODO(), user))
 
-	_, err := repo.Authentication(context.TODO(), &brzrpc.AuthRequest{
-		Email:    "",
-		Login:    "",
-		Password: "123",
-	})
-	assert.True(t, errors.Is(err, ErrWrongInput))
+	_, err := repo.Authentication(context.TODO(),
+		"",
+		"",
+		"123",
+	)
+	assert.True(t, errors.Is(err, domain.ErrWrongInput))
 }
 
 func TestAuthPwIncorrect(t *testing.T) {
@@ -255,7 +256,7 @@ func TestAuthPwIncorrect(t *testing.T) {
 	defer cleanup()
 
 	uid := uid.New()
-	user := &brzrpc.User{
+	user := &domain.User{
 		Id:       uid,
 		Login:    "login",
 		Email:    "login@example.com",
@@ -265,10 +266,10 @@ func TestAuthPwIncorrect(t *testing.T) {
 
 	assert.NoError(t, repo.Create(context.TODO(), user))
 
-	_, err := repo.Authentication(context.TODO(), &brzrpc.AuthRequest{
-		Email:    "",
-		Login:    user.GetLogin(),
-		Password: "123",
-	})
-	assert.True(t, errors.Is(err, ErrPasswordIncorrect))
+	_, err := repo.Authentication(context.TODO(),
+		"",
+		user.Login,
+		"123",
+	)
+	assert.True(t, errors.Is(err, domain.ErrPasswordIncorrect))
 }

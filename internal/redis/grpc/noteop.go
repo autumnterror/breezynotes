@@ -3,9 +3,9 @@ package grpc
 import (
 	"context"
 	"errors"
+	brzrpc2 "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/redis/redis"
 	"github.com/autumnterror/breezynotes/pkg/log"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"github.com/autumnterror/breezynotes/views"
 	"google.golang.org/grpc/codes"
@@ -27,7 +27,7 @@ func (s *ServerAPI) ensureCreate(ctx context.Context, idUser string) bool {
 	return true
 }
 
-func (s *ServerAPI) GetNoteByUser(ctx context.Context, req *brzrpc.UserNoteId) (*brzrpc.NoteWithBlocks, error) {
+func (s *ServerAPI) GetNoteByUser(ctx context.Context, req *brzrpc2.UserNoteId) (*brzrpc2.NoteWithBlocks, error) {
 	const op = "redis.grpc.GetNoteByUser"
 	log.Info(op, "")
 	ctx, done := context.WithTimeout(ctx, waitTime)
@@ -70,9 +70,9 @@ func (s *ServerAPI) GetNoteByUser(ctx context.Context, req *brzrpc.UserNoteId) (
 		return nil, format.Error(op, err)
 	}
 
-	return res.(*brzrpc.NoteWithBlocks), nil
+	return res.(*brzrpc2.NoteWithBlocks), nil
 }
-func (s *ServerAPI) GetNoteListByUser(ctx context.Context, req *brzrpc.UserId) (*brzrpc.NoteParts, error) {
+func (s *ServerAPI) GetNoteListByUser(ctx context.Context, req *brzrpc2.UserId) (*brzrpc2.NoteParts, error) {
 	const op = "redis.grpc.GetNoteListByUser"
 	log.Info(op, "")
 
@@ -106,9 +106,9 @@ func (s *ServerAPI) GetNoteListByUser(ctx context.Context, req *brzrpc.UserId) (
 		return nil, format.Error(op, err)
 	}
 
-	return &brzrpc.NoteParts{Items: res.([]*brzrpc.NotePart)}, nil
+	return &brzrpc2.NoteParts{Items: res.([]*brzrpc2.NotePart)}, nil
 }
-func (s *ServerAPI) GetNotesFromTrashByUser(ctx context.Context, req *brzrpc.UserId) (*brzrpc.NoteParts, error) {
+func (s *ServerAPI) GetNotesFromTrashByUser(ctx context.Context, req *brzrpc2.UserId) (*brzrpc2.NoteParts, error) {
 	const op = "redis.grpc.GetNotesFromTrashByUser"
 	log.Info(op, "")
 
@@ -142,10 +142,10 @@ func (s *ServerAPI) GetNotesFromTrashByUser(ctx context.Context, req *brzrpc.Use
 		return nil, format.Error(op, err)
 	}
 
-	return &brzrpc.NoteParts{Items: res.([]*brzrpc.NotePart)}, nil
+	return &brzrpc2.NoteParts{Items: res.([]*brzrpc2.NotePart)}, nil
 }
 
-func (s *ServerAPI) SetNoteByUser(ctx context.Context, req *brzrpc.NoteByUser) (*emptypb.Empty, error) {
+func (s *ServerAPI) SetNoteByUser(ctx context.Context, req *brzrpc2.NoteByUser) (*emptypb.Empty, error) {
 	const op = "redis.grpc.SetNotesByUser"
 	log.Info(op, "")
 	ctx, done := context.WithTimeout(ctx, waitTime)
@@ -195,7 +195,7 @@ func (s *ServerAPI) SetNoteByUser(ctx context.Context, req *brzrpc.NoteByUser) (
 
 	return nil, nil
 }
-func (s *ServerAPI) SetNotesFromTrashByUser(ctx context.Context, req *brzrpc.NoteListByUser) (*emptypb.Empty, error) {
+func (s *ServerAPI) SetNotesFromTrashByUser(ctx context.Context, req *brzrpc2.NoteListByUser) (*emptypb.Empty, error) {
 	const op = "redis.grpc.SetNotesFromTrashByUser"
 	log.Info(op, "")
 
@@ -232,7 +232,7 @@ func (s *ServerAPI) SetNotesFromTrashByUser(ctx context.Context, req *brzrpc.Not
 
 	return nil, nil
 }
-func (s *ServerAPI) SetNoteListByUser(ctx context.Context, req *brzrpc.NoteListByUser) (*emptypb.Empty, error) {
+func (s *ServerAPI) SetNoteListByUser(ctx context.Context, req *brzrpc2.NoteListByUser) (*emptypb.Empty, error) {
 	const op = "redis.grpc.SetNoteListByUser"
 	log.Info(op, "")
 
@@ -269,7 +269,7 @@ func (s *ServerAPI) SetNoteListByUser(ctx context.Context, req *brzrpc.NoteListB
 
 	return nil, nil
 }
-func (s *ServerAPI) RmNoteByUser(ctx context.Context, req *brzrpc.UserNoteId) (*emptypb.Empty, error) {
+func (s *ServerAPI) RmNoteByUser(ctx context.Context, req *brzrpc2.UserNoteId) (*emptypb.Empty, error) {
 	const op = "redis.grpc.RmNotesByUser"
 	log.Info(op, "")
 
@@ -293,7 +293,7 @@ func (s *ServerAPI) RmNoteByUser(ctx context.Context, req *brzrpc.UserNoteId) (*
 			}
 			return
 		}
-		idx := slices.IndexFunc(nts, func(b *brzrpc.NoteWithBlocks) bool {
+		idx := slices.IndexFunc(nts, func(b *brzrpc2.NoteWithBlocks) bool {
 			return b.Id == req.GetNoteId()
 		})
 
@@ -332,7 +332,7 @@ func (s *ServerAPI) RmNoteByUser(ctx context.Context, req *brzrpc.UserNoteId) (*
 
 	return nil, nil
 }
-func (s *ServerAPI) RmNotesFromTrashByUser(ctx context.Context, req *brzrpc.UserId) (*emptypb.Empty, error) {
+func (s *ServerAPI) RmNotesFromTrashByUser(ctx context.Context, req *brzrpc2.UserId) (*emptypb.Empty, error) {
 	const op = "redis.grpc.RmNotesFromTrashByUser"
 	log.Info(op, "")
 
@@ -370,7 +370,7 @@ func (s *ServerAPI) RmNotesFromTrashByUser(ctx context.Context, req *brzrpc.User
 	return nil, nil
 }
 
-func (s *ServerAPI) RmNoteListByUser(ctx context.Context, req *brzrpc.UserId) (*emptypb.Empty, error) {
+func (s *ServerAPI) RmNoteListByUser(ctx context.Context, req *brzrpc2.UserId) (*emptypb.Empty, error) {
 	const op = "redis.grpc.RmNoteListByUser"
 	log.Info(op, "")
 

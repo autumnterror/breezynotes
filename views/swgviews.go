@@ -1,6 +1,8 @@
 package views
 
-import brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
+import (
+	"github.com/autumnterror/breezynotes/api/proto/gen"
+)
 
 type SWGMessage struct {
 	Message string `json:"message" example:"some info"`

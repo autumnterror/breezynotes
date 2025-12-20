@@ -1,11 +1,11 @@
 package blocknote
 
 import (
+	"github.com/autumnterror/breezynotes/api/proto/gen"
 	"time"
 
 	"github.com/autumnterror/breezynotes/internal/gateway/config"
 	"github.com/autumnterror/breezynotes/pkg/log"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	grpcretry "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 	"google.golang.org/grpc"

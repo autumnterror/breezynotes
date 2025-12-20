@@ -8,6 +8,14 @@ import (
 	"time"
 )
 
+type WithConfigRepo interface {
+	GenerateToken(id, _type string) (string, error)
+	VerifyToken(tokenString string) (*jwt.Token, error)
+	GetIdFromToken(token *jwt.Token) (string, error)
+	GetTypeFromToken(token *jwt.Token) (string, error)
+	Refresh(refreshToken string) (string, error)
+}
+
 // GenerateToken generation JWT by TYPE values: "ACCESS" or "REFRESH"
 func (w *WithConfig) GenerateToken(id, _type string) (string, error) {
 	const op = "jwt.WithConfig.GenerateToken"
@@ -16,7 +24,6 @@ func (w *WithConfig) GenerateToken(id, _type string) (string, error) {
 	claims := token.Claims.(jwt.MapClaims)
 	claims["id"] = id
 	claims["type"] = _type
-	//claims["role"] = role
 	switch _type {
 	case TokenTypeAccess:
 		claims["exp"] = time.Now().Add(w.cfg.AccessTokenLifeTime).Unix()
@@ -67,22 +74,6 @@ func (w *WithConfig) GetIdFromToken(token *jwt.Token) (string, error) {
 	return id.(string), nil
 }
 
-//// GetRoleFromToken return role from token
-//func (w *WithConfig) GetRoleFromToken(token *jwt.Token) (string, error) {
-//	const op = "jwt.WithConfig.GetLoginFromToken"
-//
-//	c, ok := token.Claims.(jwt.MapClaims)
-//	if !ok || !token.Valid {
-//		return "", format.Error(op, fmt.Errorf("invalid token claims"))
-//	}
-//
-//	id := c["role"]
-//	if id == "" {
-//		return "", format.Error(op, fmt.Errorf("role not detected"))
-//	}
-//	return id.(string), nil
-//}
-
 // GetTypeFromToken return type from token
 func (w *WithConfig) GetTypeFromToken(token *jwt.Token) (string, error) {
 	const op = "jwt.WithConfig.GetLoginFromToken"
@@ -123,22 +114,10 @@ func (w *WithConfig) Refresh(refreshToken string) (string, error) {
 	if err != nil {
 		return "", format.Error(op, err)
 	}
-	//role, err := w.GetRoleFromToken(rawRefToken)
-	//if err != nil {
-	//	return "", format.Error(op, err)
-	//}
 
 	token, err := w.GenerateToken(id, TokenTypeAccess)
 	if err != nil {
 		return "", format.Error(op, err)
 	}
 	return token, nil
-}
-
-type WithConfigRepo interface {
-	GenerateToken(id, _type string) (string, error)
-	VerifyToken(tokenString string) (*jwt.Token, error)
-	GetIdFromToken(token *jwt.Token) (string, error)
-	GetTypeFromToken(token *jwt.Token) (string, error)
-	Refresh(refreshToken string) (string, error)
 }

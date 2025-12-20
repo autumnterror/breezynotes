@@ -2,11 +2,11 @@ package net
 
 import (
 	"context"
+	brzrpc2 "github.com/autumnterror/breezynotes/api/proto/gen"
 	"net/http"
 	"time"
 
 	"github.com/autumnterror/breezynotes/pkg/log"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/uid"
 	"github.com/autumnterror/breezynotes/pkg/utils/validate"
 	"github.com/autumnterror/breezynotes/views"
@@ -32,7 +32,7 @@ func (e *Echo) Auth(c echo.Context) error {
 	log.Info(op, "")
 	api := e.authAPI.API
 
-	var r brzrpc.AuthRequest
+	var r brzrpc2.AuthRequest
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "auth bind", err)
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
@@ -87,7 +87,7 @@ func (e *Echo) Auth(c echo.Context) error {
 
 	log.Success(op, "")
 
-	return c.JSON(http.StatusOK, brzrpc.Tokens{
+	return c.JSON(http.StatusOK, brzrpc2.Tokens{
 		AccessToken:  tokens.GetAccessToken(),
 		RefreshToken: tokens.GetRefreshToken(),
 	})
@@ -130,7 +130,7 @@ func (e *Echo) Reg(c echo.Context) error {
 	defer cancel()
 
 	id := uid.New()
-	_, err := auth.CreateUser(ctx, &brzrpc.User{
+	_, err := auth.CreateUser(ctx, &brzrpc2.User{
 		Id:       id,
 		Login:    u.Login,
 		Email:    u.Email,
@@ -155,7 +155,7 @@ func (e *Echo) Reg(c echo.Context) error {
 		}
 	}
 
-	tokens, err := auth.GenerateTokens(ctx, &brzrpc.UserId{UserId: id})
+	tokens, err := auth.GenerateTokens(ctx, &brzrpc2.UserId{UserId: id})
 	if err != nil {
 		log.Error(op, "token generation error", err)
 		return c.JSON(http.StatusBadGateway, views.SWGError{Error: "token generation error"})
@@ -180,7 +180,7 @@ func (e *Echo) Reg(c echo.Context) error {
 
 	log.Success(op, "")
 
-	return c.JSON(http.StatusOK, &brzrpc.Tokens{
+	return c.JSON(http.StatusOK, &brzrpc2.Tokens{
 		AccessToken:  tokens.AccessToken,
 		RefreshToken: tokens.RefreshToken,
 	})
@@ -216,8 +216,8 @@ func (e *Echo) ValidateToken(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
 	defer cancel()
 
-	if _, err := auth.CheckToken(ctx, &brzrpc.Token{Value: at.Value}); err != nil {
-		newAt, err := auth.Refresh(ctx, &brzrpc.Token{Value: rt.Value})
+	if _, err := auth.CheckToken(ctx, &brzrpc2.Token{Value: at.Value}); err != nil {
+		newAt, err := auth.Refresh(ctx, &brzrpc2.Token{Value: rt.Value})
 		if err != nil {
 			st, ok := status.FromError(err)
 			if !ok {

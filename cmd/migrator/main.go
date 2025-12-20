@@ -16,7 +16,6 @@ import (
 
 func main() {
 	typeMigration := flag.String("type", "up", "type of migration action")
-	flag.Parse()
 	pathMigration := flag.String("path", "migrations", "path to migration files")
 	flag.Parse()
 

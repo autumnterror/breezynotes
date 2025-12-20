@@ -2,11 +2,11 @@ package net
 
 import (
 	"context"
+	brzrpc2 "github.com/autumnterror/breezynotes/api/proto/gen"
 	"net/http"
 	"time"
 
 	"github.com/autumnterror/breezynotes/pkg/log"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/views"
 	"github.com/labstack/echo/v4"
 	"google.golang.org/grpc/status"
@@ -36,7 +36,7 @@ func (e *Echo) CleanTrash(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	_, err := api.CleanTrash(ctx, &brzrpc.UserId{UserId: idUser})
+	_, err := api.CleanTrash(ctx, &brzrpc2.UserId{UserId: idUser})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -51,7 +51,7 @@ func (e *Echo) CleanTrash(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
@@ -92,7 +92,7 @@ func (e *Echo) NoteToTrash(c echo.Context) error {
 	defer done()
 
 	//AUTHORIZE
-	if n, err := api.GetNote(ctx, &brzrpc.NoteId{NoteId: id}); err == nil {
+	if n, err := api.GetNote(ctx, &brzrpc2.NoteId{NoteId: id}); err == nil {
 		if n.GetAuthor() != idUser {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "not author"})
 		}
@@ -102,7 +102,7 @@ func (e *Echo) NoteToTrash(c echo.Context) error {
 	}
 	//AUTHORIZE
 
-	_, err := api.NoteToTrash(ctx, &brzrpc.NoteId{NoteId: id})
+	_, err := api.NoteToTrash(ctx, &brzrpc2.NoteId{NoteId: id})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -117,15 +117,15 @@ func (e *Echo) NoteToTrash(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
-	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
-	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: id}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc2.UserNoteId{UserId: idUser, NoteId: id}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
@@ -166,7 +166,7 @@ func (e *Echo) NoteFromTrash(c echo.Context) error {
 	defer done()
 
 	//AUTHORIZE
-	if n, err := api.FindNoteInTrash(ctx, &brzrpc.NoteId{NoteId: id}); err == nil {
+	if n, err := api.FindNoteInTrash(ctx, &brzrpc2.NoteId{NoteId: id}); err == nil {
 		if n.GetAuthor() != idUser {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "not author"})
 		}
@@ -176,7 +176,7 @@ func (e *Echo) NoteFromTrash(c echo.Context) error {
 	}
 	//AUTHORIZE
 
-	_, err := api.NoteFromTrash(ctx, &brzrpc.NoteId{NoteId: id})
+	_, err := api.NoteFromTrash(ctx, &brzrpc2.NoteId{NoteId: id})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -191,14 +191,14 @@ func (e *Echo) NoteFromTrash(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
-	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: id}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc2.UserNoteId{UserId: idUser, NoteId: id}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
@@ -231,7 +231,7 @@ func (e *Echo) GetNotesFromTrash(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if ntsT, err := e.rdsAPI.API.GetNotesFromTrashByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	if ntsT, err := e.rdsAPI.API.GetNotesFromTrashByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	} else {
 		if ntsT != nil {
@@ -244,7 +244,7 @@ func (e *Echo) GetNotesFromTrash(c echo.Context) error {
 		}
 	}
 
-	nts, err := api.GetNotesFromTrash(ctx, &brzrpc.UserId{UserId: idUser})
+	nts, err := api.GetNotesFromTrash(ctx, &brzrpc2.UserId{UserId: idUser})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -259,17 +259,17 @@ func (e *Echo) GetNotesFromTrash(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.SetNotesFromTrashByUser(ctx, &brzrpc.NoteListByUser{UserId: idUser, Items: nts.GetItems()}); err != nil {
+	if _, err := e.rdsAPI.API.SetNotesFromTrashByUser(ctx, &brzrpc2.NoteListByUser{UserId: idUser, Items: nts.GetItems()}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
 	log.Success(op, "")
 
 	if nts.GetItems() == nil {
-		return c.JSON(http.StatusOK, []brzrpc.NotePart{})
+		return c.JSON(http.StatusOK, []brzrpc2.NotePart{})
 	}
 	if len(nts.GetItems()) == 0 {
-		return c.JSON(http.StatusOK, []brzrpc.NotePart{})
+		return c.JSON(http.StatusOK, []brzrpc2.NotePart{})
 	}
 
 	return c.JSON(http.StatusOK, nts.GetItems())

@@ -2,7 +2,7 @@ package textblock
 
 import (
 	"fmt"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
+	"github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"google.golang.org/protobuf/types/known/structpb"
 )

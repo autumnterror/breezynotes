@@ -2,11 +2,11 @@ package net
 
 import (
 	"context"
+	brzrpc2 "github.com/autumnterror/breezynotes/api/proto/gen"
 	"net/http"
 	"time"
 
 	"github.com/autumnterror/breezynotes/pkg/log"
-	brzrpc "github.com/autumnterror/breezynotes/pkg/protos/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/utils/uid"
 	"github.com/autumnterror/breezynotes/views"
 	"github.com/labstack/echo/v4"
@@ -47,7 +47,7 @@ func (e *Echo) CreateTag(c echo.Context) error {
 
 	newId := uid.New()
 
-	_, err := api.CreateTag(ctx, &brzrpc.Tag{
+	_, err := api.CreateTag(ctx, &brzrpc2.Tag{
 		Id:     newId,
 		Title:  r.Title,
 		Color:  r.Color,
@@ -68,13 +68,13 @@ func (e *Echo) CreateTag(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
 	log.Success(op, "")
 
-	return c.JSON(http.StatusCreated, brzrpc.Id{Id: newId})
+	return c.JSON(http.StatusCreated, brzrpc2.Id{Id: newId})
 }
 
 // UpdateTagTitle godoc
@@ -101,7 +101,7 @@ func (e *Echo) UpdateTagTitle(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
-	var r brzrpc.UpdateTagTitleRequest
+	var r brzrpc2.UpdateTagTitleRequest
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "update tag title bind", err)
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
@@ -110,7 +110,7 @@ func (e *Echo) UpdateTagTitle(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if t, err := api.GetTag(ctx, &brzrpc.TagId{TagId: r.GetId()}); err == nil {
+	if t, err := api.GetTag(ctx, &brzrpc2.TagId{TagId: r.GetId()}); err == nil {
 		if t.GetUserId() != idUser {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
@@ -137,7 +137,7 @@ func (e *Echo) UpdateTagTitle(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
@@ -170,7 +170,7 @@ func (e *Echo) UpdateTagColor(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
-	var r brzrpc.UpdateTagColorRequest
+	var r brzrpc2.UpdateTagColorRequest
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "update tag color bind", err)
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
@@ -179,7 +179,7 @@ func (e *Echo) UpdateTagColor(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if t, err := api.GetTag(ctx, &brzrpc.TagId{TagId: r.GetId()}); err == nil {
+	if t, err := api.GetTag(ctx, &brzrpc2.TagId{TagId: r.GetId()}); err == nil {
 		if t.GetUserId() != idUser {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
@@ -206,7 +206,7 @@ func (e *Echo) UpdateTagColor(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
@@ -239,7 +239,7 @@ func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
 	}
 
-	var r brzrpc.UpdateTagEmojiRequest
+	var r brzrpc2.UpdateTagEmojiRequest
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "update tag emoji bind", err)
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
@@ -248,7 +248,7 @@ func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if t, err := api.GetTag(ctx, &brzrpc.TagId{TagId: r.GetId()}); err == nil {
+	if t, err := api.GetTag(ctx, &brzrpc2.TagId{TagId: r.GetId()}); err == nil {
 		if t.GetUserId() != idUser {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
@@ -275,7 +275,7 @@ func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
@@ -315,7 +315,7 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if t, err := api.GetTag(ctx, &brzrpc.TagId{TagId: id}); err == nil {
+	if t, err := api.GetTag(ctx, &brzrpc2.TagId{TagId: id}); err == nil {
 		if t.GetUserId() != idUser {
 			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
 		}
@@ -324,7 +324,7 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad tag id"})
 	}
 
-	_, err := api.DeleteTag(ctx, &brzrpc.TagId{TagId: id})
+	_, err := api.DeleteTag(ctx, &brzrpc2.TagId{TagId: id})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -339,7 +339,7 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
@@ -372,7 +372,7 @@ func (e *Echo) GetTagsByUser(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
 	defer done()
 
-	if tgs, err := e.rdsAPI.API.GetTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	if tgs, err := e.rdsAPI.API.GetTagsByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	} else {
 		if tgs != nil {
@@ -383,7 +383,7 @@ func (e *Echo) GetTagsByUser(c echo.Context) error {
 		}
 	}
 
-	tags, err := api.GetTagsByUser(ctx, &brzrpc.UserId{UserId: idUser})
+	tags, err := api.GetTagsByUser(ctx, &brzrpc2.UserId{UserId: idUser})
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -398,11 +398,11 @@ func (e *Echo) GetTagsByUser(c echo.Context) error {
 		}
 	}
 
-	if _, err := e.rdsAPI.API.SetTagsByUser(ctx, &brzrpc.TagsByUser{UserId: idUser, Items: tags.GetItems()}); err != nil {
+	if _, err := e.rdsAPI.API.SetTagsByUser(ctx, &brzrpc2.TagsByUser{UserId: idUser, Items: tags.GetItems()}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 	if len(tags.Items) == 0 {
-		tags.Items = []*brzrpc.Tag{}
+		tags.Items = []*brzrpc2.Tag{}
 	}
 	log.Success(op, "")
 

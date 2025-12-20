@@ -1,14 +1,15 @@
 package grpc
 
 import (
+	"context"
 	"fmt"
 	"github.com/autumnterror/breezynotes/internal/auth/config"
-	"github.com/autumnterror/breezynotes/internal/auth/jwt"
-	"github.com/autumnterror/breezynotes/internal/auth/psql"
+	"github.com/autumnterror/breezynotes/internal/auth/service"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"net"
 )
 
@@ -17,13 +18,13 @@ type App struct {
 	cfg        *config.Config
 }
 
-func New(cfg *config.Config, API psql.AuthRepo, JwtAPI jwt.WithConfigRepo) *App {
+func New(cfg *config.Config, as *service.AuthService) *App {
 	s := grpc.NewServer(
 		grpc.KeepaliveParams(keepalive.ServerParameters{
 			MaxConnectionIdle: 0,
 		}),
 	)
-	Register(s, API, JwtAPI, cfg)
+	Register(s, as)
 
 	return &App{
 		gRPCServer: s,
@@ -58,4 +59,21 @@ func (a *App) Stop() {
 	const op = "grpc.auth.Stop"
 	a.gRPCServer.GracefulStop()
 	log.Success(op, "grpc server is stop "+fmt.Sprint(a.cfg.Port))
+}
+
+func (s *ServerAPI) Healthz(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
+	const op = "auth.grpc.Healthz"
+	log.Info(op, "")
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.API.Health(ctx)
+	})
+	if err != nil {
+		return nil, format.Error(op, err)
+	}
+
+	return &emptypb.Empty{}, nil
 }
