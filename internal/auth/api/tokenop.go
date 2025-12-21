@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/auth/domain"
 	"github.com/autumnterror/breezynotes/pkg/log"
@@ -10,7 +11,7 @@ import (
 )
 
 func (s *ServerAPI) GenerateAccessToken(ctx context.Context, r *brzrpc.UserId) (*brzrpc.Token, error) {
-	const op = "auth.grpc.GenerateAccessToken"
+	const op = "grpc.GenerateAccessToken"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
@@ -27,7 +28,7 @@ func (s *ServerAPI) GenerateAccessToken(ctx context.Context, r *brzrpc.UserId) (
 }
 
 func (s *ServerAPI) GenerateRefreshToken(ctx context.Context, r *brzrpc.UserId) (*brzrpc.Token, error) {
-	const op = "auth.grpc.GenerateRefreshToken"
+	const op = "grpc.GenerateRefreshToken"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
@@ -44,7 +45,7 @@ func (s *ServerAPI) GenerateRefreshToken(ctx context.Context, r *brzrpc.UserId) 
 }
 
 func (s *ServerAPI) GenerateTokens(ctx context.Context, r *brzrpc.UserId) (*brzrpc.Tokens, error) {
-	const op = "auth.grpc.GenerateTokens"
+	const op = "grpc.GenerateTokens"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
@@ -61,7 +62,7 @@ func (s *ServerAPI) GenerateTokens(ctx context.Context, r *brzrpc.UserId) (*brzr
 }
 
 func (s *ServerAPI) Refresh(ctx context.Context, r *brzrpc.Token) (*brzrpc.Token, error) {
-	const op = "auth.grpc.Refresh"
+	const op = "grpc.Refresh"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
@@ -78,7 +79,7 @@ func (s *ServerAPI) Refresh(ctx context.Context, r *brzrpc.Token) (*brzrpc.Token
 }
 
 func (s *ServerAPI) CheckToken(ctx context.Context, r *brzrpc.Token) (*emptypb.Empty, error) {
-	const op = "auth.grpc.CheckToken"
+	const op = "grpc.CheckToken"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
@@ -94,7 +95,7 @@ func (s *ServerAPI) CheckToken(ctx context.Context, r *brzrpc.Token) (*emptypb.E
 }
 
 func (s *ServerAPI) GetIdFromToken(ctx context.Context, t *brzrpc.Token) (*brzrpc.Id, error) {
-	const op = "auth.grpc.GetIdFromToken"
+	const op = "grpc.GetIdFromToken"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)

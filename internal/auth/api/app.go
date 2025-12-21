@@ -3,6 +3,8 @@ package grpc
 import (
 	"context"
 	"fmt"
+	"net"
+
 	"github.com/autumnterror/breezynotes/internal/auth/config"
 	"github.com/autumnterror/breezynotes/internal/auth/service"
 	"github.com/autumnterror/breezynotes/pkg/log"
@@ -10,7 +12,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"net"
 )
 
 type App struct {
@@ -62,7 +63,7 @@ func (a *App) Stop() {
 }
 
 func (s *ServerAPI) Healthz(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
-	const op = "auth.grpc.Healthz"
+	const op = "grpc.Healthz"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)

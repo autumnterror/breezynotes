@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/auth/domain"
 	"github.com/autumnterror/breezynotes/pkg/log"
@@ -10,7 +11,7 @@ import (
 )
 
 func (s *ServerAPI) DeleteUser(ctx context.Context, r *brzrpc.UserId) (*emptypb.Empty, error) {
-	const op = "auth.grpc.DeleteUser"
+	const op = "grpc.DeleteUser"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
@@ -27,7 +28,7 @@ func (s *ServerAPI) DeleteUser(ctx context.Context, r *brzrpc.UserId) (*emptypb.
 }
 
 func (s *ServerAPI) UpdateAbout(ctx context.Context, r *brzrpc.UpdateAboutRequest) (*emptypb.Empty, error) {
-	const op = "auth.grpc.UpdateAbout"
+	const op = "grpc.UpdateAbout"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
@@ -43,7 +44,7 @@ func (s *ServerAPI) UpdateAbout(ctx context.Context, r *brzrpc.UpdateAboutReques
 }
 
 func (s *ServerAPI) UpdateEmail(ctx context.Context, r *brzrpc.UpdateEmailRequest) (*emptypb.Empty, error) {
-	const op = "auth.grpc.UpdateEmail"
+	const op = "grpc.UpdateEmail"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
@@ -60,7 +61,7 @@ func (s *ServerAPI) UpdateEmail(ctx context.Context, r *brzrpc.UpdateEmailReques
 }
 
 func (s *ServerAPI) UpdatePhoto(ctx context.Context, r *brzrpc.UpdatePhotoRequest) (*emptypb.Empty, error) {
-	const op = "auth.grpc.UpdatePhoto"
+	const op = "grpc.UpdatePhoto"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
@@ -77,7 +78,7 @@ func (s *ServerAPI) UpdatePhoto(ctx context.Context, r *brzrpc.UpdatePhotoReques
 }
 
 func (s *ServerAPI) ChangePasswd(ctx context.Context, r *brzrpc.ChangePasswordRequest) (*emptypb.Empty, error) {
-	const op = "auth.grpc.ChangePasswd"
+	const op = "grpc.ChangePasswd"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
@@ -94,7 +95,7 @@ func (s *ServerAPI) ChangePasswd(ctx context.Context, r *brzrpc.ChangePasswordRe
 }
 
 func (s *ServerAPI) CreateUser(ctx context.Context, u *brzrpc.User) (*emptypb.Empty, error) {
-	const op = "auth.grpc.CreateUser"
+	const op = "grpc.CreateUser"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
@@ -111,7 +112,7 @@ func (s *ServerAPI) CreateUser(ctx context.Context, u *brzrpc.User) (*emptypb.Em
 }
 
 func (s *ServerAPI) GetUserDataFromToken(ctx context.Context, t *brzrpc.Token) (*brzrpc.User, error) {
-	const op = "auth.grpc.GetUserDataFromToken"
+	const op = "grpc.GetUserDataFromToken"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)

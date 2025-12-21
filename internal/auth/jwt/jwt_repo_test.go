@@ -1,10 +1,11 @@
 package jwt
 
 import (
-	"github.com/autumnterror/breezynotes/internal/auth/config"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/autumnterror/breezynotes/internal/auth/config"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGenerateAndVerifyToken(t *testing.T) {
@@ -45,10 +46,6 @@ func TestGenerateAndVerifyToken(t *testing.T) {
 		id, err := j.GetIdFromToken(token)
 		assert.NoError(t, err)
 		assert.Equal(t, "user456", id)
-
-		//role, err := j.GetRoleFromToken(token)
-		//assert.NoError(t, err)
-		//assert.Equal(t, "reader", role)
 
 		tp, err := j.GetTypeFromToken(token)
 		assert.NoError(t, err)

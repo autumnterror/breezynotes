@@ -1,7 +1,7 @@
 .PHONY: pull-all build-all build-platform build-gateway build-auth build-blocknote build-redis \
         push-all build-migrator mig-up mig-down gen \
         compose-up compose-down compose-rest compose-up-repl compose-down-repl compose-up-db compose-down-db \
-        run-all docx
+        docx
 
 # Docker image operations
 pull-all:

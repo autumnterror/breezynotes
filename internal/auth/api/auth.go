@@ -2,13 +2,14 @@ package grpc
 
 import (
 	"context"
+
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/log"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
 )
 
 func (s *ServerAPI) Auth(ctx context.Context, r *brzrpc.AuthRequest) (*brzrpc.UserId, error) {
-	const op = "auth.grpc.Auth"
+	const op = "grpc.Auth"
 	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
