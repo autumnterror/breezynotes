@@ -1,9 +1,10 @@
-package views
+package domain
 
 import (
+	"testing"
+
 	"github.com/autumnterror/breezynotes/pkg/log"
 	"github.com/autumnterror/breezynotes/pkg/utils/format"
-	"testing"
 )
 
 type B struct {
@@ -23,7 +24,6 @@ func TestBlockDb(t *testing.T) {
 		Id:        "test",
 		Type:      "test",
 		NoteId:    "test",
-		Order:     1,
 		CreatedAt: 2,
 		UpdatedAt: 3,
 		IsUsed:    true,
@@ -48,7 +48,6 @@ func TestBlockDb2(t *testing.T) {
 		Id:        "test",
 		Type:      "test",
 		NoteId:    "test",
-		Order:     1,
 		CreatedAt: 2,
 		UpdatedAt: 3,
 		IsUsed:    true,

@@ -64,11 +64,10 @@ message Block {
   string id = 1;
   string type = 2;
   string note_id = 3;
-  int32 order = 4;
-  int64 created_at = 5;
-  int64 updated_at = 6;
-  bool is_used = 7;
-  google.protobuf.Struct data = 8;
+  int64 created_at = 4;
+  int64 updated_at = 5;
+  bool is_used = 6;
+  google.protobuf.Struct data = 7;
 }
 
 

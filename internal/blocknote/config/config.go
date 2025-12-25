@@ -35,7 +35,7 @@ func setup() (*Config, error) {
 
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
-		configPath = "./local-config/blocknote.yaml"
+		return nil, format.Error(op, errors.New("CONFIG_PATH is not set"))
 	}
 
 	viper.SetConfigFile(configPath)

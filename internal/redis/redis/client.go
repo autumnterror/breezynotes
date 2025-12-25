@@ -2,7 +2,8 @@ package redis
 
 import (
 	"context"
-	"github.com/autumnterror/breezynotes/api/proto/gen"
+
+	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/redis/config"
 	"github.com/redis/go-redis/v9"
 )
@@ -26,7 +27,7 @@ type Repo interface {
 	SetSessionNoteTrash(ctx context.Context, id string, noteTrash []*brzrpc.NotePart) error
 	GetSessionNotes(ctx context.Context, id string) ([]*brzrpc.NoteWithBlocks, error)
 	SetSessionNotes(ctx context.Context, id string, notes []*brzrpc.NoteWithBlocks) error
-	GetSessionTags(ctx context.Context, id string) ([]*brzrpc.brzrpc, error)
+	GetSessionTags(ctx context.Context, id string) ([]*brzrpc.Tag, error)
 	SetSessionTags(ctx context.Context, id string, tags []*brzrpc.Tag) error
 	CreateSession(ctx context.Context, id string) error
 	CheckSession(ctx context.Context, id string) error

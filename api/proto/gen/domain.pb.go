@@ -916,11 +916,10 @@ type Block struct {
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
 	NoteId        string                 `protobuf:"bytes,3,opt,name=note_id,json=noteId,proto3" json:"note_id,omitempty"`
-	Order         int32                  `protobuf:"varint,4,opt,name=order,proto3" json:"order,omitempty"`
-	CreatedAt     int64                  `protobuf:"varint,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     int64                  `protobuf:"varint,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	IsUsed        bool                   `protobuf:"varint,7,opt,name=is_used,json=isUsed,proto3" json:"is_used,omitempty"`
-	Data          *structpb.Struct       `protobuf:"bytes,8,opt,name=data,proto3" json:"data,omitempty"`
+	CreatedAt     int64                  `protobuf:"varint,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     int64                  `protobuf:"varint,5,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	IsUsed        bool                   `protobuf:"varint,6,opt,name=is_used,json=isUsed,proto3" json:"is_used,omitempty"`
+	Data          *structpb.Struct       `protobuf:"bytes,7,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -974,13 +973,6 @@ func (x *Block) GetNoteId() string {
 		return x.NoteId
 	}
 	return ""
-}
-
-func (x *Block) GetOrder() int32 {
-	if x != nil {
-		return x.Order
-	}
-	return 0
 }
 
 func (x *Block) GetCreatedAt() int64 {
@@ -1536,18 +1528,17 @@ const file_domain_proto_rawDesc = "" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x14\n" +
 	"\x05color\x18\x03 \x01(\tR\x05color\x12\x14\n" +
 	"\x05emoji\x18\x04 \x01(\tR\x05emoji\x12\x16\n" +
-	"\x06userId\x18\x05 \x01(\tR\x06userId\"\xde\x01\n" +
+	"\x06userId\x18\x05 \x01(\tR\x06userId\"\xc8\x01\n" +
 	"\x05Block\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04type\x18\x02 \x01(\tR\x04type\x12\x17\n" +
-	"\anote_id\x18\x03 \x01(\tR\x06noteId\x12\x14\n" +
-	"\x05order\x18\x04 \x01(\x05R\x05order\x12\x1d\n" +
+	"\anote_id\x18\x03 \x01(\tR\x06noteId\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x05 \x01(\x03R\tcreatedAt\x12\x1d\n" +
+	"created_at\x18\x04 \x01(\x03R\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\x06 \x01(\x03R\tupdatedAt\x12\x17\n" +
-	"\ais_used\x18\a \x01(\bR\x06isUsed\x12+\n" +
-	"\x04data\x18\b \x01(\v2\x17.google.protobuf.StructR\x04data\"\xea\x01\n" +
+	"updated_at\x18\x05 \x01(\x03R\tupdatedAt\x12\x17\n" +
+	"\ais_used\x18\x06 \x01(\bR\x06isUsed\x12+\n" +
+	"\x04data\x18\a \x01(\v2\x17.google.protobuf.StructR\x04data\"\xea\x01\n" +
 	"\x04Note\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1d\n" +
