@@ -101,7 +101,7 @@ func (s *AuthService) UpdateAbout(ctx context.Context, id, about string) error {
 	})
 }
 func (s *AuthService) Delete(ctx context.Context, id string) error {
-	const op = "service.Delete"
+	const op = "service.delete"
 	if err := idValidation(id); err != nil {
 		return wrapServiceCheck(op, err)
 	}

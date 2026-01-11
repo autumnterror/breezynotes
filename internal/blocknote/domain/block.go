@@ -9,7 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
-type BlockDb struct {
+type Block struct {
 	Id     string `bson:"_id"`
 	Type   string `bson:"type"`
 	NoteId string `bson:"note_id"`
@@ -20,8 +20,12 @@ type BlockDb struct {
 	Data      map[string]any `bson:"data"`
 }
 
-func ToBlockDb(b *brzrpc.Block) *BlockDb {
-	return &BlockDb{
+type Blocks struct {
+	Blks []*Block
+}
+
+func ToBlockDb(b *brzrpc.Block) *Block {
+	return &Block{
 		Id:        b.GetId(),
 		Type:      b.GetType(),
 		NoteId:    b.GetNoteId(),
@@ -73,7 +77,7 @@ func normalize(v any) any {
 
 // FromBlockDb on data field u can insert only base type.
 // If u want ur struct convert to map[string]any (check models_test.go)
-func FromBlockDb(b *BlockDb) *brzrpc.Block {
+func FromBlockDb(b *Block) *brzrpc.Block {
 	normalized := normalize(b.Data)
 
 	m, ok := normalized.(map[string]any)
@@ -95,5 +99,35 @@ func FromBlockDb(b *BlockDb) *brzrpc.Block {
 		UpdatedAt: b.UpdatedAt,
 		IsUsed:    b.IsUsed,
 		Data:      s,
+	}
+}
+
+func ToBlocksDb(b *brzrpc.Blocks) *Blocks {
+	if b == nil {
+		return nil
+	}
+
+	var blks []*Block
+	for _, blk := range b.GetItems() {
+		blks = append(blks, ToBlockDb(blk))
+	}
+
+	return &Blocks{
+		Blks: blks,
+	}
+}
+
+func FromBlocksDb(b *Blocks) *brzrpc.Blocks {
+	if b == nil {
+		return nil
+	}
+
+	var blks []*brzrpc.Block
+	for _, blk := range b.Blks {
+		blks = append(blks, FromBlockDb(blk))
+	}
+
+	return &brzrpc.Blocks{
+		Items: blks,
 	}
 }

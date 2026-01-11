@@ -366,7 +366,7 @@ func (e *Echo) ChangeBlockOrder(c echo.Context) error {
 }
 
 // DeleteBlock godoc
-// @Summary Delete block
+// @Summary delete block
 // @Description Deletes block by ID
 // @Tags block
 // @Accept json

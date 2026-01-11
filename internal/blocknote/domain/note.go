@@ -14,6 +14,10 @@ type Note struct {
 	Blocks    []string `bson:"blocks"`
 }
 
+type Notes struct {
+	Nts []*Note
+}
+
 func ToNoteDb(n *brzrpc.Note) *Note {
 	if n == nil {
 		return nil
@@ -65,5 +69,96 @@ func FromNoteDb(n *Note) *brzrpc.Note {
 		Editors:   nn.Editors,
 		Readers:   nn.Readers,
 		Blocks:    nn.Blocks,
+	}
+}
+
+func ToNotesDb(n *brzrpc.Notes) *Notes {
+	if n == nil {
+		return nil
+	}
+
+	var nts []*Note
+	for _, nt := range n.GetItems() {
+		nts = append(nts, ToNoteDb(nt))
+	}
+
+	return &Notes{
+		Nts: nts,
+	}
+}
+
+func FromNotesDb(n *Notes) *brzrpc.Notes {
+	if n == nil {
+		return nil
+	}
+
+	var nts []*brzrpc.Note
+	for _, nt := range n.Nts {
+		nts = append(nts, FromNoteDb(nt))
+	}
+
+	return &brzrpc.Notes{
+		Items: nts,
+	}
+}
+
+type NotePart struct {
+	Id         string
+	Title      string
+	Tag        *Tag
+	FirstBlock string
+	UpdatedAt  int64
+}
+type NoteParts struct {
+	Ntps []*NotePart
+}
+
+func FromNotePartDb(n *NotePart) *brzrpc.NotePart {
+	return &brzrpc.NotePart{
+		Id:         n.Id,
+		Title:      n.Title,
+		Tag:        FromTagDb(n.Tag),
+		FirstBlock: n.FirstBlock,
+		UpdatedAt:  n.UpdatedAt,
+	}
+}
+
+func ToNotePartDb(n *brzrpc.NotePart) *NotePart {
+	return &NotePart{
+		Id:         n.GetId(),
+		Title:      n.GetTitle(),
+		Tag:        ToTagDb(n.Tag),
+		FirstBlock: n.GetFirstBlock(),
+		UpdatedAt:  n.GetUpdatedAt(),
+	}
+}
+
+func ToNotePartsDb(n *brzrpc.NoteParts) *NoteParts {
+	if n == nil {
+		return nil
+	}
+
+	var nts []*NotePart
+	for _, nt := range n.GetItems() {
+		nts = append(nts, ToNotePartDb(nt))
+	}
+
+	return &NoteParts{
+		Ntps: nts,
+	}
+}
+
+func FromNotePartsDb(n *NoteParts) *brzrpc.NoteParts {
+	if n == nil {
+		return nil
+	}
+
+	var nts []*brzrpc.NotePart
+	for _, nt := range n.Ntps {
+		nts = append(nts, FromNotePartDb(nt))
+	}
+
+	return &brzrpc.NoteParts{
+		Items: nts,
 	}
 }

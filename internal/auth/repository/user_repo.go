@@ -195,7 +195,7 @@ func (d Driver) UpdateAbout(ctx context.Context, id, about string) error {
 
 // Delete user. May send sql.ErrNoRows
 func (d Driver) Delete(ctx context.Context, id string) error {
-	const op = "psql.users.Delete"
+	const op = "psql.users.delete"
 
 	query := `
 				DELETE FROM users

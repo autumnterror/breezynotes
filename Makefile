@@ -113,11 +113,11 @@ test-textblock:
 test-textblock-bm:
 	go test ./pkg/pkgs/default/textblock/benchmark -v
 test-blocks:
-	go test ./internal/blocknote/mongo/blocks -v
+	go test ./internal/blocknote/repository/blocks -v
 test-notes:
-	go test ./internal/blocknote/mongo/notes -v
+	go test ./internal/blocknote/repository/notes -v
 test-tags:
-	go test ./internal/blocknote/mongo/tags -v
+	go test ./internal/blocknote/repository/tags -v
 test-jwt:
 	go test ./internal/auth/jwt -v
 test-psql:

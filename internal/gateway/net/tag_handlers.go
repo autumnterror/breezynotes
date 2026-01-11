@@ -285,7 +285,7 @@ func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 }
 
 // DeleteTag godoc
-// @Summary Delete tag
+// @Summary delete tag
 // @Description Deletes tag by ID
 // @Tags tag
 // @Accept json

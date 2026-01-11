@@ -14,7 +14,6 @@ func FromUnified(b *brzrpc.Block) (TextBlock, error) {
 		Id:        b.GetId(),
 		Type:      b.GetType(),
 		NoteId:    b.GetNoteId(),
-		Order:     int(b.GetOrder()),
 		CreatedAt: b.GetCreatedAt(),
 		UpdatedAt: b.GetUpdatedAt(),
 		IsUsed:    b.GetIsUsed(),

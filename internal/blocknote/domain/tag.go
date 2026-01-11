@@ -10,6 +10,10 @@ type Tag struct {
 	UserId string `bson:"user_id"`
 }
 
+type Tags struct {
+	Tgs []*Tag
+}
+
 func ToTagDb(t *brzrpc.Tag) *Tag {
 	if t == nil {
 		return nil
@@ -33,5 +37,36 @@ func FromTagDb(t *Tag) *brzrpc.Tag {
 		Color:  t.Color,
 		Emoji:  t.Emoji,
 		UserId: t.UserId,
+	}
+}
+
+func ToTagsDb(t *brzrpc.Tags) *Tags {
+	if t == nil {
+		return nil
+	}
+
+	var tgs []*Tag
+
+	for _, tg := range t.GetItems() {
+		tgs = append(tgs, ToTagDb(tg))
+	}
+
+	return &Tags{
+		Tgs: tgs,
+	}
+}
+
+func FromTagsDb(t *Tags) *brzrpc.Tags {
+	if t == nil {
+		return nil
+	}
+	var tgs []*brzrpc.Tag
+
+	for _, tg := range t.Tgs {
+		tgs = append(tgs, FromTagDb(tg))
+	}
+
+	return &brzrpc.Tags{
+		Items: tgs,
 	}
 }

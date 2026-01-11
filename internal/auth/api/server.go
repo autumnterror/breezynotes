@@ -1,4 +1,4 @@
-package grpc
+package api
 
 import (
 	"github.com/autumnterror/breezynotes/api/proto/gen"

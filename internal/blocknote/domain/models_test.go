@@ -20,7 +20,7 @@ func (b B) ToMap() map[string]interface{} {
 }
 
 func TestBlockDb(t *testing.T) {
-	bdb := &BlockDb{
+	bdb := &Block{
 		Id:        "test",
 		Type:      "test",
 		NoteId:    "test",
@@ -44,7 +44,7 @@ func TestBlockDb(t *testing.T) {
 }
 
 func TestBlockDb2(t *testing.T) {
-	bdb := &BlockDb{
+	bdb := &Block{
 		Id:        "test",
 		Type:      "test",
 		NoteId:    "test",

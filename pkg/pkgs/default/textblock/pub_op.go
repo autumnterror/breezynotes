@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/autumnterror/breezynotes/api/proto/gen"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 
 	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/views"
 )
 
 type Driver struct{}
@@ -58,7 +58,7 @@ func (tb *Driver) Op(ctx context.Context, block *brzrpc.Block, op string, data m
 	}
 }
 
-func (tb *Driver) Create(ctx context.Context, data map[string]any) (*views.BlockDb, error) {
-	b := &views.BlockDb{Data: data}
+func (tb *Driver) Create(ctx context.Context, data map[string]any) (*domain.Block, error) {
+	b := &domain.Block{Data: data}
 	return b, nil
 }

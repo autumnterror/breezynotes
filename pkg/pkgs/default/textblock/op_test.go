@@ -28,7 +28,7 @@ func TestInsertText(t *testing.T) {
 			description:    "Should create new segment with default style",
 		},
 		{
-			name: "Insert at beginning",
+			name: "insert at beginning",
 			initialText: []TextData{
 				{Style: "A", Text: "World"},
 			},
@@ -41,7 +41,7 @@ func TestInsertText(t *testing.T) {
 			description: "Should insert text at beginning and preserve existing style",
 		},
 		{
-			name: "Insert at end",
+			name: "insert at end",
 			initialText: []TextData{
 				{Style: "A", Text: "Hello"},
 			},
@@ -54,7 +54,7 @@ func TestInsertText(t *testing.T) {
 			description: "Should append text at end with default style",
 		},
 		{
-			name: "Insert in middle of segment",
+			name: "insert in middle of segment",
 			initialText: []TextData{
 				{Style: "A", Text: "HelloWorld"},
 			},
@@ -68,7 +68,7 @@ func TestInsertText(t *testing.T) {
 			description: "Should split segment and insert new text with default style",
 		},
 		{
-			name: "Insert at boundary between segments",
+			name: "insert at boundary between segments",
 			initialText: []TextData{
 				{Style: "A", Text: "Hello"},
 				{Style: "B", Text: "World"},
@@ -83,7 +83,7 @@ func TestInsertText(t *testing.T) {
 			description: "Should insert between segments without splitting them",
 		},
 		{
-			name: "Insert with position out of bounds",
+			name: "insert with position out of bounds",
 			initialText: []TextData{
 				{Style: "A", Text: "Hello"},
 			},
@@ -96,7 +96,7 @@ func TestInsertText(t *testing.T) {
 			description: "Should clamp position to end and append text",
 		},
 		{
-			name: "Insert with negative position",
+			name: "insert with negative position",
 			initialText: []TextData{
 				{Style: "A", Text: "World"},
 			},
@@ -148,7 +148,7 @@ func TestDeleteRange(t *testing.T) {
 			description:    "Should do nothing on empty block",
 		},
 		{
-			name: "Delete entire single segment",
+			name: "delete entire single segment",
 			initialText: []TextData{
 				{Style: "A", Text: "Hello"},
 			},
@@ -158,7 +158,7 @@ func TestDeleteRange(t *testing.T) {
 			description:    "Should remove the entire segment",
 		},
 		{
-			name: "Delete beginning of segment",
+			name: "delete beginning of segment",
 			initialText: []TextData{
 				{Style: "A", Text: "HelloWorld"},
 			},
@@ -170,7 +170,7 @@ func TestDeleteRange(t *testing.T) {
 			description: "Should remove beginning of segment",
 		},
 		{
-			name: "Delete end of segment",
+			name: "delete end of segment",
 			initialText: []TextData{
 				{Style: "A", Text: "HelloWorld"},
 			},
@@ -182,7 +182,7 @@ func TestDeleteRange(t *testing.T) {
 			description: "Should remove end of segment",
 		},
 		{
-			name: "Delete middle of segment",
+			name: "delete middle of segment",
 			initialText: []TextData{
 				{Style: "A", Text: "HelloWorld"},
 			},
@@ -194,7 +194,7 @@ func TestDeleteRange(t *testing.T) {
 			description: "Should remove middle part of segment",
 		},
 		{
-			name: "Delete across multiple segments",
+			name: "delete across multiple segments",
 			initialText: []TextData{
 				{Style: "A", Text: "Hello"},
 				{Style: "B", Text: " "},
@@ -209,7 +209,7 @@ func TestDeleteRange(t *testing.T) {
 			description: "Should remove parts across multiple segments",
 		},
 		{
-			name: "Delete with range out of bounds",
+			name: "delete with range out of bounds",
 			initialText: []TextData{
 				{Style: "A", Text: "Hello"},
 			},
@@ -219,7 +219,7 @@ func TestDeleteRange(t *testing.T) {
 			description:    "Should clamp range and remove everything",
 		},
 		{
-			name: "Delete with invalid range",
+			name: "delete with invalid range",
 			initialText: []TextData{
 				{Style: "A", Text: "Hello"},
 			},
@@ -231,7 +231,7 @@ func TestDeleteRange(t *testing.T) {
 			description: "Should do nothing with invalid range (start > end)",
 		},
 		{
-			name: "Delete empty range",
+			name: "delete empty range",
 			initialText: []TextData{
 				{Style: "A", Text: "Hello"},
 			},
@@ -265,22 +265,22 @@ func TestDeleteRange(t *testing.T) {
 
 // TestIntegration tests combined operations
 func TestIntegration(t *testing.T) {
-	t.Run("Insert and delete operations", func(t *testing.T) {
+	t.Run("insert and delete operations", func(t *testing.T) {
 		log.Printf("=== INTEGRATION TEST ===")
 
 		tb := &TextBlock{Text: []TextData{}}
 
-		// Insert into empty block
+		// insert into empty block
 		err := tb.InsertText(0, "Hello World")
 		assert.NoError(t, err)
 		log.Printf("After initial insert: %+v", tb.Text)
 
-		// Insert in the middle
+		// insert in the middle
 		err = tb.InsertText(5, " Beautiful")
 		assert.NoError(t, err)
 		log.Printf("After middle insert: %+v", tb.Text)
 
-		// Delete part of the text
+		// delete part of the text
 		err = tb.DeleteRange(0, 6)
 		assert.NoError(t, err)
 		log.Printf("After deletion: %+v", tb.Text)
@@ -311,12 +311,12 @@ func TestEdgeCases(t *testing.T) {
 			{Style: "B", Text: "Мир"},
 		}}
 
-		// Insert in the middle of Unicode text
+		// insert in the middle of Unicode text
 		err := tb.InsertText(3, " Крутой")
 		assert.NoError(t, err)
 		log.Printf("After Unicode insert: %+v", tb.Text)
 
-		// Delete part of Unicode text
+		// delete part of Unicode text
 		err = tb.DeleteRange(0, 7)
 		assert.NoError(t, err)
 		log.Printf("After Unicode delete: %+v", tb.Text)
@@ -331,12 +331,12 @@ func TestEdgeCases(t *testing.T) {
 			{Style: "A", Text: "Hello"},
 		}}
 
-		// Insert empty text
+		// insert empty text
 		err := tb.InsertText(2, "")
 		assert.NoError(t, err)
 		log.Printf("After empty insert: %+v", tb.Text)
 
-		// Delete empty range
+		// delete empty range
 		err = tb.DeleteRange(2, 2)
 		assert.NoError(t, err)
 		log.Printf("After empty delete: %+v", tb.Text)

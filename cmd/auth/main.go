@@ -1,8 +1,8 @@
 package main
 
 import (
+	api "github.com/autumnterror/breezynotes/internal/auth/api"
 	"github.com/autumnterror/breezynotes/internal/auth/config"
-	"github.com/autumnterror/breezynotes/internal/auth/grpc"
 	"github.com/autumnterror/breezynotes/internal/auth/infra/psql"
 	"github.com/autumnterror/breezynotes/internal/auth/infra/psql/psqltx"
 	"github.com/autumnterror/breezynotes/internal/auth/jwt"
@@ -29,7 +29,7 @@ func main() {
 		cfg,
 	)
 
-	a := grpc.New(cfg, s)
+	a := api.New(cfg, s)
 	go a.MustRun()
 
 	sign := wait()

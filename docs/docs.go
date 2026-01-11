@@ -230,7 +230,7 @@ const docTemplate = `{
                 "tags": [
                     "block"
                 ],
-                "summary": "Delete block",
+                "summary": "delete block",
                 "parameters": [
                     {
                         "type": "string",
@@ -948,7 +948,7 @@ const docTemplate = `{
                 "tags": [
                     "tag"
                 ],
-                "summary": "Delete tag",
+                "summary": "delete tag",
                 "parameters": [
                     {
                         "type": "string",
