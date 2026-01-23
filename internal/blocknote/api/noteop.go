@@ -39,7 +39,7 @@ func (s *ServerAPI) GetNote(ctx context.Context, req *brzrpc.UserNoteId) (*brzrp
 		return nil, format.Error(op, err)
 	}
 
-	return res.(*brzrpc.NoteWithBlocks), nil
+	return domain.FromNoteWithBlocksDb(res.(*domain.NoteWithBlocks)), nil
 }
 
 func (s *ServerAPI) GetAllNotes(ctx context.Context, req *brzrpc.UserId) (*brzrpc.NoteParts, error) {
@@ -56,7 +56,7 @@ func (s *ServerAPI) GetAllNotes(ctx context.Context, req *brzrpc.UserId) (*brzrp
 		return nil, format.Error(op, err)
 	}
 
-	return res.(*brzrpc.NoteParts), nil
+	return domain.FromNotePartsDb(res.(*domain.NoteParts)), nil
 }
 
 func (s *ServerAPI) GetNotesByTag(ctx context.Context, req *brzrpc.UserTagId) (*brzrpc.NoteParts, error) {
@@ -73,7 +73,7 @@ func (s *ServerAPI) GetNotesByTag(ctx context.Context, req *brzrpc.UserTagId) (*
 		return nil, format.Error(op, err)
 	}
 
-	return res.(*brzrpc.NoteParts), nil
+	return domain.FromNotePartsDb(res.(*domain.NoteParts)), nil
 }
 
 func (s *ServerAPI) CreateNote(ctx context.Context, req *brzrpc.Note) (*emptypb.Empty, error) {

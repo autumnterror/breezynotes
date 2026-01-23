@@ -2,12 +2,13 @@ package net
 
 import (
 	"context"
+	"errors"
 	"net/http"
-	"strings"
 	"time"
 
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/gateway/domain"
+	domainredis "github.com/autumnterror/breezynotes/internal/redis/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/alg"
 	"github.com/autumnterror/utils_go/pkg/utils/uid"
 
@@ -102,7 +103,7 @@ func (e *Echo) GetNote(c echo.Context) error {
 	defer done()
 
 	if note, err := e.rdsAPI.API.GetNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: id}); err != nil {
-		if strings.Contains(err.Error(), "not found in cache") {
+		if errors.Is(err, domainredis.ErrNotFound) {
 		} else {
 			log.Error(op, "REDIS ERROR", err)
 		}
