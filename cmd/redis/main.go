@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/autumnterror/breezynotes/internal/redis/config"
 	"github.com/autumnterror/breezynotes/internal/redis/grpc"
-	"github.com/autumnterror/breezynotes/internal/redis/redis"
-	"github.com/autumnterror/breezynotes/pkg/log"
+	"github.com/autumnterror/breezynotes/internal/redis/repository"
+	"github.com/autumnterror/utils_go/pkg/log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,7 +16,7 @@ func main() {
 
 	cfg := config.MustSetup()
 
-	a := grpc.New(cfg, redis.New(cfg))
+	a := grpc.New(cfg, repository.New(cfg))
 	go a.MustRun()
 
 	stop := make(chan os.Signal, 1)

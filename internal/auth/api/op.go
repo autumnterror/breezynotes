@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/autumnterror/breezynotes/internal/auth/domain"
 	"github.com/autumnterror/breezynotes/internal/auth/service"
-	"github.com/autumnterror/breezynotes/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -28,6 +28,8 @@ func handleCRUDResponse(ctx context.Context, op string, action func() (any, erro
 		if r.err != nil {
 			log.Error(op, "", r.err)
 			switch {
+			case errors.Is(r.err, domain.ErrUnauthorized):
+				return nil, status.Error(codes.Unauthenticated, r.err.Error())
 			case errors.Is(r.err, domain.ErrNotFound):
 				return nil, status.Error(codes.NotFound, r.err.Error())
 			case errors.Is(r.err, domain.ErrAlreadyExists):
@@ -35,7 +37,7 @@ func handleCRUDResponse(ctx context.Context, op string, action func() (any, erro
 			case errors.Is(r.err, domain.ErrForeignKey):
 				return nil, status.Error(codes.FailedPrecondition, r.err.Error())
 			case errors.Is(r.err, domain.ErrTokenExpired):
-				return nil, status.Error(codes.Unauthenticated, r.err.Error())
+				return nil, status.Error(codes.ResourceExhausted, r.err.Error())
 			case errors.Is(r.err, domain.ErrTokenWrongType), errors.Is(r.err, domain.ErrTokenInvalid):
 				return nil, status.Error(codes.InvalidArgument, r.err.Error())
 			case errors.Is(r.err, service.ErrBadServiceCheck), errors.Is(r.err, domain.ErrWrongInput), errors.Is(r.err, domain.ErrPasswordIncorrect):

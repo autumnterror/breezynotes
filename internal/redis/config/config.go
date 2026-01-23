@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )

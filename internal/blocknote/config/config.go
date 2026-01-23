@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
@@ -42,10 +42,9 @@ func setup() (*Config, error) {
 
 	var cfg struct {
 		DataSource string `mapstructure:"data_source"`
-		PortMongo  int    `mapstructure:"port_mongo"`
-		Uri        string
-		Port       int
-		Mode       string
+		ReplicaSet string `mapstructure:"replica_set"`
+		Port       int    `mapstructure:"port"`
+		Mode       string `mapstructure:"mode"`
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -63,13 +62,29 @@ func setup() (*Config, error) {
 	}
 
 	if cfg.Mode == "DEV" {
-		log.Println(format.Struct(cfg), fmt.Sprintf("URI: mongodb://%s:%s@%s:%d/%s?authSource=admin",
-			user, pw, cfg.DataSource, cfg.PortMongo, db))
+		log.Println(format.Struct(cfg), fmt.Sprintf("URI: mongodb://%s:%s@%s/%s?authSource=admin",
+			user, pw, cfg.DataSource, db))
 	}
-
+	if cfg.Mode == "REPL" {
+		if cfg.ReplicaSet == "" {
+			return nil, format.Error(op, errors.New("replica_set is not set for REPL mode"))
+		}
+		uri := fmt.Sprintf(
+			"mongodb://%s:%s@%s/%s?replicaSet=%s&authSource=admin",
+			user,
+			pw,
+			cfg.DataSource,
+			db,
+			cfg.ReplicaSet,
+		)
+		return &Config{
+			Uri:  uri,
+			Port: cfg.Port,
+		}, nil
+	}
 	return &Config{
-		Uri: fmt.Sprintf("mongodb://%s:%s@%s:%d/%s?authSource=admin",
-			user, pw, cfg.DataSource, cfg.PortMongo, db),
+		Uri: fmt.Sprintf("mongodb://%s:%s@%s/%s?authSource=admin",
+			user, pw, cfg.DataSource, db),
 		Port: cfg.Port,
 	}, nil
 }

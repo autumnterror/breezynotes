@@ -3,7 +3,7 @@ package mongotx
 import (
 	"context"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"go.mongodb.org/mongo-driver/v2/mongo/readconcern"

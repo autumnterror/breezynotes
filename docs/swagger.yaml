@@ -1,35 +1,12 @@
 basePath: /
 definitions:
-  brzrpc.AuthRequest:
-    properties:
-      email:
-        type: string
-      login:
-        type: string
-      password:
-        type: string
-    type: object
-  brzrpc.ChangeBlockOrderRequest:
-    properties:
-      id:
-        type: string
-      new_order:
-        type: integer
-      old_order:
-        type: integer
-    type: object
   brzrpc.ChangeTitleNoteRequest:
     properties:
-      id:
+      idNote:
+        type: string
+      idUser:
         type: string
       title:
-        type: string
-    type: object
-  brzrpc.ChangeTypeBlockRequest:
-    properties:
-      id:
-        type: string
-      new_type:
         type: string
     type: object
   brzrpc.Id:
@@ -49,13 +26,6 @@ definitions:
         type: string
       updated_at:
         type: integer
-    type: object
-  brzrpc.NoteTagId:
-    properties:
-      noteId:
-        type: string
-      tagId:
-        type: string
     type: object
   brzrpc.Tag:
     properties:
@@ -88,61 +58,16 @@ definitions:
       refresh_token:
         type: string
     type: object
-  brzrpc.UpdateTagColorRequest:
+  domain.AuthRequest:
     properties:
-      color:
-        type: string
-      id:
-        type: string
-    type: object
-  brzrpc.UpdateTagEmojiRequest:
-    properties:
-      emoji:
-        type: string
-      id:
-        type: string
-    type: object
-  brzrpc.UpdateTagTitleRequest:
-    properties:
-      id:
-        type: string
-      title:
-        type: string
-    type: object
-  brzrpc.User:
-    properties:
-      about:
-        type: string
       email:
-        type: string
-      id:
         type: string
       login:
         type: string
       password:
         type: string
-      photo:
-        type: string
     type: object
-  views.ChangePasswordRequest:
-    properties:
-      email:
-        type: string
-      login:
-        type: string
-      new_password:
-        type: string
-      new_password_2:
-        type: string
-      old_password:
-        type: string
-    type: object
-  views.NoteReq:
-    properties:
-      title:
-        type: string
-    type: object
-  views.SWGBlock:
+  domain.Block:
     properties:
       created_at:
         type: integer
@@ -162,33 +87,120 @@ definitions:
       updated_at:
         type: integer
     type: object
-  views.SWGCreateBlockRequest:
+  domain.BlockNoteId:
+    properties:
+      block_id:
+        type: string
+      note_id:
+        type: string
+    type: object
+  domain.ChangeBlockOrderRequest:
+    properties:
+      new_order:
+        type: integer
+      note_id:
+        type: string
+      old_order:
+        type: integer
+    type: object
+  domain.ChangePasswordRequest:
+    properties:
+      new_password:
+        type: string
+      new_password_2:
+        type: string
+      old_password:
+        type: string
+    type: object
+  domain.ChangeTypeBlockRequest:
+    properties:
+      block_id:
+        type: string
+      new_type:
+        type: string
+      note_id:
+        type: string
+    type: object
+  domain.CreateBlockRequest:
     properties:
       data:
         additionalProperties: {}
         type: object
+      note_id:
+        type: string
+      pos:
+        type: integer
       type:
         type: string
     type: object
-  views.SWGError:
+  domain.CreateNoteRequest:
+    properties:
+      title:
+        type: string
+    type: object
+  domain.CreateTagRequest:
+    properties:
+      color:
+        type: string
+      emoji:
+        type: string
+      title:
+        type: string
+    type: object
+  domain.Error:
     properties:
       error:
         example: error
         type: string
     type: object
-  views.SWGMessage:
+  domain.Id:
+    properties:
+      id:
+        type: string
+    type: object
+  domain.Message:
     properties:
       message:
         example: some info
         type: string
     type: object
-  views.SWGNoteWithBlocks:
+  domain.NoteListPaginationResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/domain.NotePart'
+        type: array
+      total:
+        type: integer
+    type: object
+  domain.NotePart:
+    properties:
+      firstBlock:
+        type: string
+      id:
+        type: string
+      tag:
+        $ref: '#/definitions/domain.Tag'
+      title:
+        type: string
+      updatedAt:
+        format: int64
+        type: integer
+    type: object
+  domain.NoteTagId:
+    properties:
+      note_id:
+        type: string
+      tag_id:
+        type: string
+    type: object
+  domain.NoteWithBlocks:
     properties:
       author:
         type: string
       blocks:
         items:
-          $ref: '#/definitions/views.SWGBlock'
+          $ref: '#/definitions/domain.Block'
         type: array
       created_at:
         type: integer
@@ -203,55 +215,97 @@ definitions:
           type: string
         type: array
       tag:
-        $ref: '#/definitions/brzrpc.Tag'
+        $ref: '#/definitions/domain.Tag'
       title:
         type: string
       updated_at:
         type: integer
     type: object
-  views.SWGOpBlockRequest:
+  domain.OpBlockRequest:
     properties:
+      block_id:
+        type: string
       data:
         additionalProperties: {}
         type: object
-      id:
+      note_id:
         type: string
       op:
         type: string
     type: object
-  views.TagReq:
+  domain.Tag:
     properties:
       color:
         type: string
       emoji:
         type: string
+      id:
+        type: string
       title:
         type: string
+      userId:
+        type: string
     type: object
-  views.UpdateAboutRequest:
+  domain.UpdateAboutRequest:
     properties:
       new_about:
         type: string
     type: object
-  views.UpdateEmailRequest:
+  domain.UpdateEmailRequest:
     properties:
       new_email:
         type: string
     type: object
-  views.UpdatePhotoRequest:
+  domain.UpdatePhotoRequest:
     properties:
       new_photo:
         type: string
     type: object
-  views.UserRegister:
+  domain.UpdateTagColorRequest:
+    properties:
+      color:
+        type: string
+      id_tag:
+        type: string
+    type: object
+  domain.UpdateTagEmojiRequest:
+    properties:
+      emoji:
+        type: string
+      id_tag:
+        type: string
+    type: object
+  domain.UpdateTagTitleRequest:
+    properties:
+      id_tag:
+        type: string
+      title:
+        type: string
+    type: object
+  domain.User:
+    properties:
+      about:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      login:
+        type: string
+      password:
+        type: string
+      photo:
+        type: string
+    type: object
+  domain.UserRegister:
     properties:
       email:
         type: string
       login:
         type: string
-      pw1:
+      password:
         type: string
-      pw2:
+      password2:
         type: string
     type: object
 host: localhost:8080
@@ -276,7 +330,7 @@ paths:
         name: User
         required: true
         schema:
-          $ref: '#/definitions/brzrpc.AuthRequest'
+          $ref: '#/definitions/domain.AuthRequest'
       produces:
       - application/json
       responses:
@@ -287,15 +341,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Authorize user
       tags:
       - auth
@@ -310,7 +368,7 @@ paths:
         name: User
         required: true
         schema:
-          $ref: '#/definitions/views.UserRegister'
+          $ref: '#/definitions/domain.UserRegister'
       produces:
       - application/json
       responses:
@@ -321,15 +379,19 @@ paths:
         "302":
           description: Found
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Register new user
       tags:
       - auth
@@ -343,7 +405,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/views.SWGMessage'
+            $ref: '#/definitions/domain.Message'
         "201":
           description: Created
           schema:
@@ -351,15 +413,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "410":
           description: Gone
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Validate token (uses cookies)
       tags:
       - auth
@@ -387,20 +453,24 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
-      summary: Delete block
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
+      summary: delete block
       tags:
       - block
     post:
@@ -413,26 +483,30 @@ paths:
         name: CreateBlockRequest
         required: true
         schema:
-          $ref: '#/definitions/views.SWGCreateBlockRequest'
+          $ref: '#/definitions/domain.CreateBlockRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/brzrpc.Id'
+            $ref: '#/definitions/domain.Id'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Create block
       tags:
       - block
@@ -447,7 +521,7 @@ paths:
         name: OpBlockRequest
         required: true
         schema:
-          $ref: '#/definitions/views.SWGOpBlockRequest'
+          $ref: '#/definitions/domain.OpBlockRequest'
       produces:
       - application/json
       responses:
@@ -456,15 +530,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Operate on block
       tags:
       - block
@@ -479,7 +557,7 @@ paths:
         name: ChangeBlockOrderRequest
         required: true
         schema:
-          $ref: '#/definitions/brzrpc.ChangeBlockOrderRequest'
+          $ref: '#/definitions/domain.ChangeBlockOrderRequest'
       produces:
       - application/json
       responses:
@@ -488,15 +566,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Change block order in note
       tags:
       - block
@@ -511,7 +593,7 @@ paths:
         name: ChangeTypeBlockRequest
         required: true
         schema:
-          $ref: '#/definitions/brzrpc.ChangeTypeBlockRequest'
+          $ref: '#/definitions/domain.ChangeTypeBlockRequest'
       produces:
       - application/json
       responses:
@@ -520,15 +602,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Change block type
       tags:
       - block
@@ -540,11 +626,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/views.SWGMessage'
+            $ref: '#/definitions/domain.Message'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGMessage'
+            $ref: '#/definitions/domain.Message'
       summary: check health of gateway
       tags:
       - healthz
@@ -565,24 +651,28 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/views.SWGNoteWithBlocks'
+            $ref: '#/definitions/domain.NoteWithBlocks'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
-      summary: Get note
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
+      summary: GetNote note
       tags:
       - note
     post:
@@ -595,7 +685,7 @@ paths:
         name: Note
         required: true
         schema:
-          $ref: '#/definitions/views.NoteReq'
+          $ref: '#/definitions/domain.CreateNoteRequest'
       produces:
       - application/json
       responses:
@@ -606,11 +696,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Create note
       tags:
       - note
@@ -636,18 +730,20 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/brzrpc.NotePart'
-            type: array
+            $ref: '#/definitions/domain.NoteListPaginationResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
-      summary: Get all notes of user
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
+      summary: GetNote all notes of user
       tags:
       - note
   /api/note/by-tag:
@@ -683,12 +779,16 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
-      summary: Get notes by tag
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
+      summary: GetNote notes by tag
       tags:
       - note
   /api/note/find:
@@ -724,7 +824,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "408":
           description: Request Timeout
           schema:
@@ -734,11 +834,15 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: search note by title or blocks inside
       tags:
       - note
@@ -753,7 +857,7 @@ paths:
         name: AddTagToNoteRequest
         required: true
         schema:
-          $ref: '#/definitions/brzrpc.NoteTagId'
+          $ref: '#/definitions/domain.NoteTagId'
       produces:
       - application/json
       responses:
@@ -762,15 +866,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Remove tag from note
       tags:
       - note
@@ -784,7 +892,7 @@ paths:
         name: AddTagToNoteRequest
         required: true
         schema:
-          $ref: '#/definitions/brzrpc.NoteTagId'
+          $ref: '#/definitions/domain.NoteTagId'
       produces:
       - application/json
       responses:
@@ -793,15 +901,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Add tag to note
       tags:
       - note
@@ -825,19 +937,23 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Change note title
       tags:
       - note
@@ -860,16 +976,24 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
-      summary: Delete tag
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
+      summary: delete tag
       tags:
       - tag
     post:
@@ -882,22 +1006,30 @@ paths:
         name: Tag
         required: true
         schema:
-          $ref: '#/definitions/views.TagReq'
+          $ref: '#/definitions/domain.CreateTagRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/brzrpc.Id'
+            $ref: '#/definitions/domain.Id'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Create tag
       tags:
       - tag
@@ -913,17 +1045,25 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/brzrpc.Tag'
+              $ref: '#/definitions/domain.Tag'
             type: array
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
-      summary: Get tags by user
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
+      summary: GetNote tags by user
       tags:
       - tag
   /api/tag/color:
@@ -937,7 +1077,7 @@ paths:
         name: UpdateTagColorRequest
         required: true
         schema:
-          $ref: '#/definitions/brzrpc.UpdateTagColorRequest'
+          $ref: '#/definitions/domain.UpdateTagColorRequest'
       produces:
       - application/json
       responses:
@@ -946,19 +1086,23 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Update tag color
       tags:
       - tag
@@ -973,7 +1117,7 @@ paths:
         name: UpdateTagEmojiRequest
         required: true
         schema:
-          $ref: '#/definitions/brzrpc.UpdateTagEmojiRequest'
+          $ref: '#/definitions/domain.UpdateTagEmojiRequest'
       produces:
       - application/json
       responses:
@@ -982,19 +1126,23 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Update tag emoji
       tags:
       - tag
@@ -1009,7 +1157,7 @@ paths:
         name: UpdateTagTitleRequest
         required: true
         schema:
-          $ref: '#/definitions/brzrpc.UpdateTagTitleRequest'
+          $ref: '#/definitions/domain.UpdateTagTitleRequest'
       produces:
       - application/json
       responses:
@@ -1018,19 +1166,23 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Update tag title
       tags:
       - tag
@@ -1047,11 +1199,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Clean trash
       tags:
       - trash
@@ -1071,12 +1227,16 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
-      summary: Get notes from trash
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
+      summary: GetNote notes from trash
       tags:
       - trash
   /api/trash/from:
@@ -1098,15 +1258,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Restore note from trash
       tags:
       - trash
@@ -1129,15 +1293,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: Move note to trash
       tags:
       - trash
@@ -1152,23 +1320,27 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: delete user account
       tags:
       - user
@@ -1183,7 +1355,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/views.UpdateAboutRequest'
+          $ref: '#/definitions/domain.UpdateAboutRequest'
       produces:
       - application/json
       responses:
@@ -1192,23 +1364,27 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: update user about
       tags:
       - user
@@ -1222,23 +1398,27 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/brzrpc.User'
+            $ref: '#/definitions/domain.User'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "410":
           description: Gone
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: get user data from access token
       tags:
       - user
@@ -1253,7 +1433,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/views.UpdateEmailRequest'
+          $ref: '#/definitions/domain.UpdateEmailRequest'
       produces:
       - application/json
       responses:
@@ -1262,23 +1442,27 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: update user email
       tags:
       - user
@@ -1293,7 +1477,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/views.UpdatePhotoRequest'
+          $ref: '#/definitions/domain.UpdatePhotoRequest'
       produces:
       - application/json
       responses:
@@ -1302,23 +1486,27 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: update user photo
       tags:
       - user
@@ -1333,7 +1521,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/views.ChangePasswordRequest'
+          $ref: '#/definitions/domain.ChangePasswordRequest'
       produces:
       - application/json
       responses:
@@ -1342,23 +1530,27 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
-            $ref: '#/definitions/views.SWGError'
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
       summary: change user password
       tags:
       - user

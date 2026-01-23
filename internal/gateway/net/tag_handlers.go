@@ -2,16 +2,12 @@ package net
 
 import (
 	"context"
-	brzrpc2 "github.com/autumnterror/breezynotes/api/proto/gen"
-	"net/http"
-	"time"
-
-	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/pkg/utils/uid"
-	"github.com/autumnterror/breezynotes/views"
+	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
+	"github.com/autumnterror/breezynotes/internal/gateway/domain"
+	"github.com/autumnterror/utils_go/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/utils/uid"
 	"github.com/labstack/echo/v4"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"net/http"
 )
 
 // CreateTag godoc
@@ -20,61 +16,51 @@ import (
 // @Tags tag
 // @Accept json
 // @Produce json
-// @Param Tag body views.TagReq true "Tag data"
-// @Success 201 {object} brzrpc.Id
-// @Failure 400 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Param Tag body domain.CreateTagRequest true "Tag data"
+// @Success 201 {object} domain.Id
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/tag [post]
 func (e *Echo) CreateTag(c echo.Context) error {
 	const op = "gateway.net.CreateTag"
-	log.Info(op, "")
-
 	api := e.bnAPI.API
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	var r views.TagReq
+	var r domain.CreateTagRequest
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "create tag bind", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
 	newId := uid.New()
 
-	_, err := api.CreateTag(ctx, &brzrpc2.Tag{
+	_, err := api.CreateTag(ctx, &brzrpc.Tag{
 		Id:     newId,
 		Title:  r.Title,
 		Color:  r.Color,
 		Emoji:  r.Emoji,
 		UserId: idUser,
 	})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "create tag error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "create tag error"})
-		}
 
-		switch st.Code() {
-		default:
-			log.Error(op, "create tag error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "create tag error"})
-		}
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
-	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
-	log.Success(op, "")
-
-	return c.JSON(http.StatusCreated, brzrpc2.Id{Id: newId})
+	return c.JSON(http.StatusCreated, domain.Id{Id: newId})
 }
 
 // UpdateTagTitle godoc
@@ -83,65 +69,47 @@ func (e *Echo) CreateTag(c echo.Context) error {
 // @Tags tag
 // @Accept json
 // @Produce json
-// @Param UpdateTagTitleRequest body brzrpc.UpdateTagTitleRequest true "Tag ID and title"
+// @Param UpdateTagTitleRequest body domain.UpdateTagTitleRequest true "Tag ID and title"
 // @Success 200
-// @Failure 400 {object} views.SWGError
-// @Failure 401 {object} views.SWGError
-// @Failure 404 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/tag/title [patch]
 func (e *Echo) UpdateTagTitle(c echo.Context) error {
 	const op = "gateway.net.UpdateTagTitle"
-	log.Info(op, "")
 
 	api := e.bnAPI.API
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	var r brzrpc2.UpdateTagTitleRequest
+	var r domain.UpdateTagTitleRequest
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "update tag title bind", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	if t, err := api.GetTag(ctx, &brzrpc2.TagId{TagId: r.GetId()}); err == nil {
-		if t.GetUserId() != idUser {
-			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
-		}
-	} else {
-		log.Error(op, "get tag", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad tag id"})
+	_, err := api.UpdateTagTitle(ctx, &brzrpc.UpdateTagTitleRequest{
+		IdTag:  idUser,
+		Title:  r.Title,
+		IdUser: r.IdTag,
+	})
+
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
-	_, err := api.UpdateTagTitle(ctx, &r)
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "update tag title error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "update tag title error"})
-		}
-
-		switch st.Code() {
-		case codes.NotFound:
-			log.Warn(op, "tag not found", err)
-			return c.JSON(http.StatusNotFound, views.SWGError{Error: "tag not found"})
-		default:
-			log.Error(op, "update tag title error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "update tag title error"})
-		}
-	}
-
-	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-
-	log.Success(op, "")
 
 	return c.NoContent(http.StatusOK)
 }
@@ -152,65 +120,47 @@ func (e *Echo) UpdateTagTitle(c echo.Context) error {
 // @Tags tag
 // @Accept json
 // @Produce json
-// @Param UpdateTagColorRequest body brzrpc.UpdateTagColorRequest true "Tag ID and color"
+// @Param UpdateTagColorRequest body domain.UpdateTagColorRequest true "Tag ID and color"
 // @Success 200
-// @Failure 400 {object} views.SWGError
-// @Failure 401 {object} views.SWGError
-// @Failure 404 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/tag/color [patch]
 func (e *Echo) UpdateTagColor(c echo.Context) error {
 	const op = "gateway.net.UpdateTagColor"
-	log.Info(op, "")
 
 	api := e.bnAPI.API
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	var r brzrpc2.UpdateTagColorRequest
+	var r domain.UpdateTagColorRequest
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "update tag color bind", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	if t, err := api.GetTag(ctx, &brzrpc2.TagId{TagId: r.GetId()}); err == nil {
-		if t.GetUserId() != idUser {
-			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
-		}
-	} else {
-		log.Error(op, "get tag", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad tag id"})
+	_, err := api.UpdateTagColor(ctx, &brzrpc.UpdateTagColorRequest{
+		IdTag:  r.IdTag,
+		Color:  r.Color,
+		IdUser: idUser,
+	})
+
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
-	_, err := api.UpdateTagColor(ctx, &r)
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "update tag color error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "update tag color error"})
-		}
-
-		switch st.Code() {
-		case codes.NotFound:
-			log.Warn(op, "tag not found", err)
-			return c.JSON(http.StatusNotFound, views.SWGError{Error: "tag not found"})
-		default:
-			log.Error(op, "update tag color error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "update tag color error"})
-		}
-	}
-
-	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-
-	log.Success(op, "")
 
 	return c.NoContent(http.StatusOK)
 }
@@ -221,65 +171,47 @@ func (e *Echo) UpdateTagColor(c echo.Context) error {
 // @Tags tag
 // @Accept json
 // @Produce json
-// @Param UpdateTagEmojiRequest body brzrpc.UpdateTagEmojiRequest true "Tag ID and emoji"
+// @Param UpdateTagEmojiRequest body domain.UpdateTagEmojiRequest true "Tag ID and emoji"
 // @Success 200
-// @Failure 400 {object} views.SWGError
-// @Failure 401 {object} views.SWGError
-// @Failure 404 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/tag/emoji [patch]
 func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 	const op = "gateway.net.UpdateTagEmoji"
-	log.Info(op, "")
 
 	api := e.bnAPI.API
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	var r brzrpc2.UpdateTagEmojiRequest
+	var r domain.UpdateTagEmojiRequest
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "update tag emoji bind", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	if t, err := api.GetTag(ctx, &brzrpc2.TagId{TagId: r.GetId()}); err == nil {
-		if t.GetUserId() != idUser {
-			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
-		}
-	} else {
-		log.Error(op, "get tag", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad tag id"})
+	_, err := api.UpdateTagEmoji(ctx, &brzrpc.UpdateTagEmojiRequest{
+		IdTag:  r.IdTag,
+		Emoji:  r.Emoji,
+		IdUser: idUser,
+	})
+
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
-	_, err := api.UpdateTagEmoji(ctx, &r)
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "update tag emoji error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "update tag emoji error"})
-		}
-
-		switch st.Code() {
-		case codes.NotFound:
-			log.Warn(op, "tag not found", err)
-			return c.JSON(http.StatusNotFound, views.SWGError{Error: "tag not found"})
-		default:
-			log.Error(op, "update tag emoji error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "update tag emoji error"})
-		}
-	}
-
-	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-
-	log.Success(op, "")
 
 	return c.NoContent(http.StatusOK)
 }
@@ -292,58 +224,39 @@ func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 // @Produce json
 // @Param id query string true "Tag ID"
 // @Success 200
-// @Failure 400 {object} views.SWGError
-// @Failure 401 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/tag [delete]
 func (e *Echo) DeleteTag(c echo.Context) error {
 	const op = "gateway.net.DeleteTag"
-	log.Info(op, "")
 
 	api := e.bnAPI.API
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
 	id := c.QueryParam("id")
 	if id == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	if t, err := api.GetTag(ctx, &brzrpc2.TagId{TagId: id}); err == nil {
-		if t.GetUserId() != idUser {
-			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
-		}
-	} else {
-		log.Error(op, "get tag", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad tag id"})
+	_, err := api.DeleteTag(ctx, &brzrpc.UserTagId{TagId: id, UserId: idUser})
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
-	_, err := api.DeleteTag(ctx, &brzrpc2.TagId{TagId: id})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "delete tag error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "delete tag error"})
-		}
-
-		switch st.Code() {
-		default:
-			log.Error(op, "delete tag error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "delete tag error"})
-		}
-	}
-
-	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-
-	log.Success(op, "")
 
 	return c.NoContent(http.StatusOK)
 }
@@ -354,57 +267,48 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 // @Tags tag
 // @Accept json
 // @Produce json
-// @Success 200 {object} []brzrpc.Tag
-// @Failure 400 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Success 200 {object} []domain.Tag
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/tag/by-user [get]
 func (e *Echo) GetTagsByUser(c echo.Context) error {
 	const op = "gateway.net.GetTagsByUser"
-	log.Info(op, "")
 
 	api := e.bnAPI.API
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	if tgs, err := e.rdsAPI.API.GetTagsByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
+	if tgs, err := e.rdsAPI.API.GetTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	} else {
 		if tgs != nil {
 			if len(tgs.GetItems()) != 0 {
-				log.Blue("read from cache")
+
 				return c.JSON(http.StatusOK, tgs.GetItems())
 			}
 		}
 	}
 
-	tags, err := api.GetTagsByUser(ctx, &brzrpc2.UserId{UserId: idUser})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "get tags by user error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get tags by user error"})
-		}
-
-		switch st.Code() {
-		default:
-			log.Error(op, "get tags by user error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get tags by user error"})
-		}
+	tags, err := api.GetTagsByUser(ctx, &brzrpc.UserId{UserId: idUser})
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
-	if _, err := e.rdsAPI.API.SetTagsByUser(ctx, &brzrpc2.TagsByUser{UserId: idUser, Items: tags.GetItems()}); err != nil {
+	if _, err := e.rdsAPI.API.SetTagsByUser(ctx, &brzrpc.TagsByUser{UserId: idUser, Items: tags.GetItems()}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 	if len(tags.Items) == 0 {
-		tags.Items = []*brzrpc2.Tag{}
+		tags.Items = []*brzrpc.Tag{}
 	}
-	log.Success(op, "")
 
-	return c.JSON(http.StatusOK, tags.GetItems())
+	return c.JSON(http.StatusOK, domain.ToTags(tags).Tgs)
 }

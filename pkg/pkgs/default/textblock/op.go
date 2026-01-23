@@ -2,7 +2,7 @@ package textblock
 
 import (
 	"errors"
-	"github.com/autumnterror/breezynotes/pkg/utils/alg"
+	"github.com/autumnterror/utils_go/pkg/utils/alg"
 	"runtime"
 )
 

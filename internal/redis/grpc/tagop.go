@@ -3,9 +3,7 @@ package grpc
 import (
 	"context"
 	brzrpc2 "github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
-	"github.com/autumnterror/breezynotes/views"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -13,7 +11,6 @@ import (
 
 func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc2.UserId) (*brzrpc2.Tags, error) {
 	const op = "redis.grpc.GetTagsByUser"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
@@ -22,23 +19,8 @@ func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc2.UserId) (*br
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
-	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		tgs, err := s.rds.GetSessionTags(ctx, req.GetUserId())
-		if err != nil {
-			switch {
-			default:
-				log.Warn(op, "", err)
-				res <- views.ResRPC{
-					Res: nil,
-					Err: status.Error(codes.Internal, err.Error()),
-				}
-			}
-			return
-		}
-		res <- views.ResRPC{
-			Res: tgs,
-			Err: nil,
-		}
+	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return s.rds.GetSessionTags(ctx, req.GetUserId())
 	})
 
 	if err != nil {
@@ -50,7 +32,6 @@ func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc2.UserId) (*br
 
 func (s *ServerAPI) SetTagsByUser(ctx context.Context, req *brzrpc2.TagsByUser) (*emptypb.Empty, error) {
 	const op = "redis.grpc.SetTagsByUser"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
@@ -59,24 +40,8 @@ func (s *ServerAPI) SetTagsByUser(ctx context.Context, req *brzrpc2.TagsByUser) 
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		err := s.rds.SetSessionTags(ctx, req.GetUserId(), req.GetItems())
-		if err != nil {
-			switch {
-			default:
-				log.Warn(op, "", err)
-				res <- views.ResRPC{
-					Res: nil,
-					Err: status.Error(codes.Internal, err.Error()),
-				}
-			}
-			return
-		}
-
-		res <- views.ResRPC{
-			Res: nil,
-			Err: nil,
-		}
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.rds.SetSessionTags(ctx, req.GetUserId(), req.GetItems())
 	})
 
 	if err != nil {
@@ -88,7 +53,6 @@ func (s *ServerAPI) SetTagsByUser(ctx context.Context, req *brzrpc2.TagsByUser) 
 
 func (s *ServerAPI) RmTagsByUser(ctx context.Context, req *brzrpc2.UserId) (*emptypb.Empty, error) {
 	const op = "redis.grpc.RmTagsByUser"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
@@ -97,24 +61,8 @@ func (s *ServerAPI) RmTagsByUser(ctx context.Context, req *brzrpc2.UserId) (*emp
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		err := s.rds.SetSessionTags(ctx, req.GetUserId(), nil)
-		if err != nil {
-			switch {
-			default:
-				log.Warn(op, "", err)
-				res <- views.ResRPC{
-					Res: nil,
-					Err: status.Error(codes.Internal, err.Error()),
-				}
-			}
-			return
-		}
-
-		res <- views.ResRPC{
-			Res: nil,
-			Err: nil,
-		}
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.rds.SetSessionTags(ctx, req.GetUserId(), nil)
 	})
 
 	if err != nil {

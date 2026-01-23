@@ -6,7 +6,7 @@ import (
 
 	"time"
 
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
@@ -20,7 +20,7 @@ func (a *API) Create(ctx context.Context, n *domain.Note) error {
 
 	n.CreatedAt, n.UpdatedAt = time.Now().UTC().Unix(), time.Now().UTC().Unix()
 
-	if _, err := a.db.InsertOne(ctx, n); err != nil {
+	if _, err := a.noteAPI.InsertOne(ctx, n); err != nil {
 		return format.Error(op, err)
 	}
 	return nil
@@ -33,7 +33,7 @@ func (a *API) insert(ctx context.Context, n *domain.Note) error {
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	if _, err := a.db.InsertOne(ctx, n); err != nil {
+	if _, err := a.noteAPI.InsertOne(ctx, n); err != nil {
 		return format.Error(op, err)
 	}
 	return nil
@@ -46,7 +46,7 @@ func (a *API) delete(ctx context.Context, id string) error {
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	res, err := a.db.DeleteOne(ctx, bson.D{{"_id", id}})
+	res, err := a.noteAPI.DeleteOne(ctx, bson.D{{"_id", id}})
 	if err != nil || res.DeletedCount == 0 {
 		if res.DeletedCount == 0 {
 			return format.Error(op, domain.ErrNotFound)

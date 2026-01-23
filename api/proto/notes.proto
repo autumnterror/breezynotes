@@ -10,36 +10,45 @@ option go_package = "github.com/autumnterror/breezynotes;brzrpc";
 
 // ===== Requests =====
 message ChangeBlockOrderRequest {
-  string id = 1;
+  string noteId = 1;
   int32 old_order = 2;
   int32 new_order = 3;
+  string userId = 4;
 }
 message ChangeTypeBlockRequest {
-  string id = 1;
+  string blockId = 1;
   string new_type = 2;
+  string userId = 3;
+  string noteId = 4;
 }
 message OpBlockRequest {
-  string id = 1;
+  string blockId = 1;
   string op = 2;
   google.protobuf.Struct data = 3;
+  string userId = 4;
+  string noteId = 5;
 }
 
 message ChangeTitleNoteRequest {
-  string id = 1;
+  string idNote = 1;
   string title = 2;
+  string idUser = 3;
 }
 
 message UpdateTagTitleRequest {
-  string id = 1;
+  string idTag = 1;
   string title = 2;
+  string idUser = 3;
 }
 message UpdateTagColorRequest {
-  string id = 1;
+  string idTag = 1;
   string color = 2;
+  string idUser = 3;
 }
 message UpdateTagEmojiRequest {
-  string id = 1;
+  string idTag = 1;
   string emoji = 2;
+  string idUser = 3;
 }
 
 message UpdateNoteTitleRequest {
@@ -63,43 +72,44 @@ message CreateBlockRequest {
   string noteId = 2;
   int32 pos = 3;
   google.protobuf.Struct data = 4;
+  string userId = 5;
 }
 
 
 // ===== BlockNote Service =====
 service BlockNoteService {
-  rpc DeleteBlock(NoteBlockId) returns (google.protobuf.Empty);
+  rpc DeleteBlock(NoteBlockUserId) returns (google.protobuf.Empty);
   rpc CreateBlock(CreateBlockRequest) returns (Id);
   rpc OpBlock(OpBlockRequest) returns (google.protobuf.Empty);
-  rpc GetBlock(BlockId) returns (Block);
-  rpc GetBlockAsFirst(BlockId) returns (StringResponse);
+  rpc GetBlock(NoteBlockUserId) returns (Block);
+//  rpc GetBlockAsFirst(BlockId) returns (StringResponse);
   rpc ChangeBlockOrder(ChangeBlockOrderRequest) returns (google.protobuf.Empty);
   rpc ChangeTypeBlock(ChangeTypeBlockRequest) returns (google.protobuf.Empty);
 
   rpc CleanTrash(UserId) returns (google.protobuf.Empty);
-  rpc ChangeTitleNote(ChangeTitleNoteRequest) returns (google.protobuf.Empty);
-  rpc NoteToTrash(NoteId) returns (google.protobuf.Empty);
-  rpc NoteFromTrash(NoteId) returns (google.protobuf.Empty);
-  rpc FindNoteInTrash(NoteId) returns (Note);
+  rpc NoteToTrash(UserNoteId) returns (google.protobuf.Empty);
+  rpc NoteFromTrash(UserNoteId) returns (google.protobuf.Empty);
+  rpc FindNoteInTrash(UserNoteId) returns (Note);
 
-  rpc GetNote(NoteId) returns (Note);
+  rpc GetNote(UserNoteId) returns (NoteWithBlocks);
   rpc CreateNote(Note) returns (google.protobuf.Empty);
-  rpc UpdateNoteTitle(UpdateNoteTitleRequest) returns (google.protobuf.Empty);
+//  rpc UpdateNoteTitle(UpdateNoteTitleRequest) returns (google.protobuf.Empty);
+  rpc ChangeTitleNote(ChangeTitleNoteRequest) returns (google.protobuf.Empty);
 
   rpc GetAllBlocksInNote(Strings) returns (Blocks);
   rpc GetAllNotes(UserId) returns (NoteParts);
   rpc GetNotesByTag(UserTagId) returns (NoteParts);
   rpc GetNotesFromTrash(UserId) returns (NoteParts);
 
-  rpc AddTagToNote(NoteTagId) returns (google.protobuf.Empty);
-  rpc RemoveTagFromNote(NoteTagId) returns (google.protobuf.Empty);
+  rpc AddTagToNote(NoteTagUserId) returns (google.protobuf.Empty);
+  rpc RemoveTagFromNote(NoteTagUserId) returns (google.protobuf.Empty);
   rpc CreateTag(Tag) returns (google.protobuf.Empty);
   rpc GetTagsByUser(UserId) returns (Tags);
-  rpc GetTag(TagId) returns (Tag);
+//  rpc GetTag(UserTagId) returns (Tag);
   rpc UpdateTagTitle(UpdateTagTitleRequest) returns (google.protobuf.Empty);
   rpc UpdateTagColor(UpdateTagColorRequest) returns (google.protobuf.Empty);
   rpc UpdateTagEmoji(UpdateTagEmojiRequest) returns (google.protobuf.Empty);
-  rpc DeleteTag(TagId) returns (google.protobuf.Empty);
+  rpc DeleteTag(UserTagId) returns (google.protobuf.Empty);
 
   rpc ShareNote(ShareNoteRequest) returns (google.protobuf.Empty);
   rpc ChangeUserRole(ChangeUserRoleRequest) returns (google.protobuf.Empty);

@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
+	"github.com/autumnterror/breezynotes/pkg/pkgs"
 	"time"
 
-	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/pkg/pkgs"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
-	"github.com/autumnterror/breezynotes/pkg/utils/uid"
+	"github.com/autumnterror/utils_go/pkg/log"
+
+	"github.com/autumnterror/utils_go/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/uid"
 )
 
 // Create universal func that get block, calls func blocks.createBlock by field _type.
@@ -68,7 +69,7 @@ func (a *API) OpBlock(ctx context.Context, id, opName string, data map[string]an
 	if pkgs.BlockRegistry[block.Type] == nil {
 		return domain.ErrTypeNotDefined
 	}
-	newData, err := pkgs.BlockRegistry[block.Type].Op(ctx, block, opName, data)
+	newData, err := pkgs.BlockRegistry[block.Type].Op(ctx, domain.FromBlockDb(block), opName, data)
 	if err != nil {
 		return format.Error(op, err)
 	}
@@ -94,7 +95,7 @@ func (a *API) GetAsFirst(ctx context.Context, id string) (string, error) {
 		return "", domain.ErrTypeNotDefined
 	}
 
-	return pkgs.BlockRegistry[block.Type].GetAsFirst(ctx, block), nil
+	return pkgs.BlockRegistry[block.Type].GetAsFirst(ctx, domain.FromBlockDb(block)), nil
 }
 
 // ChangeType universal func that get block, calls func ChangeType by field _type. NEED TO REGISTER TYPE BEFORE USE
@@ -122,5 +123,5 @@ func (a *API) ChangeType(ctx context.Context, id, newType string) error {
 	if pkgs.BlockRegistry[block.Type] == nil {
 		return domain.ErrTypeNotDefined
 	}
-	return pkgs.BlockRegistry[block.Type].ChangeType(ctx, block, newType)
+	return pkgs.BlockRegistry[block.Type].ChangeType(ctx, domain.FromBlockDb(block), newType)
 }

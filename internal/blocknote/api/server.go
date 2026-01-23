@@ -10,21 +10,15 @@ import (
 
 type ServerAPI struct {
 	brzrpc.UnimplementedBlockNoteServiceServer
-	tagAPI    *service.TagsService
-	noteAPI   *service.NotesService
-	blocksAPI *service.BlocksService
+	service *service.BN
 }
 
 func Register(
 	server *grpc.Server,
-	tagAPI *service.TagsService,
-	noteAPI *service.NotesService,
-	blocksAPI *service.BlocksService,
+	noteAPI *service.BN,
 ) {
 	brzrpc.RegisterBlockNoteServiceServer(server, &ServerAPI{
-		tagAPI:    tagAPI,
-		noteAPI:   noteAPI,
-		blocksAPI: blocksAPI,
+		service: noteAPI,
 	})
 }
 

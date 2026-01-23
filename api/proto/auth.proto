@@ -30,17 +30,20 @@ message UpdatePhotoRequest {
 message ChangePasswordRequest {
   string id = 1;
   string new_password = 2;
+  string old_password = 3;
 }
 
 // ===== Auth Service =====
 service AuthService {
-  rpc Auth(AuthRequest) returns (UserId);
-  
-  rpc GenerateAccessToken(UserId) returns (Token);
-  rpc GenerateRefreshToken(UserId) returns (Token);
-  rpc GenerateTokens(UserId) returns (Tokens);
-  rpc Refresh(Token) returns (Token);
-  rpc CheckToken(Token) returns (google.protobuf.Empty);
+  rpc Auth(AuthRequest) returns (Tokens);
+  rpc Reg(AuthRequest) returns (Tokens);
+  rpc ValidateTokens(Tokens) returns (Token);
+
+//  rpc GenerateAccessToken(UserId) returns (Token);
+//  rpc GenerateRefreshToken(UserId) returns (Token);
+//  rpc GenerateTokens(UserId) returns (Tokens);
+//  rpc Refresh(Token) returns (Token);
+//  rpc CheckToken(Token) returns (google.protobuf.Empty);
   
   rpc DeleteUser(UserId) returns (google.protobuf.Empty);
   rpc UpdateAbout(UpdateAboutRequest) returns (google.protobuf.Empty);
@@ -48,6 +51,7 @@ service AuthService {
   rpc UpdatePhoto(UpdatePhotoRequest) returns (google.protobuf.Empty);
   rpc ChangePasswd(ChangePasswordRequest) returns (google.protobuf.Empty);
   rpc CreateUser(User) returns (google.protobuf.Empty);
+
   rpc GetUserDataFromToken(Token) returns (User);
   rpc GetIdFromToken(Token) returns (Id);
 

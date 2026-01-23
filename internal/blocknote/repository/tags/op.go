@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
@@ -41,7 +41,7 @@ func (a *API) Get(ctx context.Context, id string) (*domain.Tag, error) {
 }
 
 func (a *API) GetAllById(ctx context.Context, id string) (*domain.Tags, error) {
-	const op = "tags.GetAllById"
+	const op = "tags.GetAllByIdTag"
 
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()

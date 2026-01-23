@@ -2,8 +2,9 @@ package textblock
 
 import (
 	"fmt"
-	"github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+
+	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
@@ -61,10 +62,10 @@ func (tb *TextBlock) ToUnified() (*brzrpc.Block, error) {
 	const op = "textblock.ToUnified"
 
 	u := &brzrpc.Block{
-		Id:        tb.Id,
-		Type:      tb.Type,
-		NoteId:    tb.NoteId,
-		Order:     int32(tb.Order),
+		Id:     tb.Id,
+		Type:   tb.Type,
+		NoteId: tb.NoteId,
+		//Order:     int32(tb.Order),
 		CreatedAt: tb.CreatedAt,
 		UpdatedAt: tb.UpdatedAt,
 		IsUsed:    tb.IsUsed,
@@ -95,7 +96,6 @@ type TextBlock struct {
 	Id     string `bson:"_id" json:"id"`
 	Type   string `bson:"type" json:"type"`
 	NoteId string `bson:"noteId" json:"noteId"`
-	Order  int    `bson:"order" json:"order"`
 
 	CreatedAt int64 `bson:"createdAt" json:"createdAt"`
 	UpdatedAt int64 `bson:"updatedAt" json:"updatedAt"`

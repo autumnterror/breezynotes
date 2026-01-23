@@ -6,20 +6,20 @@ import (
 	domain "github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 
-	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-// GetNote return note by id can return mongo.ErrNotFound
-func (a *API) GetNote(ctx context.Context, id string) (*domain.Note, error) {
-	const op = "notes.GetNote"
+// Get return note by id can return mongo.ErrNotFound
+func (a *API) Get(ctx context.Context, id string) (*domain.Note, error) {
+	const op = "notes.Get"
 
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	res := a.db.FindOne(ctx, bson.M{"_id": id})
+	res := a.noteAPI.FindOne(ctx, bson.M{"_id": id})
 	if res.Err() != nil {
 		if errors.Is(res.Err(), mongo.ErrNoDocuments) {
 			return nil, format.Error(op, domain.ErrNotFound)
@@ -43,7 +43,7 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string) (*domain.NotePar
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	cur, err := a.db.Find(ctx, bson.M{"author": id}, options.Find().SetSort(bson.M{"updated_at": -1}))
+	cur, err := a.noteAPI.Find(ctx, bson.M{"author": id}, options.Find().SetSort(bson.M{"updated_at": -1}))
 
 	if err != nil {
 		return nil, format.Error(op, err)
@@ -88,7 +88,7 @@ func (a *API) GetNoteListByTag(ctx context.Context, idTag, idUser string) (*doma
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	cur, err := a.db.Find(ctx, bson.M{"tag._id": idTag, "author": idUser}, options.Find().SetSort(bson.M{"updated_at": -1}))
+	cur, err := a.noteAPI.Find(ctx, bson.M{"tag._id": idTag, "author": idUser}, options.Find().SetSort(bson.M{"updated_at": -1}))
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
@@ -126,12 +126,12 @@ func (a *API) GetNoteListByTag(ctx context.Context, idTag, idUser string) (*doma
 
 // GetAllByUser return note by id author
 func (a *API) getAllByUser(ctx context.Context, id string) (*domain.Notes, error) {
-	const op = "notes.GetNote"
+	const op = "notes.Get"
 
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	cur, err := a.db.Find(ctx, bson.M{"author": id}, options.Find().SetSort(bson.M{"updated_at": -1}))
+	cur, err := a.noteAPI.Find(ctx, bson.M{"author": id}, options.Find().SetSort(bson.M{"updated_at": -1}))
 	if err != nil {
 		return nil, format.Error(op, err)
 	}

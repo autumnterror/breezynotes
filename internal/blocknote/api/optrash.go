@@ -3,35 +3,19 @@ package api
 import (
 	"context"
 	"github.com/autumnterror/breezynotes/api/proto/gen"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 
-	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
-	"github.com/autumnterror/breezynotes/views"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func (s *ServerAPI) CleanTrash(ctx context.Context, req *brzrpc.UserId) (*emptypb.Empty, error) {
 	const op = "block.note.grpc.CleanTrash"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
-
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.noteAPI.CleanTrash(ctx, req.GetUserId()); err != nil {
-			log.Warn(op, "", err)
-			res <- views.ResRPC{
-				Res: nil,
-				Err: status.Error(codes.Internal, err.Error()),
-			}
-			return
-		}
-		res <- views.ResRPC{
-			Res: nil,
-			Err: nil,
-		}
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.service.CleanTrash(ctx, req.GetUserId())
 	})
 
 	if err != nil {
@@ -41,26 +25,13 @@ func (s *ServerAPI) CleanTrash(ctx context.Context, req *brzrpc.UserId) (*emptyp
 	return nil, nil
 }
 
-func (s *ServerAPI) NoteToTrash(ctx context.Context, req *brzrpc.NoteId) (*emptypb.Empty, error) {
+func (s *ServerAPI) NoteToTrash(ctx context.Context, req *brzrpc.UserNoteId) (*emptypb.Empty, error) {
 	const op = "block.note.grpc.ToTrash"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
-
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.noteAPI.ToTrash(ctx, req.GetNoteId()); err != nil {
-			log.Warn(op, "", err)
-			res <- views.ResRPC{
-				Res: nil,
-				Err: status.Error(codes.Internal, err.Error()),
-			}
-			return
-		}
-		res <- views.ResRPC{
-			Res: nil,
-			Err: nil,
-		}
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.service.ToTrash(ctx, req.GetNoteId(), req.GetUserId())
 	})
 
 	if err != nil {
@@ -69,26 +40,13 @@ func (s *ServerAPI) NoteToTrash(ctx context.Context, req *brzrpc.NoteId) (*empty
 
 	return nil, nil
 }
-func (s *ServerAPI) NoteFromTrash(ctx context.Context, req *brzrpc.NoteId) (*emptypb.Empty, error) {
+func (s *ServerAPI) NoteFromTrash(ctx context.Context, req *brzrpc.UserNoteId) (*emptypb.Empty, error) {
 	const op = "block.note.grpc.FromTrash"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
-
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.noteAPI.FromTrash(ctx, req.GetNoteId()); err != nil {
-			log.Warn(op, "", err)
-			res <- views.ResRPC{
-				Res: nil,
-				Err: status.Error(codes.Internal, err.Error()),
-			}
-			return
-		}
-		res <- views.ResRPC{
-			Res: nil,
-			Err: nil,
-		}
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.service.FromTrash(ctx, req.GetNoteId(), req.GetUserId())
 	})
 
 	if err != nil {
@@ -98,62 +56,36 @@ func (s *ServerAPI) NoteFromTrash(ctx context.Context, req *brzrpc.NoteId) (*emp
 	return nil, nil
 }
 
-func (s *ServerAPI) FindNoteInTrash(ctx context.Context, req *brzrpc.NoteId) (*brzrpc.Note, error) {
+func (s *ServerAPI) FindNoteInTrash(ctx context.Context, req *brzrpc.UserNoteId) (*brzrpc.Note, error) {
 	const op = "block.note.grpc.FindNoteInTrash"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		n, err := s.noteAPI.FindOnTrash(ctx, req.GetNoteId())
-		if err != nil {
-			log.Warn(op, "", err)
-			res <- views.ResRPC{
-				Res: nil,
-				Err: status.Error(codes.Internal, err.Error()),
-			}
-			return
-		}
-		res <- views.ResRPC{
-			Res: n,
-			Err: nil,
-		}
+	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return s.service.FindOnTrash(ctx, req.GetNoteId(), req.GetUserId())
 	})
 
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
 
-	return res.(*brzrpc.Note), nil
+	return domain.FromNoteDb(res.(*domain.Note)), nil
 }
 
 func (s *ServerAPI) GetNotesFromTrash(ctx context.Context, req *brzrpc.UserId) (*brzrpc.NoteParts, error) {
 	const op = "block.note.grpc.GetNotesFromTrash"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		nts, err := s.noteAPI.GetNotesFromTrash(ctx, req.GetUserId())
-		if err != nil {
-			log.Warn(op, "", err)
-			res <- views.ResRPC{
-				Res: nil,
-				Err: status.Error(codes.Internal, err.Error()),
-			}
-			return
-		}
-		res <- views.ResRPC{
-			Res: nts,
-			Err: nil,
-		}
+	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return s.service.GetNotesFromTrash(ctx, req.GetUserId())
 	})
 
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
 
-	return res.(*brzrpc.NoteParts), nil
+	return domain.FromNotePartsDb(res.(*domain.NoteParts)), nil
 }

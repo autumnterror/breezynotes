@@ -3,7 +3,8 @@ package jwt
 import (
 	"errors"
 	"fmt"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/breezynotes/internal/auth/domain"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
@@ -25,12 +26,12 @@ func (w *WithConfig) GenerateToken(id, _type string) (string, error) {
 	claims["id"] = id
 	claims["type"] = _type
 	switch _type {
-	case TokenTypeAccess:
+	case domain.TokenTypeAccess:
 		claims["exp"] = time.Now().Add(w.cfg.AccessTokenLifeTime).Unix()
-	case TokenTypeRefresh:
+	case domain.TokenTypeRefresh:
 		claims["exp"] = time.Now().Add(w.cfg.RefreshTokenLifeTime).Unix()
 	default:
-		return "", format.Error(op, ErrWrongType)
+		return "", format.Error(op, domain.ErrWrongType)
 	}
 
 	ts, err := token.SignedString([]byte(w.cfg.TokenKey))
@@ -51,7 +52,7 @@ func (w *WithConfig) VerifyToken(tokenString string) (*jwt.Token, error) {
 	})
 	if err != nil {
 		if errors.Is(err, jwt.ErrTokenExpired) {
-			return nil, ErrTokenExpired
+			return nil, domain.ErrTokenExpired
 		}
 		return nil, format.Error(op, err)
 	}
@@ -96,7 +97,7 @@ func (w *WithConfig) Refresh(refreshToken string) (string, error) {
 
 	rawRefToken, err := w.VerifyToken(refreshToken)
 	if err != nil {
-		if errors.Is(err, ErrTokenExpired) {
+		if errors.Is(err, domain.ErrTokenExpired) {
 			return "", err
 		}
 		return "", format.Error(op, err)
@@ -106,8 +107,8 @@ func (w *WithConfig) Refresh(refreshToken string) (string, error) {
 		return "", format.Error(op, err)
 	}
 
-	if tp != TokenTypeRefresh {
-		return "", ErrWrongType
+	if tp != domain.TokenTypeRefresh {
+		return "", domain.ErrWrongType
 	}
 
 	id, err := w.GetIdFromToken(rawRefToken)
@@ -115,7 +116,7 @@ func (w *WithConfig) Refresh(refreshToken string) (string, error) {
 		return "", format.Error(op, err)
 	}
 
-	token, err := w.GenerateToken(id, TokenTypeAccess)
+	token, err := w.GenerateToken(id, domain.TokenTypeAccess)
 	if err != nil {
 		return "", format.Error(op, err)
 	}

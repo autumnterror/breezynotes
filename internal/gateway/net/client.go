@@ -7,7 +7,7 @@ import (
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/blocknote"
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/redis"
 	"github.com/autumnterror/breezynotes/internal/gateway/config"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"

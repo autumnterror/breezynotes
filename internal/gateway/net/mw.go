@@ -3,11 +3,10 @@ package net
 import (
 	"context"
 	"github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/autumnterror/breezynotes/pkg/utils/uid"
-	"github.com/autumnterror/breezynotes/views"
+	"github.com/autumnterror/breezynotes/internal/gateway/domain"
+	"github.com/autumnterror/utils_go/pkg/utils/uid"
 	"github.com/labstack/echo/v4"
 	"net/http"
-	"time"
 )
 
 func ValidateID() echo.MiddlewareFunc {
@@ -15,7 +14,7 @@ func ValidateID() echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			if idReq := c.QueryParam("id"); idReq != "" {
 				if !uid.Validate(idReq) {
-					return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "id is not in format"})
+					return c.JSON(http.StatusUnauthorized, domain.Error{Error: "id is not in format"})
 				}
 			}
 			return next(c)
@@ -23,12 +22,10 @@ func ValidateID() echo.MiddlewareFunc {
 	}
 }
 
-const IdFromContext = "idUserCtx"
-
 func (e *Echo) GetUserId() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+			ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 			defer done()
 			at, err := c.Cookie("access_token")
 			if err != nil {
@@ -36,10 +33,10 @@ func (e *Echo) GetUserId() echo.MiddlewareFunc {
 			}
 			u, err := e.authAPI.API.GetIdFromToken(ctx, &brzrpc.Token{Value: at.Value})
 			if err != nil || u.GetId() == "" {
-				return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad access_token"})
+				return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad access_token"})
 			}
 
-			c.Set(IdFromContext, u.GetId())
+			c.Set(domain.IdFromContext, u.GetId())
 
 			return next(c)
 		}

@@ -26,9 +26,10 @@ const (
 // ===== Requests =====
 type ChangeBlockOrderRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	NoteId        string                 `protobuf:"bytes,1,opt,name=noteId,proto3" json:"noteId,omitempty"`
 	OldOrder      int32                  `protobuf:"varint,2,opt,name=old_order,json=oldOrder,proto3" json:"old_order,omitempty"`
 	NewOrder      int32                  `protobuf:"varint,3,opt,name=new_order,json=newOrder,proto3" json:"new_order,omitempty"`
+	UserId        string                 `protobuf:"bytes,4,opt,name=userId,proto3" json:"userId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -63,9 +64,9 @@ func (*ChangeBlockOrderRequest) Descriptor() ([]byte, []int) {
 	return file_notes_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ChangeBlockOrderRequest) GetId() string {
+func (x *ChangeBlockOrderRequest) GetNoteId() string {
 	if x != nil {
-		return x.Id
+		return x.NoteId
 	}
 	return ""
 }
@@ -84,10 +85,19 @@ func (x *ChangeBlockOrderRequest) GetNewOrder() int32 {
 	return 0
 }
 
+func (x *ChangeBlockOrderRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
 type ChangeTypeBlockRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	BlockId       string                 `protobuf:"bytes,1,opt,name=blockId,proto3" json:"blockId,omitempty"`
 	NewType       string                 `protobuf:"bytes,2,opt,name=new_type,json=newType,proto3" json:"new_type,omitempty"`
+	UserId        string                 `protobuf:"bytes,3,opt,name=userId,proto3" json:"userId,omitempty"`
+	NoteId        string                 `protobuf:"bytes,4,opt,name=noteId,proto3" json:"noteId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -122,9 +132,9 @@ func (*ChangeTypeBlockRequest) Descriptor() ([]byte, []int) {
 	return file_notes_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *ChangeTypeBlockRequest) GetId() string {
+func (x *ChangeTypeBlockRequest) GetBlockId() string {
 	if x != nil {
-		return x.Id
+		return x.BlockId
 	}
 	return ""
 }
@@ -136,11 +146,27 @@ func (x *ChangeTypeBlockRequest) GetNewType() string {
 	return ""
 }
 
+func (x *ChangeTypeBlockRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *ChangeTypeBlockRequest) GetNoteId() string {
+	if x != nil {
+		return x.NoteId
+	}
+	return ""
+}
+
 type OpBlockRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	BlockId       string                 `protobuf:"bytes,1,opt,name=blockId,proto3" json:"blockId,omitempty"`
 	Op            string                 `protobuf:"bytes,2,opt,name=op,proto3" json:"op,omitempty"`
 	Data          *structpb.Struct       `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	UserId        string                 `protobuf:"bytes,4,opt,name=userId,proto3" json:"userId,omitempty"`
+	NoteId        string                 `protobuf:"bytes,5,opt,name=noteId,proto3" json:"noteId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -175,9 +201,9 @@ func (*OpBlockRequest) Descriptor() ([]byte, []int) {
 	return file_notes_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *OpBlockRequest) GetId() string {
+func (x *OpBlockRequest) GetBlockId() string {
 	if x != nil {
-		return x.Id
+		return x.BlockId
 	}
 	return ""
 }
@@ -196,10 +222,25 @@ func (x *OpBlockRequest) GetData() *structpb.Struct {
 	return nil
 }
 
+func (x *OpBlockRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *OpBlockRequest) GetNoteId() string {
+	if x != nil {
+		return x.NoteId
+	}
+	return ""
+}
+
 type ChangeTitleNoteRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	IdNote        string                 `protobuf:"bytes,1,opt,name=idNote,proto3" json:"idNote,omitempty"`
 	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	IdUser        string                 `protobuf:"bytes,3,opt,name=idUser,proto3" json:"idUser,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -234,9 +275,9 @@ func (*ChangeTitleNoteRequest) Descriptor() ([]byte, []int) {
 	return file_notes_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *ChangeTitleNoteRequest) GetId() string {
+func (x *ChangeTitleNoteRequest) GetIdNote() string {
 	if x != nil {
-		return x.Id
+		return x.IdNote
 	}
 	return ""
 }
@@ -248,10 +289,18 @@ func (x *ChangeTitleNoteRequest) GetTitle() string {
 	return ""
 }
 
+func (x *ChangeTitleNoteRequest) GetIdUser() string {
+	if x != nil {
+		return x.IdUser
+	}
+	return ""
+}
+
 type UpdateTagTitleRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	IdTag         string                 `protobuf:"bytes,1,opt,name=idTag,proto3" json:"idTag,omitempty"`
 	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	IdUser        string                 `protobuf:"bytes,3,opt,name=idUser,proto3" json:"idUser,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -286,9 +335,9 @@ func (*UpdateTagTitleRequest) Descriptor() ([]byte, []int) {
 	return file_notes_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *UpdateTagTitleRequest) GetId() string {
+func (x *UpdateTagTitleRequest) GetIdTag() string {
 	if x != nil {
-		return x.Id
+		return x.IdTag
 	}
 	return ""
 }
@@ -300,10 +349,18 @@ func (x *UpdateTagTitleRequest) GetTitle() string {
 	return ""
 }
 
+func (x *UpdateTagTitleRequest) GetIdUser() string {
+	if x != nil {
+		return x.IdUser
+	}
+	return ""
+}
+
 type UpdateTagColorRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	IdTag         string                 `protobuf:"bytes,1,opt,name=idTag,proto3" json:"idTag,omitempty"`
 	Color         string                 `protobuf:"bytes,2,opt,name=color,proto3" json:"color,omitempty"`
+	IdUser        string                 `protobuf:"bytes,3,opt,name=idUser,proto3" json:"idUser,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -338,9 +395,9 @@ func (*UpdateTagColorRequest) Descriptor() ([]byte, []int) {
 	return file_notes_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *UpdateTagColorRequest) GetId() string {
+func (x *UpdateTagColorRequest) GetIdTag() string {
 	if x != nil {
-		return x.Id
+		return x.IdTag
 	}
 	return ""
 }
@@ -352,10 +409,18 @@ func (x *UpdateTagColorRequest) GetColor() string {
 	return ""
 }
 
+func (x *UpdateTagColorRequest) GetIdUser() string {
+	if x != nil {
+		return x.IdUser
+	}
+	return ""
+}
+
 type UpdateTagEmojiRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	IdTag         string                 `protobuf:"bytes,1,opt,name=idTag,proto3" json:"idTag,omitempty"`
 	Emoji         string                 `protobuf:"bytes,2,opt,name=emoji,proto3" json:"emoji,omitempty"`
+	IdUser        string                 `protobuf:"bytes,3,opt,name=idUser,proto3" json:"idUser,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -390,9 +455,9 @@ func (*UpdateTagEmojiRequest) Descriptor() ([]byte, []int) {
 	return file_notes_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *UpdateTagEmojiRequest) GetId() string {
+func (x *UpdateTagEmojiRequest) GetIdTag() string {
 	if x != nil {
-		return x.Id
+		return x.IdTag
 	}
 	return ""
 }
@@ -400,6 +465,13 @@ func (x *UpdateTagEmojiRequest) GetId() string {
 func (x *UpdateTagEmojiRequest) GetEmoji() string {
 	if x != nil {
 		return x.Emoji
+	}
+	return ""
+}
+
+func (x *UpdateTagEmojiRequest) GetIdUser() string {
+	if x != nil {
+		return x.IdUser
 	}
 	return ""
 }
@@ -574,6 +646,7 @@ type CreateBlockRequest struct {
 	NoteId        string                 `protobuf:"bytes,2,opt,name=noteId,proto3" json:"noteId,omitempty"`
 	Pos           int32                  `protobuf:"varint,3,opt,name=pos,proto3" json:"pos,omitempty"`
 	Data          *structpb.Struct       `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
+	UserId        string                 `protobuf:"bytes,5,opt,name=userId,proto3" json:"userId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -636,34 +709,50 @@ func (x *CreateBlockRequest) GetData() *structpb.Struct {
 	return nil
 }
 
+func (x *CreateBlockRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
 var File_notes_proto protoreflect.FileDescriptor
 
 const file_notes_proto_rawDesc = "" +
 	"\n" +
-	"\vnotes.proto\x12\x03brz\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\fdomain.proto\"c\n" +
-	"\x17ChangeBlockOrderRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
+	"\vnotes.proto\x12\x03brz\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\fdomain.proto\"\x83\x01\n" +
+	"\x17ChangeBlockOrderRequest\x12\x16\n" +
+	"\x06noteId\x18\x01 \x01(\tR\x06noteId\x12\x1b\n" +
 	"\told_order\x18\x02 \x01(\x05R\boldOrder\x12\x1b\n" +
-	"\tnew_order\x18\x03 \x01(\x05R\bnewOrder\"C\n" +
-	"\x16ChangeTypeBlockRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
-	"\bnew_type\x18\x02 \x01(\tR\anewType\"]\n" +
-	"\x0eOpBlockRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x0e\n" +
+	"\tnew_order\x18\x03 \x01(\x05R\bnewOrder\x12\x16\n" +
+	"\x06userId\x18\x04 \x01(\tR\x06userId\"}\n" +
+	"\x16ChangeTypeBlockRequest\x12\x18\n" +
+	"\ablockId\x18\x01 \x01(\tR\ablockId\x12\x19\n" +
+	"\bnew_type\x18\x02 \x01(\tR\anewType\x12\x16\n" +
+	"\x06userId\x18\x03 \x01(\tR\x06userId\x12\x16\n" +
+	"\x06noteId\x18\x04 \x01(\tR\x06noteId\"\x97\x01\n" +
+	"\x0eOpBlockRequest\x12\x18\n" +
+	"\ablockId\x18\x01 \x01(\tR\ablockId\x12\x0e\n" +
 	"\x02op\x18\x02 \x01(\tR\x02op\x12+\n" +
-	"\x04data\x18\x03 \x01(\v2\x17.google.protobuf.StructR\x04data\">\n" +
-	"\x16ChangeTitleNoteRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
-	"\x05title\x18\x02 \x01(\tR\x05title\"=\n" +
-	"\x15UpdateTagTitleRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
-	"\x05title\x18\x02 \x01(\tR\x05title\"=\n" +
-	"\x15UpdateTagColorRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
-	"\x05color\x18\x02 \x01(\tR\x05color\"=\n" +
-	"\x15UpdateTagEmojiRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
-	"\x05emoji\x18\x02 \x01(\tR\x05emoji\">\n" +
+	"\x04data\x18\x03 \x01(\v2\x17.google.protobuf.StructR\x04data\x12\x16\n" +
+	"\x06userId\x18\x04 \x01(\tR\x06userId\x12\x16\n" +
+	"\x06noteId\x18\x05 \x01(\tR\x06noteId\"^\n" +
+	"\x16ChangeTitleNoteRequest\x12\x16\n" +
+	"\x06idNote\x18\x01 \x01(\tR\x06idNote\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12\x16\n" +
+	"\x06idUser\x18\x03 \x01(\tR\x06idUser\"[\n" +
+	"\x15UpdateTagTitleRequest\x12\x14\n" +
+	"\x05idTag\x18\x01 \x01(\tR\x05idTag\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12\x16\n" +
+	"\x06idUser\x18\x03 \x01(\tR\x06idUser\"[\n" +
+	"\x15UpdateTagColorRequest\x12\x14\n" +
+	"\x05idTag\x18\x01 \x01(\tR\x05idTag\x12\x14\n" +
+	"\x05color\x18\x02 \x01(\tR\x05color\x12\x16\n" +
+	"\x06idUser\x18\x03 \x01(\tR\x06idUser\"[\n" +
+	"\x15UpdateTagEmojiRequest\x12\x14\n" +
+	"\x05idTag\x18\x01 \x01(\tR\x05idTag\x12\x14\n" +
+	"\x05emoji\x18\x02 \x01(\tR\x05emoji\x12\x16\n" +
+	"\x06idUser\x18\x03 \x01(\tR\x06idUser\">\n" +
 	"\x16UpdateNoteTitleRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\"q\n" +
@@ -675,46 +764,42 @@ const file_notes_proto_rawDesc = "" +
 	"\x15ChangeUserRoleRequest\x12\x14\n" +
 	"\x05login\x18\x01 \x01(\tR\x05login\x12%\n" +
 	"\bnew_role\x18\x02 \x01(\x0e2\n" +
-	".brz.RolesR\anewRole\"\x7f\n" +
+	".brz.RolesR\anewRole\"\x97\x01\n" +
 	"\x12CreateBlockRequest\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12\x16\n" +
 	"\x06noteId\x18\x02 \x01(\tR\x06noteId\x12\x10\n" +
 	"\x03pos\x18\x03 \x01(\x05R\x03pos\x12+\n" +
-	"\x04data\x18\x04 \x01(\v2\x17.google.protobuf.StructR\x04data2\xbb\r\n" +
-	"\x10BlockNoteService\x127\n" +
-	"\vDeleteBlock\x12\x10.brz.NoteBlockId\x1a\x16.google.protobuf.Empty\x12/\n" +
+	"\x04data\x18\x04 \x01(\v2\x17.google.protobuf.StructR\x04data\x12\x16\n" +
+	"\x06userId\x18\x05 \x01(\tR\x06userId2\xcf\f\n" +
+	"\x10BlockNoteService\x12;\n" +
+	"\vDeleteBlock\x12\x14.brz.NoteBlockUserId\x1a\x16.google.protobuf.Empty\x12/\n" +
 	"\vCreateBlock\x12\x17.brz.CreateBlockRequest\x1a\a.brz.Id\x126\n" +
-	"\aOpBlock\x12\x13.brz.OpBlockRequest\x1a\x16.google.protobuf.Empty\x12$\n" +
-	"\bGetBlock\x12\f.brz.BlockId\x1a\n" +
-	".brz.Block\x124\n" +
-	"\x0fGetBlockAsFirst\x12\f.brz.BlockId\x1a\x13.brz.StringResponse\x12H\n" +
+	"\aOpBlock\x12\x13.brz.OpBlockRequest\x1a\x16.google.protobuf.Empty\x12,\n" +
+	"\bGetBlock\x12\x14.brz.NoteBlockUserId\x1a\n" +
+	".brz.Block\x12H\n" +
 	"\x10ChangeBlockOrder\x12\x1c.brz.ChangeBlockOrderRequest\x1a\x16.google.protobuf.Empty\x12F\n" +
 	"\x0fChangeTypeBlock\x12\x1b.brz.ChangeTypeBlockRequest\x1a\x16.google.protobuf.Empty\x121\n" +
 	"\n" +
-	"CleanTrash\x12\v.brz.UserId\x1a\x16.google.protobuf.Empty\x12F\n" +
-	"\x0fChangeTitleNote\x12\x1b.brz.ChangeTitleNoteRequest\x1a\x16.google.protobuf.Empty\x122\n" +
-	"\vNoteToTrash\x12\v.brz.NoteId\x1a\x16.google.protobuf.Empty\x124\n" +
-	"\rNoteFromTrash\x12\v.brz.NoteId\x1a\x16.google.protobuf.Empty\x12)\n" +
-	"\x0fFindNoteInTrash\x12\v.brz.NoteId\x1a\t.brz.Note\x12!\n" +
-	"\aGetNote\x12\v.brz.NoteId\x1a\t.brz.Note\x12/\n" +
+	"CleanTrash\x12\v.brz.UserId\x1a\x16.google.protobuf.Empty\x126\n" +
+	"\vNoteToTrash\x12\x0f.brz.UserNoteId\x1a\x16.google.protobuf.Empty\x128\n" +
+	"\rNoteFromTrash\x12\x0f.brz.UserNoteId\x1a\x16.google.protobuf.Empty\x12-\n" +
+	"\x0fFindNoteInTrash\x12\x0f.brz.UserNoteId\x1a\t.brz.Note\x12/\n" +
+	"\aGetNote\x12\x0f.brz.UserNoteId\x1a\x13.brz.NoteWithBlocks\x12/\n" +
 	"\n" +
 	"CreateNote\x12\t.brz.Note\x1a\x16.google.protobuf.Empty\x12F\n" +
-	"\x0fUpdateNoteTitle\x12\x1b.brz.UpdateNoteTitleRequest\x1a\x16.google.protobuf.Empty\x12/\n" +
+	"\x0fChangeTitleNote\x12\x1b.brz.ChangeTitleNoteRequest\x1a\x16.google.protobuf.Empty\x12/\n" +
 	"\x12GetAllBlocksInNote\x12\f.brz.Strings\x1a\v.brz.Blocks\x12*\n" +
 	"\vGetAllNotes\x12\v.brz.UserId\x1a\x0e.brz.NoteParts\x12/\n" +
 	"\rGetNotesByTag\x12\x0e.brz.UserTagId\x1a\x0e.brz.NoteParts\x120\n" +
-	"\x11GetNotesFromTrash\x12\v.brz.UserId\x1a\x0e.brz.NoteParts\x126\n" +
-	"\fAddTagToNote\x12\x0e.brz.NoteTagId\x1a\x16.google.protobuf.Empty\x12;\n" +
-	"\x11RemoveTagFromNote\x12\x0e.brz.NoteTagId\x1a\x16.google.protobuf.Empty\x12-\n" +
+	"\x11GetNotesFromTrash\x12\v.brz.UserId\x1a\x0e.brz.NoteParts\x12:\n" +
+	"\fAddTagToNote\x12\x12.brz.NoteTagUserId\x1a\x16.google.protobuf.Empty\x12?\n" +
+	"\x11RemoveTagFromNote\x12\x12.brz.NoteTagUserId\x1a\x16.google.protobuf.Empty\x12-\n" +
 	"\tCreateTag\x12\b.brz.Tag\x1a\x16.google.protobuf.Empty\x12'\n" +
-	"\rGetTagsByUser\x12\v.brz.UserId\x1a\t.brz.Tags\x12\x1e\n" +
-	"\x06GetTag\x12\n" +
-	".brz.TagId\x1a\b.brz.Tag\x12D\n" +
+	"\rGetTagsByUser\x12\v.brz.UserId\x1a\t.brz.Tags\x12D\n" +
 	"\x0eUpdateTagTitle\x12\x1a.brz.UpdateTagTitleRequest\x1a\x16.google.protobuf.Empty\x12D\n" +
 	"\x0eUpdateTagColor\x12\x1a.brz.UpdateTagColorRequest\x1a\x16.google.protobuf.Empty\x12D\n" +
-	"\x0eUpdateTagEmoji\x12\x1a.brz.UpdateTagEmojiRequest\x1a\x16.google.protobuf.Empty\x12/\n" +
-	"\tDeleteTag\x12\n" +
-	".brz.TagId\x1a\x16.google.protobuf.Empty\x12:\n" +
+	"\x0eUpdateTagEmoji\x12\x1a.brz.UpdateTagEmojiRequest\x1a\x16.google.protobuf.Empty\x123\n" +
+	"\tDeleteTag\x12\x0e.brz.UserTagId\x1a\x16.google.protobuf.Empty\x12:\n" +
 	"\tShareNote\x12\x15.brz.ShareNoteRequest\x1a\x16.google.protobuf.Empty\x12D\n" +
 	"\x0eChangeUserRole\x12\x1a.brz.ChangeUserRoleRequest\x1a\x16.google.protobuf.Empty\x129\n" +
 	"\aHealthz\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.EmptyB,Z*github.com/autumnterror/breezynotes;brzrpcb\x06proto3"
@@ -746,93 +831,85 @@ var file_notes_proto_goTypes = []any{
 	(*CreateBlockRequest)(nil),      // 10: brz.CreateBlockRequest
 	(*structpb.Struct)(nil),         // 11: google.protobuf.Struct
 	(Roles)(0),                      // 12: brz.Roles
-	(*NoteBlockId)(nil),             // 13: brz.NoteBlockId
-	(*BlockId)(nil),                 // 14: brz.BlockId
-	(*UserId)(nil),                  // 15: brz.UserId
-	(*NoteId)(nil),                  // 16: brz.NoteId
-	(*Note)(nil),                    // 17: brz.Note
-	(*Strings)(nil),                 // 18: brz.Strings
-	(*UserTagId)(nil),               // 19: brz.UserTagId
-	(*NoteTagId)(nil),               // 20: brz.NoteTagId
-	(*Tag)(nil),                     // 21: brz.Tag
-	(*TagId)(nil),                   // 22: brz.TagId
-	(*emptypb.Empty)(nil),           // 23: google.protobuf.Empty
-	(*Id)(nil),                      // 24: brz.Id
-	(*Block)(nil),                   // 25: brz.Block
-	(*StringResponse)(nil),          // 26: brz.StringResponse
-	(*Blocks)(nil),                  // 27: brz.Blocks
-	(*NoteParts)(nil),               // 28: brz.NoteParts
-	(*Tags)(nil),                    // 29: brz.Tags
+	(*NoteBlockUserId)(nil),         // 13: brz.NoteBlockUserId
+	(*UserId)(nil),                  // 14: brz.UserId
+	(*UserNoteId)(nil),              // 15: brz.UserNoteId
+	(*Note)(nil),                    // 16: brz.Note
+	(*Strings)(nil),                 // 17: brz.Strings
+	(*UserTagId)(nil),               // 18: brz.UserTagId
+	(*NoteTagUserId)(nil),           // 19: brz.NoteTagUserId
+	(*Tag)(nil),                     // 20: brz.Tag
+	(*emptypb.Empty)(nil),           // 21: google.protobuf.Empty
+	(*Id)(nil),                      // 22: brz.Id
+	(*Block)(nil),                   // 23: brz.Block
+	(*NoteWithBlocks)(nil),          // 24: brz.NoteWithBlocks
+	(*Blocks)(nil),                  // 25: brz.Blocks
+	(*NoteParts)(nil),               // 26: brz.NoteParts
+	(*Tags)(nil),                    // 27: brz.Tags
 }
 var file_notes_proto_depIdxs = []int32{
 	11, // 0: brz.OpBlockRequest.data:type_name -> google.protobuf.Struct
 	12, // 1: brz.ShareNoteRequest.role:type_name -> brz.Roles
 	12, // 2: brz.ChangeUserRoleRequest.new_role:type_name -> brz.Roles
 	11, // 3: brz.CreateBlockRequest.data:type_name -> google.protobuf.Struct
-	13, // 4: brz.BlockNoteService.DeleteBlock:input_type -> brz.NoteBlockId
+	13, // 4: brz.BlockNoteService.DeleteBlock:input_type -> brz.NoteBlockUserId
 	10, // 5: brz.BlockNoteService.CreateBlock:input_type -> brz.CreateBlockRequest
 	2,  // 6: brz.BlockNoteService.OpBlock:input_type -> brz.OpBlockRequest
-	14, // 7: brz.BlockNoteService.GetBlock:input_type -> brz.BlockId
-	14, // 8: brz.BlockNoteService.GetBlockAsFirst:input_type -> brz.BlockId
-	0,  // 9: brz.BlockNoteService.ChangeBlockOrder:input_type -> brz.ChangeBlockOrderRequest
-	1,  // 10: brz.BlockNoteService.ChangeTypeBlock:input_type -> brz.ChangeTypeBlockRequest
-	15, // 11: brz.BlockNoteService.CleanTrash:input_type -> brz.UserId
-	3,  // 12: brz.BlockNoteService.ChangeTitleNote:input_type -> brz.ChangeTitleNoteRequest
-	16, // 13: brz.BlockNoteService.NoteToTrash:input_type -> brz.NoteId
-	16, // 14: brz.BlockNoteService.NoteFromTrash:input_type -> brz.NoteId
-	16, // 15: brz.BlockNoteService.FindNoteInTrash:input_type -> brz.NoteId
-	16, // 16: brz.BlockNoteService.GetNote:input_type -> brz.NoteId
-	17, // 17: brz.BlockNoteService.CreateNote:input_type -> brz.Note
-	7,  // 18: brz.BlockNoteService.UpdateNoteTitle:input_type -> brz.UpdateNoteTitleRequest
-	18, // 19: brz.BlockNoteService.GetAllBlocksInNote:input_type -> brz.Strings
-	15, // 20: brz.BlockNoteService.GetAllNotes:input_type -> brz.UserId
-	19, // 21: brz.BlockNoteService.GetNotesByTag:input_type -> brz.UserTagId
-	15, // 22: brz.BlockNoteService.GetNotesFromTrash:input_type -> brz.UserId
-	20, // 23: brz.BlockNoteService.AddTagToNote:input_type -> brz.NoteTagId
-	20, // 24: brz.BlockNoteService.RemoveTagFromNote:input_type -> brz.NoteTagId
-	21, // 25: brz.BlockNoteService.CreateTag:input_type -> brz.Tag
-	15, // 26: brz.BlockNoteService.GetTagsByUser:input_type -> brz.UserId
-	22, // 27: brz.BlockNoteService.GetTag:input_type -> brz.TagId
-	4,  // 28: brz.BlockNoteService.UpdateTagTitle:input_type -> brz.UpdateTagTitleRequest
-	5,  // 29: brz.BlockNoteService.UpdateTagColor:input_type -> brz.UpdateTagColorRequest
-	6,  // 30: brz.BlockNoteService.UpdateTagEmoji:input_type -> brz.UpdateTagEmojiRequest
-	22, // 31: brz.BlockNoteService.DeleteTag:input_type -> brz.TagId
-	8,  // 32: brz.BlockNoteService.ShareNote:input_type -> brz.ShareNoteRequest
-	9,  // 33: brz.BlockNoteService.ChangeUserRole:input_type -> brz.ChangeUserRoleRequest
-	23, // 34: brz.BlockNoteService.Healthz:input_type -> google.protobuf.Empty
-	23, // 35: brz.BlockNoteService.DeleteBlock:output_type -> google.protobuf.Empty
-	24, // 36: brz.BlockNoteService.CreateBlock:output_type -> brz.Id
-	23, // 37: brz.BlockNoteService.OpBlock:output_type -> google.protobuf.Empty
-	25, // 38: brz.BlockNoteService.GetBlock:output_type -> brz.Block
-	26, // 39: brz.BlockNoteService.GetBlockAsFirst:output_type -> brz.StringResponse
-	23, // 40: brz.BlockNoteService.ChangeBlockOrder:output_type -> google.protobuf.Empty
-	23, // 41: brz.BlockNoteService.ChangeTypeBlock:output_type -> google.protobuf.Empty
-	23, // 42: brz.BlockNoteService.CleanTrash:output_type -> google.protobuf.Empty
-	23, // 43: brz.BlockNoteService.ChangeTitleNote:output_type -> google.protobuf.Empty
-	23, // 44: brz.BlockNoteService.NoteToTrash:output_type -> google.protobuf.Empty
-	23, // 45: brz.BlockNoteService.NoteFromTrash:output_type -> google.protobuf.Empty
-	17, // 46: brz.BlockNoteService.FindNoteInTrash:output_type -> brz.Note
-	17, // 47: brz.BlockNoteService.GetNote:output_type -> brz.Note
-	23, // 48: brz.BlockNoteService.CreateNote:output_type -> google.protobuf.Empty
-	23, // 49: brz.BlockNoteService.UpdateNoteTitle:output_type -> google.protobuf.Empty
-	27, // 50: brz.BlockNoteService.GetAllBlocksInNote:output_type -> brz.Blocks
-	28, // 51: brz.BlockNoteService.GetAllNotes:output_type -> brz.NoteParts
-	28, // 52: brz.BlockNoteService.GetNotesByTag:output_type -> brz.NoteParts
-	28, // 53: brz.BlockNoteService.GetNotesFromTrash:output_type -> brz.NoteParts
-	23, // 54: brz.BlockNoteService.AddTagToNote:output_type -> google.protobuf.Empty
-	23, // 55: brz.BlockNoteService.RemoveTagFromNote:output_type -> google.protobuf.Empty
-	23, // 56: brz.BlockNoteService.CreateTag:output_type -> google.protobuf.Empty
-	29, // 57: brz.BlockNoteService.GetTagsByUser:output_type -> brz.Tags
-	21, // 58: brz.BlockNoteService.GetTag:output_type -> brz.Tag
-	23, // 59: brz.BlockNoteService.UpdateTagTitle:output_type -> google.protobuf.Empty
-	23, // 60: brz.BlockNoteService.UpdateTagColor:output_type -> google.protobuf.Empty
-	23, // 61: brz.BlockNoteService.UpdateTagEmoji:output_type -> google.protobuf.Empty
-	23, // 62: brz.BlockNoteService.DeleteTag:output_type -> google.protobuf.Empty
-	23, // 63: brz.BlockNoteService.ShareNote:output_type -> google.protobuf.Empty
-	23, // 64: brz.BlockNoteService.ChangeUserRole:output_type -> google.protobuf.Empty
-	23, // 65: brz.BlockNoteService.Healthz:output_type -> google.protobuf.Empty
-	35, // [35:66] is the sub-list for method output_type
-	4,  // [4:35] is the sub-list for method input_type
+	13, // 7: brz.BlockNoteService.GetBlock:input_type -> brz.NoteBlockUserId
+	0,  // 8: brz.BlockNoteService.ChangeBlockOrder:input_type -> brz.ChangeBlockOrderRequest
+	1,  // 9: brz.BlockNoteService.ChangeTypeBlock:input_type -> brz.ChangeTypeBlockRequest
+	14, // 10: brz.BlockNoteService.CleanTrash:input_type -> brz.UserId
+	15, // 11: brz.BlockNoteService.NoteToTrash:input_type -> brz.UserNoteId
+	15, // 12: brz.BlockNoteService.NoteFromTrash:input_type -> brz.UserNoteId
+	15, // 13: brz.BlockNoteService.FindNoteInTrash:input_type -> brz.UserNoteId
+	15, // 14: brz.BlockNoteService.GetNote:input_type -> brz.UserNoteId
+	16, // 15: brz.BlockNoteService.CreateNote:input_type -> brz.Note
+	3,  // 16: brz.BlockNoteService.ChangeTitleNote:input_type -> brz.ChangeTitleNoteRequest
+	17, // 17: brz.BlockNoteService.GetAllBlocksInNote:input_type -> brz.Strings
+	14, // 18: brz.BlockNoteService.GetAllNotes:input_type -> brz.UserId
+	18, // 19: brz.BlockNoteService.GetNotesByTag:input_type -> brz.UserTagId
+	14, // 20: brz.BlockNoteService.GetNotesFromTrash:input_type -> brz.UserId
+	19, // 21: brz.BlockNoteService.AddTagToNote:input_type -> brz.NoteTagUserId
+	19, // 22: brz.BlockNoteService.RemoveTagFromNote:input_type -> brz.NoteTagUserId
+	20, // 23: brz.BlockNoteService.CreateTag:input_type -> brz.Tag
+	14, // 24: brz.BlockNoteService.GetTagsByUser:input_type -> brz.UserId
+	4,  // 25: brz.BlockNoteService.UpdateTagTitle:input_type -> brz.UpdateTagTitleRequest
+	5,  // 26: brz.BlockNoteService.UpdateTagColor:input_type -> brz.UpdateTagColorRequest
+	6,  // 27: brz.BlockNoteService.UpdateTagEmoji:input_type -> brz.UpdateTagEmojiRequest
+	18, // 28: brz.BlockNoteService.DeleteTag:input_type -> brz.UserTagId
+	8,  // 29: brz.BlockNoteService.ShareNote:input_type -> brz.ShareNoteRequest
+	9,  // 30: brz.BlockNoteService.ChangeUserRole:input_type -> brz.ChangeUserRoleRequest
+	21, // 31: brz.BlockNoteService.Healthz:input_type -> google.protobuf.Empty
+	21, // 32: brz.BlockNoteService.DeleteBlock:output_type -> google.protobuf.Empty
+	22, // 33: brz.BlockNoteService.CreateBlock:output_type -> brz.Id
+	21, // 34: brz.BlockNoteService.OpBlock:output_type -> google.protobuf.Empty
+	23, // 35: brz.BlockNoteService.GetBlock:output_type -> brz.Block
+	21, // 36: brz.BlockNoteService.ChangeBlockOrder:output_type -> google.protobuf.Empty
+	21, // 37: brz.BlockNoteService.ChangeTypeBlock:output_type -> google.protobuf.Empty
+	21, // 38: brz.BlockNoteService.CleanTrash:output_type -> google.protobuf.Empty
+	21, // 39: brz.BlockNoteService.NoteToTrash:output_type -> google.protobuf.Empty
+	21, // 40: brz.BlockNoteService.NoteFromTrash:output_type -> google.protobuf.Empty
+	16, // 41: brz.BlockNoteService.FindNoteInTrash:output_type -> brz.Note
+	24, // 42: brz.BlockNoteService.GetNote:output_type -> brz.NoteWithBlocks
+	21, // 43: brz.BlockNoteService.CreateNote:output_type -> google.protobuf.Empty
+	21, // 44: brz.BlockNoteService.ChangeTitleNote:output_type -> google.protobuf.Empty
+	25, // 45: brz.BlockNoteService.GetAllBlocksInNote:output_type -> brz.Blocks
+	26, // 46: brz.BlockNoteService.GetAllNotes:output_type -> brz.NoteParts
+	26, // 47: brz.BlockNoteService.GetNotesByTag:output_type -> brz.NoteParts
+	26, // 48: brz.BlockNoteService.GetNotesFromTrash:output_type -> brz.NoteParts
+	21, // 49: brz.BlockNoteService.AddTagToNote:output_type -> google.protobuf.Empty
+	21, // 50: brz.BlockNoteService.RemoveTagFromNote:output_type -> google.protobuf.Empty
+	21, // 51: brz.BlockNoteService.CreateTag:output_type -> google.protobuf.Empty
+	27, // 52: brz.BlockNoteService.GetTagsByUser:output_type -> brz.Tags
+	21, // 53: brz.BlockNoteService.UpdateTagTitle:output_type -> google.protobuf.Empty
+	21, // 54: brz.BlockNoteService.UpdateTagColor:output_type -> google.protobuf.Empty
+	21, // 55: brz.BlockNoteService.UpdateTagEmoji:output_type -> google.protobuf.Empty
+	21, // 56: brz.BlockNoteService.DeleteTag:output_type -> google.protobuf.Empty
+	21, // 57: brz.BlockNoteService.ShareNote:output_type -> google.protobuf.Empty
+	21, // 58: brz.BlockNoteService.ChangeUserRole:output_type -> google.protobuf.Empty
+	21, // 59: brz.BlockNoteService.Healthz:output_type -> google.protobuf.Empty
+	32, // [32:60] is the sub-list for method output_type
+	4,  // [4:32] is the sub-list for method input_type
 	4,  // [4:4] is the sub-list for extension type_name
 	4,  // [4:4] is the sub-list for extension extendee
 	0,  // [0:4] is the sub-list for field type_name

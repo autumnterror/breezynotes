@@ -2,15 +2,12 @@ package net
 
 import (
 	"context"
-	brzrpc2 "github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/pkg/utils/validate"
-	"github.com/autumnterror/breezynotes/views"
+	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
+	"github.com/autumnterror/breezynotes/internal/gateway/domain"
+	"github.com/autumnterror/utils_go/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/utils/validate"
 	"github.com/labstack/echo/v4"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"net/http"
-	"time"
 )
 
 // GetUserData godoc
@@ -18,49 +15,36 @@ import (
 // @Description Checks access token from cookie, and return user data. If 401 call ValidateToken
 // @Tags user
 // @Produce json
-// @Success 200 {object} brzrpc.User
-// @Failure 400 {object} views.SWGError
-// @Failure 401 {object} views.SWGError
-// @Failure 410 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Success 200 {object} domain.User
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 410 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/user/data [get]
 func (e *Echo) GetUserData(c echo.Context) error {
 	const op = "gateway.net.GetUserData"
-	log.Info(op, "")
 
 	at, err := c.Cookie("access_token")
 	if err != nil {
-		log.Warn(op, "access_token cookie missing", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "access_token cookie missing"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "access_token cookie missing"})
 	}
 
 	auth := e.authAPI.API
 
-	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer cancel()
 
-	u, err := auth.GetUserDataFromToken(ctx, &brzrpc2.Token{Value: at.Value})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "get failed", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get failed"})
-		}
-		switch st.Code() {
-		case codes.Unauthenticated:
-			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "token expired"})
-		case codes.InvalidArgument:
-			return c.JSON(http.StatusBadRequest, views.SWGError{Error: "token is bad, or not access"})
-		case codes.NotFound:
-			return c.JSON(http.StatusGone, views.SWGError{Error: "user does not exist"})
-		default:
-			log.Error(op, "get failed", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get failed"})
-		}
+	u, err := auth.GetUserDataFromToken(ctx, &brzrpc.Token{Value: at.Value})
+
+	code, errRes := authErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
+
 	u.Password = ""
-	log.Success(op, "")
-	return c.JSON(http.StatusOK, u)
+
+	return c.JSON(http.StatusOK, domain.UserFromRpc(u))
 }
 
 // DeleteUser godoc
@@ -69,44 +53,33 @@ func (e *Echo) GetUserData(c echo.Context) error {
 // @Tags user
 // @Produce json
 // @Success 200
-// @Failure 400 {object} views.SWGError
-// @Failure 401 {object} views.SWGError
-// @Failure 404 {object} views.SWGError
-// @Failure 500 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
+// @Failure 500 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/user [delete]
 func (e *Echo) DeleteUser(c echo.Context) error {
 	const op = "gateway.net.DeleteUser"
-	log.Info(op, "")
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
 	auth := e.authAPI.API
 
-	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer cancel()
 
-	_, err := auth.DeleteUser(ctx, &brzrpc2.UserId{UserId: idUser})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "delete failed", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "delete failed"})
-		}
-		switch st.Code() {
-		case codes.NotFound:
-			return c.JSON(http.StatusNotFound, views.SWGError{Error: "user does not exist"})
-		case codes.Internal:
-			return c.JSON(http.StatusInternalServerError, views.SWGError{Error: "internal server error"})
-		default:
-			log.Error(op, "delete failed", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "delete failed"})
-		}
+	_, err := auth.DeleteUser(ctx, &brzrpc.UserId{UserId: idUser})
+
+	code, errRes := authErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
-	log.Success(op, "")
+
 	return c.NoContent(http.StatusOK)
 }
 
@@ -116,56 +89,44 @@ func (e *Echo) DeleteUser(c echo.Context) error {
 // @Tags user
 // @Accept json
 // @Produce json
-// @Param request body views.UpdateAboutRequest true "new about text"
+// @Param request body domain.UpdateAboutRequest true "new about text"
 // @Success 200
-// @Failure 400 {object} views.SWGError
-// @Failure 401 {object} views.SWGError
-// @Failure 404 {object} views.SWGError
-// @Failure 500 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
+// @Failure 500 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/user/about [patch]
 func (e *Echo) UpdateAbout(c echo.Context) error {
 	const op = "gateway.net.UpdateAbout"
-	log.Info(op, "")
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	var req views.UpdateAboutRequest
+	var req domain.UpdateAboutRequest
 	if err := c.Bind(&req); err != nil {
 		log.Error(op, "UpdateAbout bind", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "invalid request body"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "invalid request body"})
 	}
 
 	auth := e.authAPI.API
 
-	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer cancel()
 
-	_, err := auth.UpdateAbout(ctx, &brzrpc2.UpdateAboutRequest{
+	_, err := auth.UpdateAbout(ctx, &brzrpc.UpdateAboutRequest{
 		Id:       idUser,
 		NewAbout: req.NewAbout,
 	})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "update about failed", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "update about failed"})
-		}
 
-		switch st.Code() {
-		case codes.NotFound:
-			return c.JSON(http.StatusNotFound, views.SWGError{Error: "user does not exist"})
-		case codes.Internal:
-			return c.JSON(http.StatusInternalServerError, views.SWGError{Error: "internal server error"})
-		default:
-			log.Error(op, "update about failed", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "update about failed"})
-		}
+	code, errRes := authErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
-	log.Success(op, "")
+
 	return c.NoContent(http.StatusOK)
 }
 
@@ -175,56 +136,44 @@ func (e *Echo) UpdateAbout(c echo.Context) error {
 // @Tags user
 // @Accept json
 // @Produce json
-// @Param request body views.UpdateEmailRequest true "new email"
+// @Param request body domain.UpdateEmailRequest true "new email"
 // @Success 200
-// @Failure 400 {object} views.SWGError
-// @Failure 401 {object} views.SWGError
-// @Failure 404 {object} views.SWGError
-// @Failure 500 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
+// @Failure 500 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/user/email [patch]
 func (e *Echo) UpdateEmail(c echo.Context) error {
 	const op = "gateway.net.UpdateEmail"
-	log.Info(op, "")
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	var req brzrpc2.UpdateEmailRequest
+	var req domain.UpdateEmailRequest
 	if err := c.Bind(&req); err != nil || req.NewEmail == "" {
 		log.Error(op, "UpdateEmail bind", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "invalid request body"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "invalid request body"})
 	}
 
 	auth := e.authAPI.API
 
-	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer cancel()
 
-	_, err := auth.UpdateEmail(ctx, &brzrpc2.UpdateEmailRequest{
+	_, err := auth.UpdateEmail(ctx, &brzrpc.UpdateEmailRequest{
 		Id:       idUser,
 		NewEmail: req.NewEmail,
 	})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "update email failed", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "update email failed"})
-		}
 
-		switch st.Code() {
-		case codes.NotFound:
-			return c.JSON(http.StatusNotFound, views.SWGError{Error: "user does not exist"})
-		case codes.Internal:
-			return c.JSON(http.StatusInternalServerError, views.SWGError{Error: "internal server error"})
-		default:
-			log.Error(op, "update email failed", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "update email failed"})
-		}
+	code, errRes := authErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
-	log.Success(op, "")
+
 	return c.NoContent(http.StatusOK)
 }
 
@@ -234,57 +183,43 @@ func (e *Echo) UpdateEmail(c echo.Context) error {
 // @Tags user
 // @Accept json
 // @Produce json
-// @Param request body views.UpdatePhotoRequest true "new photo"
+// @Param request body domain.UpdatePhotoRequest true "new photo"
 // @Success 200
-// @Failure 400 {object} views.SWGError
-// @Failure 401 {object} views.SWGError
-// @Failure 404 {object} views.SWGError
-// @Failure 500 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
+// @Failure 500 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/user/photo [patch]
 func (e *Echo) UpdatePhoto(c echo.Context) error {
 	const op = "gateway.net.UpdatePhoto"
-	log.Info(op, "")
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	var req views.UpdatePhotoRequest
+	var req domain.UpdatePhotoRequest
 	if err := c.Bind(&req); err != nil || req.NewPhoto == "" {
 		log.Error(op, "UpdatePhoto bind", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "invalid request body"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "invalid request body"})
 	}
 
 	auth := e.authAPI.API
 
-	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer cancel()
 
-	_, err := auth.UpdatePhoto(ctx, &brzrpc2.UpdatePhotoRequest{
+	_, err := auth.UpdatePhoto(ctx, &brzrpc.UpdatePhotoRequest{
 		Id:       idUser,
 		NewPhoto: req.NewPhoto,
 	})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "update photo failed", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "update photo failed"})
-		}
-
-		switch st.Code() {
-		case codes.NotFound:
-			return c.JSON(http.StatusNotFound, views.SWGError{Error: "user does not exist"})
-
-		case codes.Internal:
-			return c.JSON(http.StatusInternalServerError, views.SWGError{Error: "internal server error"})
-		default:
-			log.Error(op, "update photo failed", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "update photo failed"})
-		}
+	code, errRes := authErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
-	log.Success(op, "")
+
 	return c.NoContent(http.StatusOK)
 }
 
@@ -294,91 +229,50 @@ func (e *Echo) UpdatePhoto(c echo.Context) error {
 // @Tags user
 // @Accept json
 // @Produce json
-// @Param request body views.ChangePasswordRequest true "new password"
+// @Param request body domain.ChangePasswordRequest true "new password"
 // @Success 200
-// @Failure 400 {object} views.SWGError
-// @Failure 401 {object} views.SWGError
-// @Failure 404 {object} views.SWGError
-// @Failure 500 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
+// @Failure 500 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/user/pw [patch]
 func (e *Echo) ChangePassword(c echo.Context) error {
 	const op = "gateway.net.ChangePassword"
-	log.Info(op, "")
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	var req views.ChangePasswordRequest
+	var req domain.ChangePasswordRequest
 	if err := c.Bind(&req); err != nil {
 		log.Error(op, "ChangePassword bind", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "invalid request body"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "invalid request body"})
 	}
 
 	if req.NewPassword != req.NewPassword2 {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "password not same"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "password not same"})
 	}
 	if !validate.Password(req.NewPassword) {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "password not in policy"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "password not in policy"})
 	}
 
 	api := e.authAPI.API
 
-	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer cancel()
 
-	id, err := api.Auth(ctx, &brzrpc2.AuthRequest{
-		Email:    req.Email,
-		Login:    req.Login,
-		Password: req.OldPassword,
-	})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "authentication error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "authentication error"})
-		}
-
-		switch st.Code() {
-		case codes.Unauthenticated:
-			log.Warn(op, "wrong login or password", err)
-			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "wrong login or password"})
-		case codes.InvalidArgument:
-			log.Warn(op, "bad argument", err)
-			return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad argument"})
-		default:
-			log.Error(op, "auth req", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "authentication error"})
-		}
-	}
-
-	if id.GetUserId() != idUser {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
-	}
-
-	_, err = api.ChangePasswd(ctx, &brzrpc2.ChangePasswordRequest{
+	_, err := api.ChangePasswd(ctx, &brzrpc.ChangePasswordRequest{
 		Id:          idUser,
 		NewPassword: req.NewPassword,
 	})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "change password failed", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "change password failed"})
-		}
 
-		switch st.Code() {
-		case codes.NotFound:
-			return c.JSON(http.StatusNotFound, views.SWGError{Error: "user does not exist"})
-		case codes.Internal:
-			return c.JSON(http.StatusInternalServerError, views.SWGError{Error: "internal server error"})
-		default:
-			log.Error(op, "change password failed", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "change password failed"})
-		}
+	code, errRes := authErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
-	log.Success(op, "")
+
 	return c.NoContent(http.StatusOK)
 }

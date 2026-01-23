@@ -162,3 +162,69 @@ func FromNotePartsDb(n *NoteParts) *brzrpc.NoteParts {
 		Items: nts,
 	}
 }
+
+type NoteWithBlocks struct {
+	Id        string   `bson:"_id"`
+	Title     string   `bson:"title"`
+	CreatedAt int64    `bson:"created_at"`
+	UpdatedAt int64    `bson:"updated_at"`
+	Tag       *Tag     `bson:"tag"`
+	Author    string   `bson:"author"`
+	Editors   []string `bson:"editors"`
+	Readers   []string `bson:"readers"`
+	Blocks    []*Block `bson:"blocks"`
+}
+
+func ToNoteWithBlocksDb(n *brzrpc.NoteWithBlocks) *NoteWithBlocks {
+	if n == nil {
+		return nil
+	}
+	nn := brzrpc.NoteWithBlocks{Blocks: n.Blocks, Editors: n.Editors, Readers: n.Readers}
+	if n.Blocks == nil {
+		nn.Blocks = []*brzrpc.Block{}
+	}
+	if n.Editors == nil {
+		nn.Editors = []string{}
+	}
+	if n.Readers == nil {
+		nn.Readers = []string{}
+	}
+	return &NoteWithBlocks{
+		Id:        n.Id,
+		Title:     n.Title,
+		CreatedAt: n.CreatedAt,
+		UpdatedAt: n.UpdatedAt,
+		Tag:       ToTagDb(n.Tag),
+		Author:    n.Author,
+		Editors:   nn.Editors,
+		Readers:   nn.Readers,
+		Blocks:    ToBlocksDb(&brzrpc.Blocks{Items: nn.Blocks}).Blks,
+	}
+}
+
+func FromNoteWithBlocksDb(n *NoteWithBlocks) *brzrpc.NoteWithBlocks {
+	if n == nil {
+		return nil
+	}
+	nn := NoteWithBlocks{Blocks: n.Blocks, Editors: n.Editors, Readers: n.Readers}
+	if n.Blocks == nil {
+		nn.Blocks = []*Block{}
+	}
+	if n.Editors == nil {
+		nn.Editors = []string{}
+	}
+	if n.Readers == nil {
+		nn.Readers = []string{}
+	}
+	return &brzrpc.NoteWithBlocks{
+		Id:        n.Id,
+		Title:     n.Title,
+		CreatedAt: n.CreatedAt,
+		UpdatedAt: n.UpdatedAt,
+		Tag:       FromTagDb(n.Tag),
+		Author:    n.Author,
+		Editors:   nn.Editors,
+		Readers:   nn.Readers,
+		Blocks:    FromBlocksDb(&Blocks{Blks: nn.Blocks}).GetItems(),
+	}
+}

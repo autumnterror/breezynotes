@@ -97,7 +97,7 @@ compose-down-db-v:
 	docker compose -f ./build/breezynotes/docker-compose.db.yml down -v
 # Documentation
 docx:
-	swag init --dir ./cmd/gateway,./internal/gateway/net/,./views,./api/proto/gen --output ./docs
+	swag init --dir ./cmd/gateway,./internal/gateway/net/,./internal/gateway/domain/,./api/proto/gen --output ./docs
 
 #test-operations
 test-method:

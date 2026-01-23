@@ -7,7 +7,7 @@ import (
 	"github.com/autumnterror/breezynotes/internal/auth/infra/psql/psqltx"
 	"github.com/autumnterror/breezynotes/internal/auth/jwt"
 	"github.com/autumnterror/breezynotes/internal/auth/service"
-	"github.com/autumnterror/breezynotes/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/log"
 	"os"
 	"os/signal"
 	"syscall"

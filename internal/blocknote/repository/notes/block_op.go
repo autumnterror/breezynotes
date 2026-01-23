@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"time"
 )
@@ -18,7 +18,7 @@ func (a *API) InsertBlock(ctx context.Context, id, blockId string, pos int) erro
 	defer done()
 
 	res, err := a.
-		db.
+		noteAPI.
 		UpdateOne(
 			ctx,
 			bson.M{
@@ -54,7 +54,7 @@ func (a *API) DeleteBlock(ctx context.Context, id, blockId string) error {
 	defer done()
 
 	res, err := a.
-		db.
+		noteAPI.
 		UpdateOne(
 			ctx,
 			bson.M{
@@ -89,7 +89,7 @@ func (a *API) ChangeBlockOrder(ctx context.Context, noteID string, oldOrder, new
 		return nil
 	}
 
-	n, err := a.GetNote(ctx, noteID)
+	n, err := a.Get(ctx, noteID)
 	if err != nil {
 		return fmt.Errorf("%s: get note failed: %w", op, err)
 	}

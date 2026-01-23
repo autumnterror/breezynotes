@@ -3,8 +3,8 @@ package domain
 import (
 	"testing"
 
-	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 )
 
 type B struct {

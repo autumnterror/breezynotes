@@ -14,7 +14,7 @@ type Repo interface {
 
 	Create(ctx context.Context, n *domain.Note) error
 	//insert(ctx context.Context, n *domain.Note) error
-	GetNote(ctx context.Context, id string) (*domain.Note, error)
+	Get(ctx context.Context, id string) (*domain.Note, error)
 	GetNoteListByUser(ctx context.Context, id string) (*domain.NoteParts, error)
 	GetNoteListByTag(ctx context.Context, idTag, idUser string) (*domain.NoteParts, error)
 
@@ -25,7 +25,7 @@ type Repo interface {
 	DeleteBlock(ctx context.Context, id, blockId string) error
 	ChangeBlockOrder(ctx context.Context, noteID string, oldOrder, newOrder int) error
 
-	//updateUpdatedAt(ctx context.Context, id string) error
+	UpdateUpdatedAt(ctx context.Context, id string) error
 	UpdateTitle(ctx context.Context, id string, nTitle string) error
 	//updateBlocks(ctx context.Context, id string, blocks []string) error
 }

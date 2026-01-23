@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/autumnterror/breezynotes/internal/gateway/config"
-	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	grpcretry "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

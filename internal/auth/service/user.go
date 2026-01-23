@@ -6,17 +6,18 @@ import (
 	"github.com/autumnterror/breezynotes/internal/auth/domain"
 )
 
-func (s *AuthService) GetInfo(ctx context.Context, id string) (*domain.User, error) {
-	const op = "service.GetInfo"
-	if err := idValidation(id); err != nil {
-		return nil, wrapServiceCheck(op, err)
-	}
-	repo, err := s.userRepo(ctx)
-	if err != nil {
-		return nil, wrapServiceCheck(op, err)
-	}
-	return repo.GetInfo(ctx, id)
-}
+//func (s *AuthService) GetInfo(ctx context.Context, id string) (*domain.User, error) {
+//	const op = "service.GetInfo"
+//	if err := idValidation(id); err != nil {
+//		return nil, wrapServiceCheck(op, err)
+//	}
+//
+//	repo, err := s.userRepo(ctx)
+//	if err != nil {
+//		return nil, wrapServiceCheck(op, err)
+//	}
+//	return repo.GetInfo(ctx, id)
+//}
 
 func (s *AuthService) Create(ctx context.Context, u *domain.User) error {
 	const op = "service.Create"
@@ -49,7 +50,7 @@ func (s *AuthService) UpdatePhoto(ctx context.Context, id, np string) error {
 		return repo.UpdatePhoto(ctx, id, np)
 	})
 }
-func (s *AuthService) UpdatePassword(ctx context.Context, id, newPassword string) error {
+func (s *AuthService) UpdatePassword(ctx context.Context, id, oldPassword string, newPassword string) error {
 	const op = "service.UpdatePassword"
 	if err := idValidation(id); err != nil {
 		return wrapServiceCheck(op, err)
@@ -63,6 +64,19 @@ func (s *AuthService) UpdatePassword(ctx context.Context, id, newPassword string
 		if err != nil {
 			return wrapServiceCheck(op, err)
 		}
+		repoAuth, err := s.authRepo(ctx)
+		if err != nil {
+			return wrapServiceCheck(op, err)
+		}
+
+		info, err := repo.GetInfo(ctx, id)
+		if err != nil {
+			return err
+		}
+		if _, err := repoAuth.Authentication(ctx, "", info.Login, oldPassword); err != nil {
+			return domain.ErrUnauthorized
+		}
+
 		return repo.UpdatePassword(ctx, id, newPassword)
 	})
 }

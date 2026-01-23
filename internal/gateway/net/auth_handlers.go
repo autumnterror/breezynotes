@@ -2,17 +2,13 @@ package net
 
 import (
 	"context"
-	brzrpc2 "github.com/autumnterror/breezynotes/api/proto/gen"
+	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
+	"github.com/autumnterror/breezynotes/internal/gateway/domain"
 	"net/http"
 	"time"
 
-	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/pkg/utils/uid"
-	"github.com/autumnterror/breezynotes/pkg/utils/validate"
-	"github.com/autumnterror/breezynotes/views"
+	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/labstack/echo/v4"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // Auth godoc
@@ -21,51 +17,34 @@ import (
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param User body brzrpc.AuthRequest true "Login or Email and Password"
+// @Param User body domain.AuthRequest true "Login or Email and Password"
 // @Success 200 {object} brzrpc.Tokens
-// @Failure 400 {object} views.SWGError
-// @Failure 401 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/auth [post]
 func (e *Echo) Auth(c echo.Context) error {
 	const op = "gateway.net.Auth"
-	log.Info(op, "")
+
 	api := e.authAPI.API
 
-	var r brzrpc2.AuthRequest
+	var r domain.AuthRequest
 	if err := c.Bind(&r); err != nil {
-		log.Error(op, "auth bind", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	id, err := api.Auth(ctx, &r)
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "authentication error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "authentication error"})
-		}
-
-		switch st.Code() {
-		case codes.Unauthenticated:
-			log.Warn(op, "wrong login or password", err)
-			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "wrong login or password"})
-		case codes.InvalidArgument:
-			log.Warn(op, "bad argument", err)
-			return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad argument"})
-		default:
-			log.Error(op, "auth req", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "authentication error"})
-		}
-	}
-
-	tokens, err := api.GenerateTokens(ctx, id)
-	if err != nil {
-		log.Error(op, "token generation error", err)
-		return c.JSON(http.StatusBadGateway, views.SWGError{Error: "token generation error"})
+	tokens, err := api.Auth(ctx, &brzrpc.AuthRequest{
+		Email:    r.Email,
+		Login:    r.Login,
+		Password: r.Password,
+	})
+	code, errRes := authErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
 	c.SetCookie(&http.Cookie{
@@ -85,11 +64,11 @@ func (e *Echo) Auth(c echo.Context) error {
 		Expires:  time.Unix(tokens.ExpRefresh, 0).UTC(),
 	})
 
-	log.Success(op, "")
-
-	return c.JSON(http.StatusOK, brzrpc2.Tokens{
+	return c.JSON(http.StatusOK, brzrpc.Tokens{
 		AccessToken:  tokens.GetAccessToken(),
 		RefreshToken: tokens.GetRefreshToken(),
+		ExpAccess:    tokens.ExpAccess,
+		ExpRefresh:   tokens.ExpRefresh,
 	})
 }
 
@@ -99,66 +78,37 @@ func (e *Echo) Auth(c echo.Context) error {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param User body views.UserRegister true "Reg data"
+// @Param User body domain.UserRegister true "Reg data"
 // @Success 200 {object} brzrpc.Tokens
-// @Failure 400 {object} views.SWGError
-// @Failure 302 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 302 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/auth/reg [post]
 func (e *Echo) Reg(c echo.Context) error {
 	const op = "gateway.net.Reg"
-	log.Info(op, "")
 
 	auth := e.authAPI.API
 
-	var u views.UserRegister
+	var u domain.UserRegister
 	if err := c.Bind(&u); err != nil {
-		log.Warn(op, "bad JSON", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 	if u.Pw1 != u.Pw2 {
-		log.Warn(op, "password not same", nil)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "password not same"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "password not same"})
 	}
 
-	if !validate.Password(u.Pw1) {
-		log.Warn(op, "password not in policy", nil)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "password not in policy"})
-	}
-
-	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer cancel()
 
-	id := uid.New()
-	_, err := auth.CreateUser(ctx, &brzrpc2.User{
-		Id:       id,
-		Login:    u.Login,
+	tokens, err := auth.Reg(ctx, &brzrpc.AuthRequest{
 		Email:    u.Email,
-		About:    "Write me!",
-		Photo:    "images/default.png",
+		Login:    u.Login,
 		Password: u.Pw1,
 	})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "user creation failed", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "user creation failed"})
-		}
-
-		switch st.Code() {
-		case codes.AlreadyExists:
-			log.Warn(op, "user creation failed", err)
-			return c.JSON(http.StatusFound, views.SWGError{Error: "user already exist"})
-		default:
-			log.Error(op, "", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "user creation failed"})
-		}
-	}
-
-	tokens, err := auth.GenerateTokens(ctx, &brzrpc2.UserId{UserId: id})
-	if err != nil {
-		log.Error(op, "token generation error", err)
-		return c.JSON(http.StatusBadGateway, views.SWGError{Error: "token generation error"})
+	code, errRes := authErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
 	c.SetCookie(&http.Cookie{
@@ -178,11 +128,11 @@ func (e *Echo) Reg(c echo.Context) error {
 		Expires:  time.Unix(tokens.ExpRefresh, 0).UTC(),
 	})
 
-	log.Success(op, "")
-
-	return c.JSON(http.StatusOK, &brzrpc2.Tokens{
+	return c.JSON(http.StatusOK, &brzrpc.Tokens{
 		AccessToken:  tokens.AccessToken,
 		RefreshToken: tokens.RefreshToken,
+		ExpAccess:    tokens.ExpAccess,
+		ExpRefresh:   tokens.ExpRefresh,
 	})
 }
 
@@ -191,15 +141,15 @@ func (e *Echo) Reg(c echo.Context) error {
 // @Description Checks access token from cookie, tries to refresh if expired. If 410 (GONE) need to re-auth
 // @Tags auth
 // @Produce json
-// @Success 200 {object} views.SWGMessage
+// @Success 200 {object} domain.Message
 // @Success 201 {object} brzrpc.Token
-// @Failure 400 {object} views.SWGError
-// @Failure 410 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 410 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/auth/token [get]
 func (e *Echo) ValidateToken(c echo.Context) error {
 	const op = "gateway.net.TokenValidate"
-	log.Info(op, "")
 
 	at, err := c.Cookie("access_token")
 	if err != nil {
@@ -208,47 +158,37 @@ func (e *Echo) ValidateToken(c echo.Context) error {
 	rt, err := c.Cookie("refresh_token")
 	if err != nil {
 		log.Warn(op, "refresh_token cookie missing", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "refresh_token cookie missing"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "refresh_token cookie missing"})
 	}
 
 	auth := e.authAPI.API
 
-	ctx, cancel := context.WithTimeout(c.Request().Context(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer cancel()
 
-	if _, err := auth.CheckToken(ctx, &brzrpc2.Token{Value: at.Value}); err != nil {
-		newAt, err := auth.Refresh(ctx, &brzrpc2.Token{Value: rt.Value})
-		if err != nil {
-			st, ok := status.FromError(err)
-			if !ok {
-				log.Error(op, "refresh failed", err)
-				return c.JSON(http.StatusBadGateway, views.SWGError{Error: "refresh failed"})
-			}
-
-			switch st.Code() {
-			case codes.Unauthenticated:
-				log.Warn(op, "refresh token expired. Terminate authorization", err)
-				return c.JSON(http.StatusGone, views.SWGError{Error: "refresh token expired. Terminate authorization"})
-
-			case codes.InvalidArgument:
-				log.Warn(op, "invalid refresh token", err)
-				return c.JSON(http.StatusBadRequest, views.SWGError{Error: "invalid refresh token"})
-
-			default:
-				log.Error(op, "refresh failed", err)
-				return c.JSON(http.StatusBadGateway, views.SWGError{Error: "refresh failed"})
-			}
-		}
+	token, err := auth.ValidateTokens(ctx, &brzrpc.Tokens{
+		AccessToken:  at.Value,
+		RefreshToken: rt.Value,
+	})
+	code, errRes := authErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
+	log.Blue(token)
+	if token != nil {
 		c.SetCookie(&http.Cookie{
 			Name:     "access_token",
-			Value:    newAt.GetValue(),
+			Value:    token.GetValue(),
 			Path:     "/",
 			HttpOnly: true,
 			SameSite: http.SameSiteLaxMode,
-			Expires:  time.Unix(newAt.GetExp(), 0).UTC(),
+			Expires:  time.Unix(token.GetExp(), 0).UTC(),
 		})
-		return c.JSON(http.StatusCreated, newAt)
+		return c.JSON(http.StatusCreated, brzrpc.Token{
+			Value: token.GetValue(),
+			Exp:   token.GetExp(),
+		})
 	}
-	log.Success(op, "")
-	return c.JSON(http.StatusOK, views.SWGMessage{Message: "tokens valid"})
+
+	return c.JSON(http.StatusOK, domain.Message{Message: "tokens valid"})
 }

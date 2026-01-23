@@ -34,6 +34,11 @@ message NoteBlockId {
   string noteId = 1;
   string blockId = 2;
 }
+message NoteBlockUserId {
+  string noteId = 1;
+  string blockId = 2;
+  string userId = 3;
+}
 message UserTagId {
   string tagId = 1;
   string userId = 2;
@@ -41,6 +46,11 @@ message UserTagId {
 message NoteTagId {
   string noteId = 1;
   string tagId = 2;
+}
+message NoteTagUserId {
+  string noteId = 1;
+  string tagId = 2;
+  string userId = 3;
 }
 
 message User {

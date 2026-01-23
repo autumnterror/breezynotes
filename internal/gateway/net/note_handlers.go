@@ -2,19 +2,15 @@ package net
 
 import (
 	"context"
-	brzrpc2 "github.com/autumnterror/breezynotes/api/proto/gen"
+	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
+	"github.com/autumnterror/breezynotes/internal/gateway/domain"
+	"github.com/autumnterror/utils_go/pkg/utils/alg"
+	"github.com/autumnterror/utils_go/pkg/utils/uid"
 	"net/http"
 	"strings"
-	"time"
 
-	"github.com/autumnterror/breezynotes/pkg/utils/alg"
-	"github.com/autumnterror/breezynotes/pkg/utils/uid"
-
-	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/views"
+	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/labstack/echo/v4"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // ChangeTitleNote godoc
@@ -25,67 +21,48 @@ import (
 // @Produce json
 // @Param ChangeTitleNoteRequest body brzrpc.ChangeTitleNoteRequest true "Note ID and new title"
 // @Success 200
-// @Failure 400 {object} views.SWGError
-// @Failure 401 {object} views.SWGError
-// @Failure 404 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/note/title [patch]
 func (e *Echo) ChangeTitleNote(c echo.Context) error {
 	const op = "gateway.net.ChangeTitleNote"
-	log.Info(op, "")
 
 	api := e.bnAPI.API
 
-	var r brzrpc2.ChangeTitleNoteRequest
-	if err := c.Bind(&r); err != nil {
-		log.Error(op, "change title bind", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
-	}
-
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	var r domain.ChangeTitleNoteRequest
+	if err := c.Bind(&r); err != nil {
+		log.Error(op, "change title bind", err)
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
+	}
+
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	//AUTHORIZE
-	if n, err := api.GetNote(ctx, &brzrpc2.NoteId{NoteId: r.GetId()}); err == nil {
-		if n.GetAuthor() != idUser {
-			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "not author"})
-		}
-	} else {
-		log.Error(op, "get note", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad note id"})
-	}
-	//AUTHORIZE
+	_, err := api.ChangeTitleNote(ctx, &brzrpc.ChangeTitleNoteRequest{
+		IdNote: r.Id,
+		Title:  r.Title,
+		IdUser: idUser,
+	})
 
-	_, err := api.ChangeTitleNote(ctx, &r)
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "change title error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "change title error"})
-		}
-
-		switch st.Code() {
-		case codes.NotFound:
-			log.Warn(op, "note not found", err)
-			return c.JSON(http.StatusNotFound, views.SWGError{Error: "note not found"})
-		default:
-			log.Error(op, "change title error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "change title error"})
-		}
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
-	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc2.UserNoteId{UserId: idUser, NoteId: r.GetId()}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.Id}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-	log.Success(op, "")
 
 	return c.NoContent(http.StatusOK)
 }
@@ -97,107 +74,57 @@ func (e *Echo) ChangeTitleNote(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param id query string true "Note ID"
-// @Success 200 {object} views.SWGNoteWithBlocks
-// @Failure 400 {object} views.SWGError
-// @Failure 401 {object} views.SWGError
-// @Failure 404 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Success 200 {object} domain.NoteWithBlocks
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/note [get]
 func (e *Echo) GetNote(c echo.Context) error {
-	const op = "gateway.net.GetNote"
-	log.Info(op, "")
+	const op = "gateway.net.Get"
 
 	api := e.bnAPI.API
 
 	id := c.QueryParam("id")
 	if id == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	//---------------REDIS---------------
-	if note, err := e.rdsAPI.API.GetNoteByUser(ctx, &brzrpc2.UserNoteId{UserId: idUser, NoteId: id}); err != nil {
+	if note, err := e.rdsAPI.API.GetNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: id}); err != nil {
 		if strings.Contains(err.Error(), "not found in cache") {
-			log.Blue("note not found in cache")
 		} else {
 			log.Error(op, "REDIS ERROR", err)
 		}
 	} else {
 		if note != nil {
 			if note.GetAuthor() != idUser || !alg.IsIn(idUser, note.GetEditors()) || !alg.IsIn(idUser, note.GetReaders()) {
-				return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
+				return c.JSON(http.StatusUnauthorized, domain.Error{Error: "user dont have permission"})
 			}
-			log.Blue("read from cache")
+
 			return c.JSON(http.StatusOK, note)
 		}
 	}
-	//---------------REDIS---------------
 
-	note, err := api.GetNote(ctx, &brzrpc2.NoteId{NoteId: id})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "get note error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get note error"})
-		}
-
-		switch st.Code() {
-		case codes.NotFound:
-			return c.JSON(http.StatusNotFound, views.SWGError{Error: "not found"})
-		default:
-			log.Error(op, "get note error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get note error"})
-		}
-	}
-	if note.GetAuthor() != idUser || !alg.IsIn(idUser, note.GetEditors()) || !alg.IsIn(idUser, note.GetReaders()) {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
+	note, err := api.GetNote(ctx, &brzrpc.UserNoteId{NoteId: id, UserId: idUser})
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
-	blocks, err := api.GetAllBlocksInNote(ctx, &brzrpc2.Strings{Values: note.Blocks})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "get blocks error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get blocks error"})
-		}
-
-		switch st.Code() {
-		default:
-			log.Error(op, "get blocks error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get blocks error"})
-		}
-	}
-
-	if blocks == nil || len(blocks.Items) == 0 {
-		blocks = &brzrpc2.Blocks{Items: []*brzrpc2.Block{}}
-	}
-
-	log.Success(op, "")
-
-	nwb := &brzrpc2.NoteWithBlocks{
-		Id:        note.GetId(),
-		Title:     note.GetTitle(),
-		Blocks:    blocks.GetItems(),
-		Author:    note.GetAuthor(),
-		Readers:   note.GetReaders(),
-		Editors:   note.GetEditors(),
-		CreatedAt: note.GetCreatedAt(),
-		UpdatedAt: note.GetUpdatedAt(),
-		Tag:       note.GetTag(),
-	}
-
-	if _, err := e.rdsAPI.API.SetNoteByUser(ctx, &brzrpc2.NoteByUser{UserId: idUser, Note: nwb}); err != nil {
+	if _, err := e.rdsAPI.API.SetNoteByUser(ctx, &brzrpc.NoteByUser{UserId: idUser, Note: note}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
-	return c.JSON(http.StatusOK, nwb)
+	return c.JSON(http.StatusOK, note)
 }
 
 // GetAllNotes godoc
@@ -208,36 +135,36 @@ func (e *Echo) GetNote(c echo.Context) error {
 // @Produce json
 // @Param start query int true  "start > 0"
 // @Param end query int true  "end"
-// @Success 200 {object} []brzrpc.NotePart
-// @Failure 400 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Success 200 {object} domain.NoteListPaginationResponse
+// @Failure 400 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/note/all [get]
 func (e *Echo) GetAllNotes(c echo.Context) error {
 	const op = "gateway.net.GetAllNotes"
-	log.Info(op, "")
 
 	api := e.bnAPI.API
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
 	start, end, resPag := getPagination(c)
 	if resPag != nil {
-		if r, ok := resPag.(views.SWGError); ok {
+		if r, ok := resPag.(domain.Error); ok {
 			return c.JSON(http.StatusBadRequest, r)
 		}
-		if r, ok := resPag.(*brzrpc2.NoteParts); ok {
+		if r, ok := resPag.(*brzrpc.NoteParts); ok {
 			return c.JSON(http.StatusOK, r)
 		}
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
 	//---------------REDIS---------------
-	if nl, err := e.rdsAPI.API.GetNoteListByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
+	if nl, err := e.rdsAPI.API.GetNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	} else {
 		if nl != nil {
@@ -245,13 +172,13 @@ func (e *Echo) GetAllNotes(c echo.Context) error {
 				if len(nl.GetItems()) != 0 {
 					items := nl.GetItems()
 					if start >= len(items) {
-						return c.JSON(http.StatusOK, []*brzrpc2.NotePart{})
+						return c.JSON(http.StatusOK, []*brzrpc.NotePart{})
 					}
 					if end > len(items) {
 						end = len(items)
 					}
 					nlPad := items[start:end]
-					log.Blue("read from cache")
+
 					return c.JSON(http.StatusOK, nlPad)
 				}
 			}
@@ -259,39 +186,31 @@ func (e *Echo) GetAllNotes(c echo.Context) error {
 	}
 	//---------------REDIS---------------
 
-	notes, err := api.GetAllNotes(ctx, &brzrpc2.UserId{
+	notes, err := api.GetAllNotes(ctx, &brzrpc.UserId{
 		UserId: idUser,
 	})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "get all notes error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get all notes error"})
-		}
-
-		switch st.Code() {
-		default:
-			log.Error(op, "get all notes error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get all notes error"})
-		}
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
-	if _, err := e.rdsAPI.API.SetNoteListByUser(ctx, &brzrpc2.NoteListByUser{UserId: idUser, Items: notes.GetItems()}); err != nil {
+	if _, err := e.rdsAPI.API.SetNoteListByUser(ctx, &brzrpc.NoteListByUser{UserId: idUser, Items: notes.GetItems()}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
 	items := notes.GetItems()
 	if start >= len(items) {
-		return c.JSON(http.StatusOK, []*brzrpc2.NotePart{})
+		return c.JSON(http.StatusOK, []*brzrpc.NotePart{})
 	}
 	if end > len(items) {
 		end = len(items)
 	}
-	nlPad := items[start:end]
+	nlPag := items[start:end]
 
-	log.Success(op, "")
-
-	return c.JSON(http.StatusOK, nlPad)
+	return c.JSON(http.StatusOK, domain.NoteListPaginationResponse{
+		Items: domain.ToNotePartList(nlPag),
+		Total: len(items),
+	})
 }
 
 // GetNotesByTag godoc
@@ -304,68 +223,60 @@ func (e *Echo) GetAllNotes(c echo.Context) error {
 // @Param start query int true  "start > 0"
 // @Param end query int true  "end"
 // @Success 200 {object} []brzrpc.NotePart
-// @Failure 400 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/note/by-tag [get]
 func (e *Echo) GetNotesByTag(c echo.Context) error {
 	const op = "gateway.net.GetNotesByTag"
-	log.Info(op, "")
 
 	api := e.bnAPI.API
 
 	id := c.QueryParam("id")
 	if id == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad id"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad id"})
 	}
 
 	start, end, resPag := getPagination(c)
 	if resPag != nil {
-		if r, ok := resPag.(views.SWGError); ok {
+		if r, ok := resPag.(domain.Error); ok {
 			return c.JSON(http.StatusBadRequest, r)
 		}
-		if r, ok := resPag.(*brzrpc2.NoteParts); ok {
+		if r, ok := resPag.(*brzrpc.NoteParts); ok {
 			return c.JSON(http.StatusOK, r)
 		}
 	}
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	notes, err := api.GetNotesByTag(ctx, &brzrpc2.UserTagId{
+	notes, err := api.GetNotesByTag(ctx, &brzrpc.UserTagId{
 		TagId:  id,
 		UserId: idUser,
 	})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "get notes by tag error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get notes by tag error"})
-		}
-
-		switch st.Code() {
-		default:
-			log.Error(op, "get notes by tag error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get notes by tag error"})
-		}
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
 	items := notes.GetItems()
 	if start >= len(items) {
-		return c.JSON(http.StatusOK, []*brzrpc2.NotePart{})
+		return c.JSON(http.StatusOK, []*brzrpc.NotePart{})
 	}
 	if end > len(items) {
 		end = len(items)
 	}
-	nlPad := items[start:end]
+	nlPag := items[start:end]
 
-	log.Success(op, "")
-
-	return c.JSON(http.StatusOK, nlPad)
+	return c.JSON(http.StatusOK, domain.NoteListPaginationResponse{
+		Items: domain.ToNotePartList(nlPag),
+		Total: len(items),
+	})
 }
 
 // CreateNote godoc
@@ -374,34 +285,34 @@ func (e *Echo) GetNotesByTag(c echo.Context) error {
 // @Tags note
 // @Accept json
 // @Produce json
-// @Param Note body views.NoteReq true "Note info"
+// @Param Note body domain.CreateNoteRequest true "Note info"
 // @Success 201 {object} brzrpc.Id
-// @Failure 400 {object} views.SWGError
-// @Failure 400 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 400 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/note [post]
 func (e *Echo) CreateNote(c echo.Context) error {
 	const op = "gateway.net.CreateNote"
-	log.Info(op, "")
 
 	api := e.bnAPI.API
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	var r views.NoteReq
+	var r domain.CreateNoteRequest
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "create note bind", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
 	id := uid.New()
-	_, err := api.CreateNote(ctx, &brzrpc2.Note{
+	_, err := api.CreateNote(ctx, &brzrpc.Note{
 		Id:        id,
 		Title:     r.Title,
 		CreatedAt: 0,
@@ -412,27 +323,16 @@ func (e *Echo) CreateNote(c echo.Context) error {
 		Readers:   []string{},
 		Blocks:    []string{},
 	})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "create note error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "create note error"})
-		}
-
-		switch st.Code() {
-		default:
-			log.Error(op, "create note error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "create note error"})
-		}
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
-	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
-	log.Success(op, "")
-
-	return c.JSON(http.StatusCreated, brzrpc2.Id{Id: id})
+	return c.JSON(http.StatusCreated, brzrpc.Id{Id: id})
 }
 
 // AddTagToNote godoc
@@ -441,66 +341,49 @@ func (e *Echo) CreateNote(c echo.Context) error {
 // @Tags note
 // @Accept json
 // @Produce json
-// @Param AddTagToNoteRequest body brzrpc.NoteTagId true "Note ID and Tag ID"
+// @Param AddTagToNoteRequest body domain.NoteTagId true "Note ID and Tag ID"
 // @Success 200
-// @Failure 400 {object} views.SWGError
-// @Failure 401 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/note/tag [post]
 func (e *Echo) AddTagToNote(c echo.Context) error {
 	const op = "gateway.net.AddTagToNote"
-	log.Info(op, "")
 
 	api := e.bnAPI.API
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	var r brzrpc2.NoteTagId
+	var r domain.NoteTagId
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "add tag to note bind", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	if n, err := api.GetNote(ctx, &brzrpc2.NoteId{NoteId: r.GetNoteId()}); err == nil {
-		if n.GetAuthor() != idUser || !alg.IsIn(idUser, n.GetEditors()) || !alg.IsIn(idUser, n.GetReaders()) {
-			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
-		}
-	} else {
-		log.Error(op, "get note", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad note id"})
+	_, err := api.AddTagToNote(ctx, &brzrpc.NoteTagUserId{
+		NoteId: r.NoteId,
+		TagId:  r.TagId,
+		UserId: idUser,
+	})
+
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
-	_, err := api.AddTagToNote(ctx, &r)
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "add tag to note error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "add tag to note error"})
-		}
-
-		switch st.Code() {
-		case codes.InvalidArgument:
-			log.Warn(op, "bad argument", err)
-			return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad argument"})
-		default:
-			log.Error(op, "add tag to note error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "add tag to note error"})
-		}
-	}
-
-	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc2.UserNoteId{UserId: idUser, NoteId: r.GetNoteId()}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.NoteId}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-	log.Success(op, "")
 
 	return c.NoContent(http.StatusOK)
 }
@@ -511,67 +394,49 @@ func (e *Echo) AddTagToNote(c echo.Context) error {
 // @Tags note
 // @Accept json
 // @Produce json
-// @Param AddTagToNoteRequest body brzrpc.NoteTagId true "Note ID and Tag ID"
+// @Param AddTagToNoteRequest body domain.NoteTagId true "Note ID and Tag ID"
 // @Success 200
-// @Failure 400 {object} views.SWGError
-// @Failure 401 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/note/tag [delete]
 func (e *Echo) RmTagFromNote(c echo.Context) error {
 	const op = "gateway.net.RmTagFromNote"
-	log.Info(op, "")
 
 	api := e.bnAPI.API
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	var r brzrpc2.NoteTagId
+	var r domain.NoteTagId
 	if err := c.Bind(&r); err != nil {
 		log.Error(op, "add tag to note bind", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	if n, err := api.GetNote(ctx, &brzrpc2.NoteId{NoteId: r.GetNoteId()}); err == nil {
-		if n.GetAuthor() != idUser || !alg.IsIn(idUser, n.GetEditors()) || !alg.IsIn(idUser, n.GetReaders()) {
-			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "user dont have permission"})
-		}
-	} else {
-		log.Error(op, "get note", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad note id"})
+	_, err := api.RemoveTagFromNote(ctx, &brzrpc.NoteTagUserId{
+		NoteId: r.NoteId,
+		TagId:  r.TagId,
+		UserId: idUser,
+	})
+
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
-	_, err := api.RemoveTagFromNote(ctx, &r)
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "add tag to note error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "add tag to note error"})
-		}
-
-		switch st.Code() {
-		case codes.InvalidArgument:
-			log.Warn(op, "bad argument", err)
-			return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad argument"})
-		default:
-			log.Error(op, "add tag to note error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "add tag to note error"})
-		}
-	}
-
-	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc2.UserNoteId{UserId: idUser, NoteId: r.GetNoteId()}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.NoteId}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-
-	log.Success(op, "")
 
 	return c.NoContent(http.StatusOK)
 }

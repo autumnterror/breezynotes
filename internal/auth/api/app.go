@@ -7,8 +7,8 @@ import (
 
 	"github.com/autumnterror/breezynotes/internal/auth/config"
 	"github.com/autumnterror/breezynotes/internal/auth/service"
-	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -25,7 +25,7 @@ func New(cfg *config.Config, as *service.AuthService) *App {
 			MaxConnectionIdle: 0,
 		}),
 	)
-	Register(s, as)
+	Register(s, as, cfg)
 
 	return &App{
 		gRPCServer: s,
@@ -64,7 +64,6 @@ func (a *App) Stop() {
 
 func (s *ServerAPI) Healthz(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
 	const op = "grpc.Healthz"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()

@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 )
 
 type HealthRepo interface {

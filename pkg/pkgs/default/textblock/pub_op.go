@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/autumnterror/breezynotes/api/proto/gen"
+
+	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 
-	"github.com/autumnterror/breezynotes/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/log"
 )
 
 type Driver struct{}

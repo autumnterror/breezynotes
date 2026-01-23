@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/autumnterror/breezynotes/internal/blocknote/config"
 	"github.com/autumnterror/breezynotes/internal/blocknote/service"
-	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -20,16 +20,14 @@ type App struct {
 
 func New(
 	cfg *config.Config,
-	tagAPI *service.TagsService,
-	noteAPI *service.NotesService,
-	blocksAPI *service.BlocksService,
+	noteAPI *service.BN,
 ) *App {
 	s := grpc.NewServer(
 		grpc.KeepaliveParams(keepalive.ServerParameters{
 			MaxConnectionIdle: 0,
 		}),
 	)
-	Register(s, tagAPI, noteAPI, blocksAPI)
+	Register(s, noteAPI)
 
 	return &App{
 		gRPCServer: s,
@@ -68,12 +66,11 @@ func (a *App) Stop() {
 
 func (s *ServerAPI) Healthz(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
 	const op = "block.note.grpc.healthz"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	if err := s.noteAPI.Healthz(ctx); err != nil {
+	if err := s.service.Healthz(ctx); err != nil {
 		return nil, err
 	}
 	return nil, nil

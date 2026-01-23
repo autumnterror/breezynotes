@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"time"
@@ -18,7 +18,7 @@ func (a *API) AddTagToNote(ctx context.Context, id string, tag *domain.Tag) erro
 	defer done()
 
 	res, err := a.
-		db.
+		noteAPI.
 		UpdateOne(
 			ctx,
 			bson.M{
@@ -49,7 +49,7 @@ func (a *API) RemoveTagFromNote(ctx context.Context, id string, tagId string) er
 	defer done()
 
 	res, err := a.
-		db.
+		noteAPI.
 		UpdateOne(
 			ctx,
 			bson.M{

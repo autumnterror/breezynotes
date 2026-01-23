@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"github.com/autumnterror/breezynotes/internal/auth/domain"
 	"testing"
 	"time"
 
@@ -14,7 +15,7 @@ func TestGenerateAndVerifyToken(t *testing.T) {
 
 	t.Run("generate and verify access token", func(t *testing.T) {
 		t.Parallel()
-		tokenStr, err := j.GenerateToken("user123", TokenTypeAccess)
+		tokenStr, err := j.GenerateToken("user123", domain.TokenTypeAccess)
 		assert.NoError(t, err)
 
 		token, err := j.VerifyToken(tokenStr)
@@ -36,7 +37,7 @@ func TestGenerateAndVerifyToken(t *testing.T) {
 
 	t.Run("generate and verify refresh token", func(t *testing.T) {
 		t.Parallel()
-		tokenStr, err := j.GenerateToken("user456", TokenTypeRefresh)
+		tokenStr, err := j.GenerateToken("user456", domain.TokenTypeRefresh)
 		assert.NoError(t, err)
 
 		token, err := j.VerifyToken(tokenStr)
@@ -57,7 +58,7 @@ func TestRefreshToken(t *testing.T) {
 	t.Parallel()
 	j := NewWithConfig(config.Test())
 
-	refreshToken, err := j.GenerateToken("refresh_id", TokenTypeRefresh)
+	refreshToken, err := j.GenerateToken("refresh_id", domain.TokenTypeRefresh)
 	assert.NoError(t, err)
 
 	accessToken, err := j.Refresh(refreshToken)
@@ -68,7 +69,7 @@ func TestRefreshToken(t *testing.T) {
 
 	tp, err := j.GetTypeFromToken(parsed)
 	assert.NoError(t, err)
-	assert.Equal(t, TokenTypeAccess, tp)
+	assert.Equal(t, domain.TokenTypeAccess, tp)
 }
 
 func TestExpiredToken(t *testing.T) {
@@ -78,28 +79,28 @@ func TestExpiredToken(t *testing.T) {
 	cfg.RefreshTokenLifeTime = -1 * time.Minute
 	j := NewWithConfig(cfg)
 
-	tokenStr, err := j.GenerateToken("expired_user", TokenTypeAccess)
+	tokenStr, err := j.GenerateToken("expired_user", domain.TokenTypeAccess)
 	assert.NoError(t, err)
 
 	_, err = j.VerifyToken(tokenStr)
-	assert.ErrorIs(t, err, ErrTokenExpired)
+	assert.ErrorIs(t, err, domain.ErrTokenExpired)
 
-	tokenStr, err = j.GenerateToken("expired_user", TokenTypeRefresh)
+	tokenStr, err = j.GenerateToken("expired_user", domain.TokenTypeRefresh)
 	assert.NoError(t, err)
 
 	_, err = j.VerifyToken(tokenStr)
-	assert.ErrorIs(t, err, ErrTokenExpired)
+	assert.ErrorIs(t, err, domain.ErrTokenExpired)
 }
 
 func TestWrongTypeRefresh(t *testing.T) {
 	t.Parallel()
 	j := NewWithConfig(config.Test())
 
-	accessToken, err := j.GenerateToken("userX", TokenTypeAccess)
+	accessToken, err := j.GenerateToken("userX", domain.TokenTypeAccess)
 	assert.NoError(t, err)
 
 	_, err = j.Refresh(accessToken)
-	assert.ErrorIs(t, err, ErrWrongType)
+	assert.ErrorIs(t, err, domain.ErrWrongType)
 }
 
 func TestInvalidTokenStructure(t *testing.T) {

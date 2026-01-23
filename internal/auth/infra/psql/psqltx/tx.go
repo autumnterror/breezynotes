@@ -3,7 +3,7 @@ package psqltx
 import (
 	"context"
 	"database/sql"
-	"github.com/autumnterror/breezynotes/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/log"
 )
 
 type TxRunner struct {

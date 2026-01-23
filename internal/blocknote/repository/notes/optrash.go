@@ -5,7 +5,7 @@ import (
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
@@ -17,7 +17,7 @@ func (a *API) CleanTrash(ctx context.Context, uid string) error {
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	_, err := a.trashDriver.DeleteMany(ctx, bson.M{"author": uid})
+	_, err := a.trashAPI.DeleteMany(ctx, bson.M{"author": uid})
 	if err != nil {
 		return format.Error(op, err)
 	}
@@ -32,7 +32,7 @@ func (a *API) GetNotesFromTrash(ctx context.Context, uid string) (*domain.NotePa
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	cur, err := a.trashDriver.Find(ctx, bson.M{"author": uid})
+	cur, err := a.trashAPI.Find(ctx, bson.M{"author": uid})
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
@@ -74,12 +74,12 @@ func (a *API) ToTrash(ctx context.Context, id string) error {
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	n, err := a.GetNote(ctx, id)
+	n, err := a.Get(ctx, id)
 	if err != nil {
 		return format.Error(op, err)
 	}
 
-	if _, err := a.trashDriver.InsertOne(ctx, n); err != nil {
+	if _, err := a.trashAPI.InsertOne(ctx, n); err != nil {
 		return format.Error(op, err)
 	}
 
@@ -96,7 +96,7 @@ func (a *API) FromTrash(ctx context.Context, id string) error {
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	res := a.trashDriver.FindOne(ctx, bson.M{"_id": id})
+	res := a.trashAPI.FindOne(ctx, bson.M{"_id": id})
 	if res.Err() != nil {
 		return format.Error(op, res.Err())
 	}
@@ -110,7 +110,7 @@ func (a *API) FromTrash(ctx context.Context, id string) error {
 		return format.Error(op, err)
 	}
 
-	_, err := a.trashDriver.DeleteOne(ctx, bson.D{{"_id", id}})
+	_, err := a.trashAPI.DeleteOne(ctx, bson.D{{"_id", id}})
 	if err != nil {
 		return format.Error(op, err)
 	}
@@ -118,14 +118,14 @@ func (a *API) FromTrash(ctx context.Context, id string) error {
 	return nil
 }
 
-// FindFromTrash return note by id from trash
+// FindOnTrash return note by id from trash
 func (a *API) FindOnTrash(ctx context.Context, id string) (*domain.Note, error) {
 	const op = "notes.FindOnTrash"
 
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	res := a.trashDriver.FindOne(ctx, bson.M{"_id": id})
+	res := a.trashAPI.FindOne(ctx, bson.M{"_id": id})
 	if res.Err() != nil {
 		return nil, format.Error(op, res.Err())
 	}

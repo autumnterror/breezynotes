@@ -2,26 +2,84 @@ package api
 
 import (
 	"context"
+	"github.com/autumnterror/utils_go/pkg/log"
+	"time"
 
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 )
 
-func (s *ServerAPI) Auth(ctx context.Context, r *brzrpc.AuthRequest) (*brzrpc.UserId, error) {
+func (s *ServerAPI) Auth(ctx context.Context, r *brzrpc.AuthRequest) (*brzrpc.Tokens, error) {
 	const op = "grpc.Auth"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
 	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
-		return s.API.Auth(ctx, r.GetEmail(), r.GetLogin(), r.GetPassword())
+		at, rt, err := s.API.Auth(ctx, r.GetEmail(), r.GetLogin(), r.GetPassword())
+		if err != nil {
+			return nil, err
+		}
+		return &brzrpc.Tokens{
+			AccessToken:  at,
+			RefreshToken: rt,
+			ExpAccess:    time.Now().UTC().Add(s.Cfg.AccessTokenLifeTime).Unix(),
+			ExpRefresh:   time.Now().UTC().Add(s.Cfg.RefreshTokenLifeTime).Unix(),
+		}, nil
 	})
 
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
 
-	return &brzrpc.UserId{UserId: res.(string)}, nil
+	return res.(*brzrpc.Tokens), nil
+}
+
+func (s *ServerAPI) Reg(ctx context.Context, r *brzrpc.AuthRequest) (*brzrpc.Tokens, error) {
+	const op = "grpc.Reg"
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		at, rt, err := s.API.Reg(ctx, r.GetEmail(), r.GetLogin(), r.GetPassword())
+		if err != nil {
+			return nil, err
+		}
+		return &brzrpc.Tokens{
+			AccessToken:  at,
+			RefreshToken: rt,
+			ExpAccess:    time.Now().UTC().Add(s.Cfg.AccessTokenLifeTime).Unix(),
+			ExpRefresh:   time.Now().UTC().Add(s.Cfg.RefreshTokenLifeTime).Unix(),
+		}, nil
+	})
+
+	if err != nil {
+		return nil, format.Error(op, err)
+	}
+
+	return res.(*brzrpc.Tokens), nil
+}
+
+func (s *ServerAPI) ValidateTokens(ctx context.Context, r *brzrpc.Tokens) (*brzrpc.Token, error) {
+	const op = "grpc.Reg"
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return s.API.ValidateTokens(ctx, r.GetAccessToken(), r.GetRefreshToken())
+	})
+
+	if err != nil {
+		return nil, format.Error(op, err)
+	}
+	if res.(string) != "" {
+		log.Blue("im here")
+		return &brzrpc.Token{
+			Value: res.(string),
+			Exp:   time.Now().UTC().Add(s.Cfg.AccessTokenLifeTime).Unix(),
+		}, nil
+	}
+	return nil, nil
 }

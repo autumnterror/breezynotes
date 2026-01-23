@@ -2,14 +2,11 @@ package net
 
 import (
 	"context"
-	brzrpc2 "github.com/autumnterror/breezynotes/api/proto/gen"
-	"net/http"
-	"time"
-
-	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/views"
+	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
+	"github.com/autumnterror/breezynotes/internal/gateway/domain"
+	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/labstack/echo/v4"
-	"google.golang.org/grpc/status"
+	"net/http"
 )
 
 // CleanTrash godoc
@@ -19,43 +16,32 @@ import (
 // @Accept json
 // @Produce json
 // @Success 200
-// @Failure 400 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/trash [delete]
 func (e *Echo) CleanTrash(c echo.Context) error {
 	const op = "gateway.net.CleanTrash"
-	log.Info(op, "")
 
 	api := e.bnAPI.API
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	_, err := api.CleanTrash(ctx, &brzrpc2.UserId{UserId: idUser})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "clean trash error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "clean trash error"})
-		}
-
-		switch st.Code() {
-		default:
-			log.Error(op, "clean trash error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "clean trash error"})
-		}
+	_, err := api.CleanTrash(ctx, &brzrpc.UserId{UserId: idUser})
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
-	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-
-	log.Success(op, "")
 
 	return c.NoContent(http.StatusOK)
 }
@@ -68,68 +54,46 @@ func (e *Echo) CleanTrash(c echo.Context) error {
 // @Produce json
 // @Param id query string true "Note ID"
 // @Success 200
-// @Failure 400 {object} views.SWGError
-// @Failure 401 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/trash/to [put]
 func (e *Echo) NoteToTrash(c echo.Context) error {
 	const op = "gateway.net.NoteToTrash"
-	log.Info(op, "")
 
 	api := e.bnAPI.API
 
 	id := c.QueryParam("id")
 	if id == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	//AUTHORIZE
-	if n, err := api.GetNote(ctx, &brzrpc2.NoteId{NoteId: id}); err == nil {
-		if n.GetAuthor() != idUser {
-			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "not author"})
-		}
-	} else {
-		log.Error(op, "get note", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad note id"})
-	}
-	//AUTHORIZE
-
-	_, err := api.NoteToTrash(ctx, &brzrpc2.NoteId{NoteId: id})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "note to trash error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "note to trash error"})
-		}
-
-		switch st.Code() {
-		default:
-			log.Error(op, "note to trash error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "note to trash error"})
-		}
+	_, err := api.NoteToTrash(ctx, &brzrpc.UserNoteId{NoteId: id, UserId: idUser})
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
-	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
-	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
-	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc2.UserNoteId{UserId: idUser, NoteId: id}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: id}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-
-	log.Success(op, "")
 
 	return c.NoContent(http.StatusOK)
 }
@@ -142,67 +106,45 @@ func (e *Echo) NoteToTrash(c echo.Context) error {
 // @Produce json
 // @Param id query string true "Note ID"
 // @Success 200
-// @Failure 400 {object} views.SWGError
-// @Failure 401 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/trash/from [put]
 func (e *Echo) NoteFromTrash(c echo.Context) error {
 	const op = "gateway.net.NoteFromTrash"
-	log.Info(op, "")
 
 	api := e.bnAPI.API
 
 	id := c.QueryParam("id")
 	if id == "" {
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad JSON"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	//AUTHORIZE
-	if n, err := api.FindNoteInTrash(ctx, &brzrpc2.NoteId{NoteId: id}); err == nil {
-		if n.GetAuthor() != idUser {
-			return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "not author"})
-		}
-	} else {
-		log.Error(op, "get note", err)
-		return c.JSON(http.StatusBadRequest, views.SWGError{Error: "bad note id"})
-	}
-	//AUTHORIZE
-
-	_, err := api.NoteFromTrash(ctx, &brzrpc2.NoteId{NoteId: id})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "note from trash error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "note from trash error"})
-		}
-
-		switch st.Code() {
-		default:
-			log.Error(op, "note from trash error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "note from trash error"})
-		}
+	_, err := api.NoteFromTrash(ctx, &brzrpc.UserNoteId{NoteId: id, UserId: idUser})
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
-	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
-	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc2.UserNoteId{UserId: idUser, NoteId: id}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: id}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
-
-	log.Success(op, "")
 
 	return c.NoContent(http.StatusOK)
 }
@@ -214,62 +156,51 @@ func (e *Echo) NoteFromTrash(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Success 200 {object} []brzrpc.NotePart
-// @Failure 400 {object} views.SWGError
-// @Failure 502 {object} views.SWGError
+// @Failure 400 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
 // @Router /api/trash [get]
 func (e *Echo) GetNotesFromTrash(c echo.Context) error {
 	const op = "gateway.net.GetNotesFromTrash"
-	log.Info(op, "")
 
 	api := e.bnAPI.API
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, views.SWGError{Error: "bad idUser from access token"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), 5*time.Second)
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	if ntsT, err := e.rdsAPI.API.GetNotesFromTrashByUser(ctx, &brzrpc2.UserId{UserId: idUser}); err != nil {
+	if ntsT, err := e.rdsAPI.API.GetNotesFromTrashByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	} else {
 		if ntsT != nil {
 			if ntsT.GetItems() != nil {
 				if len(ntsT.GetItems()) != 0 {
-					log.Blue("read from cache")
+
 					return c.JSON(http.StatusOK, ntsT.GetItems())
 				}
 			}
 		}
 	}
 
-	nts, err := api.GetNotesFromTrash(ctx, &brzrpc2.UserId{UserId: idUser})
-	if err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "get notes from trash error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get notes from trash error"})
-		}
-
-		switch st.Code() {
-		default:
-			log.Error(op, "get notes from trash error", err)
-			return c.JSON(http.StatusBadGateway, views.SWGError{Error: "get notes from trash error"})
-		}
+	nts, err := api.GetNotesFromTrash(ctx, &brzrpc.UserId{UserId: idUser})
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
-	if _, err := e.rdsAPI.API.SetNotesFromTrashByUser(ctx, &brzrpc2.NoteListByUser{UserId: idUser, Items: nts.GetItems()}); err != nil {
+	if _, err := e.rdsAPI.API.SetNotesFromTrashByUser(ctx, &brzrpc.NoteListByUser{UserId: idUser, Items: nts.GetItems()}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
 	}
 
-	log.Success(op, "")
-
 	if nts.GetItems() == nil {
-		return c.JSON(http.StatusOK, []brzrpc2.NotePart{})
+		return c.JSON(http.StatusOK, []brzrpc.NotePart{})
 	}
 	if len(nts.GetItems()) == 0 {
-		return c.JSON(http.StatusOK, []brzrpc2.NotePart{})
+		return c.JSON(http.StatusOK, []brzrpc.NotePart{})
 	}
 
 	return c.JSON(http.StatusOK, nts.GetItems())

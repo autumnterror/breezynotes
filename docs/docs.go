@@ -40,7 +40,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.AuthRequest"
+                            "$ref": "#/definitions/domain.AuthRequest"
                         }
                     }
                 ],
@@ -54,19 +54,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -92,7 +98,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/views.UserRegister"
+                            "$ref": "#/definitions/domain.UserRegister"
                         }
                     }
                 ],
@@ -106,19 +112,25 @@ const docTemplate = `{
                     "302": {
                         "description": "Found",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -138,7 +150,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGMessage"
+                            "$ref": "#/definitions/domain.Message"
                         }
                     },
                     "201": {
@@ -150,19 +162,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "410": {
                         "description": "Gone",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -188,7 +206,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/views.SWGCreateBlockRequest"
+                            "$ref": "#/definitions/domain.CreateBlockRequest"
                         }
                     }
                 ],
@@ -196,25 +214,31 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.Id"
+                            "$ref": "#/definitions/domain.Id"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -254,25 +278,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -298,7 +328,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/views.SWGOpBlockRequest"
+                            "$ref": "#/definitions/domain.OpBlockRequest"
                         }
                     }
                 ],
@@ -309,19 +339,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -347,7 +383,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.ChangeBlockOrderRequest"
+                            "$ref": "#/definitions/domain.ChangeBlockOrderRequest"
                         }
                     }
                 ],
@@ -358,19 +394,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -396,7 +438,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.ChangeTypeBlockRequest"
+                            "$ref": "#/definitions/domain.ChangeTypeBlockRequest"
                         }
                     }
                 ],
@@ -407,19 +449,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -438,13 +486,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGMessage"
+                            "$ref": "#/definitions/domain.Message"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGMessage"
+                            "$ref": "#/definitions/domain.Message"
                         }
                     }
                 }
@@ -476,31 +524,37 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGNoteWithBlocks"
+                            "$ref": "#/definitions/domain.NoteWithBlocks"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -524,7 +578,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/views.NoteReq"
+                            "$ref": "#/definitions/domain.CreateNoteRequest"
                         }
                     }
                 ],
@@ -538,13 +592,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -583,22 +643,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/brzrpc.NotePart"
-                            }
+                            "$ref": "#/definitions/domain.NoteListPaginationResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -653,13 +716,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -714,7 +783,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "408": {
@@ -729,13 +798,19 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -761,7 +836,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.NoteTagId"
+                            "$ref": "#/definitions/domain.NoteTagId"
                         }
                     }
                 ],
@@ -772,19 +847,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -808,7 +889,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.NoteTagId"
+                            "$ref": "#/definitions/domain.NoteTagId"
                         }
                     }
                 ],
@@ -819,19 +900,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -868,25 +955,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -912,7 +1005,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/views.TagReq"
+                            "$ref": "#/definitions/domain.CreateTagRequest"
                         }
                     }
                 ],
@@ -920,19 +1013,31 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.Id"
+                            "$ref": "#/definitions/domain.Id"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -965,19 +1070,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -1002,20 +1119,32 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/brzrpc.Tag"
+                                "$ref": "#/definitions/domain.Tag"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -1041,7 +1170,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.UpdateTagColorRequest"
+                            "$ref": "#/definitions/domain.UpdateTagColorRequest"
                         }
                     }
                 ],
@@ -1052,25 +1181,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -1096,7 +1231,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.UpdateTagEmojiRequest"
+                            "$ref": "#/definitions/domain.UpdateTagEmojiRequest"
                         }
                     }
                 ],
@@ -1107,25 +1242,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -1151,7 +1292,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.UpdateTagTitleRequest"
+                            "$ref": "#/definitions/domain.UpdateTagTitleRequest"
                         }
                     }
                 ],
@@ -1162,25 +1303,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -1212,13 +1359,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -1242,13 +1395,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -1283,19 +1442,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -1330,19 +1495,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -1365,31 +1536,37 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -1415,7 +1592,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/views.UpdateAboutRequest"
+                            "$ref": "#/definitions/domain.UpdateAboutRequest"
                         }
                     }
                 ],
@@ -1426,31 +1603,37 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -1470,31 +1653,37 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.User"
+                            "$ref": "#/definitions/domain.User"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "410": {
                         "description": "Gone",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -1520,7 +1709,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/views.UpdateEmailRequest"
+                            "$ref": "#/definitions/domain.UpdateEmailRequest"
                         }
                     }
                 ],
@@ -1531,31 +1720,37 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -1581,7 +1776,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/views.UpdatePhotoRequest"
+                            "$ref": "#/definitions/domain.UpdatePhotoRequest"
                         }
                     }
                 ],
@@ -1592,31 +1787,37 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -1642,7 +1843,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/views.ChangePasswordRequest"
+                            "$ref": "#/definitions/domain.ChangePasswordRequest"
                         }
                     }
                 ],
@@ -1653,31 +1854,37 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
-                            "$ref": "#/definitions/views.SWGError"
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
                         }
                     }
                 }
@@ -1685,52 +1892,16 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "brzrpc.AuthRequest": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "login": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "brzrpc.ChangeBlockOrderRequest": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "new_order": {
-                    "type": "integer"
-                },
-                "old_order": {
-                    "type": "integer"
-                }
-            }
-        },
         "brzrpc.ChangeTitleNoteRequest": {
             "type": "object",
             "properties": {
-                "id": {
+                "idNote": {
+                    "type": "string"
+                },
+                "idUser": {
                     "type": "string"
                 },
                 "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "brzrpc.ChangeTypeBlockRequest": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "new_type": {
                     "type": "string"
                 }
             }
@@ -1760,17 +1931,6 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "integer"
-                }
-            }
-        },
-        "brzrpc.NoteTagId": {
-            "type": "object",
-            "properties": {
-                "noteId": {
-                    "type": "string"
-                },
-                "tagId": {
-                    "type": "string"
                 }
             }
         },
@@ -1822,49 +1982,10 @@ const docTemplate = `{
                 }
             }
         },
-        "brzrpc.UpdateTagColorRequest": {
+        "domain.AuthRequest": {
             "type": "object",
             "properties": {
-                "color": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                }
-            }
-        },
-        "brzrpc.UpdateTagEmojiRequest": {
-            "type": "object",
-            "properties": {
-                "emoji": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                }
-            }
-        },
-        "brzrpc.UpdateTagTitleRequest": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "brzrpc.User": {
-            "type": "object",
-            "properties": {
-                "about": {
-                    "type": "string"
-                },
                 "email": {
-                    "type": "string"
-                },
-                "id": {
                     "type": "string"
                 },
                 "login": {
@@ -1872,41 +1993,10 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
-                },
-                "photo": {
-                    "type": "string"
                 }
             }
         },
-        "views.ChangePasswordRequest": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "login": {
-                    "type": "string"
-                },
-                "new_password": {
-                    "type": "string"
-                },
-                "new_password_2": {
-                    "type": "string"
-                },
-                "old_password": {
-                    "type": "string"
-                }
-            }
-        },
-        "views.NoteReq": {
-            "type": "object",
-            "properties": {
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "views.SWGBlock": {
+        "domain.Block": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -1936,19 +2026,100 @@ const docTemplate = `{
                 }
             }
         },
-        "views.SWGCreateBlockRequest": {
+        "domain.BlockNoteId": {
+            "type": "object",
+            "properties": {
+                "block_id": {
+                    "type": "string"
+                },
+                "note_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.ChangeBlockOrderRequest": {
+            "type": "object",
+            "properties": {
+                "new_order": {
+                    "type": "integer"
+                },
+                "note_id": {
+                    "type": "string"
+                },
+                "old_order": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.ChangePasswordRequest": {
+            "type": "object",
+            "properties": {
+                "new_password": {
+                    "type": "string"
+                },
+                "new_password_2": {
+                    "type": "string"
+                },
+                "old_password": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.ChangeTypeBlockRequest": {
+            "type": "object",
+            "properties": {
+                "block_id": {
+                    "type": "string"
+                },
+                "new_type": {
+                    "type": "string"
+                },
+                "note_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.CreateBlockRequest": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "object",
                     "additionalProperties": {}
                 },
+                "note_id": {
+                    "type": "string"
+                },
+                "pos": {
+                    "type": "integer"
+                },
                 "type": {
                     "type": "string"
                 }
             }
         },
-        "views.SWGError": {
+        "domain.CreateNoteRequest": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.CreateTagRequest": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "emoji": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.Error": {
             "type": "object",
             "properties": {
                 "error": {
@@ -1957,7 +2128,15 @@ const docTemplate = `{
                 }
             }
         },
-        "views.SWGMessage": {
+        "domain.Id": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.Message": {
             "type": "object",
             "properties": {
                 "message": {
@@ -1966,7 +2145,53 @@ const docTemplate = `{
                 }
             }
         },
-        "views.SWGNoteWithBlocks": {
+        "domain.NoteListPaginationResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.NotePart"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.NotePart": {
+            "type": "object",
+            "properties": {
+                "firstBlock": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "tag": {
+                    "$ref": "#/definitions/domain.Tag"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "domain.NoteTagId": {
+            "type": "object",
+            "properties": {
+                "note_id": {
+                    "type": "string"
+                },
+                "tag_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.NoteWithBlocks": {
             "type": "object",
             "properties": {
                 "author": {
@@ -1975,7 +2200,7 @@ const docTemplate = `{
                 "blocks": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/views.SWGBlock"
+                        "$ref": "#/definitions/domain.Block"
                     }
                 },
                 "created_at": {
@@ -1997,7 +2222,7 @@ const docTemplate = `{
                     }
                 },
                 "tag": {
-                    "$ref": "#/definitions/brzrpc.Tag"
+                    "$ref": "#/definitions/domain.Tag"
                 },
                 "title": {
                     "type": "string"
@@ -2007,14 +2232,17 @@ const docTemplate = `{
                 }
             }
         },
-        "views.SWGOpBlockRequest": {
+        "domain.OpBlockRequest": {
             "type": "object",
             "properties": {
+                "block_id": {
+                    "type": "string"
+                },
                 "data": {
                     "type": "object",
                     "additionalProperties": {}
                 },
-                "id": {
+                "note_id": {
                     "type": "string"
                 },
                 "op": {
@@ -2022,7 +2250,7 @@ const docTemplate = `{
                 }
             }
         },
-        "views.TagReq": {
+        "domain.Tag": {
             "type": "object",
             "properties": {
                 "color": {
@@ -2031,12 +2259,18 @@ const docTemplate = `{
                 "emoji": {
                     "type": "string"
                 },
+                "id": {
+                    "type": "string"
+                },
                 "title": {
+                    "type": "string"
+                },
+                "userId": {
                     "type": "string"
                 }
             }
         },
-        "views.UpdateAboutRequest": {
+        "domain.UpdateAboutRequest": {
             "type": "object",
             "properties": {
                 "new_about": {
@@ -2044,7 +2278,7 @@ const docTemplate = `{
                 }
             }
         },
-        "views.UpdateEmailRequest": {
+        "domain.UpdateEmailRequest": {
             "type": "object",
             "properties": {
                 "new_email": {
@@ -2052,7 +2286,7 @@ const docTemplate = `{
                 }
             }
         },
-        "views.UpdatePhotoRequest": {
+        "domain.UpdatePhotoRequest": {
             "type": "object",
             "properties": {
                 "new_photo": {
@@ -2060,7 +2294,63 @@ const docTemplate = `{
                 }
             }
         },
-        "views.UserRegister": {
+        "domain.UpdateTagColorRequest": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "id_tag": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.UpdateTagEmojiRequest": {
+            "type": "object",
+            "properties": {
+                "emoji": {
+                    "type": "string"
+                },
+                "id_tag": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.UpdateTagTitleRequest": {
+            "type": "object",
+            "properties": {
+                "id_tag": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.User": {
+            "type": "object",
+            "properties": {
+                "about": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "login": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "photo": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.UserRegister": {
             "type": "object",
             "properties": {
                 "email": {
@@ -2069,10 +2359,10 @@ const docTemplate = `{
                 "login": {
                     "type": "string"
                 },
-                "pw1": {
+                "password": {
                     "type": "string"
                 },
-                "pw2": {
+                "password2": {
                     "type": "string"
                 }
             }

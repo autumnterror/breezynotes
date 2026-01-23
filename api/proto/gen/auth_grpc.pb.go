@@ -21,11 +21,8 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	AuthService_Auth_FullMethodName                 = "/brz.AuthService/Auth"
-	AuthService_GenerateAccessToken_FullMethodName  = "/brz.AuthService/GenerateAccessToken"
-	AuthService_GenerateRefreshToken_FullMethodName = "/brz.AuthService/GenerateRefreshToken"
-	AuthService_GenerateTokens_FullMethodName       = "/brz.AuthService/GenerateTokens"
-	AuthService_Refresh_FullMethodName              = "/brz.AuthService/Refresh"
-	AuthService_CheckToken_FullMethodName           = "/brz.AuthService/CheckToken"
+	AuthService_Reg_FullMethodName                  = "/brz.AuthService/Reg"
+	AuthService_ValidateTokens_FullMethodName       = "/brz.AuthService/ValidateTokens"
 	AuthService_DeleteUser_FullMethodName           = "/brz.AuthService/DeleteUser"
 	AuthService_UpdateAbout_FullMethodName          = "/brz.AuthService/UpdateAbout"
 	AuthService_UpdateEmail_FullMethodName          = "/brz.AuthService/UpdateEmail"
@@ -43,12 +40,9 @@ const (
 //
 // ===== Auth Service =====
 type AuthServiceClient interface {
-	Auth(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*UserId, error)
-	GenerateAccessToken(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Token, error)
-	GenerateRefreshToken(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Token, error)
-	GenerateTokens(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Tokens, error)
-	Refresh(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Token, error)
-	CheckToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Auth(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*Tokens, error)
+	Reg(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*Tokens, error)
+	ValidateTokens(ctx context.Context, in *Tokens, opts ...grpc.CallOption) (*Token, error)
 	DeleteUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateAbout(ctx context.Context, in *UpdateAboutRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateEmail(ctx context.Context, in *UpdateEmailRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -68,9 +62,9 @@ func NewAuthServiceClient(cc grpc.ClientConnInterface) AuthServiceClient {
 	return &authServiceClient{cc}
 }
 
-func (c *authServiceClient) Auth(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*UserId, error) {
+func (c *authServiceClient) Auth(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*Tokens, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UserId)
+	out := new(Tokens)
 	err := c.cc.Invoke(ctx, AuthService_Auth_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -78,50 +72,20 @@ func (c *authServiceClient) Auth(ctx context.Context, in *AuthRequest, opts ...g
 	return out, nil
 }
 
-func (c *authServiceClient) GenerateAccessToken(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Token, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Token)
-	err := c.cc.Invoke(ctx, AuthService_GenerateAccessToken_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *authServiceClient) GenerateRefreshToken(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Token, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Token)
-	err := c.cc.Invoke(ctx, AuthService_GenerateRefreshToken_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *authServiceClient) GenerateTokens(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Tokens, error) {
+func (c *authServiceClient) Reg(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*Tokens, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Tokens)
-	err := c.cc.Invoke(ctx, AuthService_GenerateTokens_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, AuthService_Reg_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authServiceClient) Refresh(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Token, error) {
+func (c *authServiceClient) ValidateTokens(ctx context.Context, in *Tokens, opts ...grpc.CallOption) (*Token, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Token)
-	err := c.cc.Invoke(ctx, AuthService_Refresh_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *authServiceClient) CheckToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, AuthService_CheckToken_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, AuthService_ValidateTokens_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -224,12 +188,9 @@ func (c *authServiceClient) Healthz(ctx context.Context, in *emptypb.Empty, opts
 //
 // ===== Auth Service =====
 type AuthServiceServer interface {
-	Auth(context.Context, *AuthRequest) (*UserId, error)
-	GenerateAccessToken(context.Context, *UserId) (*Token, error)
-	GenerateRefreshToken(context.Context, *UserId) (*Token, error)
-	GenerateTokens(context.Context, *UserId) (*Tokens, error)
-	Refresh(context.Context, *Token) (*Token, error)
-	CheckToken(context.Context, *Token) (*emptypb.Empty, error)
+	Auth(context.Context, *AuthRequest) (*Tokens, error)
+	Reg(context.Context, *AuthRequest) (*Tokens, error)
+	ValidateTokens(context.Context, *Tokens) (*Token, error)
 	DeleteUser(context.Context, *UserId) (*emptypb.Empty, error)
 	UpdateAbout(context.Context, *UpdateAboutRequest) (*emptypb.Empty, error)
 	UpdateEmail(context.Context, *UpdateEmailRequest) (*emptypb.Empty, error)
@@ -249,23 +210,14 @@ type AuthServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAuthServiceServer struct{}
 
-func (UnimplementedAuthServiceServer) Auth(context.Context, *AuthRequest) (*UserId, error) {
+func (UnimplementedAuthServiceServer) Auth(context.Context, *AuthRequest) (*Tokens, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Auth not implemented")
 }
-func (UnimplementedAuthServiceServer) GenerateAccessToken(context.Context, *UserId) (*Token, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GenerateAccessToken not implemented")
+func (UnimplementedAuthServiceServer) Reg(context.Context, *AuthRequest) (*Tokens, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Reg not implemented")
 }
-func (UnimplementedAuthServiceServer) GenerateRefreshToken(context.Context, *UserId) (*Token, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GenerateRefreshToken not implemented")
-}
-func (UnimplementedAuthServiceServer) GenerateTokens(context.Context, *UserId) (*Tokens, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GenerateTokens not implemented")
-}
-func (UnimplementedAuthServiceServer) Refresh(context.Context, *Token) (*Token, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Refresh not implemented")
-}
-func (UnimplementedAuthServiceServer) CheckToken(context.Context, *Token) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckToken not implemented")
+func (UnimplementedAuthServiceServer) ValidateTokens(context.Context, *Tokens) (*Token, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ValidateTokens not implemented")
 }
 func (UnimplementedAuthServiceServer) DeleteUser(context.Context, *UserId) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
@@ -333,92 +285,38 @@ func _AuthService_Auth_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_GenerateAccessToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserId)
+func _AuthService_Reg_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AuthRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).GenerateAccessToken(ctx, in)
+		return srv.(AuthServiceServer).Reg(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AuthService_GenerateAccessToken_FullMethodName,
+		FullMethod: AuthService_Reg_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).GenerateAccessToken(ctx, req.(*UserId))
+		return srv.(AuthServiceServer).Reg(ctx, req.(*AuthRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_GenerateRefreshToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserId)
+func _AuthService_ValidateTokens_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Tokens)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).GenerateRefreshToken(ctx, in)
+		return srv.(AuthServiceServer).ValidateTokens(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AuthService_GenerateRefreshToken_FullMethodName,
+		FullMethod: AuthService_ValidateTokens_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).GenerateRefreshToken(ctx, req.(*UserId))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AuthService_GenerateTokens_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserId)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AuthServiceServer).GenerateTokens(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AuthService_GenerateTokens_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).GenerateTokens(ctx, req.(*UserId))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AuthService_Refresh_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Token)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AuthServiceServer).Refresh(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AuthService_Refresh_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).Refresh(ctx, req.(*Token))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AuthService_CheckToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Token)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AuthServiceServer).CheckToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AuthService_CheckToken_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).CheckToken(ctx, req.(*Token))
+		return srv.(AuthServiceServer).ValidateTokens(ctx, req.(*Tokens))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -597,24 +495,12 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AuthService_Auth_Handler,
 		},
 		{
-			MethodName: "GenerateAccessToken",
-			Handler:    _AuthService_GenerateAccessToken_Handler,
+			MethodName: "Reg",
+			Handler:    _AuthService_Reg_Handler,
 		},
 		{
-			MethodName: "GenerateRefreshToken",
-			Handler:    _AuthService_GenerateRefreshToken_Handler,
-		},
-		{
-			MethodName: "GenerateTokens",
-			Handler:    _AuthService_GenerateTokens_Handler,
-		},
-		{
-			MethodName: "Refresh",
-			Handler:    _AuthService_Refresh_Handler,
-		},
-		{
-			MethodName: "CheckToken",
-			Handler:    _AuthService_CheckToken_Handler,
+			MethodName: "ValidateTokens",
+			Handler:    _AuthService_ValidateTokens_Handler,
 		},
 		{
 			MethodName: "DeleteUser",

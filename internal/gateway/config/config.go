@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"github.com/spf13/viper"
 )
 

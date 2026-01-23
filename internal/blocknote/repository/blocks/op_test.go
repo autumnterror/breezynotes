@@ -4,9 +4,10 @@ import (
 	"context"
 	"github.com/autumnterror/breezynotes/internal/blocknote/config"
 	"github.com/autumnterror/breezynotes/internal/blocknote/infra/mongo"
-	"github.com/autumnterror/breezynotes/pkg/log"
 	"github.com/autumnterror/breezynotes/pkg/pkgs"
 	"github.com/autumnterror/breezynotes/pkg/pkgs/default/textblock"
+	"github.com/autumnterror/utils_go/pkg/log"
+
 	"github.com/stretchr/testify/assert"
 
 	"testing"
@@ -38,7 +39,7 @@ func TestOnText(t *testing.T) {
 	b, err := a.Get(context.TODO(), id)
 	assert.NoError(t, err)
 	log.Green("get block after create ", b)
-	log.Green("data block after create ", b.Data.AsMap())
+	log.Green("data block after create ", b.Data)
 
 	bf, err := a.GetAsFirst(context.TODO(), id)
 	assert.NoError(t, err)
@@ -53,5 +54,5 @@ func TestOnText(t *testing.T) {
 	b, err = a.Get(context.TODO(), id)
 	assert.NoError(t, err)
 	log.Green("get block after op ", b)
-	log.Green("data block after op ", b.Data.AsMap())
+	log.Green("data block after op ", b.Data)
 }

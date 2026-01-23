@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
-	"github.com/autumnterror/breezynotes/pkg/utils/uid"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/uid"
 )
 
 var (

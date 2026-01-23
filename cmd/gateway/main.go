@@ -9,7 +9,7 @@ import (
 	redis "github.com/autumnterror/breezynotes/internal/gateway/clients/redis"
 	"github.com/autumnterror/breezynotes/internal/gateway/config"
 	"github.com/autumnterror/breezynotes/internal/gateway/net"
-	"github.com/autumnterror/breezynotes/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/log"
 	"golang.org/x/sync/errgroup"
 	"os"
 	"os/signal"

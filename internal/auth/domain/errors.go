@@ -11,4 +11,6 @@ var (
 	ErrTokenExpired      = errors.New("token expired")
 	ErrTokenWrongType    = errors.New("token wrong type")
 	ErrTokenInvalid      = errors.New("token invalid")
+	ErrUnauthorized      = errors.New("unauthorized")
+	ErrWrongType         = errors.New("wrong type of token")
 )

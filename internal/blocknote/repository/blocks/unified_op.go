@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -27,7 +27,7 @@ func (a *API) Delete(ctx context.Context, id string) error {
 }
 
 func (a *API) Get(ctx context.Context, id string) (*domain.Block, error) {
-	const op = "blocks.GetNote"
+	const op = "blocks.Get"
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
@@ -45,4 +45,25 @@ func (a *API) Get(ctx context.Context, id string) (*domain.Block, error) {
 	}
 
 	return &b, nil
+}
+
+func (a *API) GetMany(ctx context.Context, ids []string) (*domain.Blocks, error) {
+	const op = "blocks.GetMany"
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	defer done()
+
+	filter := bson.D{{"_id", bson.D{{"$in", ids}}}}
+
+	cur, err := a.db.Find(ctx, filter)
+	if err != nil {
+		return nil, format.Error(op, err)
+	}
+	defer cur.Close(ctx)
+
+	var blocks []*domain.Block
+	if err = cur.All(ctx, &blocks); err != nil {
+		return nil, format.Error(op, err)
+	}
+
+	return &domain.Blocks{Blks: blocks}, nil
 }

@@ -9,58 +9,22 @@ import (
 	"github.com/autumnterror/breezynotes/internal/blocknote/config"
 )
 
-type TagsService struct {
-	tx  TxRunner
-	tgs tags.Repo
-	cfg *config.Config
-}
-
-func NewTagsService(
-	tx TxRunner,
-	tgs tags.Repo,
-	cfg *config.Config,
-) *TagsService {
-	return &TagsService{
-		tx:  tx,
-		tgs: tgs,
-		cfg: cfg,
-	}
-}
-
-type BlocksService struct {
-	tx  TxRunner
-	bls blocks.Repo
-	cfg *config.Config
-}
-
-func NewBlocksService(
-	tx TxRunner,
-	bls blocks.Repo,
-	cfg *config.Config,
-) *BlocksService {
-	return &BlocksService{
-		tx:  tx,
-		bls: bls,
-		cfg: cfg,
-	}
-}
-
-type NotesService struct {
+type BN struct {
 	tx  TxRunner
 	nts notes.Repo
-	tgs *TagsService
-	blk *BlocksService
+	tgs tags.Repo
+	blk blocks.Repo
 	cfg *config.Config
 }
 
 func NewNoteService(
+	cfg *config.Config,
 	tx TxRunner,
 	nts notes.Repo,
-	cfg *config.Config,
-	blk *BlocksService,
-	tgs *TagsService,
-) *NotesService {
-	return &NotesService{
+	blk blocks.Repo,
+	tgs tags.Repo,
+) *BN {
+	return &BN{
 		tx:  tx,
 		nts: nts,
 		cfg: cfg,
@@ -69,6 +33,6 @@ func NewNoteService(
 	}
 }
 
-func (s *NotesService) Healthz(ctx context.Context) error {
+func (s *BN) Healthz(ctx context.Context) error {
 	return s.tx.Healthz(ctx)
 }

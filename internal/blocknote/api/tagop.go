@@ -2,32 +2,35 @@ package api
 
 import (
 	"context"
-	"errors"
-	brzrpc2 "github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/autumnterror/breezynotes/internal/blocknote/mongo"
-	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
-	"github.com/autumnterror/breezynotes/views"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *ServerAPI) CreateTag(ctx context.Context, t *brzrpc2.Tag) (*emptypb.Empty, error) {
-	const op = "blocknote.grpc.CreateTag"
-	log.Info(op, "")
+func (s *ServerAPI) CreateTag(ctx context.Context, t *brzrpc.Tag) (*emptypb.Empty, error) {
+	const op = "grpc.CreateTag"
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.tagAPI.Create(ctx, t); err != nil {
-			log.Error(op, "", err)
-			res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, "check logs")}
-			return
-		}
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.service.CreateTag(ctx, domain.ToTagDb(t))
+	})
 
-		res <- views.ResRPC{Res: nil, Err: nil}
+	if err != nil {
+		return nil, format.Error(op, err)
+	}
+	return nil, nil
+}
+func (s *ServerAPI) UpdateTagTitle(ctx context.Context, req *brzrpc.UpdateTagTitleRequest) (*emptypb.Empty, error) {
+	const op = "grpc.UpdateTagTitle"
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.service.UpdateTitleTag(ctx, req.GetIdTag(), req.GetIdUser(), req.GetTitle())
 	})
 
 	if err != nil {
@@ -36,160 +39,90 @@ func (s *ServerAPI) CreateTag(ctx context.Context, t *brzrpc2.Tag) (*emptypb.Emp
 
 	return nil, nil
 }
-func (s *ServerAPI) UpdateTagTitle(ctx context.Context, req *brzrpc2.UpdateTagTitleRequest) (*emptypb.Empty, error) {
-	const op = "blocknote.grpc.UpdateTagTitle"
-	log.Info(op, "")
+func (s *ServerAPI) UpdateTagColor(ctx context.Context, req *brzrpc.UpdateTagColorRequest) (*emptypb.Empty, error) {
+	const op = "grpc.UpdateTagColor"
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.tagAPI.UpdateTitle(ctx, req.GetId(), req.GetTitle()); err != nil {
-			if errors.Is(err, mongo.ErrNotFound) {
-				res <- views.ResRPC{Res: nil, Err: status.Error(codes.NotFound, "not found")}
-				return
-			} else {
-				log.Error(op, "", err)
-				res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, "check logs")}
-				return
-			}
-		}
-
-		res <- views.ResRPC{Res: nil, Err: nil}
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.service.UpdateColorTag(ctx, req.GetIdTag(), req.GetIdUser(), req.GetColor())
 	})
 
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
-
 	return nil, nil
 }
-func (s *ServerAPI) UpdateTagColor(ctx context.Context, req *brzrpc2.UpdateTagColorRequest) (*emptypb.Empty, error) {
-	const op = "blocknote.grpc.UpdateTagColor"
-	log.Info(op, "")
+func (s *ServerAPI) UpdateTagEmoji(ctx context.Context, req *brzrpc.UpdateTagEmojiRequest) (*emptypb.Empty, error) {
+	const op = "grpc.UpdateTagEmoji"
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.tagAPI.UpdateColor(ctx, req.GetId(), req.GetColor()); err != nil {
-			if errors.Is(err, mongo.ErrNotFound) {
-				res <- views.ResRPC{Res: nil, Err: status.Error(codes.NotFound, "not found")}
-				return
-			} else {
-				log.Error(op, "", err)
-				res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, "check logs")}
-				return
-			}
-		}
-
-		res <- views.ResRPC{Res: nil, Err: nil}
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.service.UpdateEmojiTag(ctx, req.GetIdTag(), req.GetIdUser(), req.GetEmoji())
 	})
 
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
-
 	return nil, nil
 }
-func (s *ServerAPI) UpdateTagEmoji(ctx context.Context, req *brzrpc2.UpdateTagEmojiRequest) (*emptypb.Empty, error) {
-	const op = "blocknote.grpc.UpdateTagEmoji"
-	log.Info(op, "")
+func (s *ServerAPI) DeleteTag(ctx context.Context, req *brzrpc.UserTagId) (*emptypb.Empty, error) {
+	const op = "grpc.DeleteTag"
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.tagAPI.UpdateEmoji(ctx, req.GetId(), req.GetEmoji()); err != nil {
-			if errors.Is(err, mongo.ErrNotFound) {
-				res <- views.ResRPC{Res: nil, Err: status.Error(codes.NotFound, "not found")}
-				return
-			} else {
-				log.Error(op, "", err)
-				res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, "check logs")}
-				return
-			}
-		}
-
-		res <- views.ResRPC{Res: nil, Err: nil}
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.service.DeleteTag(ctx, req.GetTagId(), req.GetUserId())
 	})
 
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
-
 	return nil, nil
 }
-func (s *ServerAPI) DeleteTag(ctx context.Context, req *brzrpc2.TagId) (*emptypb.Empty, error) {
-	const op = "blocknote.grpc.DeleteTag"
-	log.Info(op, "")
+
+func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc.UserId) (*brzrpc.Tags, error) {
+	const op = "grpc.GetTagsByUser"
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		if err := s.tagAPI.Delete(ctx, req.GetTagId()); err != nil {
-			log.Error(op, "", err)
-			res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, "check logs")}
-			return
-		}
-
-		res <- views.ResRPC{Res: nil, Err: nil}
-	})
-
-	if err != nil {
-		return nil, format.Error(op, err)
-	}
-
-	return nil, nil
-}
-
-func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc2.UserId) (*brzrpc2.Tags, error) {
-	const op = "blocknote.grpc.GetTagsByUser"
-	log.Info(op, "")
-
-	ctx, done := context.WithTimeout(ctx, waitTime)
-	defer done()
-
-	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		tgs, err := s.tagAPI.GetAllById(ctx, req.GetUserId())
+	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		r, err := s.service.GetAllByIdTag(ctx, req.GetUserId())
 		if err != nil {
-			log.Error(op, "", err)
-			res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, "check logs")}
-			return
+			return nil, err
 		}
-
-		res <- views.ResRPC{Res: tgs, Err: nil}
+		return domain.FromTagsDb(r), nil
 	})
 
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
 
-	return res.(*brzrpc2.Tags), nil
+	return res.(*brzrpc.Tags), nil
 }
 
-func (s *ServerAPI) GetTag(ctx context.Context, req *brzrpc2.TagId) (*brzrpc2.Tag, error) {
-	const op = "blocknote.grpc.GetTag"
-	log.Info(op, "")
-
-	ctx, done := context.WithTimeout(ctx, waitTime)
-	defer done()
-
-	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		tg, err := s.tagAPI.Get(ctx, req.GetTagId())
-		if err != nil {
-			log.Error(op, "", err)
-			res <- views.ResRPC{Res: nil, Err: status.Error(codes.Internal, "check logs")}
-			return
-		}
-
-		res <- views.ResRPC{Res: tg, Err: nil}
-	})
-
-	if err != nil {
-		return nil, format.Error(op, err)
-	}
-
-	return res.(*brzrpc2.Tag), nil
-}
+//func (s *ServerAPI) GetTag(ctx context.Context, req *brzrpc.TagId) (*brzrpc.Tag, error) {
+//	const op = "grpc.GetTag"
+//
+//	ctx, done := context.WithTimeout(ctx, waitTime)
+//	defer done()
+//
+//	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+//		r, err := s.service.GetTag(ctx, req.GetTagId())
+//		if err != nil {
+//			return nil, err
+//		}
+//		return domain.FromTagDb(r), nil
+//	})
+//
+//	if err != nil {
+//		return nil, format.Error(op, err)
+//	}
+//
+//	return res.(*brzrpc.Tag), nil
+//}

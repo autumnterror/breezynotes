@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/autumnterror/breezynotes/internal/auth/domain"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"golang.org/x/crypto/bcrypt"
 )
 

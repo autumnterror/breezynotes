@@ -1,4 +1,4 @@
-data_source: "blocknotedb"
-port_mongo: 27017
+data_source: "mongo1:27017,mongo2:27018,mongo3:27019"
+replica_set: "rs0"
 port: 8018
-mode: "PROD"
+mode: "REPL"

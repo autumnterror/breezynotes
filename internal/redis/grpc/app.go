@@ -3,9 +3,9 @@ package grpc
 import (
 	"fmt"
 	"github.com/autumnterror/breezynotes/internal/redis/config"
-	"github.com/autumnterror/breezynotes/internal/redis/redis"
-	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/breezynotes/internal/redis/repository"
+	"github.com/autumnterror/utils_go/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"net"
@@ -17,7 +17,7 @@ type App struct {
 	cfg        *config.Config
 }
 
-func New(cfg *config.Config, rds redis.Repo) *App {
+func New(cfg *config.Config, rds repository.Repo) *App {
 	s := grpc.NewServer(
 		grpc.KeepaliveParams(keepalive.ServerParameters{
 			MaxConnectionIdle: 0,

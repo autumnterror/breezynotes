@@ -3,11 +3,10 @@ package grpc
 import (
 	"context"
 	"errors"
-	brzrpc2 "github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/autumnterror/breezynotes/internal/redis/redis"
-	"github.com/autumnterror/breezynotes/pkg/log"
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
-	"github.com/autumnterror/breezynotes/views"
+	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
+	"github.com/autumnterror/breezynotes/internal/redis/domain"
+	"github.com/autumnterror/breezynotes/internal/redis/repository"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -16,7 +15,7 @@ import (
 
 func (s *ServerAPI) ensureCreate(ctx context.Context, idUser string) bool {
 	if err := s.rds.CheckSession(ctx, idUser); err != nil {
-		if errors.Is(err, redis.ErrNotFound) {
+		if errors.Is(err, repository.ErrNotFound) {
 			if err := s.rds.CreateSession(ctx, idUser); err != nil {
 				return false
 			}
@@ -27,9 +26,9 @@ func (s *ServerAPI) ensureCreate(ctx context.Context, idUser string) bool {
 	return true
 }
 
-func (s *ServerAPI) GetNoteByUser(ctx context.Context, req *brzrpc2.UserNoteId) (*brzrpc2.NoteWithBlocks, error) {
+func (s *ServerAPI) GetNoteByUser(ctx context.Context, req *brzrpc.UserNoteId) (*brzrpc.NoteWithBlocks, error) {
 	const op = "redis.grpc.GetNoteByUser"
-	log.Info(op, "")
+
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
@@ -37,44 +36,28 @@ func (s *ServerAPI) GetNoteByUser(ctx context.Context, req *brzrpc2.UserNoteId) 
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
-	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
+	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
 		nts, err := s.rds.GetSessionNotes(ctx, req.GetUserId())
 		if err != nil {
-			switch {
-			default:
-				log.Warn(op, "", err)
-				res <- views.ResRPC{
-					Res: nil,
-					Err: status.Error(codes.Internal, err.Error()),
-				}
-			}
-			return
+			return nil, err
 		}
 
 		for _, n := range nts {
 			if n.GetId() == req.GetNoteId() {
-				res <- views.ResRPC{
-					Res: n,
-					Err: nil,
-				}
-				return
+				return n, err
 			}
 		}
-		res <- views.ResRPC{
-			Res: nil,
-			Err: status.Error(codes.NotFound, "not found in cache"),
-		}
+		return nil, domain.ErrNotFound
 	})
 
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
 
-	return res.(*brzrpc2.NoteWithBlocks), nil
+	return res.(*brzrpc.NoteWithBlocks), nil
 }
-func (s *ServerAPI) GetNoteListByUser(ctx context.Context, req *brzrpc2.UserId) (*brzrpc2.NoteParts, error) {
+func (s *ServerAPI) GetNoteListByUser(ctx context.Context, req *brzrpc.UserId) (*brzrpc.NoteParts, error) {
 	const op = "redis.grpc.GetNoteListByUser"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
@@ -83,34 +66,18 @@ func (s *ServerAPI) GetNoteListByUser(ctx context.Context, req *brzrpc2.UserId) 
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
-	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		nts, err := s.rds.GetSessionNoteList(ctx, req.GetUserId())
-		if err != nil {
-			switch {
-			default:
-				log.Warn(op, "", err)
-				res <- views.ResRPC{
-					Res: nil,
-					Err: status.Error(codes.Internal, err.Error()),
-				}
-			}
-			return
-		}
-		res <- views.ResRPC{
-			Res: nts,
-			Err: nil,
-		}
+	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return s.rds.GetSessionNoteList(ctx, req.GetUserId())
 	})
 
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
 
-	return &brzrpc2.NoteParts{Items: res.([]*brzrpc2.NotePart)}, nil
+	return &brzrpc.NoteParts{Items: res.([]*brzrpc.NotePart)}, nil
 }
-func (s *ServerAPI) GetNotesFromTrashByUser(ctx context.Context, req *brzrpc2.UserId) (*brzrpc2.NoteParts, error) {
+func (s *ServerAPI) GetNotesFromTrashByUser(ctx context.Context, req *brzrpc.UserId) (*brzrpc.NoteParts, error) {
 	const op = "redis.grpc.GetNotesFromTrashByUser"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
@@ -119,35 +86,20 @@ func (s *ServerAPI) GetNotesFromTrashByUser(ctx context.Context, req *brzrpc2.Us
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
-	res, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		nts, err := s.rds.GetSessionNoteTrash(ctx, req.GetUserId())
-		if err != nil {
-			switch {
-			default:
-				log.Warn(op, "", err)
-				res <- views.ResRPC{
-					Res: nil,
-					Err: status.Error(codes.Internal, err.Error()),
-				}
-			}
-			return
-		}
-		res <- views.ResRPC{
-			Res: nts,
-			Err: nil,
-		}
+	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return s.rds.GetSessionNoteTrash(ctx, req.GetUserId())
 	})
 
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
 
-	return &brzrpc2.NoteParts{Items: res.([]*brzrpc2.NotePart)}, nil
+	return &brzrpc.NoteParts{Items: res.([]*brzrpc.NotePart)}, nil
 }
 
-func (s *ServerAPI) SetNoteByUser(ctx context.Context, req *brzrpc2.NoteByUser) (*emptypb.Empty, error) {
+func (s *ServerAPI) SetNoteByUser(ctx context.Context, req *brzrpc.NoteByUser) (*emptypb.Empty, error) {
 	const op = "redis.grpc.SetNotesByUser"
-	log.Info(op, "")
+
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
@@ -155,38 +107,14 @@ func (s *ServerAPI) SetNoteByUser(ctx context.Context, req *brzrpc2.NoteByUser) 
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
 		nts, err := s.rds.GetSessionNotes(ctx, req.GetUserId())
 		if err != nil {
-			switch {
-			default:
-				log.Warn(op, "", err)
-				res <- views.ResRPC{
-					Res: nil,
-					Err: status.Error(codes.Internal, err.Error()),
-				}
-			}
-			return
+			return nil, err
 		}
 		nts = append(nts, req.GetNote())
 
-		err = s.rds.SetSessionNotes(ctx, req.GetUserId(), nts)
-		if err != nil {
-			switch {
-			default:
-				log.Warn(op, "", err)
-				res <- views.ResRPC{
-					Res: nil,
-					Err: status.Error(codes.Internal, err.Error()),
-				}
-			}
-			return
-		}
-
-		res <- views.ResRPC{
-			Res: nil,
-			Err: nil,
-		}
+		return nil, s.rds.SetSessionNotes(ctx, req.GetUserId(), nts)
 	})
 
 	if err != nil {
@@ -195,9 +123,8 @@ func (s *ServerAPI) SetNoteByUser(ctx context.Context, req *brzrpc2.NoteByUser) 
 
 	return nil, nil
 }
-func (s *ServerAPI) SetNotesFromTrashByUser(ctx context.Context, req *brzrpc2.NoteListByUser) (*emptypb.Empty, error) {
+func (s *ServerAPI) SetNotesFromTrashByUser(ctx context.Context, req *brzrpc.NoteListByUser) (*emptypb.Empty, error) {
 	const op = "redis.grpc.SetNotesFromTrashByUser"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
@@ -206,24 +133,8 @@ func (s *ServerAPI) SetNotesFromTrashByUser(ctx context.Context, req *brzrpc2.No
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		err := s.rds.SetSessionNoteTrash(ctx, req.GetUserId(), req.GetItems())
-		if err != nil {
-			switch {
-			default:
-				log.Warn(op, "", err)
-				res <- views.ResRPC{
-					Res: nil,
-					Err: status.Error(codes.Internal, err.Error()),
-				}
-			}
-			return
-		}
-
-		res <- views.ResRPC{
-			Res: nil,
-			Err: nil,
-		}
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.rds.SetSessionNoteTrash(ctx, req.GetUserId(), req.GetItems())
 	})
 
 	if err != nil {
@@ -232,9 +143,8 @@ func (s *ServerAPI) SetNotesFromTrashByUser(ctx context.Context, req *brzrpc2.No
 
 	return nil, nil
 }
-func (s *ServerAPI) SetNoteListByUser(ctx context.Context, req *brzrpc2.NoteListByUser) (*emptypb.Empty, error) {
+func (s *ServerAPI) SetNoteListByUser(ctx context.Context, req *brzrpc.NoteListByUser) (*emptypb.Empty, error) {
 	const op = "redis.grpc.SetNoteListByUser"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
@@ -243,24 +153,8 @@ func (s *ServerAPI) SetNoteListByUser(ctx context.Context, req *brzrpc2.NoteList
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		err := s.rds.SetSessionNoteList(ctx, req.GetUserId(), req.GetItems())
-		if err != nil {
-			switch {
-			default:
-				log.Warn(op, "", err)
-				res <- views.ResRPC{
-					Res: nil,
-					Err: status.Error(codes.Internal, err.Error()),
-				}
-			}
-			return
-		}
-
-		res <- views.ResRPC{
-			Res: nil,
-			Err: nil,
-		}
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.rds.SetSessionNoteList(ctx, req.GetUserId(), req.GetItems())
 	})
 
 	if err != nil {
@@ -269,9 +163,8 @@ func (s *ServerAPI) SetNoteListByUser(ctx context.Context, req *brzrpc2.NoteList
 
 	return nil, nil
 }
-func (s *ServerAPI) RmNoteByUser(ctx context.Context, req *brzrpc2.UserNoteId) (*emptypb.Empty, error) {
+func (s *ServerAPI) RmNoteByUser(ctx context.Context, req *brzrpc.UserNoteId) (*emptypb.Empty, error) {
 	const op = "redis.grpc.RmNotesByUser"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
@@ -280,50 +173,22 @@ func (s *ServerAPI) RmNoteByUser(ctx context.Context, req *brzrpc2.UserNoteId) (
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
 		nts, err := s.rds.GetSessionNotes(ctx, req.GetUserId())
 		if err != nil {
-			switch {
-			default:
-				log.Warn(op, "", err)
-				res <- views.ResRPC{
-					Res: nil,
-					Err: status.Error(codes.Internal, err.Error()),
-				}
-			}
-			return
+			return nil, err
 		}
-		idx := slices.IndexFunc(nts, func(b *brzrpc2.NoteWithBlocks) bool {
+
+		idx := slices.IndexFunc(nts, func(b *brzrpc.NoteWithBlocks) bool {
 			return b.Id == req.GetNoteId()
 		})
-
 		if idx == -1 {
-			res <- views.ResRPC{
-				Res: nil,
-				Err: nil,
-			}
-			return
+			return nil, domain.ErrNotFound
 		}
 
 		nts = append(nts[:idx], nts[idx+1:]...)
 
-		err = s.rds.SetSessionNotes(ctx, req.GetUserId(), nts)
-		if err != nil {
-			switch {
-			default:
-				log.Warn(op, "", err)
-				res <- views.ResRPC{
-					Res: nil,
-					Err: status.Error(codes.Internal, err.Error()),
-				}
-			}
-			return
-		}
-
-		res <- views.ResRPC{
-			Res: nil,
-			Err: nil,
-		}
+		return nil, s.rds.SetSessionNotes(ctx, req.GetUserId(), nts)
 	})
 
 	if err != nil {
@@ -332,9 +197,8 @@ func (s *ServerAPI) RmNoteByUser(ctx context.Context, req *brzrpc2.UserNoteId) (
 
 	return nil, nil
 }
-func (s *ServerAPI) RmNotesFromTrashByUser(ctx context.Context, req *brzrpc2.UserId) (*emptypb.Empty, error) {
+func (s *ServerAPI) RmNotesFromTrashByUser(ctx context.Context, req *brzrpc.UserId) (*emptypb.Empty, error) {
 	const op = "redis.grpc.RmNotesFromTrashByUser"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
@@ -343,24 +207,8 @@ func (s *ServerAPI) RmNotesFromTrashByUser(ctx context.Context, req *brzrpc2.Use
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		err := s.rds.SetSessionNoteTrash(ctx, req.GetUserId(), nil)
-		if err != nil {
-			switch {
-			default:
-				log.Warn(op, "", err)
-				res <- views.ResRPC{
-					Res: nil,
-					Err: status.Error(codes.Internal, err.Error()),
-				}
-			}
-			return
-		}
-
-		res <- views.ResRPC{
-			Res: nil,
-			Err: nil,
-		}
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.rds.SetSessionNoteTrash(ctx, req.GetUserId(), nil)
 	})
 
 	if err != nil {
@@ -370,9 +218,8 @@ func (s *ServerAPI) RmNotesFromTrashByUser(ctx context.Context, req *brzrpc2.Use
 	return nil, nil
 }
 
-func (s *ServerAPI) RmNoteListByUser(ctx context.Context, req *brzrpc2.UserId) (*emptypb.Empty, error) {
+func (s *ServerAPI) RmNoteListByUser(ctx context.Context, req *brzrpc.UserId) (*emptypb.Empty, error) {
 	const op = "redis.grpc.RmNoteListByUser"
-	log.Info(op, "")
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
@@ -381,24 +228,8 @@ func (s *ServerAPI) RmNoteListByUser(ctx context.Context, req *brzrpc2.UserId) (
 		return nil, status.Error(codes.Internal, "can't create session")
 	}
 
-	_, err := opWithContext(ctx, func(res chan views.ResRPC) {
-		err := s.rds.SetSessionNoteList(ctx, req.GetUserId(), nil)
-		if err != nil {
-			switch {
-			default:
-				log.Warn(op, "", err)
-				res <- views.ResRPC{
-					Res: nil,
-					Err: status.Error(codes.Internal, err.Error()),
-				}
-			}
-			return
-		}
-
-		res <- views.ResRPC{
-			Res: nil,
-			Err: nil,
-		}
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.rds.SetSessionNoteList(ctx, req.GetUserId(), nil)
 	})
 
 	if err != nil {

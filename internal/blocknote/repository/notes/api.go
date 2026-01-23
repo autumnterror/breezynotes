@@ -6,11 +6,11 @@ import (
 )
 
 type API struct {
-	db          repository.NoSqlRepo
-	trashDriver repository.NoSqlRepo
-	blockAPI    blocks.Repo
+	noteAPI  repository.NoSqlRepo
+	trashAPI repository.NoSqlRepo
+	blockAPI blocks.Repo
 }
 
-func NewApi(c repository.NoSqlRepo, trashDriver repository.NoSqlRepo, blockAPI blocks.Repo) *API {
-	return &API{db: c, trashDriver: trashDriver, blockAPI: blockAPI}
+func NewApi(noteAPI repository.NoSqlRepo, trashAPI repository.NoSqlRepo, blockAPI blocks.Repo) *API {
+	return &API{noteAPI: noteAPI, trashAPI: trashAPI, blockAPI: blockAPI}
 }

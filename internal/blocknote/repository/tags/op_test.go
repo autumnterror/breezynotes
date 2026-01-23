@@ -6,7 +6,7 @@ import (
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/config"
 	mongo2 "github.com/autumnterror/breezynotes/internal/blocknote/infra/mongo"
-	"github.com/autumnterror/breezynotes/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

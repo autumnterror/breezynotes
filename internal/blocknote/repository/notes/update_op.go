@@ -4,21 +4,21 @@ import (
 	"context"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 
-	"github.com/autumnterror/breezynotes/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"time"
 )
 
 // UpdateUpdatedAt update updated time to time.Now().UTC().Unix() can return mongo.ErrNotFound
-func (a *API) updateUpdatedAt(ctx context.Context, id string) error {
-	const op = "notes.updateUpdatedAt"
+func (a *API) UpdateUpdatedAt(ctx context.Context, id string) error {
+	const op = "notes.UpdateUpdatedAt"
 
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	res, err := a.
-		db.
+		noteAPI.
 		UpdateOne(
 			ctx,
 			bson.M{
@@ -48,7 +48,7 @@ func (a *API) UpdateTitle(ctx context.Context, id string, nTitle string) error {
 	defer done()
 
 	res, err := a.
-		db.
+		noteAPI.
 		UpdateOne(
 			ctx,
 			bson.M{
@@ -79,7 +79,7 @@ func (a *API) updateBlocks(ctx context.Context, id string, blocks []string) erro
 	defer done()
 
 	res, err := a.
-		db.
+		noteAPI.
 		UpdateOne(
 			ctx,
 			bson.M{

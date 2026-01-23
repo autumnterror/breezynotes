@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/autumnterror/breezynotes/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/log"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"google.golang.org/protobuf/types/known/structpb"
 )

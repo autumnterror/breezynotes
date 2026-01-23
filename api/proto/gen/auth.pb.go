@@ -243,6 +243,7 @@ type ChangePasswordRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	NewPassword   string                 `protobuf:"bytes,2,opt,name=new_password,json=newPassword,proto3" json:"new_password,omitempty"`
+	OldPassword   string                 `protobuf:"bytes,3,opt,name=old_password,json=oldPassword,proto3" json:"old_password,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -291,6 +292,13 @@ func (x *ChangePasswordRequest) GetNewPassword() string {
 	return ""
 }
 
+func (x *ChangePasswordRequest) GetOldPassword() string {
+	if x != nil {
+		return x.OldPassword
+	}
+	return ""
+}
+
 var File_auth_proto protoreflect.FileDescriptor
 
 const file_auth_proto_rawDesc = "" +
@@ -309,23 +317,16 @@ const file_auth_proto_rawDesc = "" +
 	"\tnew_email\x18\x02 \x01(\tR\bnewEmail\"A\n" +
 	"\x12UpdatePhotoRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
-	"\tnew_photo\x18\x02 \x01(\tR\bnewPhoto\"J\n" +
+	"\tnew_photo\x18\x02 \x01(\tR\bnewPhoto\"m\n" +
 	"\x15ChangePasswordRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12!\n" +
-	"\fnew_password\x18\x02 \x01(\tR\vnewPassword2\x8f\x06\n" +
+	"\fnew_password\x18\x02 \x01(\tR\vnewPassword\x12!\n" +
+	"\fold_password\x18\x03 \x01(\tR\voldPassword2\xfe\x04\n" +
 	"\vAuthService\x12%\n" +
-	"\x04Auth\x12\x10.brz.AuthRequest\x1a\v.brz.UserId\x12.\n" +
-	"\x13GenerateAccessToken\x12\v.brz.UserId\x1a\n" +
-	".brz.Token\x12/\n" +
-	"\x14GenerateRefreshToken\x12\v.brz.UserId\x1a\n" +
-	".brz.Token\x12*\n" +
-	"\x0eGenerateTokens\x12\v.brz.UserId\x1a\v.brz.Tokens\x12!\n" +
-	"\aRefresh\x12\n" +
-	".brz.Token\x1a\n" +
-	".brz.Token\x120\n" +
-	"\n" +
-	"CheckToken\x12\n" +
-	".brz.Token\x1a\x16.google.protobuf.Empty\x121\n" +
+	"\x04Auth\x12\x10.brz.AuthRequest\x1a\v.brz.Tokens\x12$\n" +
+	"\x03Reg\x12\x10.brz.AuthRequest\x1a\v.brz.Tokens\x12)\n" +
+	"\x0eValidateTokens\x12\v.brz.Tokens\x1a\n" +
+	".brz.Token\x121\n" +
 	"\n" +
 	"DeleteUser\x12\v.brz.UserId\x1a\x16.google.protobuf.Empty\x12>\n" +
 	"\vUpdateAbout\x12\x17.brz.UpdateAboutRequest\x1a\x16.google.protobuf.Empty\x12>\n" +
@@ -359,46 +360,40 @@ var file_auth_proto_goTypes = []any{
 	(*UpdateEmailRequest)(nil),    // 2: brz.UpdateEmailRequest
 	(*UpdatePhotoRequest)(nil),    // 3: brz.UpdatePhotoRequest
 	(*ChangePasswordRequest)(nil), // 4: brz.ChangePasswordRequest
-	(*UserId)(nil),                // 5: brz.UserId
-	(*Token)(nil),                 // 6: brz.Token
+	(*Tokens)(nil),                // 5: brz.Tokens
+	(*UserId)(nil),                // 6: brz.UserId
 	(*User)(nil),                  // 7: brz.User
-	(*emptypb.Empty)(nil),         // 8: google.protobuf.Empty
-	(*Tokens)(nil),                // 9: brz.Tokens
+	(*Token)(nil),                 // 8: brz.Token
+	(*emptypb.Empty)(nil),         // 9: google.protobuf.Empty
 	(*Id)(nil),                    // 10: brz.Id
 }
 var file_auth_proto_depIdxs = []int32{
 	0,  // 0: brz.AuthService.Auth:input_type -> brz.AuthRequest
-	5,  // 1: brz.AuthService.GenerateAccessToken:input_type -> brz.UserId
-	5,  // 2: brz.AuthService.GenerateRefreshToken:input_type -> brz.UserId
-	5,  // 3: brz.AuthService.GenerateTokens:input_type -> brz.UserId
-	6,  // 4: brz.AuthService.Refresh:input_type -> brz.Token
-	6,  // 5: brz.AuthService.CheckToken:input_type -> brz.Token
-	5,  // 6: brz.AuthService.DeleteUser:input_type -> brz.UserId
-	1,  // 7: brz.AuthService.UpdateAbout:input_type -> brz.UpdateAboutRequest
-	2,  // 8: brz.AuthService.UpdateEmail:input_type -> brz.UpdateEmailRequest
-	3,  // 9: brz.AuthService.UpdatePhoto:input_type -> brz.UpdatePhotoRequest
-	4,  // 10: brz.AuthService.ChangePasswd:input_type -> brz.ChangePasswordRequest
-	7,  // 11: brz.AuthService.CreateUser:input_type -> brz.User
-	6,  // 12: brz.AuthService.GetUserDataFromToken:input_type -> brz.Token
-	6,  // 13: brz.AuthService.GetIdFromToken:input_type -> brz.Token
-	8,  // 14: brz.AuthService.Healthz:input_type -> google.protobuf.Empty
-	5,  // 15: brz.AuthService.Auth:output_type -> brz.UserId
-	6,  // 16: brz.AuthService.GenerateAccessToken:output_type -> brz.Token
-	6,  // 17: brz.AuthService.GenerateRefreshToken:output_type -> brz.Token
-	9,  // 18: brz.AuthService.GenerateTokens:output_type -> brz.Tokens
-	6,  // 19: brz.AuthService.Refresh:output_type -> brz.Token
-	8,  // 20: brz.AuthService.CheckToken:output_type -> google.protobuf.Empty
-	8,  // 21: brz.AuthService.DeleteUser:output_type -> google.protobuf.Empty
-	8,  // 22: brz.AuthService.UpdateAbout:output_type -> google.protobuf.Empty
-	8,  // 23: brz.AuthService.UpdateEmail:output_type -> google.protobuf.Empty
-	8,  // 24: brz.AuthService.UpdatePhoto:output_type -> google.protobuf.Empty
-	8,  // 25: brz.AuthService.ChangePasswd:output_type -> google.protobuf.Empty
-	8,  // 26: brz.AuthService.CreateUser:output_type -> google.protobuf.Empty
-	7,  // 27: brz.AuthService.GetUserDataFromToken:output_type -> brz.User
-	10, // 28: brz.AuthService.GetIdFromToken:output_type -> brz.Id
-	8,  // 29: brz.AuthService.Healthz:output_type -> google.protobuf.Empty
-	15, // [15:30] is the sub-list for method output_type
-	0,  // [0:15] is the sub-list for method input_type
+	0,  // 1: brz.AuthService.Reg:input_type -> brz.AuthRequest
+	5,  // 2: brz.AuthService.ValidateTokens:input_type -> brz.Tokens
+	6,  // 3: brz.AuthService.DeleteUser:input_type -> brz.UserId
+	1,  // 4: brz.AuthService.UpdateAbout:input_type -> brz.UpdateAboutRequest
+	2,  // 5: brz.AuthService.UpdateEmail:input_type -> brz.UpdateEmailRequest
+	3,  // 6: brz.AuthService.UpdatePhoto:input_type -> brz.UpdatePhotoRequest
+	4,  // 7: brz.AuthService.ChangePasswd:input_type -> brz.ChangePasswordRequest
+	7,  // 8: brz.AuthService.CreateUser:input_type -> brz.User
+	8,  // 9: brz.AuthService.GetUserDataFromToken:input_type -> brz.Token
+	8,  // 10: brz.AuthService.GetIdFromToken:input_type -> brz.Token
+	9,  // 11: brz.AuthService.Healthz:input_type -> google.protobuf.Empty
+	5,  // 12: brz.AuthService.Auth:output_type -> brz.Tokens
+	5,  // 13: brz.AuthService.Reg:output_type -> brz.Tokens
+	8,  // 14: brz.AuthService.ValidateTokens:output_type -> brz.Token
+	9,  // 15: brz.AuthService.DeleteUser:output_type -> google.protobuf.Empty
+	9,  // 16: brz.AuthService.UpdateAbout:output_type -> google.protobuf.Empty
+	9,  // 17: brz.AuthService.UpdateEmail:output_type -> google.protobuf.Empty
+	9,  // 18: brz.AuthService.UpdatePhoto:output_type -> google.protobuf.Empty
+	9,  // 19: brz.AuthService.ChangePasswd:output_type -> google.protobuf.Empty
+	9,  // 20: brz.AuthService.CreateUser:output_type -> google.protobuf.Empty
+	7,  // 21: brz.AuthService.GetUserDataFromToken:output_type -> brz.User
+	10, // 22: brz.AuthService.GetIdFromToken:output_type -> brz.Id
+	9,  // 23: brz.AuthService.Healthz:output_type -> google.protobuf.Empty
+	12, // [12:24] is the sub-list for method output_type
+	0,  // [0:12] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
