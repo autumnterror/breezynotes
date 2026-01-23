@@ -29,7 +29,7 @@ func (s *BN) ChangeBlockOrder(ctx context.Context, idNote, idUser string, oldOrd
 		if err != nil {
 			return nil, err
 		}
-		if n.Author != idUser || !alg.IsIn(idUser, n.Editors) || !alg.IsIn(idUser, n.Readers) {
+		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 			return nil, domain.ErrUnauthorized
 		}
 
@@ -55,7 +55,7 @@ func (s *BN) GetBlock(ctx context.Context, idBlock, idNote, idUser string) (*dom
 	if err != nil {
 		return nil, err
 	}
-	if n.Author != idUser || !alg.IsIn(idUser, n.Editors) || !alg.IsIn(idUser, n.Readers) {
+	if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 		return nil, domain.ErrUnauthorized
 	}
 
@@ -94,7 +94,7 @@ func (s *BN) CreateBlock(ctx context.Context, _type, noteId string, data map[str
 	res, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		if n, err := s.nts.Get(ctx, noteId); err != nil {
 			return nil, err
-		} else if n.Author != idUser || !alg.IsIn(idUser, n.Editors) || !alg.IsIn(idUser, n.Readers) {
+		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 			return nil, domain.ErrUnauthorized
 		}
 
@@ -133,7 +133,7 @@ func (s *BN) DeleteBlock(ctx context.Context, noteId, blockId, idUser string) er
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		if n, err := s.nts.Get(ctx, noteId); err != nil {
 			return nil, err
-		} else if n.Author != idUser || !alg.IsIn(idUser, n.Editors) || !alg.IsIn(idUser, n.Readers) {
+		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 			return nil, domain.ErrUnauthorized
 		}
 
@@ -159,7 +159,7 @@ func (s *BN) OpBlock(ctx context.Context, id, opName string, data map[string]any
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		if n, err := s.nts.Get(ctx, idNote); err != nil {
 			return nil, err
-		} else if n.Author != idUser || !alg.IsIn(idUser, n.Editors) || !alg.IsIn(idUser, n.Readers) {
+		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 			return nil, domain.ErrUnauthorized
 		}
 		if err := s.nts.UpdateUpdatedAt(ctx, idNote); err != nil {
@@ -183,7 +183,7 @@ func (s *BN) ChangeTypeBlock(ctx context.Context, idBlock, idNote, idUser, newTy
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		if n, err := s.nts.Get(ctx, idNote); err != nil {
 			return nil, err
-		} else if n.Author != idUser || !alg.IsIn(idUser, n.Editors) || !alg.IsIn(idUser, n.Readers) {
+		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 			return nil, domain.ErrUnauthorized
 		}
 		return nil, s.blk.ChangeType(ctx, idBlock, newType)
