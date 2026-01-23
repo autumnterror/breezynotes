@@ -3,7 +3,9 @@ package service
 import (
 	"context"
 	"errors"
+
 	"github.com/autumnterror/breezynotes/internal/auth/domain"
+	"github.com/autumnterror/utils_go/pkg/utils/validate"
 )
 
 //func (s *AuthService) GetInfo(ctx context.Context, id string) (*domain.User, error) {
@@ -55,10 +57,10 @@ func (s *AuthService) UpdatePassword(ctx context.Context, id, oldPassword string
 	if err := idValidation(id); err != nil {
 		return wrapServiceCheck(op, err)
 	}
-	if stringEmpty(newPassword) {
-		return wrapServiceCheck(op, errors.New("new password is empty"))
-	}
 
+	if !validate.Password(newPassword) {
+		return wrapServiceCheck(op, errors.New("new password not in policy"))
+	}
 	return s.runInTx(ctx, op, func(ctx context.Context) error {
 		repo, err := s.userRepo(ctx)
 		if err != nil {

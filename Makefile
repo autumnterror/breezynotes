@@ -22,7 +22,7 @@ build-all:
 	docker build -t zitrax78/breezynotes-blocknote --file ./build/docker/blocknote/dockerfile .
 	docker build -t zitrax78/breezynotes-redis --file ./build/docker/redis/dockerfile .
 
-build-platform:
+build-all-mac:
 	docker build --platform linux/amd64 -t zitrax78/breezynotes-gateway --file ./build/docker/gateway/dockerfile .
 	docker build --platform linux/amd64 -t zitrax78/breezynotes-auth --file ./build/docker/auth/dockerfile .
 	docker build --platform linux/amd64 -t zitrax78/breezynotes-blocknote --file ./build/docker/blocknote/dockerfile .
@@ -95,11 +95,10 @@ compose-down-db:
 	docker compose -f ./build/breezynotes/docker-compose.db.yml down
 compose-down-db-v:
 	docker compose -f ./build/breezynotes/docker-compose.db.yml down -v
-# Documentation
+
 docx:
 	swag init --dir ./cmd/gateway,./internal/gateway/net/,./internal/gateway/domain/,./api/proto/gen --output ./docs
 
-#test-operations
 test-method:
 	go test -run $(METHOD) ./... -v
 test-redis:

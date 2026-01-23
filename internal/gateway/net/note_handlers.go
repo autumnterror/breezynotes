@@ -2,12 +2,14 @@ package net
 
 import (
 	"context"
+	"net/http"
+	"strings"
+	"time"
+
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/gateway/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/alg"
 	"github.com/autumnterror/utils_go/pkg/utils/uid"
-	"net/http"
-	"strings"
 
 	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/labstack/echo/v4"
@@ -315,8 +317,8 @@ func (e *Echo) CreateNote(c echo.Context) error {
 	_, err := api.CreateNote(ctx, &brzrpc.Note{
 		Id:        id,
 		Title:     r.Title,
-		CreatedAt: 0,
-		UpdatedAt: 0,
+		CreatedAt: time.Now().UTC().Unix(),
+		UpdatedAt: time.Now().UTC().Unix(),
 		Tag:       nil,
 		Author:    idUser,
 		Editors:   []string{},

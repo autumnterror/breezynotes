@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"github.com/autumnterror/utils_go/pkg/log"
 	"time"
 
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
@@ -75,7 +74,6 @@ func (s *ServerAPI) ValidateTokens(ctx context.Context, r *brzrpc.Tokens) (*brzr
 		return nil, format.Error(op, err)
 	}
 	if res.(string) != "" {
-		log.Blue("im here")
 		return &brzrpc.Token{
 			Value: res.(string),
 			Exp:   time.Now().UTC().Add(s.Cfg.AccessTokenLifeTime).Unix(),

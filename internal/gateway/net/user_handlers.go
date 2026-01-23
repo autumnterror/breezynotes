@@ -2,12 +2,12 @@ package net
 
 import (
 	"context"
+	"net/http"
+
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/gateway/domain"
 	"github.com/autumnterror/utils_go/pkg/log"
-	"github.com/autumnterror/utils_go/pkg/utils/validate"
 	"github.com/labstack/echo/v4"
-	"net/http"
 )
 
 // GetUserData godoc
@@ -254,9 +254,6 @@ func (e *Echo) ChangePassword(c echo.Context) error {
 
 	if req.NewPassword != req.NewPassword2 {
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "password not same"})
-	}
-	if !validate.Password(req.NewPassword) {
-		return c.JSON(http.StatusBadRequest, domain.Error{Error: "password not in policy"})
 	}
 
 	api := e.authAPI.API

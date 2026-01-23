@@ -3,8 +3,8 @@ package service
 import (
 	"errors"
 	"fmt"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
-	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"github.com/autumnterror/utils_go/pkg/utils/uid"
 )
 
@@ -16,7 +16,7 @@ func wrapServiceCheck(op string, err error) error {
 	if err == nil {
 		return nil
 	}
-	return format.Error(op, fmt.Errorf("%w: %v", ErrBadServiceCheck, err))
+	return fmt.Errorf("%w: %v", ErrBadServiceCheck, err)
 }
 
 func idValidation(id string) error {

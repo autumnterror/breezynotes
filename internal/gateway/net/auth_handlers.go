@@ -2,10 +2,11 @@ package net
 
 import (
 	"context"
-	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/autumnterror/breezynotes/internal/gateway/domain"
 	"net/http"
 	"time"
+
+	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
+	"github.com/autumnterror/breezynotes/internal/gateway/domain"
 
 	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/labstack/echo/v4"
@@ -174,8 +175,11 @@ func (e *Echo) ValidateToken(c echo.Context) error {
 	if code != http.StatusOK {
 		return c.JSON(code, errRes)
 	}
-	log.Blue(token)
+
 	if token != nil {
+		if token.Value == "" {
+			return c.JSON(http.StatusOK, domain.Message{Message: "tokens valid"})
+		}
 		c.SetCookie(&http.Cookie{
 			Name:     "access_token",
 			Value:    token.GetValue(),

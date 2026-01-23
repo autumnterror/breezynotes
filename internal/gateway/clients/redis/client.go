@@ -1,7 +1,11 @@
 package redis
 
 import (
-	"github.com/autumnterror/breezynotes/api/proto/gen"
+	"context"
+	"os"
+	"time"
+
+	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/gateway/config"
 	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
@@ -10,7 +14,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials/insecure"
-	"time"
 )
 
 type Client struct {
@@ -46,14 +49,16 @@ func New(
 		return nil, format.Error(op, err)
 	}
 
+	ctx, done := context.WithTimeout(context.Background(), 30*time.Second)
+	defer done()
 	log.Info(op, "start")
-	for {
-		cc.Connect()
-		if cc.GetState() == connectivity.Ready {
-			log.Success(op, "CONNECT!!")
-			break
+	cc.Connect()
+	if cc.GetState() != connectivity.Ready {
+		if !cc.WaitForStateChange(ctx, connectivity.Ready) {
+			log.Error(op, "cant connect in 30 sec", nil)
+			os.Exit(1)
 		}
-		time.Sleep(3 * time.Second)
+		log.Success(op, "CONNECT!!")
 	}
 
 	return &Client{

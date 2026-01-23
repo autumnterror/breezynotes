@@ -1,11 +1,12 @@
 package net
 
 import (
+	"net/http"
+
 	"github.com/autumnterror/breezynotes/internal/gateway/domain"
 	"github.com/autumnterror/utils_go/pkg/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"net/http"
 )
 
 func bNErrors(op string, err error) (int, domain.Error) {
@@ -26,7 +27,7 @@ func bNErrors(op string, err error) (int, domain.Error) {
 		case codes.PermissionDenied:
 			return http.StatusLocked, domain.Error{Error: "block already in use"}
 		case codes.InvalidArgument:
-			return http.StatusBadRequest, domain.Error{Error: err.Error()}
+			return http.StatusBadRequest, domain.Error{Error: st.Message()}
 		case codes.Internal:
 			return http.StatusBadGateway, domain.Error{Error: "check logs on service"}
 		case codes.DeadlineExceeded:
@@ -56,7 +57,7 @@ func authErrors(op string, err error) (int, domain.Error) {
 		case codes.FailedPrecondition:
 			return http.StatusFailedDependency, domain.Error{Error: "bad foreign key"}
 		case codes.InvalidArgument:
-			return http.StatusBadRequest, domain.Error{Error: err.Error()}
+			return http.StatusBadRequest, domain.Error{Error: st.Message()}
 		case codes.ResourceExhausted:
 			return http.StatusGone, domain.Error{Error: "terminate auth. Refresh token is expired"}
 		case codes.Internal:
