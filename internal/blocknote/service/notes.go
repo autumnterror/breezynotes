@@ -155,7 +155,7 @@ func (s *BN) UpdateTitleNote(ctx context.Context, idNote, idUser, nTitle string)
 		if err != nil {
 			return nil, err
 		}
-		if n.Author != idUser || !alg.IsIn(idUser, n.Editors) {
+		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
 			return nil, domain.ErrUnauthorized
 		}
 

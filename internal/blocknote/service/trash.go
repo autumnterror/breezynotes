@@ -50,7 +50,7 @@ func (s *BN) ToTrash(ctx context.Context, idNote, idUser string) error {
 		if err != nil {
 			return nil, err
 		}
-		if n.Author != idUser || !alg.IsIn(idUser, n.Editors) {
+		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
 			return nil, domain.ErrUnauthorized
 		}
 
@@ -73,7 +73,7 @@ func (s *BN) FromTrash(ctx context.Context, idNote, idUser string) error {
 		if err != nil {
 			return nil, err
 		}
-		if n.Author != idUser || !alg.IsIn(idUser, n.Editors) {
+		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
 			return nil, domain.ErrUnauthorized
 		}
 
@@ -95,7 +95,7 @@ func (s *BN) FindOnTrash(ctx context.Context, idNote, idUser string) (*domain.No
 	if err != nil {
 		return nil, err
 	}
-	if n.Author != idUser || !alg.IsIn(idUser, n.Editors) {
+	if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
 		return nil, domain.ErrUnauthorized
 	}
 

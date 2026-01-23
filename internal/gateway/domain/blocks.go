@@ -12,7 +12,7 @@ type Block struct {
 }
 
 type Blocks struct {
-	Items []*Block `json:"items,omitempty"`
+	Items []*Block `json:"items"`
 }
 type CreateBlockRequest struct {
 	NoteId string         `json:"note_id"`
