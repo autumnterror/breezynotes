@@ -97,9 +97,9 @@ func (e *Echo) UpdateTagTitle(c echo.Context) error {
 	defer done()
 
 	_, err := api.UpdateTagTitle(ctx, &brzrpc.UpdateTagTitleRequest{
-		IdTag:  idUser,
+		IdTag:  r.IdTag,
 		Title:  r.Title,
-		IdUser: r.IdTag,
+		IdUser: idUser,
 	})
 
 	code, errRes := bNErrors(op, err)

@@ -108,7 +108,7 @@ func (e *Echo) GetNote(c echo.Context) error {
 		}
 	} else {
 		if note != nil {
-			if note.GetAuthor() != idUser || !alg.IsIn(idUser, note.GetEditors()) || !alg.IsIn(idUser, note.GetReaders()) {
+			if note.GetAuthor() != idUser && !alg.IsIn(idUser, note.GetEditors()) && !alg.IsIn(idUser, note.GetReaders()) {
 				return c.JSON(http.StatusUnauthorized, domain.Error{Error: "user dont have permission"})
 			}
 

@@ -34,7 +34,7 @@ func (s *BN) GetNote(ctx context.Context, idNote, idUser string) (*domain.NoteWi
 		return nil, err
 	}
 
-	if n.Author != idUser || !alg.IsIn(idUser, n.Editors) || !alg.IsIn(idUser, n.Readers) {
+	if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 		return nil, domain.ErrUnauthorized
 	}
 
@@ -94,7 +94,7 @@ func (s *BN) AddTagToNote(ctx context.Context, noteId, tagId, idUser string) err
 		if err != nil {
 			return nil, err
 		}
-		if n.Author != idUser || !alg.IsIn(idUser, n.Editors) || !alg.IsIn(idUser, n.Readers) {
+		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 			return nil, domain.ErrUnauthorized
 		}
 
@@ -126,7 +126,7 @@ func (s *BN) RemoveTagFromNote(ctx context.Context, noteId string, tagId, idUser
 		if err != nil {
 			return nil, err
 		}
-		if n.Author != idUser || !alg.IsIn(idUser, n.Editors) || !alg.IsIn(idUser, n.Readers) {
+		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 			return nil, domain.ErrUnauthorized
 		}
 
