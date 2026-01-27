@@ -3,7 +3,7 @@ package notes
 import (
 	"context"
 	"errors"
-	domain "github.com/autumnterror/breezynotes/internal/blocknote/domain"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 
 	"github.com/autumnterror/utils_go/pkg/log"

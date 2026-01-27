@@ -1,7 +1,7 @@
 package main
 
 import (
-	api "github.com/autumnterror/breezynotes/internal/auth/api"
+	"github.com/autumnterror/breezynotes/internal/auth/api"
 	"github.com/autumnterror/breezynotes/internal/auth/config"
 	"github.com/autumnterror/breezynotes/internal/auth/infra/psql"
 	"github.com/autumnterror/breezynotes/internal/auth/infra/psql/psqltx"

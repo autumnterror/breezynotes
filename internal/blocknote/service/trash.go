@@ -59,6 +59,7 @@ func (s *BN) ToTrash(ctx context.Context, idNote, idUser string) error {
 
 	return err
 }
+
 func (s *BN) FromTrash(ctx context.Context, idNote, idUser string) error {
 	const op = "service.FromTrash"
 
@@ -69,7 +70,7 @@ func (s *BN) FromTrash(ctx context.Context, idNote, idUser string) error {
 		return wrapServiceCheck(op, err)
 	}
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
-		n, err := s.nts.Get(ctx, idNote)
+		n, err := s.nts.FindOnTrash(ctx, idNote)
 		if err != nil {
 			return nil, err
 		}
@@ -82,6 +83,7 @@ func (s *BN) FromTrash(ctx context.Context, idNote, idUser string) error {
 
 	return err
 }
+
 func (s *BN) FindOnTrash(ctx context.Context, idNote, idUser string) (*domain.Note, error) {
 	const op = "service.FindOnTrash"
 

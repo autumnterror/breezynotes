@@ -179,7 +179,7 @@ func (e *Echo) ValidateToken(c echo.Context) error {
 	if token != nil {
 		if token.Value == "" {
 			return c.JSON(http.StatusOK, domain.Message{Message: "tokens valid"})
-		}
+		}	
 		c.SetCookie(&http.Cookie{
 			Name:     "access_token",
 			Value:    token.GetValue(),

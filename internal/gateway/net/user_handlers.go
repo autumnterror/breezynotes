@@ -264,6 +264,7 @@ func (e *Echo) ChangePassword(c echo.Context) error {
 	_, err := api.ChangePasswd(ctx, &brzrpc.ChangePasswordRequest{
 		Id:          idUser,
 		NewPassword: req.NewPassword,
+		OldPassword: req.OldPassword,
 	})
 
 	code, errRes := authErrors(op, err)

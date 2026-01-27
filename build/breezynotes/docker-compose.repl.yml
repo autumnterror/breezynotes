@@ -41,6 +41,7 @@ services:
       - mongo1
       - mongo2
       - mongo3
+      - mongo-rs-init
     container_name: blocknote
     image: zitrax78/breezynotes-blocknote:latest
     ports:

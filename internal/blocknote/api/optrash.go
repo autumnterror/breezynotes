@@ -45,6 +45,7 @@ func (s *ServerAPI) NoteFromTrash(ctx context.Context, req *brzrpc.UserNoteId) (
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
+
 	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
 		return nil, s.service.FromTrash(ctx, req.GetNoteId(), req.GetUserId())
 	})
