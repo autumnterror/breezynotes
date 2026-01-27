@@ -2,12 +2,15 @@ package net
 
 import (
 	"context"
+	"net/http"
+
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/gateway/domain"
 	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/autumnterror/utils_go/pkg/utils/uid"
 	"github.com/labstack/echo/v4"
-	"net/http"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // CreateTag godoc
@@ -287,7 +290,14 @@ func (e *Echo) GetTagsByUser(c echo.Context) error {
 	defer done()
 
 	if tgs, err := e.rdsAPI.API.GetTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	} else {
 		if tgs != nil {
 			if len(tgs.GetItems()) != 0 {

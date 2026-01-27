@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/alg"
 )
@@ -29,6 +30,7 @@ func (s *BN) ChangeBlockOrder(ctx context.Context, idNote, idUser string, oldOrd
 		if err != nil {
 			return nil, err
 		}
+
 		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
 			return nil, domain.ErrUnauthorized
 		}

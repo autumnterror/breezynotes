@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
@@ -29,7 +30,6 @@ func (s *ServerAPI) ChangeBlockOrder(ctx context.Context, req *brzrpc.ChangeBloc
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
-
 	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
 		return nil, s.service.ChangeBlockOrder(ctx, req.GetNoteId(), req.GetUserId(), int(req.GetOldOrder()), int(req.GetNewOrder()))
 	})

@@ -2,10 +2,11 @@ package net
 
 import (
 	"context"
+	"net/http"
+
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/gateway/domain"
 	"google.golang.org/protobuf/types/known/structpb"
-	"net/http"
 
 	"github.com/labstack/echo/v4"
 

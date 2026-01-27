@@ -3,6 +3,7 @@ package blocks
 import (
 	"context"
 	"errors"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -65,5 +66,17 @@ func (a *API) GetMany(ctx context.Context, ids []string) (*domain.Blocks, error)
 		return nil, format.Error(op, err)
 	}
 
-	return &domain.Blocks{Blks: blocks}, nil
+	blockMap := make(map[string]*domain.Block, len(blocks))
+	for _, b := range blocks {
+		blockMap[b.Id] = b
+	}
+
+	ordered := make([]*domain.Block, 0, len(ids))
+	for _, id := range ids {
+		if b, ok := blockMap[id]; ok {
+			ordered = append(ordered, b)
+		}
+	}
+
+	return &domain.Blocks{Blks: ordered}, nil
 }

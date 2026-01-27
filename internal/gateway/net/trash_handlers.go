@@ -2,11 +2,14 @@ package net
 
 import (
 	"context"
+	"net/http"
+
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/gateway/domain"
 	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/labstack/echo/v4"
-	"net/http"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // CleanTrash godoc
@@ -174,7 +177,14 @@ func (e *Echo) GetNotesFromTrash(c echo.Context) error {
 	defer done()
 
 	if ntsT, err := e.rdsAPI.API.GetNotesFromTrashByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	} else {
 		if ntsT != nil {
 			if ntsT.GetItems() != nil {

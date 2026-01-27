@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   gateway:
@@ -72,7 +72,6 @@ services:
     networks:
       - redisnet
 
-
   usersdb:
     container_name: usersdb
     image: postgres:latest
@@ -115,7 +114,15 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     restart: unless-stopped
-    command: ["--replSet", "rs0", "--bind_ip_all","--keyFile","/data/keyfile/mongo-keyfile.key","--auth" ]
+    command:
+      [
+        "--replSet",
+        "rs0",
+        "--bind_ip_all",
+        "--keyFile",
+        "/data/keyfile/mongo-keyfile.key",
+        "--auth",
+      ]
     env_file: .env
     networks:
       - mongo-cluster
@@ -134,7 +141,15 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-    command: ["--replSet", "rs0", "--bind_ip_all","--keyFile","/data/keyfile/mongo-keyfile.key","--auth" ]
+    command:
+      [
+        "--replSet",
+        "rs0",
+        "--bind_ip_all",
+        "--keyFile",
+        "/data/keyfile/mongo-keyfile.key",
+        "--auth",
+      ]
     restart: unless-stopped
     env_file: .env
     networks:
@@ -154,7 +169,15 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-    command: ["--replSet", "rs0", "--bind_ip_all","--keyFile","/data/keyfile/mongo-keyfile.key","--auth" ]
+    command:
+      [
+        "--replSet",
+        "rs0",
+        "--bind_ip_all",
+        "--keyFile",
+        "/data/keyfile/mongo-keyfile.key",
+        "--auth",
+      ]
     restart: unless-stopped
     env_file: .env
     networks:
@@ -167,7 +190,7 @@ services:
       mkdir -p /keyfile &&
       head -c 756 /dev/urandom | base64 -w 0 > /keyfile/mongo-keyfile.key &&
       chmod 400 /keyfile/mongo-keyfile.key &&
-      chown 999:999 /keyfile/mongo-keyfile.key && 
+      chown 999:999 /keyfile/mongo-keyfile.key &&
       echo "keyfile is created successfully"
       "
     volumes:
@@ -192,6 +215,21 @@ services:
             })
           ' || echo \"ReplicaSet already initialized\"
       "
+
+  tests:
+    image: golang:alpine
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    working_dir: /app
+    volumes:
+      - ../..:/app
+    command: go test ./internal/blocknote/repository/notes -v
+    networks:
+      - mongo-cluster
+    # restart: unless-stopped
+
 networks:
   auth:
     driver: bridge
@@ -206,4 +244,3 @@ volumes:
   mongo2-data:
   mongo3-data:
   mongo-keyfile:
-

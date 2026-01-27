@@ -124,12 +124,12 @@ test-psql:
 
 test-all:
 	go test \
-	    ./internal/blocknote/mongo/blocks \
-		./internal/blocknote/mongo/notes \
-		./internal/blocknote/mongo/tags  \
-		./internal/auth/psql \
+	    ./internal/blocknote/repository/blocks \
+		./internal/blocknote/repository/notes \
+		./internal/blocknote/repository/tags  \
+		./internal/auth/repository \
 		./internal/auth/jwt \
-		./internal/redis/redis \
+		./internal/redis/repository \
 		./pkg/pkgs/default/textblock \
 		./test \
 		./views
