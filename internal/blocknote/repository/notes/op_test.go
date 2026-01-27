@@ -360,6 +360,5 @@ func TestBlockOrder2(t *testing.T) {
 			log.Println(note.Blocks)
 			assert.Equal(t, wanted1, note.Blocks)
 		}
-
 	})
 }

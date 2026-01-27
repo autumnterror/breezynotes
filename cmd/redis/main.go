@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/autumnterror/breezynotes/internal/redis/api"
 	"github.com/autumnterror/breezynotes/internal/redis/config"
-	"github.com/autumnterror/breezynotes/internal/redis/grpc"
 	"github.com/autumnterror/breezynotes/internal/redis/repository"
 	"github.com/autumnterror/utils_go/pkg/log"
 	"os"
@@ -16,7 +16,7 @@ func main() {
 
 	cfg := config.MustSetup()
 
-	a := grpc.New(cfg, repository.New(cfg))
+	a := api.New(cfg, repository.New(cfg))
 	go a.MustRun()
 
 	stop := make(chan os.Signal, 1)

@@ -2,13 +2,13 @@ package net
 
 import (
 	"context"
-	"errors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"net/http"
 	"time"
 
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/gateway/domain"
-	domainredis "github.com/autumnterror/breezynotes/internal/redis/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/alg"
 	"github.com/autumnterror/utils_go/pkg/utils/uid"
 
@@ -103,16 +103,19 @@ func (e *Echo) GetNote(c echo.Context) error {
 	defer done()
 
 	if note, err := e.rdsAPI.API.GetNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: id}); err != nil {
-		if errors.Is(err, domainredis.ErrNotFound) {
-		} else {
+		st, ok := status.FromError(err)
+		if !ok {
 			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
 		}
 	} else {
 		if note != nil {
 			if note.GetAuthor() != idUser && !alg.IsIn(idUser, note.GetEditors()) && !alg.IsIn(idUser, note.GetReaders()) {
 				return c.JSON(http.StatusUnauthorized, domain.Error{Error: "user dont have permission"})
 			}
-
 			return c.JSON(http.StatusOK, note)
 		}
 	}

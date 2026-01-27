@@ -29,7 +29,7 @@ func (s *BN) ChangeBlockOrder(ctx context.Context, idNote, idUser string, oldOrd
 		if err != nil {
 			return nil, err
 		}
-		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
+		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
 			return nil, domain.ErrUnauthorized
 		}
 

@@ -662,7 +662,7 @@ function renderNoteDetails(note) {
       applyBtn.className = "btn-outline small";
       applyBtn.textContent = "Применить стиль";
       applyBtn.addEventListener("click", async () => {
-        await applyStyleToBlock(block.id, {
+        await applyStyleToBlock(block.id, note.id, {
           start: Number(startInput.value) || 0,
           end: Number(endInput.value) || 0,
           style: styleInput.value || "bold",
@@ -967,7 +967,7 @@ async function createTextBlock(noteId, text) {
     "Новый текстовый блок — здесь пример длинной строки, чтобы проверить разметку.";
   const payload = {
     type: "text",
-    noteid: noteId,
+    note_id: noteId,
     pos,
     data: {
       text: [
@@ -985,11 +985,12 @@ async function createTextBlock(noteId, text) {
   }
 }
 
-async function applyStyleToBlock(blockId, styleData) {
+async function applyStyleToBlock(blockId, noteId, styleData) {
   if (!blockId) return;
   const payload = {
-    id: blockId,
+    block_id: blockId,
     op: "apply_style",
+    note_id: noteId,
     data: {
       start: styleData.start ?? 0,
       end: styleData.end ?? 0,
@@ -1022,7 +1023,7 @@ async function changeBlockOrder(noteId, oldOrder, newOrder) {
   const oldInt = Number(oldOrder);
   const newInt = Math.max(0, Number(newOrder));
   if (Number.isNaN(oldInt) || Number.isNaN(newInt)) return;
-  const payload = { id: targetNoteId, old_order: oldInt, new_order: newInt };
+  const payload = { note_id: targetNoteId, old_order: oldInt, new_order: newInt };
 
   try {
     await apiRequest("/api/block/order", { method: "PATCH", body: payload });
