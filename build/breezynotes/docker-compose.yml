@@ -38,12 +38,8 @@ services:
 
   breezynotes-blocknoteservice:
     depends_on:
-      breezynotes-mongo1:
-        condition: service_healthy
-      breezynotes-mongo2:
-        condition: service_healthy
-      breezynotes-mongo3:
-        condition: service_healthy
+      breezynotes-mongo-repl-set-check:
+        condition: service_completed_successfully
     container_name: blocknote
     image: zitrax78/breezynotes-blocknote:latest
     ports:
@@ -90,7 +86,7 @@ services:
     networks:
       - auth
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -106,7 +102,7 @@ services:
       - .env:/app/.env
     environment:
       CONFIG_PATH: configs/migrator.yaml
-    command: [ "--type", "up", "--path", "./migrations" ]
+    command: ["--type", "up", "--path", "./migrations"]
     networks:
       - auth
 
@@ -150,17 +146,11 @@ services:
       - mongo-cluster
     healthcheck:
       test: |
-        mongosh --host mongo1 --authenticationDatabase admin -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --eval "
-          const status = rs.status();
-          if (status.ok && status.members.every(m => m.health === 1 && (m.state === 1 || m.state === 2))) {
-            quit(0);
-          }
-          quit(1);
-        "
+        mongosh --host mongo1 --authenticationDatabase admin -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --eval "db.adminCommand('ping')"
       interval: 5s
       timeout: 10s
-      retries: 20
-      start_period: 10s
+      retries: 10
+      start_period: 5s
 
   breezynotes-mongo2:
     depends_on:
@@ -191,17 +181,11 @@ services:
       - mongo-cluster
     healthcheck:
       test: |
-        mongosh --host mongo1 --authenticationDatabase admin -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --eval "
-          const status = rs.status();
-          if (status.ok && status.members.every(m => m.health === 1 && (m.state === 1 || m.state === 2))) {
-            quit(0);
-          }
-          quit(1);
-        "
+        mongosh --host mongo1 --authenticationDatabase admin -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --eval "db.adminCommand('ping')"
       interval: 5s
       timeout: 10s
-      retries: 20
-      start_period: 10s
+      retries: 10
+      start_period: 5s
 
   breezynotes-mongo3:
     depends_on:
@@ -232,17 +216,11 @@ services:
       - mongo-cluster
     healthcheck:
       test: |
-        mongosh --host mongo1 --authenticationDatabase admin -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --eval "
-          const status = rs.status();
-          if (status.ok && status.members.every(m => m.health === 1 && (m.state === 1 || m.state === 2))) {
-            quit(0);
-          }
-          quit(1);
-        "
+        mongosh --host mongo1 --authenticationDatabase admin -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --eval "db.adminCommand('ping')"
       interval: 5s
       timeout: 10s
-      retries: 20
-      start_period: 10s
+      retries: 10
+      start_period: 5s
 
   breezynotes-mongo-keygen:
     container_name: mng-setup-key
@@ -261,9 +239,12 @@ services:
   breezynotes-mongo-rs-init:
     image: mongo:latest
     depends_on:
-      - breezynotes-mongo1
-      - breezynotes-mongo2
-      - breezynotes-mongo3
+      breezynotes-mongo1:
+        condition: service_healthy
+      breezynotes-mongo2:
+        condition: service_healthy
+      breezynotes-mongo3:
+        condition: service_healthy
     networks:
       - mongo-cluster
     env_file: .env
@@ -278,7 +259,30 @@ services:
             })
           ' || echo \"ReplicaSet already initialized\"
       "
-
+  breezynotes-mongo-repl-set-check:
+    image: mongo:latest
+    depends_on:
+      breezynotes-mongo-rs-init:
+        condition: service_completed_successfully
+    networks:
+      - mongo-cluster
+    env_file: .env
+    command: >
+      bash -c "
+        echo 'Waiting for MongoDB replica set to be healthy...';
+        until mongosh --host mongo1 --authenticationDatabase admin -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --eval \"
+          const status = rs.status();
+          if (status.ok && status.members.every(m => m.health === 1 && (m.state === 1 || m.state === 2))) {
+            quit(0);
+          }
+          quit(1);
+        \"; do
+          echo 'Replica set not ready yet, waiting...';
+          sleep 2;
+        done;
+        echo 'MongoDB replica set is healthy!';
+      "
+    restart: "no" # Это одноразовая задача
 #  tests:
 #    image: golang:alpine
 #    depends_on:

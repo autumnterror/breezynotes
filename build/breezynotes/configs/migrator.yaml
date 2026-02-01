@@ -1,4 +1,4 @@
-data_source: "localhost"
+data_source: "usersdb"
 port_postgres: 5432
 
 access_token_life: 10m

@@ -2,12 +2,15 @@ package notes
 
 import (
 	"context"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
+	"github.com/autumnterror/breezynotes/internal/blocknote/repository/blocks"
 	"github.com/autumnterror/breezynotes/pkg/block"
 	"github.com/autumnterror/breezynotes/pkg/block/default/textblock"
 
-	"github.com/autumnterror/breezynotes/internal/blocknote/infra/mongo"
 	"testing"
+
+	"github.com/autumnterror/breezynotes/internal/blocknote/infra/mongo"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/config"
 
@@ -20,7 +23,7 @@ func TestWithBlocks(t *testing.T) {
 	t.Run("test with blocks", func(t *testing.T) {
 		block.RegisterBlock("text", &textblock.Driver{})
 		m := mongo.MustConnect(config.Test())
-		b := block.NewApi(m.Blocks())
+		b := blocks.NewApi(m.Blocks())
 		a := NewApi(m.Notes(), m.Trash(), b)
 		idNote := "test_with_blocks_note"
 		t.Cleanup(func() {
@@ -103,7 +106,7 @@ func TestCrudGood(t *testing.T) {
 	t.Parallel()
 	t.Run("crud good", func(t *testing.T) {
 		m := mongo.MustConnect(config.Test())
-		b := block.NewApi(m.Blocks())
+		b := blocks.NewApi(m.Blocks())
 		a := NewApi(m.Notes(), m.Trash(), b)
 		id := "testIDGood"
 		t.Cleanup(func() {
@@ -201,7 +204,7 @@ func TestCrudNotExist(t *testing.T) {
 	t.Parallel()
 	t.Run("crud bad", func(t *testing.T) {
 		m := mongo.MustConnect(config.Test())
-		b := block.NewApi(m.Blocks())
+		b := blocks.NewApi(m.Blocks())
 		a := NewApi(m.Notes(), m.Trash(), b)
 		id := "testIDNotExist"
 		t.Cleanup(func() {
@@ -226,7 +229,7 @@ func TestBlockOrder(t *testing.T) {
 	t.Parallel()
 	t.Run("test block order", func(t *testing.T) {
 		m := mongo.MustConnect(config.Test())
-		b := block.NewApi(m.Blocks())
+		b := blocks.NewApi(m.Blocks())
 		a := NewApi(m.Notes(), m.Trash(), b)
 
 		id := "testblockorder"
@@ -275,7 +278,7 @@ func TestBlockOrder2(t *testing.T) {
 	t.Parallel()
 	t.Run("test block order 2 el", func(t *testing.T) {
 		m := mongo.MustConnect(config.Test())
-		b := block.NewApi(m.Blocks())
+		b := blocks.NewApi(m.Blocks())
 		a := NewApi(m.Notes(), m.Trash(), b)
 		id := "testblockorder2"
 
