@@ -54,6 +54,7 @@ service AuthService {
 
   rpc GetUserDataFromToken(Token) returns (User);
   rpc GetIdFromToken(Token) returns (Id);
+  rpc GetIdFromLogin(String) returns (Id);
 
   rpc Healthz(google.protobuf.Empty) returns (google.protobuf.Empty);
 }

@@ -164,3 +164,14 @@ func (s *BN) UpdateTitleNote(ctx context.Context, idNote, idUser, nTitle string)
 
 	return err
 }
+
+func (s *BN) Search(ctx context.Context, idUser, prompt string) (<-chan *domain.NotePart, error) {
+	const op = "service.Search"
+	if err := idValidation(idUser); err != nil {
+		return nil, wrapServiceCheck(op, err)
+	}
+	if stringEmpty(prompt) {
+		return nil, nil
+	}
+	return s.nts.Search(ctx, idUser, prompt)
+}

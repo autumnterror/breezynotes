@@ -130,3 +130,16 @@ func (s *AuthService) Delete(ctx context.Context, id string) error {
 		return repo.Delete(ctx, id)
 	})
 }
+
+func (s *AuthService) GetIdFromLogin(ctx context.Context, login string) (string, error) {
+	const op = "service.Create"
+	if stringEmpty(login) {
+		return "", wrapServiceCheck(op, errors.New("login is empty"))
+	}
+
+	repo, err := s.userRepo(ctx)
+	if err != nil {
+		return "", wrapServiceCheck(op, err)
+	}
+	return repo.GetIdFromLogin(ctx, login)
+}

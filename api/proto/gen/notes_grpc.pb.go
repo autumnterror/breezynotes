@@ -37,6 +37,7 @@ const (
 	BlockNoteService_GetAllNotes_FullMethodName        = "/brz.BlockNoteService/GetAllNotes"
 	BlockNoteService_GetNotesByTag_FullMethodName      = "/brz.BlockNoteService/GetNotesByTag"
 	BlockNoteService_GetNotesFromTrash_FullMethodName  = "/brz.BlockNoteService/GetNotesFromTrash"
+	BlockNoteService_Search_FullMethodName             = "/brz.BlockNoteService/Search"
 	BlockNoteService_AddTagToNote_FullMethodName       = "/brz.BlockNoteService/AddTagToNote"
 	BlockNoteService_RemoveTagFromNote_FullMethodName  = "/brz.BlockNoteService/RemoveTagFromNote"
 	BlockNoteService_CreateTag_FullMethodName          = "/brz.BlockNoteService/CreateTag"
@@ -75,6 +76,7 @@ type BlockNoteServiceClient interface {
 	GetAllNotes(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*NoteParts, error)
 	GetNotesByTag(ctx context.Context, in *UserTagId, opts ...grpc.CallOption) (*NoteParts, error)
 	GetNotesFromTrash(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*NoteParts, error)
+	Search(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[NotePart], error)
 	AddTagToNote(ctx context.Context, in *NoteTagUserId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	RemoveTagFromNote(ctx context.Context, in *NoteTagUserId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CreateTag(ctx context.Context, in *Tag, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -267,6 +269,25 @@ func (c *blockNoteServiceClient) GetNotesFromTrash(ctx context.Context, in *User
 	return out, nil
 }
 
+func (c *blockNoteServiceClient) Search(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[NotePart], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &BlockNoteService_ServiceDesc.Streams[0], BlockNoteService_Search_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[SearchRequest, NotePart]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type BlockNoteService_SearchClient = grpc.ServerStreamingClient[NotePart]
+
 func (c *blockNoteServiceClient) AddTagToNote(ctx context.Context, in *NoteTagUserId, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
@@ -402,6 +423,7 @@ type BlockNoteServiceServer interface {
 	GetAllNotes(context.Context, *UserId) (*NoteParts, error)
 	GetNotesByTag(context.Context, *UserTagId) (*NoteParts, error)
 	GetNotesFromTrash(context.Context, *UserId) (*NoteParts, error)
+	Search(*SearchRequest, grpc.ServerStreamingServer[NotePart]) error
 	AddTagToNote(context.Context, *NoteTagUserId) (*emptypb.Empty, error)
 	RemoveTagFromNote(context.Context, *NoteTagUserId) (*emptypb.Empty, error)
 	CreateTag(context.Context, *Tag) (*emptypb.Empty, error)
@@ -474,6 +496,9 @@ func (UnimplementedBlockNoteServiceServer) GetNotesByTag(context.Context, *UserT
 }
 func (UnimplementedBlockNoteServiceServer) GetNotesFromTrash(context.Context, *UserId) (*NoteParts, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNotesFromTrash not implemented")
+}
+func (UnimplementedBlockNoteServiceServer) Search(*SearchRequest, grpc.ServerStreamingServer[NotePart]) error {
+	return status.Errorf(codes.Unimplemented, "method Search not implemented")
 }
 func (UnimplementedBlockNoteServiceServer) AddTagToNote(context.Context, *NoteTagUserId) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddTagToNote not implemented")
@@ -835,6 +860,17 @@ func _BlockNoteService_GetNotesFromTrash_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BlockNoteService_Search_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(SearchRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(BlockNoteServiceServer).Search(m, &grpc.GenericServerStream[SearchRequest, NotePart]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type BlockNoteService_SearchServer = grpc.ServerStreamingServer[NotePart]
+
 func _BlockNoteService_AddTagToNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(NoteTagUserId)
 	if err := dec(in); err != nil {
@@ -1153,6 +1189,12 @@ var BlockNoteService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _BlockNoteService_Healthz_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Search",
+			Handler:       _BlockNoteService_Search_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "notes.proto",
 }

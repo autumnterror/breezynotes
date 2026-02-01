@@ -58,13 +58,16 @@ message UpdateNoteTitleRequest {
 
 message ShareNoteRequest {
   string note_id = 1;
-  string login_to_share = 2;
-  Roles role = 3;
+  string user_id_to_share = 2;
+  string role = 3;
+  string user_id = 4;
 }
 
 message ChangeUserRoleRequest {
-  string login = 1;
-  Roles new_role = 2;
+  string user_id_to_change = 1;
+  string new_role = 2;
+  string note_id = 3;
+  string user_id = 4;
 }
 
 message CreateBlockRequest {
@@ -73,6 +76,11 @@ message CreateBlockRequest {
   int32 pos = 3;
   google.protobuf.Struct data = 4;
   string userId = 5;
+}
+
+message SearchRequest{
+  string userId = 1;
+  string prompt = 2;
 }
 
 
@@ -100,6 +108,7 @@ service BlockNoteService {
   rpc GetAllNotes(UserId) returns (NoteParts);
   rpc GetNotesByTag(UserTagId) returns (NoteParts);
   rpc GetNotesFromTrash(UserId) returns (NoteParts);
+  rpc Search(SearchRequest) returns (stream NotePart);
 
   rpc AddTagToNote(NoteTagUserId) returns (google.protobuf.Empty);
   rpc RemoveTagFromNote(NoteTagUserId) returns (google.protobuf.Empty);

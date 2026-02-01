@@ -6,7 +6,6 @@ import (
 
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/gateway/domain"
-	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/labstack/echo/v4"
 )
 
@@ -108,7 +107,7 @@ func (e *Echo) UpdateAbout(c echo.Context) error {
 
 	var req domain.UpdateAboutRequest
 	if err := c.Bind(&req); err != nil {
-		log.Error(op, "UpdateAbout bind", err)
+
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "invalid request body"})
 	}
 
@@ -155,7 +154,7 @@ func (e *Echo) UpdateEmail(c echo.Context) error {
 
 	var req domain.UpdateEmailRequest
 	if err := c.Bind(&req); err != nil || req.NewEmail == "" {
-		log.Error(op, "UpdateEmail bind", err)
+
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "invalid request body"})
 	}
 
@@ -202,7 +201,7 @@ func (e *Echo) UpdatePhoto(c echo.Context) error {
 
 	var req domain.UpdatePhotoRequest
 	if err := c.Bind(&req); err != nil || req.NewPhoto == "" {
-		log.Error(op, "UpdatePhoto bind", err)
+
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "invalid request body"})
 	}
 
@@ -248,7 +247,7 @@ func (e *Echo) ChangePassword(c echo.Context) error {
 
 	var req domain.ChangePasswordRequest
 	if err := c.Bind(&req); err != nil {
-		log.Error(op, "ChangePassword bind", err)
+
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "invalid request body"})
 	}
 

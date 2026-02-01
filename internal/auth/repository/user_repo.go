@@ -19,6 +19,7 @@ type UserRepo interface {
 	UpdateAbout(ctx context.Context, id, about string) error
 	Delete(ctx context.Context, id string) error
 	GetInfo(ctx context.Context, id string) (*domain.User, error)
+	GetIdFromLogin(ctx context.Context, login string) (string, error)
 }
 
 // getAll only for test
@@ -64,6 +65,25 @@ func (d Driver) GetInfo(ctx context.Context, id string) (*domain.User, error) {
 	u.Id = id
 
 	return &u, nil
+}
+
+// GetIdFromLogin get info about user by login. May send sql.ErrNoRows
+func (d Driver) GetIdFromLogin(ctx context.Context, login string) (string, error) {
+	const op = "psql.users.GetInfo"
+	query := `
+		SELECT id FROM users
+		WHERE login = $1
+	`
+
+	var id string
+	if err := d.Driver.QueryRowContext(ctx, query, login).Scan(&id); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", format.Error(op, domain.ErrNotFound)
+		}
+		return "", format.Error(op, err)
+	}
+
+	return id, nil
 }
 
 // Create new user

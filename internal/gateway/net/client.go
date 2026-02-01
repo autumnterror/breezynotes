@@ -1,18 +1,21 @@
 package net
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/auth"
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/blocknote"
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/redis"
 	"github.com/autumnterror/breezynotes/internal/gateway/config"
+	"github.com/autumnterror/breezynotes/internal/gateway/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type Echo struct {
@@ -74,7 +77,7 @@ func New(
 		notes := api.Group("/note")
 		{
 			notes.GET("", e.GetNote)
-			notes.GET("/find", e.Search)
+			notes.GET("/search", e.Search)
 			notes.POST("", e.CreateNote)
 
 			notes.GET("/all", e.GetAllNotes)
@@ -83,6 +86,12 @@ func New(
 
 			notes.POST("/tag", e.AddTagToNote)
 			notes.DELETE("/tag", e.RmTagFromNote)
+
+			share := notes.Group("/share")
+			{
+				share.PATCH("", e.ShareNote)
+				share.PATCH("/change", e.ChangeUserRole)
+			}
 		}
 
 		blocks := api.Group("/block")
@@ -137,4 +146,33 @@ func (e *Echo) Stop() error {
 		return format.Error(op, err)
 	}
 	return nil
+}
+
+// Healthz godoc
+// @Summary check health of gateway
+// @Description
+// @Tags healthz
+// @Produce json
+// @Success 200 {object} domain.Message
+// @Failure 502 {object} domain.Message
+// @Router /api/healthz [get]
+func (e *Echo) Healthz(c echo.Context) error {
+	const op = "gateway.net.Healthz"
+
+	ctx, done := context.WithTimeout(c.Request().Context(), time.Second)
+	defer done()
+	_, err := e.bnAPI.API.Healthz(ctx, nil)
+	if err != nil {
+		return c.JSON(http.StatusBadGateway, domain.Message{Message: "bad blocknote"})
+	}
+	_, err = e.rdsAPI.API.Healthz(ctx, nil)
+	if err != nil {
+		return c.JSON(http.StatusBadGateway, domain.Message{Message: "bad redis"})
+	}
+	_, err = e.authAPI.API.Healthz(ctx, nil)
+	if err != nil {
+		return c.JSON(http.StatusBadGateway, domain.Message{Message: "bad auth"})
+	}
+
+	return c.JSON(http.StatusOK, domain.Message{Message: "HEALTHZ"})
 }

@@ -3,25 +3,12 @@ package api
 import (
 	"context"
 	"errors"
-	"github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/breezynotes/internal/blocknote/service"
 	"github.com/autumnterror/utils_go/pkg/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
-
-func (s *ServerAPI) ShareNote(ctx context.Context, req *brzrpc.ShareNoteRequest) (*emptypb.Empty, error) {
-	const op = "block.note.grpc.ShareNote"
-
-	return nil, nil
-}
-func (s *ServerAPI) ChangeUserRole(context.Context, *brzrpc.ChangeUserRoleRequest) (*emptypb.Empty, error) {
-	const op = "block.note.grpc.ChangeUserRole"
-
-	return nil, nil
-}
 
 func handleCRUDResponse(ctx context.Context, op string, action func() (any, error)) (any, error) {
 	type resV struct {

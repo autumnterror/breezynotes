@@ -19,6 +19,17 @@ type NoteTagId struct {
 	NoteId string `json:"note_id"`
 }
 
+type ShareNoteRequest struct {
+	NoteId string `json:"note_id"`
+	Login  string `json:"login"`
+	Role   string `json:"role"`
+}
+type ChangeRoleRequest struct {
+	NoteId  string `json:"note_id"`
+	Login   string `json:"login"`
+	NewRole string `json:"new_role"`
+}
+
 type NotePart struct {
 	Id         string
 	Title      string

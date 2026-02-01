@@ -17,7 +17,7 @@ func TestCrudGood(t *testing.T) {
 		m := mongo2.MustConnect(config.Test())
 		a := NewApi(m.Tags())
 
-		assert.NoError(t, a.Create(context.TODO(), &domain.Tag{
+		assert.NoError(t, a.Create(context.Background(), &domain.Tag{
 			Id:     "test_id_good",
 			Title:  "test_title",
 			Color:  "test_color",
@@ -25,24 +25,24 @@ func TestCrudGood(t *testing.T) {
 			UserId: "test_userid",
 		}))
 
-		if tgs, err := a.GetAllById(context.TODO(), "test_userid"); assert.NoError(t, err) {
+		if tgs, err := a.GetAllById(context.Background(), "test_userid"); assert.NoError(t, err) {
 			log.Green("get after create", tgs.Tgs)
 		}
 
-		assert.NoError(t, a.UpdateColor(context.TODO(), "test_id_good", "new_color"))
-		assert.NoError(t, a.UpdateTitle(context.TODO(), "test_id_good", "new_title"))
-		assert.NoError(t, a.UpdateEmoji(context.TODO(), "test_id_good", "new_emoji"))
+		assert.NoError(t, a.UpdateColor(context.Background(), "test_id_good", "new_color"))
+		assert.NoError(t, a.UpdateTitle(context.Background(), "test_id_good", "new_title"))
+		assert.NoError(t, a.UpdateEmoji(context.Background(), "test_id_good", "new_emoji"))
 
-		if tgs, err := a.GetAllById(context.TODO(), "test_userid"); assert.NoError(t, err) {
+		if tgs, err := a.GetAllById(context.Background(), "test_userid"); assert.NoError(t, err) {
 			log.Green("get after update", tgs.Tgs)
 		}
 
-		_, err := a.Get(context.TODO(), "test_id_good")
+		_, err := a.Get(context.Background(), "test_id_good")
 		assert.NoError(t, err)
 
 		t.Cleanup(func() {
-			assert.NoError(t, a.Delete(context.TODO(), "test_id_good"))
-			if tgs, err := a.GetAllById(context.TODO(), "test_userid"); assert.NoError(t, err) {
+			assert.NoError(t, a.Delete(context.Background(), "test_id_good"))
+			if tgs, err := a.GetAllById(context.Background(), "test_userid"); assert.NoError(t, err) {
 				log.Green("get after delete", tgs.Tgs)
 			}
 			assert.NoError(t, m.Disconnect())
@@ -59,14 +59,14 @@ func TestBad(t *testing.T) {
 	})
 
 	t.Run("BAD create repeat id", func(t *testing.T) {
-		assert.NoError(t, a.Create(context.TODO(), &domain.Tag{
+		assert.NoError(t, a.Create(context.Background(), &domain.Tag{
 			Id:     "test_id",
 			Title:  "test_title",
 			Color:  "test_color",
 			Emoji:  "test_emoji",
 			UserId: "test_userid",
 		}))
-		assert.Error(t, a.Create(context.TODO(), &domain.Tag{
+		assert.Error(t, a.Create(context.Background(), &domain.Tag{
 			Id:     "test_id",
 			Title:  "test_title",
 			Color:  "test_color",
@@ -74,15 +74,15 @@ func TestBad(t *testing.T) {
 			UserId: "test_userid",
 		}))
 
-		assert.NoError(t, a.Delete(context.TODO(), "test_id"))
+		assert.NoError(t, a.Delete(context.Background(), "test_id"))
 	})
 
 	t.Run("BAD ErrNotFound", func(t *testing.T) {
-		assert.ErrorIs(t, a.UpdateColor(context.TODO(), "test_id", "new_color"), domain.ErrNotFound)
-		assert.ErrorIs(t, a.UpdateTitle(context.TODO(), "test_id", "new_title"), domain.ErrNotFound)
-		assert.ErrorIs(t, a.UpdateEmoji(context.TODO(), "test_id", "new_emoji"), domain.ErrNotFound)
-		assert.ErrorIs(t, a.Delete(context.TODO(), "test_id"), domain.ErrNotFound)
-		_, err := a.Get(context.TODO(), "test_id")
+		assert.ErrorIs(t, a.UpdateColor(context.Background(), "test_id", "new_color"), domain.ErrNotFound)
+		assert.ErrorIs(t, a.UpdateTitle(context.Background(), "test_id", "new_title"), domain.ErrNotFound)
+		assert.ErrorIs(t, a.UpdateEmoji(context.Background(), "test_id", "new_emoji"), domain.ErrNotFound)
+		assert.ErrorIs(t, a.Delete(context.Background(), "test_id"), domain.ErrNotFound)
+		_, err := a.Get(context.Background(), "test_id")
 		assert.ErrorIs(t, err, domain.ErrNotFound)
 	})
 

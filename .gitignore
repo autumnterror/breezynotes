@@ -14,3 +14,4 @@ config-test.go
 /.idea
 .idea/workspace.xml
 /.idea
+pkg/pkgs/default/textblock/benchmark/text.txt

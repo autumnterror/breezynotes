@@ -31,6 +31,7 @@ const (
 	AuthService_CreateUser_FullMethodName           = "/brz.AuthService/CreateUser"
 	AuthService_GetUserDataFromToken_FullMethodName = "/brz.AuthService/GetUserDataFromToken"
 	AuthService_GetIdFromToken_FullMethodName       = "/brz.AuthService/GetIdFromToken"
+	AuthService_GetIdFromLogin_FullMethodName       = "/brz.AuthService/GetIdFromLogin"
 	AuthService_Healthz_FullMethodName              = "/brz.AuthService/Healthz"
 )
 
@@ -51,6 +52,7 @@ type AuthServiceClient interface {
 	CreateUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetUserDataFromToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*User, error)
 	GetIdFromToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Id, error)
+	GetIdFromLogin(ctx context.Context, in *String, opts ...grpc.CallOption) (*Id, error)
 	Healthz(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -172,6 +174,16 @@ func (c *authServiceClient) GetIdFromToken(ctx context.Context, in *Token, opts 
 	return out, nil
 }
 
+func (c *authServiceClient) GetIdFromLogin(ctx context.Context, in *String, opts ...grpc.CallOption) (*Id, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Id)
+	err := c.cc.Invoke(ctx, AuthService_GetIdFromLogin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authServiceClient) Healthz(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
@@ -199,6 +211,7 @@ type AuthServiceServer interface {
 	CreateUser(context.Context, *User) (*emptypb.Empty, error)
 	GetUserDataFromToken(context.Context, *Token) (*User, error)
 	GetIdFromToken(context.Context, *Token) (*Id, error)
+	GetIdFromLogin(context.Context, *String) (*Id, error)
 	Healthz(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
@@ -242,6 +255,9 @@ func (UnimplementedAuthServiceServer) GetUserDataFromToken(context.Context, *Tok
 }
 func (UnimplementedAuthServiceServer) GetIdFromToken(context.Context, *Token) (*Id, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetIdFromToken not implemented")
+}
+func (UnimplementedAuthServiceServer) GetIdFromLogin(context.Context, *String) (*Id, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetIdFromLogin not implemented")
 }
 func (UnimplementedAuthServiceServer) Healthz(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Healthz not implemented")
@@ -465,6 +481,24 @@ func _AuthService_GetIdFromToken_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_GetIdFromLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(String)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetIdFromLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetIdFromLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetIdFromLogin(ctx, req.(*String))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AuthService_Healthz_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
@@ -533,6 +567,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetIdFromToken",
 			Handler:    _AuthService_GetIdFromToken_Handler,
+		},
+		{
+			MethodName: "GetIdFromLogin",
+			Handler:    _AuthService_GetIdFromLogin_Handler,
 		},
 		{
 			MethodName: "Healthz",

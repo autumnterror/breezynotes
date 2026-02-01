@@ -34,7 +34,7 @@ func TestUsersOperations(t *testing.T) {
 
 	print := func() {
 		t.Run("getAll", func(t *testing.T) {
-			users, err := repo.getAll(context.TODO())
+			users, err := repo.getAll(context.Background())
 			assert.NoError(t, err)
 			fmt.Println("🔍 Current Users in DB:")
 			for _, u := range users {
@@ -44,46 +44,53 @@ func TestUsersOperations(t *testing.T) {
 	}
 
 	t.Run("create", func(t *testing.T) {
-		err := repo.Create(context.TODO(), user)
+		err := repo.Create(context.Background(), user)
 		assert.NoError(t, err)
 	})
 	print()
 
 	t.Run("get info", func(t *testing.T) {
-		info, err := repo.GetInfo(context.TODO(), user.Id)
+		info, err := repo.GetInfo(context.Background(), user.Id)
 		assert.NoError(t, err)
 		fmt.Printf("👤 GetInfo: %s", format.Struct(info))
 	})
 
+	t.Run("GetIdFromLogin", func(t *testing.T) {
+		gettedId, err := repo.GetIdFromLogin(context.Background(), user.Login)
+		assert.NoError(t, err)
+		assert.Equal(t, user.Id, gettedId)
+		log.Println("get id from login: ", gettedId)
+	})
+
 	t.Run("update email", func(t *testing.T) {
 		newEmail := "newemail@example.com"
-		err := repo.UpdateEmail(context.TODO(), user.Id, newEmail)
+		err := repo.UpdateEmail(context.Background(), user.Id, newEmail)
 		assert.NoError(t, err)
 		user.Email = newEmail
-		info, err := repo.GetInfo(context.TODO(), user.Id)
+		info, err := repo.GetInfo(context.Background(), user.Id)
 		assert.NoError(t, err)
 		fmt.Printf("👤 GetInfo after update email: %s", format.Struct(info))
 	})
 
 	t.Run("update about", func(t *testing.T) {
 		newAbout := "updated about"
-		err := repo.UpdateAbout(context.TODO(), user.Id, newAbout)
+		err := repo.UpdateAbout(context.Background(), user.Id, newAbout)
 		assert.NoError(t, err)
 		user.About = newAbout
-		info, err := repo.GetInfo(context.TODO(), user.Id)
+		info, err := repo.GetInfo(context.Background(), user.Id)
 		assert.NoError(t, err)
 		fmt.Printf("👤 GetInfo after update about: %s", format.Struct(info))
 	})
 
 	t.Run("update password", func(t *testing.T) {
-		err := repo.UpdatePassword(context.TODO(), user.Id, "newSecurePassword")
+		err := repo.UpdatePassword(context.Background(), user.Id, "newSecurePassword")
 		assert.NoError(t, err)
 		log.Println("after update password")
 		print()
 	})
 
 	t.Run("delete", func(t *testing.T) {
-		err := repo.Delete(context.TODO(), user.Id)
+		err := repo.Delete(context.Background(), user.Id)
 		assert.NoError(t, err)
 		log.Println("after delete")
 		print()
@@ -116,9 +123,9 @@ func TestCreateDuplicateUser(t *testing.T) {
 		Password: "password",
 	}
 
-	assert.NoError(t, repo.Create(context.TODO(), user))
+	assert.NoError(t, repo.Create(context.Background(), user))
 	user.Id = uid.New()
-	err := repo.Create(context.TODO(), user)
+	err := repo.Create(context.Background(), user)
 	assert.Error(t, err)
 	assert.True(t, errors.Is(err, domain.ErrAlreadyExists))
 }
@@ -128,7 +135,7 @@ func TestUpdateNonExistentUser(t *testing.T) {
 	repo, _, cleanup := setupTestTx(t)
 	defer cleanup()
 
-	err := repo.UpdateAbout(context.TODO(), uid.New(), "123")
+	err := repo.UpdateAbout(context.Background(), uid.New(), "123")
 	assert.Error(t, err)
 	assert.True(t, errors.Is(err, domain.ErrNotFound))
 }
@@ -138,7 +145,7 @@ func TestDeleteNonExistentUser(t *testing.T) {
 	repo, _, cleanup := setupTestTx(t)
 	defer cleanup()
 
-	err := repo.Delete(context.TODO(), uid.New())
+	err := repo.Delete(context.Background(), uid.New())
 	assert.Error(t, err)
 	assert.True(t, errors.Is(err, domain.ErrNotFound))
 }
@@ -148,7 +155,7 @@ func TestGetInfo_InvalidID(t *testing.T) {
 	repo, _, cleanup := setupTestTx(t)
 	defer cleanup()
 
-	_, err := repo.GetInfo(context.TODO(), uid.New())
+	_, err := repo.GetInfo(context.Background(), uid.New())
 	assert.Error(t, err)
 	assert.True(t, errors.Is(err, domain.ErrNotFound))
 }
@@ -167,9 +174,9 @@ func TestAuthLogin(t *testing.T) {
 		Password: "password",
 	}
 
-	assert.NoError(t, repo.Create(context.TODO(), user))
+	assert.NoError(t, repo.Create(context.Background(), user))
 
-	_, err := repo.Authentication(context.TODO(),
+	_, err := repo.Authentication(context.Background(),
 		"",
 		user.Login,
 		user.Password,
@@ -192,9 +199,9 @@ func TestAuthEmail(t *testing.T) {
 		Password: "password",
 	}
 
-	assert.NoError(t, repo.Create(context.TODO(), user))
+	assert.NoError(t, repo.Create(context.Background(), user))
 
-	_, err := repo.Authentication(context.TODO(),
+	_, err := repo.Authentication(context.Background(),
 		user.Email,
 		"",
 		user.Password,
@@ -216,9 +223,9 @@ func TestAuthWrongInput1(t *testing.T) {
 		Password: "password",
 	}
 
-	assert.NoError(t, repo.Create(context.TODO(), user))
+	assert.NoError(t, repo.Create(context.Background(), user))
 
-	_, err := repo.Authentication(context.TODO(),
+	_, err := repo.Authentication(context.Background(),
 		user.Email,
 		"",
 		"",
@@ -240,9 +247,9 @@ func TestAuthWrongInput2(t *testing.T) {
 		Password: "password",
 	}
 
-	assert.NoError(t, repo.Create(context.TODO(), user))
+	assert.NoError(t, repo.Create(context.Background(), user))
 
-	_, err := repo.Authentication(context.TODO(),
+	_, err := repo.Authentication(context.Background(),
 		"",
 		"",
 		"123",
@@ -264,9 +271,9 @@ func TestAuthPwIncorrect(t *testing.T) {
 		Password: "password",
 	}
 
-	assert.NoError(t, repo.Create(context.TODO(), user))
+	assert.NoError(t, repo.Create(context.Background(), user))
 
-	_, err := repo.Authentication(context.TODO(),
+	_, err := repo.Authentication(context.Background(),
 		"",
 		user.Login,
 		"123",

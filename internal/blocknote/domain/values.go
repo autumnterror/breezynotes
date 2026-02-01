@@ -11,4 +11,7 @@ const (
 	NoteColl  = "notes"
 	BlockColl = "blocks"
 	TrashColl = "trash"
+
+	ReaderRole = "reader"
+	EditorRole = "editor"
 )

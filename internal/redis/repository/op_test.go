@@ -14,7 +14,7 @@ func TestCrudSession(t *testing.T) {
 	idTest := "test"
 	s, err := structpb.NewStruct(map[string]any{"text": []any{map[string]any{"style": "default", "text": "test"}, map[string]any{"style": "italic", "text": "ghost"}}})
 	assert.NoError(t, err)
-	assert.NoError(t, c.saveSession(context.TODO(), &userSession{
+	assert.NoError(t, c.saveSession(context.Background(), &userSession{
 		Id: idTest,
 		NoteParts: []*brzrpc.NotePart{
 			{
@@ -168,14 +168,14 @@ func TestCrudSession(t *testing.T) {
 		assert.Equal(t, 2, len(s.NoteTrash))
 	}
 
-	assert.NoError(t, c.deleteSession(context.TODO(), idTest))
+	assert.NoError(t, c.deleteSession(context.Background(), idTest))
 	if _, err := c.getSession(context.Background(), idTest); assert.Error(t, err) {
 	}
 }
 func TestCrudFields(t *testing.T) {
 	c := New(config.Test())
 	idTest := "TestCrudFields"
-	ctx := context.TODO()
+	ctx := context.Background()
 	s, err := structpb.NewStruct(map[string]any{"text": []any{map[string]any{"style": "default", "text": "test"}, map[string]any{"style": "italic", "text": "ghost"}}})
 	assert.NoError(t, err)
 	assert.Error(t, c.CheckSession(ctx, idTest))
@@ -362,7 +362,7 @@ func TestCrudFields(t *testing.T) {
 	assert.NoError(t, c.SetSessionTags(ctx, idTest, nil))
 	assert.NoError(t, c.SetSessionNoteList(ctx, idTest, nil))
 
-	assert.NoError(t, c.deleteSession(context.TODO(), idTest))
+	assert.NoError(t, c.deleteSession(context.Background(), idTest))
 	if _, err := c.getSession(context.Background(), idTest); assert.Error(t, err) {
 
 	}

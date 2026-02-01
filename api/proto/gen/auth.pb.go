@@ -321,7 +321,7 @@ const file_auth_proto_rawDesc = "" +
 	"\x15ChangePasswordRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12!\n" +
 	"\fnew_password\x18\x02 \x01(\tR\vnewPassword\x12!\n" +
-	"\fold_password\x18\x03 \x01(\tR\voldPassword2\xfe\x04\n" +
+	"\fold_password\x18\x03 \x01(\tR\voldPassword2\xa6\x05\n" +
 	"\vAuthService\x12%\n" +
 	"\x04Auth\x12\x10.brz.AuthRequest\x1a\v.brz.Tokens\x12$\n" +
 	"\x03Reg\x12\x10.brz.AuthRequest\x1a\v.brz.Tokens\x12)\n" +
@@ -338,7 +338,8 @@ const file_auth_proto_rawDesc = "" +
 	"\x14GetUserDataFromToken\x12\n" +
 	".brz.Token\x1a\t.brz.User\x12%\n" +
 	"\x0eGetIdFromToken\x12\n" +
-	".brz.Token\x1a\a.brz.Id\x129\n" +
+	".brz.Token\x1a\a.brz.Id\x12&\n" +
+	"\x0eGetIdFromLogin\x12\v.brz.String\x1a\a.brz.Id\x129\n" +
 	"\aHealthz\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.EmptyB,Z*github.com/autumnterror/breezynotes;brzrpcb\x06proto3"
 
 var (
@@ -364,8 +365,9 @@ var file_auth_proto_goTypes = []any{
 	(*UserId)(nil),                // 6: brz.UserId
 	(*User)(nil),                  // 7: brz.User
 	(*Token)(nil),                 // 8: brz.Token
-	(*emptypb.Empty)(nil),         // 9: google.protobuf.Empty
-	(*Id)(nil),                    // 10: brz.Id
+	(*String)(nil),                // 9: brz.String
+	(*emptypb.Empty)(nil),         // 10: google.protobuf.Empty
+	(*Id)(nil),                    // 11: brz.Id
 }
 var file_auth_proto_depIdxs = []int32{
 	0,  // 0: brz.AuthService.Auth:input_type -> brz.AuthRequest
@@ -379,21 +381,23 @@ var file_auth_proto_depIdxs = []int32{
 	7,  // 8: brz.AuthService.CreateUser:input_type -> brz.User
 	8,  // 9: brz.AuthService.GetUserDataFromToken:input_type -> brz.Token
 	8,  // 10: brz.AuthService.GetIdFromToken:input_type -> brz.Token
-	9,  // 11: brz.AuthService.Healthz:input_type -> google.protobuf.Empty
-	5,  // 12: brz.AuthService.Auth:output_type -> brz.Tokens
-	5,  // 13: brz.AuthService.Reg:output_type -> brz.Tokens
-	8,  // 14: brz.AuthService.ValidateTokens:output_type -> brz.Token
-	9,  // 15: brz.AuthService.DeleteUser:output_type -> google.protobuf.Empty
-	9,  // 16: brz.AuthService.UpdateAbout:output_type -> google.protobuf.Empty
-	9,  // 17: brz.AuthService.UpdateEmail:output_type -> google.protobuf.Empty
-	9,  // 18: brz.AuthService.UpdatePhoto:output_type -> google.protobuf.Empty
-	9,  // 19: brz.AuthService.ChangePasswd:output_type -> google.protobuf.Empty
-	9,  // 20: brz.AuthService.CreateUser:output_type -> google.protobuf.Empty
-	7,  // 21: brz.AuthService.GetUserDataFromToken:output_type -> brz.User
-	10, // 22: brz.AuthService.GetIdFromToken:output_type -> brz.Id
-	9,  // 23: brz.AuthService.Healthz:output_type -> google.protobuf.Empty
-	12, // [12:24] is the sub-list for method output_type
-	0,  // [0:12] is the sub-list for method input_type
+	9,  // 11: brz.AuthService.GetIdFromLogin:input_type -> brz.String
+	10, // 12: brz.AuthService.Healthz:input_type -> google.protobuf.Empty
+	5,  // 13: brz.AuthService.Auth:output_type -> brz.Tokens
+	5,  // 14: brz.AuthService.Reg:output_type -> brz.Tokens
+	8,  // 15: brz.AuthService.ValidateTokens:output_type -> brz.Token
+	10, // 16: brz.AuthService.DeleteUser:output_type -> google.protobuf.Empty
+	10, // 17: brz.AuthService.UpdateAbout:output_type -> google.protobuf.Empty
+	10, // 18: brz.AuthService.UpdateEmail:output_type -> google.protobuf.Empty
+	10, // 19: brz.AuthService.UpdatePhoto:output_type -> google.protobuf.Empty
+	10, // 20: brz.AuthService.ChangePasswd:output_type -> google.protobuf.Empty
+	10, // 21: brz.AuthService.CreateUser:output_type -> google.protobuf.Empty
+	7,  // 22: brz.AuthService.GetUserDataFromToken:output_type -> brz.User
+	11, // 23: brz.AuthService.GetIdFromToken:output_type -> brz.Id
+	11, // 24: brz.AuthService.GetIdFromLogin:output_type -> brz.Id
+	10, // 25: brz.AuthService.Healthz:output_type -> google.protobuf.Empty
+	13, // [13:26] is the sub-list for method output_type
+	0,  // [0:13] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name

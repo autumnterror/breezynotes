@@ -3,7 +3,6 @@ package blocks
 import (
 	"context"
 	"errors"
-
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -80,3 +79,44 @@ func (a *API) GetMany(ctx context.Context, ids []string) (*domain.Blocks, error)
 
 	return &domain.Blocks{Blks: ordered}, nil
 }
+
+//func (a *API) SearchInContentByNotes(ctx context.Context, idNotes []string) (*domain.Blocks, error) {
+//	const op = "blocks.GetMany"
+//	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+//	defer done()
+//
+//	filter := bson.D{{"note_id", bson.D{{"$in", idNotes}}}}
+//
+//	cur, err := a.db.Find(ctx, filter, options.Find().SetSort(bson.M{"updated_at": -1}))
+//	if err != nil {
+//		return nil, format.Error(op, err)
+//	}
+//	defer cur.Close(ctx)
+//
+//	for cur.Next(ctx) {
+//		var b domain.Block
+//		if err = cur.Decode(&b); err != nil {
+//			continue
+//		}
+//		c, err := a.GetAsFirst(ctx, b.Id)
+//		if err != nil {
+//			continue
+//		}
+//
+//		select {
+//		case <-ctx.Done():
+//			cur.Close(ctx)
+//			return
+//		default:
+//			notesChan <- &domain.NotePart{
+//				Id:         n.Id,
+//				Title:      n.Title,
+//				Tag:        n.Tag,
+//				FirstBlock: "",
+//				UpdatedAt:  n.UpdatedAt,
+//			}
+//		}
+//	}
+//
+//	return &domain.Blocks{Blks: ordered}, nil
+//}

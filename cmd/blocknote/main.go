@@ -7,11 +7,20 @@ import (
 	"github.com/autumnterror/breezynotes/internal/blocknote/infra/mongo"
 	"github.com/autumnterror/breezynotes/internal/blocknote/infra/mongo/mongotx"
 	"github.com/autumnterror/breezynotes/internal/blocknote/repository/blocks"
+	"github.com/autumnterror/breezynotes/pkg/block"
+	"github.com/autumnterror/breezynotes/pkg/block/default/codeblock"
+	"github.com/autumnterror/breezynotes/pkg/block/default/fileblock"
+	"github.com/autumnterror/breezynotes/pkg/block/default/headerblock"
+	"github.com/autumnterror/breezynotes/pkg/block/default/imgblock"
+	"github.com/autumnterror/breezynotes/pkg/block/default/linkblock"
+	"github.com/autumnterror/breezynotes/pkg/block/default/listblock"
+	"github.com/autumnterror/breezynotes/pkg/block/default/quoteblock"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/repository/notes"
 	"github.com/autumnterror/breezynotes/internal/blocknote/repository/tags"
 	"github.com/autumnterror/breezynotes/internal/blocknote/service"
-	"github.com/autumnterror/breezynotes/pkg/pkgs"
-	"github.com/autumnterror/breezynotes/pkg/pkgs/default/textblock"
+
+	"github.com/autumnterror/breezynotes/pkg/block/default/textblock"
 	"github.com/autumnterror/utils_go/pkg/log"
 
 	"os"
@@ -23,8 +32,16 @@ func main() {
 	const op = "cmd.blocknote"
 
 	//------------REG-----------
-	pkgs.RegisterBlock("text", &textblock.Driver{})
+	block.RegisterBlock("text", &textblock.Driver{})
+	block.RegisterBlock("code", &codeblock.Driver{})
+	block.RegisterBlock("file", &fileblock.Driver{})
+	block.RegisterBlock("header", &headerblock.Driver{})
+	block.RegisterBlock("img", &imgblock.Driver{})
+	block.RegisterBlock("link", &linkblock.Driver{})
+	block.RegisterBlock("list", &listblock.Driver{})
+	block.RegisterBlock("quote", &quoteblock.Driver{})
 	//------------REG-----------
+	log.Green("Types was registered: ", block.GetRegisteredTypes())
 
 	cfg := config.MustSetup()
 

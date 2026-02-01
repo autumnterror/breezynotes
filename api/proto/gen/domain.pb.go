@@ -22,55 +22,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Roles int32
-
-const (
-	Roles_ROLE_UNSPECIFIED Roles = 0
-	Roles_EDITOR           Roles = 1
-	Roles_READER           Roles = 2
-)
-
-// Enum value maps for Roles.
-var (
-	Roles_name = map[int32]string{
-		0: "ROLE_UNSPECIFIED",
-		1: "EDITOR",
-		2: "READER",
-	}
-	Roles_value = map[string]int32{
-		"ROLE_UNSPECIFIED": 0,
-		"EDITOR":           1,
-		"READER":           2,
-	}
-)
-
-func (x Roles) Enum() *Roles {
-	p := new(Roles)
-	*p = x
-	return p
-}
-
-func (x Roles) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (Roles) Descriptor() protoreflect.EnumDescriptor {
-	return file_domain_proto_enumTypes[0].Descriptor()
-}
-
-func (Roles) Type() protoreflect.EnumType {
-	return &file_domain_proto_enumTypes[0]
-}
-
-func (x Roles) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use Roles.Descriptor instead.
-func (Roles) EnumDescriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{0}
-}
-
 type BoolResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Ok            bool                   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
@@ -159,6 +110,50 @@ func (x *StringResponse) GetValue() string {
 	return ""
 }
 
+type String struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Value         string                 `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *String) Reset() {
+	*x = String{}
+	mi := &file_domain_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *String) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*String) ProtoMessage() {}
+
+func (x *String) ProtoReflect() protoreflect.Message {
+	mi := &file_domain_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use String.ProtoReflect.Descriptor instead.
+func (*String) Descriptor() ([]byte, []int) {
+	return file_domain_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *String) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	return ""
+}
+
 type Strings struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Values        []string               `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty"`
@@ -168,7 +163,7 @@ type Strings struct {
 
 func (x *Strings) Reset() {
 	*x = Strings{}
-	mi := &file_domain_proto_msgTypes[2]
+	mi := &file_domain_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -180,7 +175,7 @@ func (x *Strings) String() string {
 func (*Strings) ProtoMessage() {}
 
 func (x *Strings) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[2]
+	mi := &file_domain_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -193,7 +188,7 @@ func (x *Strings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Strings.ProtoReflect.Descriptor instead.
 func (*Strings) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{2}
+	return file_domain_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Strings) GetValues() []string {
@@ -213,7 +208,7 @@ type Token struct {
 
 func (x *Token) Reset() {
 	*x = Token{}
-	mi := &file_domain_proto_msgTypes[3]
+	mi := &file_domain_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -225,7 +220,7 @@ func (x *Token) String() string {
 func (*Token) ProtoMessage() {}
 
 func (x *Token) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[3]
+	mi := &file_domain_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -238,7 +233,7 @@ func (x *Token) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Token.ProtoReflect.Descriptor instead.
 func (*Token) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{3}
+	return file_domain_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Token) GetValue() string {
@@ -267,7 +262,7 @@ type Tokens struct {
 
 func (x *Tokens) Reset() {
 	*x = Tokens{}
-	mi := &file_domain_proto_msgTypes[4]
+	mi := &file_domain_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -279,7 +274,7 @@ func (x *Tokens) String() string {
 func (*Tokens) ProtoMessage() {}
 
 func (x *Tokens) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[4]
+	mi := &file_domain_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -292,7 +287,7 @@ func (x *Tokens) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Tokens.ProtoReflect.Descriptor instead.
 func (*Tokens) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{4}
+	return file_domain_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Tokens) GetAccessToken() string {
@@ -332,7 +327,7 @@ type UserId struct {
 
 func (x *UserId) Reset() {
 	*x = UserId{}
-	mi := &file_domain_proto_msgTypes[5]
+	mi := &file_domain_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -344,7 +339,7 @@ func (x *UserId) String() string {
 func (*UserId) ProtoMessage() {}
 
 func (x *UserId) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[5]
+	mi := &file_domain_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -357,7 +352,7 @@ func (x *UserId) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserId.ProtoReflect.Descriptor instead.
 func (*UserId) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{5}
+	return file_domain_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *UserId) GetUserId() string {
@@ -376,7 +371,7 @@ type NoteId struct {
 
 func (x *NoteId) Reset() {
 	*x = NoteId{}
-	mi := &file_domain_proto_msgTypes[6]
+	mi := &file_domain_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -388,7 +383,7 @@ func (x *NoteId) String() string {
 func (*NoteId) ProtoMessage() {}
 
 func (x *NoteId) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[6]
+	mi := &file_domain_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -401,7 +396,7 @@ func (x *NoteId) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoteId.ProtoReflect.Descriptor instead.
 func (*NoteId) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{6}
+	return file_domain_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *NoteId) GetNoteId() string {
@@ -420,7 +415,7 @@ type BlockId struct {
 
 func (x *BlockId) Reset() {
 	*x = BlockId{}
-	mi := &file_domain_proto_msgTypes[7]
+	mi := &file_domain_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -432,7 +427,7 @@ func (x *BlockId) String() string {
 func (*BlockId) ProtoMessage() {}
 
 func (x *BlockId) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[7]
+	mi := &file_domain_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -445,7 +440,7 @@ func (x *BlockId) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlockId.ProtoReflect.Descriptor instead.
 func (*BlockId) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{7}
+	return file_domain_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *BlockId) GetBlockId() string {
@@ -464,7 +459,7 @@ type TagId struct {
 
 func (x *TagId) Reset() {
 	*x = TagId{}
-	mi := &file_domain_proto_msgTypes[8]
+	mi := &file_domain_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -476,7 +471,7 @@ func (x *TagId) String() string {
 func (*TagId) ProtoMessage() {}
 
 func (x *TagId) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[8]
+	mi := &file_domain_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -489,7 +484,7 @@ func (x *TagId) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TagId.ProtoReflect.Descriptor instead.
 func (*TagId) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{8}
+	return file_domain_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *TagId) GetTagId() string {
@@ -508,7 +503,7 @@ type Id struct {
 
 func (x *Id) Reset() {
 	*x = Id{}
-	mi := &file_domain_proto_msgTypes[9]
+	mi := &file_domain_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -520,7 +515,7 @@ func (x *Id) String() string {
 func (*Id) ProtoMessage() {}
 
 func (x *Id) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[9]
+	mi := &file_domain_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -533,7 +528,7 @@ func (x *Id) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Id.ProtoReflect.Descriptor instead.
 func (*Id) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{9}
+	return file_domain_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *Id) GetId() string {
@@ -553,7 +548,7 @@ type UserNoteId struct {
 
 func (x *UserNoteId) Reset() {
 	*x = UserNoteId{}
-	mi := &file_domain_proto_msgTypes[10]
+	mi := &file_domain_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -565,7 +560,7 @@ func (x *UserNoteId) String() string {
 func (*UserNoteId) ProtoMessage() {}
 
 func (x *UserNoteId) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[10]
+	mi := &file_domain_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -578,7 +573,7 @@ func (x *UserNoteId) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserNoteId.ProtoReflect.Descriptor instead.
 func (*UserNoteId) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{10}
+	return file_domain_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *UserNoteId) GetUserId() string {
@@ -605,7 +600,7 @@ type NoteBlockId struct {
 
 func (x *NoteBlockId) Reset() {
 	*x = NoteBlockId{}
-	mi := &file_domain_proto_msgTypes[11]
+	mi := &file_domain_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -617,7 +612,7 @@ func (x *NoteBlockId) String() string {
 func (*NoteBlockId) ProtoMessage() {}
 
 func (x *NoteBlockId) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[11]
+	mi := &file_domain_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -630,7 +625,7 @@ func (x *NoteBlockId) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoteBlockId.ProtoReflect.Descriptor instead.
 func (*NoteBlockId) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{11}
+	return file_domain_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *NoteBlockId) GetNoteId() string {
@@ -658,7 +653,7 @@ type NoteBlockUserId struct {
 
 func (x *NoteBlockUserId) Reset() {
 	*x = NoteBlockUserId{}
-	mi := &file_domain_proto_msgTypes[12]
+	mi := &file_domain_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -670,7 +665,7 @@ func (x *NoteBlockUserId) String() string {
 func (*NoteBlockUserId) ProtoMessage() {}
 
 func (x *NoteBlockUserId) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[12]
+	mi := &file_domain_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -683,7 +678,7 @@ func (x *NoteBlockUserId) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoteBlockUserId.ProtoReflect.Descriptor instead.
 func (*NoteBlockUserId) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{12}
+	return file_domain_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *NoteBlockUserId) GetNoteId() string {
@@ -717,7 +712,7 @@ type UserTagId struct {
 
 func (x *UserTagId) Reset() {
 	*x = UserTagId{}
-	mi := &file_domain_proto_msgTypes[13]
+	mi := &file_domain_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -729,7 +724,7 @@ func (x *UserTagId) String() string {
 func (*UserTagId) ProtoMessage() {}
 
 func (x *UserTagId) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[13]
+	mi := &file_domain_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -742,7 +737,7 @@ func (x *UserTagId) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserTagId.ProtoReflect.Descriptor instead.
 func (*UserTagId) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{13}
+	return file_domain_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *UserTagId) GetTagId() string {
@@ -769,7 +764,7 @@ type NoteTagId struct {
 
 func (x *NoteTagId) Reset() {
 	*x = NoteTagId{}
-	mi := &file_domain_proto_msgTypes[14]
+	mi := &file_domain_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -781,7 +776,7 @@ func (x *NoteTagId) String() string {
 func (*NoteTagId) ProtoMessage() {}
 
 func (x *NoteTagId) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[14]
+	mi := &file_domain_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -794,7 +789,7 @@ func (x *NoteTagId) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoteTagId.ProtoReflect.Descriptor instead.
 func (*NoteTagId) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{14}
+	return file_domain_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *NoteTagId) GetNoteId() string {
@@ -822,7 +817,7 @@ type NoteTagUserId struct {
 
 func (x *NoteTagUserId) Reset() {
 	*x = NoteTagUserId{}
-	mi := &file_domain_proto_msgTypes[15]
+	mi := &file_domain_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -834,7 +829,7 @@ func (x *NoteTagUserId) String() string {
 func (*NoteTagUserId) ProtoMessage() {}
 
 func (x *NoteTagUserId) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[15]
+	mi := &file_domain_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -847,7 +842,7 @@ func (x *NoteTagUserId) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoteTagUserId.ProtoReflect.Descriptor instead.
 func (*NoteTagUserId) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{15}
+	return file_domain_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *NoteTagUserId) GetNoteId() string {
@@ -885,7 +880,7 @@ type User struct {
 
 func (x *User) Reset() {
 	*x = User{}
-	mi := &file_domain_proto_msgTypes[16]
+	mi := &file_domain_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -897,7 +892,7 @@ func (x *User) String() string {
 func (*User) ProtoMessage() {}
 
 func (x *User) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[16]
+	mi := &file_domain_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -910,7 +905,7 @@ func (x *User) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use User.ProtoReflect.Descriptor instead.
 func (*User) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{16}
+	return file_domain_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *User) GetId() string {
@@ -968,7 +963,7 @@ type Tag struct {
 
 func (x *Tag) Reset() {
 	*x = Tag{}
-	mi := &file_domain_proto_msgTypes[17]
+	mi := &file_domain_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -980,7 +975,7 @@ func (x *Tag) String() string {
 func (*Tag) ProtoMessage() {}
 
 func (x *Tag) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[17]
+	mi := &file_domain_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -993,7 +988,7 @@ func (x *Tag) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Tag.ProtoReflect.Descriptor instead.
 func (*Tag) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{17}
+	return file_domain_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *Tag) GetId() string {
@@ -1046,7 +1041,7 @@ type Block struct {
 
 func (x *Block) Reset() {
 	*x = Block{}
-	mi := &file_domain_proto_msgTypes[18]
+	mi := &file_domain_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1058,7 +1053,7 @@ func (x *Block) String() string {
 func (*Block) ProtoMessage() {}
 
 func (x *Block) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[18]
+	mi := &file_domain_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1071,7 +1066,7 @@ func (x *Block) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Block.ProtoReflect.Descriptor instead.
 func (*Block) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{18}
+	return file_domain_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *Block) GetId() string {
@@ -1140,7 +1135,7 @@ type Note struct {
 
 func (x *Note) Reset() {
 	*x = Note{}
-	mi := &file_domain_proto_msgTypes[19]
+	mi := &file_domain_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1152,7 +1147,7 @@ func (x *Note) String() string {
 func (*Note) ProtoMessage() {}
 
 func (x *Note) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[19]
+	mi := &file_domain_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1165,7 +1160,7 @@ func (x *Note) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Note.ProtoReflect.Descriptor instead.
 func (*Note) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{19}
+	return file_domain_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *Note) GetId() string {
@@ -1248,7 +1243,7 @@ type NoteWithBlocks struct {
 
 func (x *NoteWithBlocks) Reset() {
 	*x = NoteWithBlocks{}
-	mi := &file_domain_proto_msgTypes[20]
+	mi := &file_domain_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1260,7 +1255,7 @@ func (x *NoteWithBlocks) String() string {
 func (*NoteWithBlocks) ProtoMessage() {}
 
 func (x *NoteWithBlocks) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[20]
+	mi := &file_domain_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1273,7 +1268,7 @@ func (x *NoteWithBlocks) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoteWithBlocks.ProtoReflect.Descriptor instead.
 func (*NoteWithBlocks) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{20}
+	return file_domain_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *NoteWithBlocks) GetId() string {
@@ -1352,7 +1347,7 @@ type NotePart struct {
 
 func (x *NotePart) Reset() {
 	*x = NotePart{}
-	mi := &file_domain_proto_msgTypes[21]
+	mi := &file_domain_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1364,7 +1359,7 @@ func (x *NotePart) String() string {
 func (*NotePart) ProtoMessage() {}
 
 func (x *NotePart) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[21]
+	mi := &file_domain_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1377,7 +1372,7 @@ func (x *NotePart) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotePart.ProtoReflect.Descriptor instead.
 func (*NotePart) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{21}
+	return file_domain_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *NotePart) GetId() string {
@@ -1425,7 +1420,7 @@ type Blocks struct {
 
 func (x *Blocks) Reset() {
 	*x = Blocks{}
-	mi := &file_domain_proto_msgTypes[22]
+	mi := &file_domain_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1437,7 +1432,7 @@ func (x *Blocks) String() string {
 func (*Blocks) ProtoMessage() {}
 
 func (x *Blocks) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[22]
+	mi := &file_domain_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1450,7 +1445,7 @@ func (x *Blocks) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Blocks.ProtoReflect.Descriptor instead.
 func (*Blocks) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{22}
+	return file_domain_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *Blocks) GetItems() []*Block {
@@ -1469,7 +1464,7 @@ type Notes struct {
 
 func (x *Notes) Reset() {
 	*x = Notes{}
-	mi := &file_domain_proto_msgTypes[23]
+	mi := &file_domain_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1481,7 +1476,7 @@ func (x *Notes) String() string {
 func (*Notes) ProtoMessage() {}
 
 func (x *Notes) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[23]
+	mi := &file_domain_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1494,7 +1489,7 @@ func (x *Notes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Notes.ProtoReflect.Descriptor instead.
 func (*Notes) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{23}
+	return file_domain_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *Notes) GetItems() []*Note {
@@ -1513,7 +1508,7 @@ type NoteParts struct {
 
 func (x *NoteParts) Reset() {
 	*x = NoteParts{}
-	mi := &file_domain_proto_msgTypes[24]
+	mi := &file_domain_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1525,7 +1520,7 @@ func (x *NoteParts) String() string {
 func (*NoteParts) ProtoMessage() {}
 
 func (x *NoteParts) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[24]
+	mi := &file_domain_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1538,7 +1533,7 @@ func (x *NoteParts) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoteParts.ProtoReflect.Descriptor instead.
 func (*NoteParts) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{24}
+	return file_domain_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *NoteParts) GetItems() []*NotePart {
@@ -1557,7 +1552,7 @@ type Tags struct {
 
 func (x *Tags) Reset() {
 	*x = Tags{}
-	mi := &file_domain_proto_msgTypes[25]
+	mi := &file_domain_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1569,7 +1564,7 @@ func (x *Tags) String() string {
 func (*Tags) ProtoMessage() {}
 
 func (x *Tags) ProtoReflect() protoreflect.Message {
-	mi := &file_domain_proto_msgTypes[25]
+	mi := &file_domain_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1582,7 +1577,7 @@ func (x *Tags) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Tags.ProtoReflect.Descriptor instead.
 func (*Tags) Descriptor() ([]byte, []int) {
-	return file_domain_proto_rawDescGZIP(), []int{25}
+	return file_domain_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *Tags) GetItems() []*Tag {
@@ -1600,6 +1595,8 @@ const file_domain_proto_rawDesc = "" +
 	"\fBoolResponse\x12\x0e\n" +
 	"\x02ok\x18\x01 \x01(\bR\x02ok\"&\n" +
 	"\x0eStringResponse\x12\x14\n" +
+	"\x05value\x18\x01 \x01(\tR\x05value\"\x1e\n" +
+	"\x06String\x12\x14\n" +
 	"\x05value\x18\x01 \x01(\tR\x05value\"!\n" +
 	"\aStrings\x12\x16\n" +
 	"\x06values\x18\x01 \x03(\tR\x06values\"/\n" +
@@ -1708,13 +1705,7 @@ const file_domain_proto_rawDesc = "" +
 	"\tNoteParts\x12#\n" +
 	"\x05items\x18\x01 \x03(\v2\r.brz.NotePartR\x05items\"&\n" +
 	"\x04Tags\x12\x1e\n" +
-	"\x05items\x18\x01 \x03(\v2\b.brz.TagR\x05items*5\n" +
-	"\x05Roles\x12\x14\n" +
-	"\x10ROLE_UNSPECIFIED\x10\x00\x12\n" +
-	"\n" +
-	"\x06EDITOR\x10\x01\x12\n" +
-	"\n" +
-	"\x06READER\x10\x02B,Z*github.com/autumnterror/breezynotes;brzrpcb\x06proto3"
+	"\x05items\x18\x01 \x03(\v2\b.brz.TagR\x05itemsB,Z*github.com/autumnterror/breezynotes;brzrpcb\x06proto3"
 
 var (
 	file_domain_proto_rawDescOnce sync.Once
@@ -1728,12 +1719,11 @@ func file_domain_proto_rawDescGZIP() []byte {
 	return file_domain_proto_rawDescData
 }
 
-var file_domain_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_domain_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
+var file_domain_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
 var file_domain_proto_goTypes = []any{
-	(Roles)(0),              // 0: brz.Roles
-	(*BoolResponse)(nil),    // 1: brz.BoolResponse
-	(*StringResponse)(nil),  // 2: brz.StringResponse
+	(*BoolResponse)(nil),    // 0: brz.BoolResponse
+	(*StringResponse)(nil),  // 1: brz.StringResponse
+	(*String)(nil),          // 2: brz.String
 	(*Strings)(nil),         // 3: brz.Strings
 	(*Token)(nil),           // 4: brz.Token
 	(*Tokens)(nil),          // 5: brz.Tokens
@@ -1787,14 +1777,13 @@ func file_domain_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_domain_proto_rawDesc), len(file_domain_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   26,
+			NumEnums:      0,
+			NumMessages:   27,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_domain_proto_goTypes,
 		DependencyIndexes: file_domain_proto_depIdxs,
-		EnumInfos:         file_domain_proto_enumTypes,
 		MessageInfos:      file_domain_proto_msgTypes,
 	}.Build()
 	File_domain_proto = out.File

@@ -119,3 +119,18 @@ func (s *ServerAPI) GetUserDataFromToken(ctx context.Context, t *brzrpc.Token) (
 
 	return domain.UserToRpc(res.(*domain.User)), nil
 }
+func (s *ServerAPI) GetIdFromLogin(ctx context.Context, t *brzrpc.String) (*brzrpc.Id, error) {
+	const op = "grpc.GetUserDataFromToken"
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return s.API.GetIdFromLogin(ctx, t.GetValue())
+	})
+	if err != nil {
+		return nil, format.Error(op, err)
+	}
+
+	return &brzrpc.Id{Id: res.(string)}, nil
+}

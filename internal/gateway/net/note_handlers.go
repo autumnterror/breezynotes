@@ -43,7 +43,7 @@ func (e *Echo) ChangeTitleNote(c echo.Context) error {
 
 	var r domain.ChangeTitleNoteRequest
 	if err := c.Bind(&r); err != nil {
-		log.Error(op, "change title bind", err)
+
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
@@ -318,7 +318,7 @@ func (e *Echo) CreateNote(c echo.Context) error {
 
 	var r domain.CreateNoteRequest
 	if err := c.Bind(&r); err != nil {
-		log.Error(op, "create note bind", err)
+
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
@@ -374,7 +374,7 @@ func (e *Echo) AddTagToNote(c echo.Context) error {
 
 	var r domain.NoteTagId
 	if err := c.Bind(&r); err != nil {
-		log.Error(op, "add tag to note bind", err)
+
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
@@ -427,7 +427,7 @@ func (e *Echo) RmTagFromNote(c echo.Context) error {
 
 	var r domain.NoteTagId
 	if err := c.Bind(&r); err != nil {
-		log.Error(op, "add tag to note bind", err)
+
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
@@ -450,6 +450,110 @@ func (e *Echo) RmTagFromNote(c echo.Context) error {
 	}
 	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.NoteId}); err != nil {
 		log.Error(op, "REDIS ERROR", err)
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+// ShareNote godoc
+// @Summary share note
+// @Description add new user to list of editors or readers
+// @Tags note
+// @Accept json
+// @Produce json
+// @Param Note body domain.ShareNoteRequest true "share info"
+// @Success 200
+// @Failure 400 {object} domain.Error
+// @Failure 400 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
+// @Router /api/note/share [patch]
+func (e *Echo) ShareNote(c echo.Context) error {
+	const op = "gateway.net.ShareNote"
+
+	api := e.bnAPI.API
+
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
+	}
+
+	var r domain.ShareNoteRequest
+	if err := c.Bind(&r); err != nil {
+
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
+	}
+
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
+	defer done()
+
+	id, err := e.authAPI.API.GetIdFromLogin(ctx, &brzrpc.String{Value: r.Login})
+	code, errRes := authErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
+
+	_, err = api.ShareNote(ctx, &brzrpc.ShareNoteRequest{
+		NoteId:        r.NoteId,
+		UserIdToShare: id.Id,
+		Role:          r.Role,
+		UserId:        idUser,
+	})
+	code, errRes = bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+// ChangeUserRole godoc
+// @Summary share note
+// @Description replace user to list of editors or readers
+// @Tags note
+// @Accept json
+// @Produce json
+// @Param Note body domain.ChangeRoleRequest true "share info"
+// @Success 200
+// @Failure 400 {object} domain.Error
+// @Failure 400 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
+// @Router /api/note/share/change [patch]
+func (e *Echo) ChangeUserRole(c echo.Context) error {
+	const op = "gateway.net.ShareNote"
+
+	api := e.bnAPI.API
+
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
+	}
+
+	var r domain.ChangeRoleRequest
+	if err := c.Bind(&r); err != nil {
+
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
+	}
+
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
+	defer done()
+
+	id, err := e.authAPI.API.GetIdFromLogin(ctx, &brzrpc.String{Value: r.Login})
+	code, errRes := authErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
+
+	_, err = api.ChangeUserRole(ctx, &brzrpc.ChangeUserRoleRequest{
+		UserIdToChange: id.Id,
+		NewRole:        r.NewRole,
+		NoteId:         r.NoteId,
+		UserId:         idUser,
+	})
+	code, errRes = bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
 	return c.NoContent(http.StatusOK)

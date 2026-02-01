@@ -11,7 +11,6 @@ import (
 // UpdateData can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix()
 func (a *API) updateData(ctx context.Context, id string, data map[string]any) error {
 	const op = "blocks.updateData"
-
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
@@ -25,6 +24,37 @@ func (a *API) updateData(ctx context.Context, id string, data map[string]any) er
 			bson.M{
 				"$set": bson.M{
 					"data":       data,
+					"updated_at": time.Now().UTC().Unix(),
+				},
+			},
+		)
+	if err != nil {
+		return format.Error(op, err)
+	}
+	if res.MatchedCount == 0 {
+		return format.Error(op, domain.ErrNotFound)
+	}
+
+	return nil
+}
+
+// updateType can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix()
+func (a *API) updateType(ctx context.Context, id string, _type string) error {
+	const op = "blocks.updateData"
+
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	defer done()
+
+	res, err := a.
+		db.
+		UpdateOne(
+			ctx,
+			bson.M{
+				"_id": id,
+			},
+			bson.M{
+				"$set": bson.M{
+					"type":       _type,
 					"updated_at": time.Now().UTC().Unix(),
 				},
 			},

@@ -4,7 +4,8 @@ import (
 	"context"
 	"errors"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
-	"github.com/autumnterror/breezynotes/pkg/pkgs"
+	"github.com/autumnterror/breezynotes/pkg/block"
+
 	"time"
 
 	"github.com/autumnterror/utils_go/pkg/log"
@@ -21,26 +22,26 @@ func (a *API) Create(ctx context.Context, _type, noteId string, data map[string]
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	if pkgs.BlockRegistry[_type] == nil {
+	if block.BlockRegistry[_type] == nil {
 		return "", domain.ErrTypeNotDefined
 	}
-	block, err := pkgs.BlockRegistry[_type].Create(ctx, data)
+	b, err := block.BlockRegistry[_type].Create(ctx, data)
 	if err != nil {
 		return "", format.Error(op, err)
 	}
 
-	block.Id = uid.New()
-	block.NoteId = noteId
-	block.Type = _type
-	block.CreatedAt = time.Now().UTC().Unix()
-	block.UpdatedAt = time.Now().UTC().Unix()
-	block.IsUsed = false
+	b.Id = uid.New()
+	b.NoteId = noteId
+	b.Type = _type
+	b.CreatedAt = time.Now().UTC().Unix()
+	b.UpdatedAt = time.Now().UTC().Unix()
+	b.IsUsed = false
 
-	if err := a.createBlock(ctx, block); err != nil {
+	if err := a.createBlock(ctx, domain.ToBlockDb(b)); err != nil {
 		return "", format.Error(op, err)
 	}
 
-	return block.Id, nil
+	return b.Id, nil
 }
 
 // OpBlock universal func that get block, calls func op by field _type and set field data of block after op func. NEED TO REGISTER TYPE BEFORE USE
@@ -61,17 +62,21 @@ func (a *API) OpBlock(ctx context.Context, id, opName string, data map[string]an
 		}
 	}()
 
-	block, err := a.Get(ctx, id)
+	b, err := a.Get(ctx, id)
 	if err != nil {
 		return format.Error(op, err)
 	}
 
-	if pkgs.BlockRegistry[block.Type] == nil {
+	if block.BlockRegistry[b.Type] == nil {
 		return domain.ErrTypeNotDefined
 	}
-	newData, err := pkgs.BlockRegistry[block.Type].Op(ctx, domain.FromBlockDb(block), opName, data)
+	newData, err := block.BlockRegistry[b.Type].Op(ctx, domain.FromBlockDb(b), opName, data)
 	if err != nil {
 		return format.Error(op, err)
+	}
+
+	if newData == nil {
+		return nil
 	}
 
 	if err := a.updateData(ctx, id, newData); err != nil {
@@ -87,15 +92,15 @@ func (a *API) GetAsFirst(ctx context.Context, id string) (string, error) {
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	block, err := a.Get(ctx, id)
+	b, err := a.Get(ctx, id)
 	if err != nil {
 		return "", format.Error(op, err)
 	}
-	if pkgs.BlockRegistry[block.Type] == nil {
+	if block.BlockRegistry[b.Type] == nil {
 		return "", domain.ErrTypeNotDefined
 	}
 
-	return pkgs.BlockRegistry[block.Type].GetAsFirst(ctx, domain.FromBlockDb(block)), nil
+	return block.BlockRegistry[b.Type].GetAsFirst(ctx, domain.FromBlockDb(b)), nil
 }
 
 // ChangeType universal func that get block, calls func ChangeType by field _type. NEED TO REGISTER TYPE BEFORE USE
@@ -104,24 +109,23 @@ func (a *API) ChangeType(ctx context.Context, id, newType string) error {
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	if err := a.updateUsed(ctx, id, true); err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			return domain.ErrAlreadyUsed
-		}
-		return format.Error(op, err)
-	}
-	defer func() {
-		if err := a.updateUsed(ctx, id, false); err != nil {
-			log.Error(op, "cant set isUse to false", err)
-		}
-	}()
-	block, err := a.Get(ctx, id)
+	b, err := a.Get(ctx, id)
 	if err != nil {
 		return format.Error(op, err)
 	}
 
-	if pkgs.BlockRegistry[block.Type] == nil {
+	if block.BlockRegistry[b.Type] == nil {
 		return domain.ErrTypeNotDefined
 	}
-	return pkgs.BlockRegistry[block.Type].ChangeType(ctx, domain.FromBlockDb(block), newType)
+	err = block.BlockRegistry[b.Type].ChangeType(ctx, domain.FromBlockDb(b), newType)
+	if err != nil {
+		return format.Error(op, err)
+	}
+	if err := a.updateType(ctx, id, newType); err != nil {
+		return format.Error(op, err)
+	}
+	if err := a.updateData(ctx, id, b.Data); err != nil {
+		return format.Error(op, err)
+	}
+	return nil
 }

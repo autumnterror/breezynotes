@@ -37,7 +37,7 @@ func (e *Echo) CreateTag(c echo.Context) error {
 
 	var r domain.CreateTagRequest
 	if err := c.Bind(&r); err != nil {
-		log.Error(op, "create tag bind", err)
+
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
@@ -92,7 +92,7 @@ func (e *Echo) UpdateTagTitle(c echo.Context) error {
 
 	var r domain.UpdateTagTitleRequest
 	if err := c.Bind(&r); err != nil {
-		log.Error(op, "update tag title bind", err)
+
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
@@ -143,7 +143,7 @@ func (e *Echo) UpdateTagColor(c echo.Context) error {
 
 	var r domain.UpdateTagColorRequest
 	if err := c.Bind(&r); err != nil {
-		log.Error(op, "update tag color bind", err)
+
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
@@ -194,7 +194,7 @@ func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 
 	var r domain.UpdateTagEmojiRequest
 	if err := c.Bind(&r); err != nil {
-		log.Error(op, "update tag emoji bind", err)
+
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 

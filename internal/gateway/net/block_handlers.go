@@ -34,7 +34,7 @@ func (e *Echo) GetBlock(c echo.Context) error {
 
 	var r domain.BlockNoteId
 	if err := c.Bind(&r); err != nil {
-		log.Error(op, "add tag to note bind", err)
+
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
@@ -138,7 +138,7 @@ func (e *Echo) OpBlock(c echo.Context) error {
 
 	var r domain.OpBlockRequest
 	if err := c.Bind(&r); err != nil {
-		log.Error(op, "op block bind", err)
+
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
@@ -197,7 +197,7 @@ func (e *Echo) ChangeTypeBlock(c echo.Context) error {
 
 	var r domain.ChangeTypeBlockRequest
 	if err := c.Bind(&r); err != nil {
-		log.Error(op, "change type block bind", err)
+
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
@@ -250,7 +250,7 @@ func (e *Echo) ChangeBlockOrder(c echo.Context) error {
 
 	var r domain.ChangeBlockOrderRequest
 	if err := c.Bind(&r); err != nil {
-		log.Error(op, "change block order bind", err)
+
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
