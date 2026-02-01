@@ -1,63 +1,80 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  gateway:
+  breezynotes-gateway:
+    depends_on:
+      - breezynotes-authservice
+      - breezynotes-blocknoteservice
+      - breezynotes-redisservice
     container_name: gateway
     image: zitrax78/breezynotes-gateway:latest
     ports:
       - "8080:8080"
     volumes:
       - ./configs:/app/configs
-      - .env:/app/.env
     environment:
       CONFIG_PATH: configs/prod-gateway.yaml
     restart: unless-stopped
     networks:
       - auth
-      - notes
+      - mongo-cluster
       - redisnet
 
-  authservice:
+  breezynotes-authservice:
+    depends_on:
+      - breezynotes-usersdb
     container_name: auth
     image: zitrax78/breezynotes-auth:latest
     ports:
       - "8008:8008"
     volumes:
       - ./configs:/app/configs
+      - .env:/app/.env
     environment:
       CONFIG_PATH: configs/prod-auth.yaml
     restart: unless-stopped
     networks:
       - auth
 
-  blocknoteservice:
+  breezynotes-blocknoteservice:
+    depends_on:
+      breezynotes-mongo1:
+        condition: service_healthy
+      breezynotes-mongo2:
+        condition: service_healthy
+      breezynotes-mongo3:
+        condition: service_healthy
     container_name: blocknote
     image: zitrax78/breezynotes-blocknote:latest
     ports:
       - "8018:8018"
     volumes:
       - ./configs:/app/configs
+      - .env:/app/.env
     environment:
       CONFIG_PATH: configs/prod-blocknote.yaml
+
     restart: unless-stopped
     networks:
-      - notes
+      - mongo-cluster
 
-  redisservice:
+  breezynotes-redisservice:
+    depends_on:
+      - breezynotes-redis
     container_name: redis-service
     image: zitrax78/breezynotes-redis:latest
     ports:
       - "8028:8028"
     volumes:
       - ./configs:/app/configs
+      - .env:/app/.env
     environment:
       CONFIG_PATH: configs/prod-redis.yaml
     restart: unless-stopped
     networks:
       - redisnet
 
-
-  usersdb:
+  breezynotes-usersdb:
     container_name: usersdb
     image: postgres:latest
     ports:
@@ -72,24 +89,28 @@ services:
     env_file: .env
     networks:
       - auth
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  blocknotedb:
-    container_name: blocknotedb
-    image: mongo:latest
-    ports:
-      - "27017:27017"
+  breezynotes-migrator:
+    image: zitrax78/breezynotes-migrator:latest
+    depends_on:
+      breezynotes-usersdb:
+        condition: service_healthy
     volumes:
-      - blocknotedb-data:/data/db
+      - ./configs:/app/configs
+      - ./migrations:/app/migrations
+      - .env:/app/.env
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-    restart: unless-stopped
-    env_file: .env
+      CONFIG_PATH: configs/migrator.yaml
+    command: [ "--type", "up", "--path", "./migrations" ]
     networks:
-      - notes
+      - auth
 
-  redis:
+  breezynotes-redis:
     container_name: redis
     image: redis:latest
     ports:
@@ -100,14 +121,189 @@ services:
     networks:
       - redisnet
 
+  breezynotes-mongo1:
+    depends_on:
+      - breezynotes-mongo-keygen
+    container_name: mongo1
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-keyfile:/data/keyfile:ro
+      - mongo1-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    restart: unless-stopped
+    command:
+      [
+        "--replSet",
+        "rs0",
+        "--bind_ip_all",
+        "--keyFile",
+        "/data/keyfile/mongo-keyfile.key",
+        "--auth",
+      ]
+    env_file: .env
+    networks:
+      - mongo-cluster
+    healthcheck:
+      test: |
+        mongosh --host mongo1 --authenticationDatabase admin -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --eval "
+          const status = rs.status();
+          if (status.ok && status.members.every(m => m.health === 1 && (m.state === 1 || m.state === 2))) {
+            quit(0);
+          }
+          quit(1);
+        "
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 10s
+
+  breezynotes-mongo2:
+    depends_on:
+      - breezynotes-mongo-keygen
+    container_name: mongo2
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-keyfile:/data/keyfile:ro
+      - mongo2-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    command:
+      [
+        "--replSet",
+        "rs0",
+        "--bind_ip_all",
+        "--keyFile",
+        "/data/keyfile/mongo-keyfile.key",
+        "--auth",
+      ]
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - mongo-cluster
+    healthcheck:
+      test: |
+        mongosh --host mongo1 --authenticationDatabase admin -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --eval "
+          const status = rs.status();
+          if (status.ok && status.members.every(m => m.health === 1 && (m.state === 1 || m.state === 2))) {
+            quit(0);
+          }
+          quit(1);
+        "
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 10s
+
+  breezynotes-mongo3:
+    depends_on:
+      - breezynotes-mongo-keygen
+    container_name: mongo3
+    image: mongo:latest
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongo-keyfile:/data/keyfile:ro
+      - mongo3-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    command:
+      [
+        "--replSet",
+        "rs0",
+        "--bind_ip_all",
+        "--keyFile",
+        "/data/keyfile/mongo-keyfile.key",
+        "--auth",
+      ]
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - mongo-cluster
+    healthcheck:
+      test: |
+        mongosh --host mongo1 --authenticationDatabase admin -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --eval "
+          const status = rs.status();
+          if (status.ok && status.members.every(m => m.health === 1 && (m.state === 1 || m.state === 2))) {
+            quit(0);
+          }
+          quit(1);
+        "
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 10s
+
+  breezynotes-mongo-keygen:
+    container_name: mng-setup-key
+    image: alpine
+    command: >
+      sh -c "
+      mkdir -p /keyfile &&
+      head -c 756 /dev/urandom | base64 -w 0 > /keyfile/mongo-keyfile.key &&
+      chmod 400 /keyfile/mongo-keyfile.key &&
+      chown 999:999 /keyfile/mongo-keyfile.key &&
+      echo "keyfile is created successfully"
+      "
+    volumes:
+      - mongo-keyfile:/keyfile
+
+  breezynotes-mongo-rs-init:
+    image: mongo:latest
+    depends_on:
+      - breezynotes-mongo1
+      - breezynotes-mongo2
+      - breezynotes-mongo3
+    networks:
+      - mongo-cluster
+    env_file: .env
+    entrypoint: >
+      bash -c "mongosh --host mongo1:27017 -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin --eval ' rs.initiate({
+              _id: \"rs0\",
+              members: [
+                { _id: 0, host: \"mongo1:27017\" },
+                { _id: 1, host: \"mongo2:27017\" },
+                { _id: 2, host: \"mongo3:27017\" }
+              ]
+            })
+          ' || echo \"ReplicaSet already initialized\"
+      "
+
+#  tests:
+#    image: golang:alpine
+#    depends_on:
+#      - mongo1
+#      - mongo2
+#      - mongo3
+#    working_dir: /app
+#    volumes:
+#      - ../..:/app
+#    command: go test ./internal/blocknote/repository/notes -v
+#    networks:
+#      - mongo-cluster
+#    # restart: unless-stopped
+
 networks:
   auth:
     driver: bridge
-  notes:
+  mongo-cluster:
     driver: bridge
   redisnet:
     driver: bridge
 
 volumes:
   postgres-data:
-  blocknotedb-data:
+  mongo1-data:
+  mongo2-data:
+  mongo3-data:
+  mongo-keyfile:
