@@ -1,6 +1,6 @@
-#!/bin/bash
+echo off
 
-docker compose down
+docker compose down -v
 
 docker pull zitrax78/breezynotes-gateway
 docker pull zitrax78/breezynotes-auth
