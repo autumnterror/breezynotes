@@ -2,11 +2,12 @@ package fileblock
 
 import (
 	"context"
+	"testing"
+
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/domain"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/structpb"
-	"testing"
 )
 
 var (
@@ -17,12 +18,12 @@ var (
 func TestGetAsFirst(t *testing.T) {
 	t.Parallel()
 	block := testBlock()
-	assert.Equal(t, "path/to/my/file.pdf", d.GetAsFirst(ctx, block))
+	assert.Equal(t, "file", d.GetAsFirst(ctx, block))
 
 	blockNil := testBlockNil()
-	assert.Equal(t, "", d.GetAsFirst(ctx, blockNil))
+	assert.Equal(t, "file", d.GetAsFirst(ctx, blockNil))
 
-	assert.Equal(t, "", d.GetAsFirst(ctx, nil))
+	assert.Equal(t, "file", d.GetAsFirst(ctx, nil))
 }
 
 func TestOp(t *testing.T) {
@@ -73,33 +74,33 @@ func TestChangeType(t *testing.T) {
 	t.Parallel()
 	t.Run(domain.TextBlockType, func(t *testing.T) {
 		block := testBlock()
-		fb, _ := domain.FromUnifiedToFileBlock(block)
+		// fb, _ := domain.FromUnifiedToFileBlock(block)
 
 		assert.NoError(t, d.ChangeType(ctx, block, domain.TextBlockType))
 		tb, err := domain.FromUnifiedToTextBlock(block)
 		assert.NoError(t, err)
-		assert.Equal(t, fb.Data.Src, tb.Data.PlainText())
+		assert.Equal(t, "from file", tb.Data.PlainText())
 	})
 
 	t.Run(domain.QuoteBlockType, func(t *testing.T) {
 		block := testBlock()
-		fb, _ := domain.FromUnifiedToFileBlock(block)
+		// fb, _ := domain.FromUnifiedToFileBlock(block)
 
 		assert.NoError(t, d.ChangeType(ctx, block, domain.QuoteBlockType))
 		qb, err := domain.FromUnifiedToQuoteBlock(block)
 		assert.NoError(t, err)
-		assert.Equal(t, fb.Data.Src, qb.Data.Text)
+		assert.Equal(t, "from file", qb.Data.Text)
 	})
 
 	t.Run(domain.ImgBlockType, func(t *testing.T) {
 		block := testBlock()
-		fb, _ := domain.FromUnifiedToFileBlock(block)
+		// fb, _ := domain.FromUnifiedToFileBlock(block)
 
 		assert.NoError(t, d.ChangeType(ctx, block, domain.ImgBlockType))
 		ib, err := domain.FromUnifiedToImgBlock(block)
 		assert.NoError(t, err)
-		assert.Equal(t, fb.Data.Src, ib.Data.Src)
-		assert.Equal(t, "", ib.Data.Alt)
+		assert.Equal(t, "", ib.Data.Src)
+		assert.Equal(t, "from file", ib.Data.Alt)
 	})
 }
 

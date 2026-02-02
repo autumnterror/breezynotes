@@ -2,15 +2,15 @@ package codeblock
 
 import (
 	"context"
-	"fmt"
-	"github.com/alecthomas/chroma/v2/lexers"
+	"testing"
+
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/pkg/domain"
+	"github.com/autumnterror/breezynotes/utils/lang"
 	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/structpb"
-	"testing"
 )
 
 func TestGetAsFirst(t *testing.T) {
@@ -320,10 +320,10 @@ func TestLang(t *testing.T) {
 		function addNumbers(a, b) {
 			return a + b;
 		}
-		
+
 		// Call the function and store the result
 		let result = addNumbers(5, 10);
-		
+
 		// Output the result (15)
 		console.log(result);
 `
@@ -350,13 +350,14 @@ func TestLang(t *testing.T) {
 }
 
 func analyzeAndPrint(code string) {
-	lexer := lexers.Analyse(code)
-	if lexer != nil {
-		lang := lexer.Config().Name
-		fmt.Printf("Для фрагмента:\n%s\n... определён язык: %s\n", code, lang)
-		fmt.Println("---")
-	} else {
-		fmt.Printf("Для фрагмента:\n%s\n... не удалось определить язык.\n", code)
-		fmt.Println("---")
-	}
+	// lexer := lexers.Analyse(code)
+	// if lexer != nil {
+	// 	lang := lexer.Config().Name
+	// 	fmt.Printf("Для фрагмента:\n%s\n... определён язык: %s\n", code, lang)
+	// 	fmt.Println("---")
+	// } else {
+	// 	fmt.Printf("Для фрагмента:\n%s\n... не удалось определить язык.\n", code)
+	// 	fmt.Println("---")
+	// }
+	log.Green(code, lang.AnalyzeLanguage(code))
 }

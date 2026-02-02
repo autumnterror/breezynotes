@@ -15,3 +15,4 @@ config-test.go
 .idea/workspace.xml
 /.idea
 pkg/pkgs/default/textblock/benchmark/text.txt
+build/breezynotes/bin/migrator

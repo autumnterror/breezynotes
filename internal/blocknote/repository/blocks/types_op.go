@@ -3,8 +3,10 @@ package blocks
 import (
 	"context"
 	"errors"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/breezynotes/pkg/block"
+	domainblocks "github.com/autumnterror/breezynotes/pkg/domain"
 
 	"time"
 
@@ -117,14 +119,24 @@ func (a *API) ChangeType(ctx context.Context, id, newType string) error {
 	if block.BlockRegistry[b.Type] == nil {
 		return domain.ErrTypeNotDefined
 	}
-	err = block.BlockRegistry[b.Type].ChangeType(ctx, domain.FromBlockDb(b), newType)
+
+	nb := domain.FromBlockDb(b)
+	err = block.BlockRegistry[b.Type].ChangeType(ctx, nb, newType)
 	if err != nil {
 		return format.Error(op, err)
 	}
+
+	switch newType {
+	case domainblocks.ListBlockToDoType, domainblocks.ListBlockOrderedType, domainblocks.ListBlockUnorderedType:
+		newType = "list"
+	case domainblocks.HeaderBlockType1, domainblocks.HeaderBlockType2, domainblocks.HeaderBlockType3:
+		newType = "header"
+	}
+
 	if err := a.updateType(ctx, id, newType); err != nil {
 		return format.Error(op, err)
 	}
-	if err := a.updateData(ctx, id, b.Data); err != nil {
+	if err := a.updateData(ctx, id, nb.Data.AsMap()); err != nil {
 		return format.Error(op, err)
 	}
 	return nil

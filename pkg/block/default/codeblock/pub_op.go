@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	blockpkg "github.com/autumnterror/breezynotes/pkg/block"
 	"github.com/autumnterror/breezynotes/pkg/domain"
@@ -54,7 +55,22 @@ func (tb *Driver) Create(ctx context.Context, data map[string]any) (*brzrpc.Bloc
 
 	b := &brzrpc.Block{Data: s}
 
-	return b, nil
+	cb, err := domain.FromUnifiedToCodeBlock(b)
+	if err != nil {
+		return nil, err
+	}
+
+	newData, err := analyseLang(cb)
+	if err != nil {
+		return nil, err
+	}
+
+	s, err = structpb.NewStruct(newData)
+	if err != nil {
+		return nil, format.Error(op, err)
+	}
+
+	return &brzrpc.Block{Data: s}, nil
 }
 func (tb *Driver) ChangeType(ctx context.Context, block *brzrpc.Block, newType string) error {
 	const op = "codeblock.ChangeType"

@@ -112,6 +112,15 @@ definitions:
       old_password:
         type: string
     type: object
+  domain.ChangeRoleRequest:
+    properties:
+      login:
+        type: string
+      new_role:
+        type: string
+      note_id:
+        type: string
+    type: object
   domain.ChangeTypeBlockRequest:
     properties:
       block_id:
@@ -233,6 +242,15 @@ definitions:
       op:
         type: string
     type: object
+  domain.ShareNoteRequest:
+    properties:
+      login:
+        type: string
+      note_id:
+        type: string
+      role:
+        type: string
+    type: object
   domain.Tag:
     properties:
       color:
@@ -303,9 +321,9 @@ definitions:
         type: string
       login:
         type: string
-      password:
+      pw1:
         type: string
-      password2:
+      pw2:
         type: string
     type: object
 host: localhost:8080
@@ -791,7 +809,7 @@ paths:
       summary: GetNote notes by tag
       tags:
       - note
-  /api/note/find:
+  /api/note/search:
     get:
       consumes:
       - application/json
@@ -844,6 +862,70 @@ paths:
           schema:
             $ref: '#/definitions/domain.Error'
       summary: search note by title or blocks inside
+      tags:
+      - note
+  /api/note/share:
+    patch:
+      consumes:
+      - application/json
+      description: add new user to list of editors or readers
+      parameters:
+      - description: share info
+        in: body
+        name: Note
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ShareNoteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
+      summary: share note
+      tags:
+      - note
+  /api/note/share/change:
+    patch:
+      consumes:
+      - application/json
+      description: replace user to list of editors or readers
+      parameters:
+      - description: share info
+        in: body
+        name: Note
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ChangeRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
+      summary: share note
       tags:
       - note
   /api/note/tag:

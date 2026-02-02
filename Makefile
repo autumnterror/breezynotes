@@ -42,7 +42,7 @@ build-redis:
 
 # Migration operations
 build-migrator:
-	docker build -t zitrax78/breezynotes-migrator --file ./build/docker/migrator/dockerfile .
+	docker build  -t zitrax78/breezynotes-migrator --file ./build/docker/migrator/dockerfile .
 #go build -o ./build/breezynotes/bin/migrator.exe ./cmd/migrator
 mig-up: build-migrator
 	./build/breezynotes/bin/migrator.exe --type up --path ./build/breezynotes/migrations

@@ -2,8 +2,9 @@ package codeblock
 
 import (
 	"encoding/json"
-	"github.com/alecthomas/chroma/v2/lexers"
+
 	"github.com/autumnterror/breezynotes/pkg/domain"
+	"github.com/autumnterror/breezynotes/utils/lang"
 )
 
 func changeText(b *domain.CodeBlock, raw []byte) (map[string]any, error) {
@@ -19,6 +20,7 @@ func changeText(b *domain.CodeBlock, raw []byte) (map[string]any, error) {
 	}
 
 	b.Data.Text = req.NewText
+	b.Data.Lang = lang.AnalyzeLanguage(b.Data.Text)
 
 	nb, err := b.ToUnified()
 	if err != nil {
@@ -33,12 +35,7 @@ func analyseLang(b *domain.CodeBlock) (map[string]any, error) {
 		return nil, nil
 	}
 
-	lexer := lexers.Analyse(b.Data.Text)
-	if lexer == nil {
-		b.Data.Lang = ""
-	} else {
-		b.Data.Lang = lexer.Config().Name
-	}
+	b.Data.Lang = lang.AnalyzeLanguage(b.Data.Text)
 
 	nb, err := b.ToUnified()
 	if err != nil {

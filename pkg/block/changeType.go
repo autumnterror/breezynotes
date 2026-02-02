@@ -3,6 +3,7 @@ package block
 import (
 	"github.com/autumnterror/breezynotes/pkg/domain"
 	"github.com/autumnterror/breezynotes/pkg/text"
+	"github.com/autumnterror/breezynotes/utils/lang"
 )
 
 func ChangeTypeUnif(textData *text.Data, plainText, newType string, levelList uint, valueOrdered int) (map[string]any, error) {
@@ -41,8 +42,9 @@ func ChangeTypeUnif(textData *text.Data, plainText, newType string, levelList ui
 	case domain.CodeBlockType:
 		nd := domain.CodeData{
 			Text: plainText,
-			Lang: "undefined",
+			Lang: lang.AnalyzeLanguage(plainText),
 		}
+
 		newData = nd.ToMap()
 	case domain.HeaderBlockType1:
 		nd := domain.HeaderData{
