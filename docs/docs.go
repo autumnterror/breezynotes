@@ -57,12 +57,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/domain.Error"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Error"
-                        }
-                    },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
@@ -1649,12 +1643,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/domain.Error"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Error"
-                        }
-                    },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
@@ -1716,12 +1704,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/domain.Error"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Error"
-                        }
-                    },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
@@ -1754,20 +1736,14 @@ const docTemplate = `{
                             "$ref": "#/definitions/domain.User"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Error"
-                        }
-                    },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/domain.Error"
                         }
                     },
-                    "410": {
-                        "description": "Gone",
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/domain.Error"
                         }
@@ -1833,12 +1809,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/domain.Error"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Error"
-                        }
-                    },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
@@ -1900,12 +1870,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/domain.Error"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Error"
-                        }
-                    },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
@@ -1963,12 +1927,6 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/domain.Error"
                         }
@@ -2506,8 +2464,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "Full API for BreezyNotes.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
-	// LeftDelim:        "{{",
-	// RightDelim:       "}}",
+	//LeftDelim:        "{{",
+	//RightDelim:       "}}",
 }
 
 func init() {

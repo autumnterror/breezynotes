@@ -360,10 +360,6 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/domain.Error'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
@@ -1411,10 +1407,6 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/domain.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
@@ -1455,10 +1447,6 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/domain.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
@@ -1481,16 +1469,12 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/domain.User'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/domain.Error'
         "401":
           description: Unauthorized
           schema:
             $ref: '#/definitions/domain.Error'
-        "410":
-          description: Gone
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/domain.Error'
         "502":
@@ -1533,10 +1517,6 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/domain.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
@@ -1577,10 +1557,6 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/domain.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/domain.Error'
         "502":
           description: Bad Gateway
           schema:
@@ -1619,10 +1595,6 @@ paths:
             $ref: '#/definitions/domain.Error'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/domain.Error'
-        "500":
-          description: Internal Server Error
           schema:
             $ref: '#/definitions/domain.Error'
         "502":

@@ -29,27 +29,6 @@ func (s *AuthService) GetIdFromToken(ctx context.Context, token string) (string,
 	return id, nil
 }
 
-func (s *AuthService) GetUserDataFromToken(ctx context.Context, token string) (*domain.User, error) {
-	const op = "service.GetUserDataFromToken"
-
-	id, err := s.GetIdFromToken(ctx, token)
-	if err != nil {
-		return nil, format.Error(op, err)
-	}
-
-	repo, err := s.userRepo(ctx)
-	if err != nil {
-		return nil, wrapServiceCheck(op, err)
-	}
-
-	user, err := repo.GetInfo(ctx, id)
-	if err != nil {
-		return nil, format.Error(op, err)
-	}
-
-	return user, nil
-}
-
 func (s *AuthService) parseToken(ctx context.Context, token string) (*jwtlib.Token, jwt.WithConfigRepo, error) {
 	const op = "service.parseToken"
 	if stringEmpty(token) {

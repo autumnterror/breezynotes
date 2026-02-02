@@ -15,9 +15,8 @@ import (
 // @Tags user
 // @Produce json
 // @Success 200 {object} domain.User
-// @Failure 400 {object} domain.Error
 // @Failure 401 {object} domain.Error
-// @Failure 410 {object} domain.Error
+// @Failure 404 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
 // @Router /api/user/data [get]
@@ -55,7 +54,6 @@ func (e *Echo) GetUserData(c echo.Context) error {
 // @Failure 400 {object} domain.Error
 // @Failure 401 {object} domain.Error
 // @Failure 404 {object} domain.Error
-// @Failure 500 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
 // @Router /api/user [delete]
@@ -93,7 +91,6 @@ func (e *Echo) DeleteUser(c echo.Context) error {
 // @Failure 400 {object} domain.Error
 // @Failure 401 {object} domain.Error
 // @Failure 404 {object} domain.Error
-// @Failure 500 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
 // @Router /api/user/about [patch]
@@ -108,7 +105,7 @@ func (e *Echo) UpdateAbout(c echo.Context) error {
 	var req domain.UpdateAboutRequest
 	if err := c.Bind(&req); err != nil {
 
-		return c.JSON(http.StatusBadRequest, domain.Error{Error: "invalid request body"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
 	auth := e.authAPI.API
@@ -140,7 +137,6 @@ func (e *Echo) UpdateAbout(c echo.Context) error {
 // @Failure 400 {object} domain.Error
 // @Failure 401 {object} domain.Error
 // @Failure 404 {object} domain.Error
-// @Failure 500 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
 // @Router /api/user/email [patch]
@@ -153,9 +149,8 @@ func (e *Echo) UpdateEmail(c echo.Context) error {
 	}
 
 	var req domain.UpdateEmailRequest
-	if err := c.Bind(&req); err != nil || req.NewEmail == "" {
-
-		return c.JSON(http.StatusBadRequest, domain.Error{Error: "invalid request body"})
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
 	auth := e.authAPI.API
@@ -187,7 +182,6 @@ func (e *Echo) UpdateEmail(c echo.Context) error {
 // @Failure 400 {object} domain.Error
 // @Failure 401 {object} domain.Error
 // @Failure 404 {object} domain.Error
-// @Failure 500 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
 // @Router /api/user/photo [patch]
@@ -200,9 +194,8 @@ func (e *Echo) UpdatePhoto(c echo.Context) error {
 	}
 
 	var req domain.UpdatePhotoRequest
-	if err := c.Bind(&req); err != nil || req.NewPhoto == "" {
-
-		return c.JSON(http.StatusBadRequest, domain.Error{Error: "invalid request body"})
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
 	auth := e.authAPI.API
@@ -233,7 +226,6 @@ func (e *Echo) UpdatePhoto(c echo.Context) error {
 // @Failure 400 {object} domain.Error
 // @Failure 401 {object} domain.Error
 // @Failure 404 {object} domain.Error
-// @Failure 500 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
 // @Router /api/user/pw [patch]
@@ -248,7 +240,7 @@ func (e *Echo) ChangePassword(c echo.Context) error {
 	var req domain.ChangePasswordRequest
 	if err := c.Bind(&req); err != nil {
 
-		return c.JSON(http.StatusBadRequest, domain.Error{Error: "invalid request body"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
 	if req.NewPassword != req.NewPassword2 {
