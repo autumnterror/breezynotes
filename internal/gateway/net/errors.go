@@ -59,7 +59,7 @@ func authErrors(op string, err error) (int, domain.Error) {
 		case codes.InvalidArgument:
 			return http.StatusBadRequest, domain.Error{Error: st.Message()}
 		case codes.ResourceExhausted:
-			return http.StatusGone, domain.Error{Error: "terminate auth. Refresh token is expired"}
+			return http.StatusUnauthorized, domain.Error{Error: "terminate auth. Refresh token is expired"}
 		case codes.Internal:
 			return http.StatusBadGateway, domain.Error{Error: "check logs on service"}
 		case codes.DeadlineExceeded:

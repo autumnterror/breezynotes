@@ -21,7 +21,6 @@ import (
 // @Param User body domain.AuthRequest true "Login or Email and Password"
 // @Success 200 {object} brzrpc.Tokens
 // @Failure 400 {object} domain.Error
-// @Failure 401 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
 // @Router /api/auth [post]
@@ -159,7 +158,7 @@ func (e *Echo) ValidateToken(c echo.Context) error {
 	rt, err := c.Cookie("refresh_token")
 	if err != nil {
 		log.Warn(op, "refresh_token cookie missing", err)
-		return c.JSON(http.StatusBadRequest, domain.Error{Error: "refresh_token cookie missing"})
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "refresh_token cookie missing"})
 	}
 
 	auth := e.authAPI.API
@@ -179,7 +178,7 @@ func (e *Echo) ValidateToken(c echo.Context) error {
 	if token != nil {
 		if token.Value == "" {
 			return c.JSON(http.StatusOK, domain.Message{Message: "tokens valid"})
-		}	
+		}
 		c.SetCookie(&http.Cookie{
 			Name:     "access_token",
 			Value:    token.GetValue(),

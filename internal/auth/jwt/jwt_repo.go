@@ -46,7 +46,8 @@ func (w *WithConfig) VerifyToken(tokenString string) (*jwt.Token, error) {
 	const op = "jwt.WithConfig.VerifyToken"
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, format.Error(op, fmt.Errorf("unexpected signing method: %v", token.Header["alg"]))
+			return nil, domain.ErrTokenInvalid
+			//return nil, format.Error(op, fmt.Errorf("unexpected signing method: %v", token.Header["alg"]))
 		}
 		return []byte(w.cfg.TokenKey), nil
 	})

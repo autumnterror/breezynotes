@@ -22,11 +22,10 @@ func handleCRUDResponse(ctx context.Context, op string, action func() (any, erro
 	}()
 	select {
 	case <-ctx.Done():
-		log.Error(op, "Context dead", ctx.Err())
 		return nil, status.Error(codes.DeadlineExceeded, "Context dead")
 	case r := <-res:
 		if r.err != nil {
-			log.Error(op, "", r.err)
+
 			switch {
 			case errors.Is(r.err, domain.ErrUnauthorized):
 				return nil, status.Error(codes.Unauthenticated, r.err.Error())
@@ -38,11 +37,15 @@ func handleCRUDResponse(ctx context.Context, op string, action func() (any, erro
 				return nil, status.Error(codes.FailedPrecondition, r.err.Error())
 			case errors.Is(r.err, domain.ErrTokenExpired):
 				return nil, status.Error(codes.ResourceExhausted, r.err.Error())
+			case errors.Is(r.err, domain.ErrTokenInvalid):
+				return nil, status.Error(codes.Unauthenticated, r.err.Error())
 			case errors.Is(r.err, domain.ErrTokenWrongType), errors.Is(r.err, domain.ErrTokenInvalid):
 				return nil, status.Error(codes.InvalidArgument, r.err.Error())
 			case errors.Is(r.err, service.ErrBadServiceCheck), errors.Is(r.err, domain.ErrWrongInput), errors.Is(r.err, domain.ErrPasswordIncorrect):
 				return nil, status.Error(codes.InvalidArgument, r.err.Error())
+
 			default:
+				log.Error(op, "", r.err)
 				return nil, status.Error(codes.Internal, "check logs")
 			}
 		}

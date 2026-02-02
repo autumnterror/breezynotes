@@ -19,11 +19,11 @@ func (s *AuthService) Auth(ctx context.Context, email, login, pw string) (string
 
 	repo, err := s.authRepo(ctx)
 	if err != nil {
-		return "", "", wrapServiceCheck(op, err)
+		return "", "", err
 	}
 	repoJwt, err := s.tokenRepo()
 	if err != nil {
-		return "", "", wrapServiceCheck(op, err)
+		return "", "", err
 	}
 
 	id, err := repo.Authentication(ctx, email, login, pw)
@@ -55,11 +55,11 @@ func (s *AuthService) Reg(ctx context.Context, email, login, pw string) (string,
 	}
 	repo, err := s.userRepo(ctx)
 	if err != nil {
-		return "", "", wrapServiceCheck(op, err)
+		return "", "", err
 	}
 	repoJwt, err := s.tokenRepo()
 	if err != nil {
-		return "", "", wrapServiceCheck(op, err)
+		return "", "", err
 	}
 
 	id := uid.New()
@@ -93,20 +93,16 @@ func (s *AuthService) ValidateTokens(ctx context.Context, at, rt string) (string
 
 	repoJwt, err := s.tokenRepo()
 	if err != nil {
-		return "", wrapServiceCheck(op, err)
+		return "", err
 	}
 
 	_, err = repoJwt.VerifyToken(at)
 	if err != nil {
-		if errors.Is(err, domain.ErrTokenExpired) {
-			rt, err := repoJwt.Refresh(rt)
-			if err != nil {
-				return "", err
-			}
-			return rt, nil
-		} else {
+		rt, err := repoJwt.Refresh(rt)
+		if err != nil {
 			return "", err
 		}
+		return rt, nil
 	}
 
 	return "", nil

@@ -20,10 +20,6 @@ func (d Driver) Authentication(ctx context.Context, email, login, pw string) (st
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
-	if pw == "" {
-		return "", format.Error(op, domain.ErrWrongInput)
-	}
-
 	var (
 		query string
 		arg   string

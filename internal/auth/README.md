@@ -1,21 +1,9 @@
-## Welcome to BreezyNotes. The place where fantasy becomes reality!
-#### Development by [Breezy Innovation RZN](https://about.breezynotes.ru) 
-![BREEZYNOTES](https://i.ibb.co/PvRh0KvX/favicon.png)
-### Technology stack:
-![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)
-![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
-![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white)
-### Frontend repository:
-[GitHub](https://github.com/DaniilaRyadinsky/breezy)
-
-# ДОКУМЕНТАЦИЯ
-
 # Сервис аутентификации и работы с пользователями
 
-Подключен к базе данных PostgreSQL
+Подключен к базе данных PostgreSQL 
 
 ## Основные методы для аутентификации
-Во всех методах при ошибке возвращается код и
+Во всех методах при ошибке возвращается код и 
 {
 "error": "текст ошибки"
 }
@@ -28,8 +16,8 @@
 ### /api/auth [post]
 Используется для аутентификации пользователя. В случае нахождения его в базе данных возвращает access refresh токены. Также возвращает Set-Cookie заголовки с этими токена с нужным временем действия
 
-#### Статусы
-- 400 (bad request) возникает при неправильном вводе данных.
+#### Статусы 
+- 400 (bad request) возникает при неправильном вводе данных. 
   - Неправильный json в body который нельзя считать "bad JSON"
   - Пустой email и login "email and login is empty"
   - Пустой пароль "pw is empty"
@@ -41,7 +29,7 @@
 ### /api/auth/reg [post]
 Используется для регистрации пользователя. В случае успеха возвращаются токены так же с Set-Cookie заголовками
 #### Статусы
-- 302 (found) пользователь уже существует
+- 302 (found) пользователь уже существует 
 - 400 (bad request) возникает при неправильном вводе данных.
   - Неправильный json в body который нельзя считать "bad JSON"
   - Не совпадении паролей  "password not same"

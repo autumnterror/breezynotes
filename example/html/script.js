@@ -3,19 +3,45 @@
 let API_BASE = "http://127.0.0.1:8080";
 
 async function refreshToken() {
-  const url = API_BASE + "/api/auth/token";
   try {
-    const res = await fetch(url, { method: "GET", credentials: "include" });
-    if (!res.ok) {
-      throw new Error(`Refresh failed with status ${res.status}`);
-    }
+    // Запрос на обновление токена не должен сам себя валидировать.
+    await apiRequest("/api/auth/token", { method: "GET", validate: false });
   } catch (err) {
     console.error("Token refresh error:", err);
     throw err;
   }
 }
 
-async function apiRequest(path, { method = "GET", body, retryOnAuth = true } = {}) {
+async function validateToken() {
+  try {
+    // Вызываем apiRequest, но отключаем для этого вызова проверку токена (validate: false),
+    // чтобы избежать бесконечной рекурсии.
+    await apiRequest("/api/auth/validate", { method: "GET", validate: false, retryOnAuth: false });
+  } catch (err) {
+    // Если токен невалиден, сервер вернет 410.
+    if (err.status === 410) {
+      console.warn("Сессия истекла (статус 410). Выполняется выход.");
+      logout();
+      // Прерываем выполнение дальнейшего кода, выбросив ошибку.
+      throw new Error("Сессия истекла. Пожалуйста, войдите снова.");
+    }
+    // В случае других ошибок (например, сетевых), просто пробрасываем их дальше.
+    throw err;
+  }
+}
+
+async function apiRequest(path, { method = "GET", body, retryOnAuth = true, validate = true } = {}) {
+  if (validate) {
+  try {
+    await validateToken();
+  } catch (err) {
+    // Если validateToken выбросил ошибку (например, из-за статуса 410),
+    // дальнейший запрос не будет выполнен.
+    console.error("Запрос остановлен из-за ошибки валидации токена.");
+    throw err; // Пробрасываем ошибку, чтобы остановить выполнение.
+  }
+}
+
   const url = API_BASE + path;
 
   const options = {
@@ -68,10 +94,13 @@ async function apiRequest(path, { method = "GET", body, retryOnAuth = true } = {
       method,
     });
 
-    throw new Error(
-      (errorPayload && errorPayload.error) ||
-        `Request failed with status ${res.status}`
-    );
+    const error = new Error(
+  (errorPayload && errorPayload.error) ||
+    `Request failed with status ${res.status}`
+);
+error.status = res.status; // Добавляем статус к объекту ошибки
+throw error;
+
   }
 
   return data;
@@ -448,7 +477,7 @@ function renderNotesList(notes, { append = false } = {}) {
 
     const fb = document.createElement("div");
     fb.className = "note-fb";
-    fb.textContent = note.first_block || "Без названия";
+    fb.textContent = (note.first_block || note.firstBlock) || "Без описания";
     content.appendChild(fb);
     if (note.tag) {
       const tagPill = document.createElement("div");
@@ -467,7 +496,7 @@ function renderNotesList(notes, { append = false } = {}) {
 
     const meta = document.createElement("div");
     meta.className = "note-meta";
-    const updated = formatDate(note.updated_at || note.created_at);
+    const updated = formatDate(note.updated_at || note.updatedAt)
     meta.textContent = updated ? `Обновлено: ${updated}` : "";
     content.appendChild(meta);
 
@@ -573,7 +602,7 @@ function renderNoteDetails(note) {
 
   const metaEl = document.createElement("div");
   metaEl.className = "note-detail-meta";
-  const updated = formatDate(note.updated_at || note.created_at);
+  const updated = formatDate(note.updated_at || note.updatedAt)
   metaEl.textContent = updated ? `Обновлено: ${updated}` : "";
   card.appendChild(metaEl);
 
@@ -780,7 +809,7 @@ function renderTrashList(notes) {
 
     const meta = document.createElement("div");
     meta.className = "note-meta";
-    const updated = formatDate(note.updated_at || note.created_at);
+    const updated = formatDate(note.updated_at || note.updatedAt)
     meta.textContent = updated ? `Обновлено: ${updated}` : "";
 
     const firstBlock = document.createElement("div");
@@ -989,7 +1018,7 @@ async function applyStyleToBlock(blockId, noteId, styleData) {
   if (!blockId) return;
   const payload = {
     block_id: blockId,
-    op: "apply_style",
+    op: "apply_style", note_id: noteId,
     note_id: noteId,
     data: {
       start: styleData.start ?? 0,
@@ -1262,21 +1291,21 @@ async function editTag(tag) {
     if (newTitle !== null && newTitle !== "" && newTitle !== tag.title) {
       await apiRequest("/api/tag/title", {
         method: "PUT",
-        body: { id: tag.id, title: newTitle },
+        body: { id_tag: tag.id, title: newTitle },
       });
     }
 
     if (newEmoji !== null && newEmoji !== "" && newEmoji !== tag.emoji) {
       await apiRequest("/api/tag/emoji", {
         method: "PUT",
-        body: { id: tag.id, emoji: newEmoji },
+        body: { id_tag: tag.id, emoji: newEmoji },
       });
     }
 
     if (newColor !== null && newColor !== "" && newColor !== tag.color) {
       await apiRequest("/api/tag/color", {
         method: "PUT",
-        body: { id: tag.id, color: newColor },
+        body: { id_tag: tag.id, color: newColor },
       });
     }
 
@@ -1436,7 +1465,10 @@ if (editPhotoBtn) {
 
 if (changePwBtn) {
   changePwBtn.addEventListener("click", async () => {
-    const pw1 = prompt("Новый пароль:");
+   const oldPassword = prompt("Старый пароль:");
+  if (!oldPassword) return;
+  const pw1 = prompt("Новый пароль:");
+
     if (!pw1) return;
     const pw2 = prompt("Повтори новый пароль:");
     if (!pw2) return;
@@ -1444,7 +1476,7 @@ if (changePwBtn) {
     try {
       await apiRequest("/api/user/pw", {
         method: "PATCH",
-        body: { new_password: pw1, new_password_2: pw2 },
+        body: { old_password: oldPassword, new_password: pw1, new_password_2: pw2 }
       });
       alert("Пароль обновлён (если бекэнд принял запрос).");
     } catch (err) {
@@ -1457,7 +1489,7 @@ if (changePwBtn) {
 
 async function verifyTokenAndGoToNotes() {
   try {
-    await apiRequest("/api/auth/token", { method: "GET" });
+    await apiRequest("/api/auth/token", { method: "GET", validate: false });;
     setAuthUI(true);
     showView("notes");
     setNavActive("notes");
@@ -1488,7 +1520,7 @@ if (loginForm) {
     try {
       await apiRequest("/api/auth", {
         method: "POST",
-        body: payload,
+        body: payload, validate: false
       });
 
       await verifyTokenAndGoToNotes();
@@ -1518,7 +1550,7 @@ if (registerForm) {
     try {
       await apiRequest("/api/auth/reg", {
         method: "POST",
-        body: payload,
+        body: payload, validate: false
       });
 
       await verifyTokenAndGoToNotes();
@@ -1534,7 +1566,7 @@ if (registerForm) {
 
 (async function autoCheckAuthOnLoad() {
   try {
-    await apiRequest("/api/auth/token", { method: "GET" });
+    await apiRequest("/api/auth/token", { method: "GET", validate: false });;
     setAuthUI(true);
     showView("notes");
     setNavActive("notes");
