@@ -25,7 +25,6 @@ func handleCRUDResponse(ctx context.Context, op string, action func() (any, erro
 		return nil, status.Error(codes.DeadlineExceeded, "Context dead")
 	case r := <-res:
 		if r.err != nil {
-
 			switch {
 			case errors.Is(r.err, domain.ErrUnauthorized):
 				return nil, status.Error(codes.Unauthenticated, r.err.Error())
@@ -49,7 +48,6 @@ func handleCRUDResponse(ctx context.Context, op string, action func() (any, erro
 				return nil, status.Error(codes.Internal, "check logs")
 			}
 		}
-		log.Green(op)
 		if r.res != nil {
 			return r.res, nil
 		}
