@@ -28,7 +28,7 @@ import (
 // @Failure 404 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
-// @Router /api/block [post]
+// @Router /api/block [get]
 func (e *Echo) GetBlock(c echo.Context) error {
 	const op = "gateway.net.GetBlock"
 
@@ -387,6 +387,7 @@ func (e *Echo) DeleteBlock(c echo.Context) error {
 	if code != http.StatusOK {
 		return c.JSON(code, errRes)
 	}
+
 	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: noteId}); err != nil {
 		st, ok := status.FromError(err)
 		if !ok {

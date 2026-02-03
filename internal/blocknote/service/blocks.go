@@ -28,7 +28,7 @@ func (s *BN) ChangeBlockOrder(ctx context.Context, idNote, idUser string, oldOrd
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		n, err := s.nts.Get(ctx, idNote)
 		if err != nil {
-			return nil, err
+			return nil, domain.ErrNotFound
 		}
 
 		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
@@ -55,7 +55,7 @@ func (s *BN) GetBlock(ctx context.Context, idBlock, idNote, idUser string) (*dom
 
 	n, err := s.nts.Get(ctx, idNote)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrNotFound
 	}
 	if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 		return nil, domain.ErrUnauthorized
@@ -90,12 +90,12 @@ func (s *BN) CreateBlock(ctx context.Context, _type, noteId string, data map[str
 	}
 
 	if stringEmpty(_type) {
-		return "", wrapServiceCheck(op, errors.New("_type is empty"))
+		return "", wrapServiceCheck(op, errors.New("type is empty"))
 	}
 
 	res, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		if n, err := s.nts.Get(ctx, noteId); err != nil {
-			return nil, err
+			return nil, domain.ErrNotFound
 		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 			return nil, domain.ErrUnauthorized
 		}
@@ -134,7 +134,7 @@ func (s *BN) DeleteBlock(ctx context.Context, noteId, blockId, idUser string) er
 
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		if n, err := s.nts.Get(ctx, noteId); err != nil {
-			return nil, err
+			return nil, domain.ErrNotFound
 		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 			return nil, domain.ErrUnauthorized
 		}
@@ -152,7 +152,7 @@ func (s *BN) OpBlock(ctx context.Context, id, opName string, data map[string]any
 	const op = "service.OpBlock"
 
 	if stringEmpty(opName) {
-		return wrapServiceCheck(op, errors.New("opName is empty"))
+		return wrapServiceCheck(op, errors.New("op is empty"))
 	}
 	if idValidation(id) != nil {
 		return wrapServiceCheck(op, errors.New("bad id"))
@@ -160,7 +160,7 @@ func (s *BN) OpBlock(ctx context.Context, id, opName string, data map[string]any
 
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		if n, err := s.nts.Get(ctx, idNote); err != nil {
-			return nil, err
+			return nil, domain.ErrNotFound
 		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 			return nil, domain.ErrUnauthorized
 		}
@@ -176,7 +176,7 @@ func (s *BN) OpBlock(ctx context.Context, id, opName string, data map[string]any
 func (s *BN) ChangeTypeBlock(ctx context.Context, idBlock, idNote, idUser, newType string) error {
 	const op = "service.ChangeTypeBlock"
 	if stringEmpty(newType) {
-		return wrapServiceCheck(op, errors.New("newType is empty"))
+		return wrapServiceCheck(op, errors.New("type is empty"))
 	}
 	if idValidation(idBlock) != nil {
 		return wrapServiceCheck(op, errors.New("bad idBlock"))
@@ -184,7 +184,7 @@ func (s *BN) ChangeTypeBlock(ctx context.Context, idBlock, idNote, idUser, newTy
 
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		if n, err := s.nts.Get(ctx, idNote); err != nil {
-			return nil, err
+			return nil, domain.ErrNotFound
 		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 			return nil, domain.ErrUnauthorized
 		}
