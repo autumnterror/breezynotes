@@ -48,7 +48,7 @@ func (s *BN) ToTrash(ctx context.Context, idNote, idUser string) error {
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		n, err := s.nts.Get(ctx, idNote)
 		if err != nil {
-			return nil, err
+			return nil, domain.ErrNotFound
 		}
 		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
 			return nil, domain.ErrUnauthorized
@@ -72,7 +72,7 @@ func (s *BN) FromTrash(ctx context.Context, idNote, idUser string) error {
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		n, err := s.nts.FindOnTrash(ctx, idNote)
 		if err != nil {
-			return nil, err
+			return nil, domain.ErrNotFound
 		}
 		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
 			return nil, domain.ErrUnauthorized
@@ -84,22 +84,22 @@ func (s *BN) FromTrash(ctx context.Context, idNote, idUser string) error {
 	return err
 }
 
-func (s *BN) FindOnTrash(ctx context.Context, idNote, idUser string) (*domain.Note, error) {
-	const op = "service.FindOnTrash"
-
-	if err := idValidation(idNote); err != nil {
-		return nil, wrapServiceCheck(op, err)
-	}
-	if err := idValidation(idUser); err != nil {
-		return nil, wrapServiceCheck(op, err)
-	}
-	n, err := s.nts.Get(ctx, idNote)
-	if err != nil {
-		return nil, err
-	}
-	if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
-		return nil, domain.ErrUnauthorized
-	}
-
-	return s.nts.FindOnTrash(ctx, idNote)
-}
+//func (s *BN) FindOnTrash(ctx context.Context, idNote, idUser string) (*domain.Note, error) {
+//	const op = "service.FindOnTrash"
+//
+//	if err := idValidation(idNote); err != nil {
+//		return nil, wrapServiceCheck(op, err)
+//	}
+//	if err := idValidation(idUser); err != nil {
+//		return nil, wrapServiceCheck(op, err)
+//	}
+//	n, err := s.nts.Get(ctx, idNote)
+//	if err != nil {
+//		return nil, domain.ErrNotFound
+//	}
+//	if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
+//		return nil, domain.ErrUnauthorized
+//	}
+//
+//	return s.nts.FindOnTrash(ctx, idNote)
+//}

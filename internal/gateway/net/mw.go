@@ -36,6 +36,10 @@ func (e *Echo) GetUserId() echo.MiddlewareFunc {
 				return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad access_token"})
 			}
 
+			if !uid.Validate(u.GetId()) {
+				return c.JSON(http.StatusUnauthorized, domain.Error{Error: "id is not in format"})
+			}
+
 			c.Set(domain.IdFromContext, u.GetId())
 
 			return next(c)

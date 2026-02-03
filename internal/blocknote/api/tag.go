@@ -4,7 +4,6 @@ import (
 	"context"
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
-	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -19,7 +18,7 @@ func (s *ServerAPI) CreateTag(ctx context.Context, t *brzrpc.Tag) (*emptypb.Empt
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 	return nil, nil
 }
@@ -34,7 +33,7 @@ func (s *ServerAPI) UpdateTagTitle(ctx context.Context, req *brzrpc.UpdateTagTit
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return nil, nil
@@ -50,7 +49,7 @@ func (s *ServerAPI) UpdateTagColor(ctx context.Context, req *brzrpc.UpdateTagCol
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 	return nil, nil
 }
@@ -65,7 +64,7 @@ func (s *ServerAPI) UpdateTagEmoji(ctx context.Context, req *brzrpc.UpdateTagEmo
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 	return nil, nil
 }
@@ -80,7 +79,7 @@ func (s *ServerAPI) DeleteTag(ctx context.Context, req *brzrpc.UserTagId) (*empt
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 	return nil, nil
 }
@@ -100,7 +99,7 @@ func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc.UserId) (*brz
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return res.(*brzrpc.Tags), nil
@@ -121,7 +120,7 @@ func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc.UserId) (*brz
 //	})
 //
 //	if err != nil {
-//		return nil, format.Error(op, err)
+//		return nil, err
 //	}
 //
 //	return res.(*brzrpc.Tag), nil

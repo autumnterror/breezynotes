@@ -48,7 +48,7 @@ func tagValidation(t *domain.Tag) error {
 		return err
 	}
 	if stringEmpty(t.Title) {
-		return errors.New("login is empty")
+		return errors.New("title is empty")
 	}
 	if stringEmpty(t.Color) {
 		return errors.New("email is empty")

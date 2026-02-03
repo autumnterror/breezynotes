@@ -4,7 +4,6 @@ import (
 	"context"
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
-	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -19,7 +18,7 @@ func (s *ServerAPI) ChangeTitleNote(ctx context.Context, req *brzrpc.ChangeTitle
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return nil, nil
@@ -35,7 +34,7 @@ func (s *ServerAPI) GetNote(ctx context.Context, req *brzrpc.UserNoteId) (*brzrp
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return domain.FromNoteWithBlocksDb(res.(*domain.NoteWithBlocks)), nil
@@ -52,7 +51,7 @@ func (s *ServerAPI) GetAllNotes(ctx context.Context, req *brzrpc.UserId) (*brzrp
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return domain.FromNotePartsDb(res.(*domain.NoteParts)), nil
@@ -69,7 +68,7 @@ func (s *ServerAPI) GetNotesByTag(ctx context.Context, req *brzrpc.UserTagId) (*
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return domain.FromNotePartsDb(res.(*domain.NoteParts)), nil
@@ -83,7 +82,7 @@ func (s *ServerAPI) Search(req *brzrpc.SearchRequest, stream brzrpc.BlockNoteSer
 
 	chn, err := s.service.Search(ctx, req.GetUserId(), req.GetPrompt())
 	if err != nil {
-		return format.Error(op, err)
+		return err
 	}
 
 	for n := range chn {
@@ -105,7 +104,7 @@ func (s *ServerAPI) CreateNote(ctx context.Context, req *brzrpc.Note) (*emptypb.
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return nil, nil
@@ -122,25 +121,53 @@ func (s *ServerAPI) AddTagToNote(ctx context.Context, req *brzrpc.NoteTagUserId)
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return nil, nil
 }
 
-func (s *ServerAPI) RemoveTagFromNote(ctx context.Context, req *brzrpc.NoteTagUserId) (*emptypb.Empty, error) {
+func (s *ServerAPI) RemoveTagFromNote(ctx context.Context, req *brzrpc.UserNoteId) (*emptypb.Empty, error) {
 	const op = "block.note.grpc.RemoveTagFromNote"
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
 	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
-		return nil, s.service.RemoveTagFromNote(ctx, req.GetNoteId(), req.GetTagId(), req.GetUserId())
+		return nil, s.service.RemoveTagFromNote(ctx, req.GetNoteId(), req.GetUserId())
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
+	return nil, nil
+}
+func (s *ServerAPI) ShareNote(ctx context.Context, req *brzrpc.ShareNoteRequest) (*emptypb.Empty, error) {
+	const op = "block.note.grpc.ShareNote"
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.service.ShareNote(ctx, req.GetNoteId(), req.GetUserId(), req.GetUserIdToShare(), req.GetRole())
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
+}
+func (s *ServerAPI) ChangeUserRole(ctx context.Context, req *brzrpc.ChangeUserRoleRequest) (*emptypb.Empty, error) {
+	const op = "block.note.grpc.ChangeUserRole"
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.service.ChangeUserRole(ctx, req.GetNoteId(), req.GetUserId(), req.GetUserIdToChange(), req.GetNewRole())
+	})
+
+	if err != nil {
+		return nil, err
+	}
 	return nil, nil
 }

@@ -5,7 +5,6 @@ import (
 
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
-	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -19,7 +18,7 @@ func (s *ServerAPI) GetAllBlocksInNote(ctx context.Context, req *brzrpc.Strings)
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return domain.FromBlocksDb(res.(*domain.Blocks)), nil
@@ -35,7 +34,7 @@ func (s *ServerAPI) ChangeBlockOrder(ctx context.Context, req *brzrpc.ChangeBloc
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 	return nil, nil
 }
@@ -53,7 +52,7 @@ func (s *ServerAPI) DeleteBlock(ctx context.Context, req *brzrpc.NoteBlockUserId
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return nil, nil
@@ -69,7 +68,7 @@ func (s *ServerAPI) GetBlock(ctx context.Context, req *brzrpc.NoteBlockUserId) (
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return res.(*brzrpc.Block), nil
@@ -88,7 +87,7 @@ func (s *ServerAPI) CreateBlock(ctx context.Context, req *brzrpc.CreateBlockRequ
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return &brzrpc.Id{Id: res.(string)}, nil
@@ -103,7 +102,7 @@ func (s *ServerAPI) OpBlock(ctx context.Context, req *brzrpc.OpBlockRequest) (*e
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return nil, nil
@@ -120,7 +119,7 @@ func (s *ServerAPI) ChangeTypeBlock(ctx context.Context, req *brzrpc.ChangeTypeB
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return nil, nil
@@ -164,7 +163,7 @@ func (s *ServerAPI) GetBlockAsFirst(ctx context.Context, req *brzrpc.BlockId) (*
 	//})
 	//
 	//if err != nil {
-	//	return nil, format.Error(op, err)
+	//	return nil, err
 	//}
 	//
 	//return &brzrpc.StringResponse{Value: res.(string)}, nil

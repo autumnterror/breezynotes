@@ -850,7 +850,7 @@ const file_notes_proto_rawDesc = "" +
 	"\x06userId\x18\x05 \x01(\tR\x06userId\"?\n" +
 	"\rSearchRequest\x12\x16\n" +
 	"\x06userId\x18\x01 \x01(\tR\x06userId\x12\x16\n" +
-	"\x06prompt\x18\x02 \x01(\tR\x06prompt2\xfe\f\n" +
+	"\x06prompt\x18\x02 \x01(\tR\x06prompt2\xfb\f\n" +
 	"\x10BlockNoteService\x12;\n" +
 	"\vDeleteBlock\x12\x14.brz.NoteBlockUserId\x1a\x16.google.protobuf.Empty\x12/\n" +
 	"\vCreateBlock\x12\x17.brz.CreateBlockRequest\x1a\a.brz.Id\x126\n" +
@@ -873,8 +873,8 @@ const file_notes_proto_rawDesc = "" +
 	"\rGetNotesByTag\x12\x0e.brz.UserTagId\x1a\x0e.brz.NoteParts\x120\n" +
 	"\x11GetNotesFromTrash\x12\v.brz.UserId\x1a\x0e.brz.NoteParts\x12-\n" +
 	"\x06Search\x12\x12.brz.SearchRequest\x1a\r.brz.NotePart0\x01\x12:\n" +
-	"\fAddTagToNote\x12\x12.brz.NoteTagUserId\x1a\x16.google.protobuf.Empty\x12?\n" +
-	"\x11RemoveTagFromNote\x12\x12.brz.NoteTagUserId\x1a\x16.google.protobuf.Empty\x12-\n" +
+	"\fAddTagToNote\x12\x12.brz.NoteTagUserId\x1a\x16.google.protobuf.Empty\x12<\n" +
+	"\x11RemoveTagFromNote\x12\x0f.brz.UserNoteId\x1a\x16.google.protobuf.Empty\x12-\n" +
 	"\tCreateTag\x12\b.brz.Tag\x1a\x16.google.protobuf.Empty\x12'\n" +
 	"\rGetTagsByUser\x12\v.brz.UserId\x1a\t.brz.Tags\x12D\n" +
 	"\x0eUpdateTagTitle\x12\x1a.brz.UpdateTagTitleRequest\x1a\x16.google.protobuf.Empty\x12D\n" +
@@ -951,7 +951,7 @@ var file_notes_proto_depIdxs = []int32{
 	14, // 18: brz.BlockNoteService.GetNotesFromTrash:input_type -> brz.UserId
 	11, // 19: brz.BlockNoteService.Search:input_type -> brz.SearchRequest
 	19, // 20: brz.BlockNoteService.AddTagToNote:input_type -> brz.NoteTagUserId
-	19, // 21: brz.BlockNoteService.RemoveTagFromNote:input_type -> brz.NoteTagUserId
+	15, // 21: brz.BlockNoteService.RemoveTagFromNote:input_type -> brz.UserNoteId
 	20, // 22: brz.BlockNoteService.CreateTag:input_type -> brz.Tag
 	14, // 23: brz.BlockNoteService.GetTagsByUser:input_type -> brz.UserId
 	4,  // 24: brz.BlockNoteService.UpdateTagTitle:input_type -> brz.UpdateTagTitleRequest

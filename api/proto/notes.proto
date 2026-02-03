@@ -111,7 +111,7 @@ service BlockNoteService {
   rpc Search(SearchRequest) returns (stream NotePart);
 
   rpc AddTagToNote(NoteTagUserId) returns (google.protobuf.Empty);
-  rpc RemoveTagFromNote(NoteTagUserId) returns (google.protobuf.Empty);
+  rpc RemoveTagFromNote(UserNoteId) returns (google.protobuf.Empty);
   rpc CreateTag(Tag) returns (google.protobuf.Empty);
   rpc GetTagsByUser(UserId) returns (Tags);
 //  rpc GetTag(UserTagId) returns (Tag);

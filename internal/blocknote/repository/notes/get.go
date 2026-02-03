@@ -97,7 +97,6 @@ func (a *API) GetNoteListByTag(ctx context.Context, idTag, idUser string) (*doma
 		Ntps: []*domain.NotePart{},
 	}
 
-	idx := 0
 	for cur.Next(ctx) {
 		var n domain.Note
 		if err = cur.Decode(&n); err != nil {
@@ -117,7 +116,6 @@ func (a *API) GetNoteListByTag(ctx context.Context, idTag, idUser string) (*doma
 			FirstBlock: fb,
 			UpdatedAt:  n.UpdatedAt,
 		})
-		idx++
 	}
 
 	return nts, nil

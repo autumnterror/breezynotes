@@ -78,7 +78,7 @@ type BlockNoteServiceClient interface {
 	GetNotesFromTrash(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*NoteParts, error)
 	Search(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[NotePart], error)
 	AddTagToNote(ctx context.Context, in *NoteTagUserId, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	RemoveTagFromNote(ctx context.Context, in *NoteTagUserId, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	RemoveTagFromNote(ctx context.Context, in *UserNoteId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CreateTag(ctx context.Context, in *Tag, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetTagsByUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Tags, error)
 	// rpc GetTag(UserTagId) returns (Tag);
@@ -298,7 +298,7 @@ func (c *blockNoteServiceClient) AddTagToNote(ctx context.Context, in *NoteTagUs
 	return out, nil
 }
 
-func (c *blockNoteServiceClient) RemoveTagFromNote(ctx context.Context, in *NoteTagUserId, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *blockNoteServiceClient) RemoveTagFromNote(ctx context.Context, in *UserNoteId, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, BlockNoteService_RemoveTagFromNote_FullMethodName, in, out, cOpts...)
@@ -425,7 +425,7 @@ type BlockNoteServiceServer interface {
 	GetNotesFromTrash(context.Context, *UserId) (*NoteParts, error)
 	Search(*SearchRequest, grpc.ServerStreamingServer[NotePart]) error
 	AddTagToNote(context.Context, *NoteTagUserId) (*emptypb.Empty, error)
-	RemoveTagFromNote(context.Context, *NoteTagUserId) (*emptypb.Empty, error)
+	RemoveTagFromNote(context.Context, *UserNoteId) (*emptypb.Empty, error)
 	CreateTag(context.Context, *Tag) (*emptypb.Empty, error)
 	GetTagsByUser(context.Context, *UserId) (*Tags, error)
 	// rpc GetTag(UserTagId) returns (Tag);
@@ -503,7 +503,7 @@ func (UnimplementedBlockNoteServiceServer) Search(*SearchRequest, grpc.ServerStr
 func (UnimplementedBlockNoteServiceServer) AddTagToNote(context.Context, *NoteTagUserId) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddTagToNote not implemented")
 }
-func (UnimplementedBlockNoteServiceServer) RemoveTagFromNote(context.Context, *NoteTagUserId) (*emptypb.Empty, error) {
+func (UnimplementedBlockNoteServiceServer) RemoveTagFromNote(context.Context, *UserNoteId) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveTagFromNote not implemented")
 }
 func (UnimplementedBlockNoteServiceServer) CreateTag(context.Context, *Tag) (*emptypb.Empty, error) {
@@ -890,7 +890,7 @@ func _BlockNoteService_AddTagToNote_Handler(srv interface{}, ctx context.Context
 }
 
 func _BlockNoteService_RemoveTagFromNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NoteTagUserId)
+	in := new(UserNoteId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -902,7 +902,7 @@ func _BlockNoteService_RemoveTagFromNote_Handler(srv interface{}, ctx context.Co
 		FullMethod: BlockNoteService_RemoveTagFromNote_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BlockNoteServiceServer).RemoveTagFromNote(ctx, req.(*NoteTagUserId))
+		return srv.(BlockNoteServiceServer).RemoveTagFromNote(ctx, req.(*UserNoteId))
 	}
 	return interceptor(ctx, in, info, handler)
 }

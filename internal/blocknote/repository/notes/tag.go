@@ -42,7 +42,7 @@ func (a *API) AddTagToNote(ctx context.Context, id string, tag *domain.Tag) erro
 }
 
 // RemoveTagFromNote can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix().
-func (a *API) RemoveTagFromNote(ctx context.Context, id string, tagId string) error {
+func (a *API) RemoveTagFromNote(ctx context.Context, idNote string) error {
 	const op = "notes.RemoveTagFromNote"
 
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
@@ -53,8 +53,7 @@ func (a *API) RemoveTagFromNote(ctx context.Context, id string, tagId string) er
 		UpdateOne(
 			ctx,
 			bson.M{
-				"_id":     id,
-				"tag._id": tagId,
+				"_id": idNote,
 			},
 			bson.M{
 				"$set": bson.M{

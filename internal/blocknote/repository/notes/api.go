@@ -30,7 +30,7 @@ type Repo interface {
 	GetNoteListByTag(ctx context.Context, idTag, idUser string) (*domain.NoteParts, error)
 
 	AddTagToNote(ctx context.Context, id string, tag *domain.Tag) error
-	RemoveTagFromNote(ctx context.Context, id string, tagId string) error
+	RemoveTagFromNote(ctx context.Context, idNote string) error
 
 	InsertBlock(ctx context.Context, id, blockId string, pos int) error
 	DeleteBlock(ctx context.Context, id, blockId string) error

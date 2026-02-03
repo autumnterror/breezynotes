@@ -87,11 +87,8 @@ func New(
 			notes.POST("/tag", e.AddTagToNote)
 			notes.DELETE("/tag", e.RmTagFromNote)
 
-			share := notes.Group("/share")
-			{
-				share.PATCH("", e.ShareNote)
-				share.PATCH("/change", e.ChangeUserRole)
-			}
+			notes.PATCH("/share", e.ShareNote)
+			notes.PATCH("/role", e.ChangeUserRole)
 		}
 
 		blocks := api.Group("/block")

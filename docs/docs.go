@@ -159,8 +159,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/domain.Error"
                         }
                     },
-                    "410": {
-                        "description": "Gone",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/domain.Error"
                         }
@@ -589,6 +589,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/domain.Error"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
@@ -642,6 +648,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/domain.Error"
                         }
@@ -701,14 +713,78 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/brzrpc.NotePart"
-                            }
+                            "$ref": "#/definitions/domain.NoteListPaginationResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/note/role": {
+            "patch": {
+                "description": "replace user to list of editors or readers",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "note"
+                ],
+                "summary": "share note",
+                "parameters": [
+                    {
+                        "description": "share info",
+                        "name": "Note",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.ChangeRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/domain.Error"
                         }
@@ -844,51 +920,14 @@ const docTemplate = `{
                             "$ref": "#/definitions/domain.Error"
                         }
                     },
-                    "502": {
-                        "description": "Bad Gateway",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/domain.Error"
                         }
                     },
-                    "504": {
-                        "description": "Gateway Timeout",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/note/share/change": {
-            "patch": {
-                "description": "replace user to list of editors or readers",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "note"
-                ],
-                "summary": "share note",
-                "parameters": [
-                    {
-                        "description": "share info",
-                        "name": "Note",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/domain.ChangeRoleRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/domain.Error"
                         }
@@ -948,6 +987,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/domain.Error"
                         }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
@@ -997,6 +1042,12 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/domain.Error"
                         }
@@ -1213,12 +1264,6 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/domain.Tag"
                             }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Error"
                         }
                     },
                     "401": {
@@ -1448,8 +1493,8 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/domain.Error"
                         }
@@ -1484,8 +1529,8 @@ const docTemplate = `{
                     "200": {
                         "description": "OK"
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/domain.Error"
                         }
@@ -1543,6 +1588,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/domain.Error"
                         }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
                     "502": {
                         "description": "Bad Gateway",
                         "schema": {
@@ -1592,6 +1643,12 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/domain.Error"
                         }

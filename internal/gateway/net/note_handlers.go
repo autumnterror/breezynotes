@@ -106,7 +106,7 @@ func (e *Echo) GetNote(c echo.Context) error {
 
 	id := c.QueryParam("id")
 	if id == "" {
-		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad param"})
 	}
 
 	idUser, errGetId := getIdUser(c)
@@ -179,6 +179,7 @@ func (e *Echo) GetNote(c echo.Context) error {
 // @Param end query int true  "end"
 // @Success 200 {object} domain.NoteListPaginationResponse
 // @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
 // @Router /api/note/all [get]
@@ -292,8 +293,9 @@ func (e *Echo) GetAllNotes(c echo.Context) error {
 // @Param id query string true  "Tag ID"
 // @Param start query int true  "start > 0"
 // @Param end query int true  "end"
-// @Success 200 {object} []brzrpc.NotePart
+// @Success 200 {object} domain.NoteListPaginationResponse
 // @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
 // @Router /api/note/by-tag [get]
@@ -304,7 +306,7 @@ func (e *Echo) GetNotesByTag(c echo.Context) error {
 
 	id := c.QueryParam("id")
 	if id == "" {
-		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad id"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad param"})
 	}
 
 	start, end, resPag := getPagination(c)
@@ -358,7 +360,7 @@ func (e *Echo) GetNotesByTag(c echo.Context) error {
 // @Param Note body domain.CreateNoteRequest true "Note info"
 // @Success 201 {object} brzrpc.Id
 // @Failure 400 {object} domain.Error
-// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
 // @Router /api/note [post]
@@ -422,6 +424,7 @@ func (e *Echo) CreateNote(c echo.Context) error {
 // @Success 200
 // @Failure 400 {object} domain.Error
 // @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
 // @Router /api/note/tag [post]
@@ -489,6 +492,7 @@ func (e *Echo) AddTagToNote(c echo.Context) error {
 // @Success 200
 // @Failure 400 {object} domain.Error
 // @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
 // @Router /api/note/tag [delete]
@@ -502,7 +506,7 @@ func (e *Echo) RmTagFromNote(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	var r domain.NoteTagId
+	var r domain.NoteId
 	if err := c.Bind(&r); err != nil {
 
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
@@ -511,9 +515,8 @@ func (e *Echo) RmTagFromNote(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	_, err := api.RemoveTagFromNote(ctx, &brzrpc.NoteTagUserId{
+	_, err := api.RemoveTagFromNote(ctx, &brzrpc.UserNoteId{
 		NoteId: r.NoteId,
-		TagId:  r.TagId,
 		UserId: idUser,
 	})
 
@@ -555,7 +558,8 @@ func (e *Echo) RmTagFromNote(c echo.Context) error {
 // @Param Note body domain.ShareNoteRequest true "share info"
 // @Success 200
 // @Failure 400 {object} domain.Error
-// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
 // @Router /api/note/share [patch]
@@ -607,10 +611,11 @@ func (e *Echo) ShareNote(c echo.Context) error {
 // @Param Note body domain.ChangeRoleRequest true "share info"
 // @Success 200
 // @Failure 400 {object} domain.Error
-// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
-// @Router /api/note/share/change [patch]
+// @Router /api/note/role [patch]
 func (e *Echo) ChangeUserRole(c echo.Context) error {
 	const op = "gateway.net.ShareNote"
 

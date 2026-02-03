@@ -19,6 +19,10 @@ type NoteTagId struct {
 	NoteId string `json:"note_id"`
 }
 
+type NoteId struct {
+	NoteId string `json:"note_id"`
+}
+
 type ShareNoteRequest struct {
 	NoteId string `json:"note_id"`
 	Login  string `json:"login"`

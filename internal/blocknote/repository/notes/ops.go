@@ -4,8 +4,6 @@ import (
 	"context"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 
-	"time"
-
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -17,8 +15,6 @@ func (a *API) Create(ctx context.Context, n *domain.Note) error {
 
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
-
-	n.CreatedAt, n.UpdatedAt = time.Now().UTC().Unix(), time.Now().UTC().Unix()
 
 	if _, err := a.noteAPI.InsertOne(ctx, n); err != nil {
 		return format.Error(op, err)

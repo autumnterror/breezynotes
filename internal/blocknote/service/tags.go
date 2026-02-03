@@ -67,7 +67,7 @@ func (s *BN) UpdateTitleTag(ctx context.Context, idTag, idUser, nTitle string) e
 		return wrapServiceCheck(op, err)
 	}
 	if stringEmpty(nTitle) {
-		return wrapServiceCheck(op, errors.New("nTitle is empty"))
+		return wrapServiceCheck(op, errors.New("title is empty"))
 	}
 
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
@@ -93,7 +93,7 @@ func (s *BN) UpdateColorTag(ctx context.Context, idTag, idUser, nColor string) e
 		return wrapServiceCheck(op, err)
 	}
 	if stringEmpty(nColor) {
-		return wrapServiceCheck(op, errors.New("nColor is empty"))
+		return wrapServiceCheck(op, errors.New("color is empty"))
 	}
 
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
@@ -119,7 +119,7 @@ func (s *BN) UpdateEmojiTag(ctx context.Context, idTag, idUser, nEmoji string) e
 		return wrapServiceCheck(op, err)
 	}
 	if stringEmpty(nEmoji) {
-		return wrapServiceCheck(op, errors.New("nEmoji is empty"))
+		return wrapServiceCheck(op, errors.New("emoji is empty"))
 	}
 
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {

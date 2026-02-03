@@ -163,7 +163,6 @@ func TestCrudGood(t *testing.T) {
 			log.Green("get after update updated ", n)
 		}
 
-		idTag := "newIdTag"
 		assert.NoError(t, a.AddTagToNote(context.Background(), id, &domain.Tag{
 			Id:     "newIdTag",
 			Title:  "newTag",
@@ -176,7 +175,7 @@ func TestCrudGood(t *testing.T) {
 			assert.Equal(t, "newIdTag", n.Tag.Id)
 		}
 
-		assert.NoError(t, a.RemoveTagFromNote(context.Background(), id, idTag))
+		assert.NoError(t, a.RemoveTagFromNote(context.Background(), id))
 		if n, err := a.Get(context.Background(), id); assert.NoError(t, err) {
 			log.Green("get after remove tag ", n)
 			assert.Nil(t, n.Tag)

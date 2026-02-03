@@ -26,7 +26,7 @@ func bNErrors(op string, err error) (int, domain.Error) {
 
 		switch st.Code() {
 		case codes.Unauthenticated:
-			return http.StatusUnauthorized, domain.Error{Error: "u dont have permission to this"}
+			return http.StatusUnauthorized, domain.Error{Error: "you dont have permission"}
 		case codes.NotFound:
 			return http.StatusNotFound, domain.Error{Error: "not found"}
 		case codes.FailedPrecondition:

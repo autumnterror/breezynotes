@@ -273,7 +273,7 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 
 	id := c.QueryParam("id")
 	if id == "" {
-		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad param"})
 	}
 
 	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
@@ -306,7 +306,6 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Success 200 {object} []domain.Tag
-// @Failure 400 {object} domain.Error
 // @Failure 401 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error

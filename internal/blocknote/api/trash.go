@@ -5,7 +5,6 @@ import (
 	"github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 
-	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -19,7 +18,7 @@ func (s *ServerAPI) CleanTrash(ctx context.Context, req *brzrpc.UserId) (*emptyp
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return nil, nil
@@ -35,7 +34,7 @@ func (s *ServerAPI) NoteToTrash(ctx context.Context, req *brzrpc.UserNoteId) (*e
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return nil, nil
@@ -51,7 +50,7 @@ func (s *ServerAPI) NoteFromTrash(ctx context.Context, req *brzrpc.UserNoteId) (
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return nil, nil
@@ -68,7 +67,7 @@ func (s *ServerAPI) FindNoteInTrash(ctx context.Context, req *brzrpc.UserNoteId)
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return domain.FromNoteDb(res.(*domain.Note)), nil
@@ -85,7 +84,7 @@ func (s *ServerAPI) GetNotesFromTrash(ctx context.Context, req *brzrpc.UserId) (
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return domain.FromNotePartsDb(res.(*domain.NoteParts)), nil
