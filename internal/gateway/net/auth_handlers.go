@@ -144,7 +144,7 @@ func (e *Echo) Reg(c echo.Context) error {
 // @Success 200 {object} domain.Message
 // @Success 201 {object} brzrpc.Token
 // @Failure 400 {object} domain.Error
-// @Failure 410 {object} domain.Error
+// @Failure 401 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
 // @Router /api/auth/token [get]

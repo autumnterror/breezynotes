@@ -4,7 +4,6 @@ import (
 	"context"
 
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/autumnterror/utils_go/pkg/utils/format"
 )
 
 func (s *ServerAPI) GetIdFromToken(ctx context.Context, t *brzrpc.Token) (*brzrpc.Id, error) {
@@ -17,7 +16,7 @@ func (s *ServerAPI) GetIdFromToken(ctx context.Context, t *brzrpc.Token) (*brzrp
 		return s.API.GetIdFromToken(ctx, t.GetValue())
 	})
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return &brzrpc.Id{Id: res.(string)}, nil
@@ -33,7 +32,7 @@ func (s *ServerAPI) GetIdFromToken(ctx context.Context, t *brzrpc.Token) (*brzrp
 //		return s.API.GenerateAccessToken(ctx, r.GetUserId())
 //	})
 //	if err != nil {
-//		return nil, format.Error(op, err)
+//		return nil, err
 //	}
 //
 //	return domain.TokenToRPC(res.(*domain.Token)), nil
@@ -49,7 +48,7 @@ func (s *ServerAPI) GetIdFromToken(ctx context.Context, t *brzrpc.Token) (*brzrp
 //		return s.API.GenerateRefreshToken(ctx, r.GetUserId())
 //	})
 //	if err != nil {
-//		return nil, format.Error(op, err)
+//		return nil, err
 //	}
 //
 //	return domain.TokenToRPC(res.(*domain.Token)), nil
@@ -65,7 +64,7 @@ func (s *ServerAPI) GetIdFromToken(ctx context.Context, t *brzrpc.Token) (*brzrp
 //		return s.API.GenerateTokens(ctx, r.GetUserId())
 //	})
 //	if err != nil {
-//		return nil, format.Error(op, err)
+//		return nil, err
 //	}
 //
 //	return domain.TokensToRPC(res.(*domain.Tokens)), nil
@@ -81,7 +80,7 @@ func (s *ServerAPI) GetIdFromToken(ctx context.Context, t *brzrpc.Token) (*brzrp
 //		return s.API.Refresh(ctx, r.GetValue())
 //	})
 //	if err != nil {
-//		return nil, format.Error(op, err)
+//		return nil, err
 //	}
 //
 //	return domain.TokenToRPC(res.(*domain.Token)), nil
@@ -97,7 +96,7 @@ func (s *ServerAPI) GetIdFromToken(ctx context.Context, t *brzrpc.Token) (*brzrp
 //		return nil, s.API.CheckToken(ctx, r.GetValue())
 //	})
 //	if err != nil {
-//		return nil, format.Error(op, err)
+//		return nil, err
 //	}
 //	return &emptypb.Empty{}, nil
 //}

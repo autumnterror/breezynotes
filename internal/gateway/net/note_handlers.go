@@ -62,10 +62,24 @@ func (e *Echo) ChangeTitleNote(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.Id}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -106,10 +120,24 @@ func (e *Echo) GetNote(c echo.Context) error {
 	if note, err := e.rdsAPI.API.GetNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: id}); err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
-			log.Error(op, "REDIS ERROR", err)
+			st, ok := status.FromError(err)
+			if !ok {
+				log.Error(op, "REDIS ERROR", err)
+			} else {
+				if st.Code() != codes.NotFound {
+					log.Error(op, "REDIS ERROR", err)
+				}
+			}
 		} else {
 			if st.Code() != codes.NotFound {
-				log.Error(op, "REDIS ERROR", err)
+				st, ok := status.FromError(err)
+				if !ok {
+					log.Error(op, "REDIS ERROR", err)
+				} else {
+					if st.Code() != codes.NotFound {
+						log.Error(op, "REDIS ERROR", err)
+					}
+				}
 			}
 		}
 	} else {
@@ -128,7 +156,14 @@ func (e *Echo) GetNote(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.SetNoteByUser(ctx, &brzrpc.NoteByUser{UserId: idUser, Note: note}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.JSON(http.StatusOK, note)
@@ -174,10 +209,24 @@ func (e *Echo) GetAllNotes(c echo.Context) error {
 	if nl, err := e.rdsAPI.API.GetNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
-			log.Error(op, "REDIS ERROR", err)
+			st, ok := status.FromError(err)
+			if !ok {
+				log.Error(op, "REDIS ERROR", err)
+			} else {
+				if st.Code() != codes.NotFound {
+					log.Error(op, "REDIS ERROR", err)
+				}
+			}
 		} else {
 			if st.Code() != codes.NotFound {
-				log.Error(op, "REDIS ERROR", err)
+				st, ok := status.FromError(err)
+				if !ok {
+					log.Error(op, "REDIS ERROR", err)
+				} else {
+					if st.Code() != codes.NotFound {
+						log.Error(op, "REDIS ERROR", err)
+					}
+				}
 			}
 		}
 	} else {
@@ -209,7 +258,14 @@ func (e *Echo) GetAllNotes(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.SetNoteListByUser(ctx, &brzrpc.NoteListByUser{UserId: idUser, Items: notes.GetItems()}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	items := notes.GetItems()
@@ -343,7 +399,14 @@ func (e *Echo) CreateNote(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.JSON(http.StatusCreated, brzrpc.Id{Id: id})
@@ -393,10 +456,24 @@ func (e *Echo) AddTagToNote(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.NoteId}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -446,10 +523,24 @@ func (e *Echo) RmTagFromNote(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.NoteId}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.NoContent(http.StatusOK)

@@ -5,7 +5,6 @@ import (
 
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/auth/domain"
-	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -19,7 +18,7 @@ func (s *ServerAPI) DeleteUser(ctx context.Context, r *brzrpc.UserId) (*emptypb.
 		return nil, s.API.Delete(ctx, r.GetUserId())
 	})
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return &emptypb.Empty{}, nil
@@ -35,7 +34,7 @@ func (s *ServerAPI) UpdateAbout(ctx context.Context, r *brzrpc.UpdateAboutReques
 		return nil, s.API.UpdateAbout(ctx, r.GetId(), r.GetNewAbout())
 	})
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 	return &emptypb.Empty{}, nil
 }
@@ -50,7 +49,7 @@ func (s *ServerAPI) UpdateEmail(ctx context.Context, r *brzrpc.UpdateEmailReques
 		return nil, s.API.UpdateEmail(ctx, r.GetId(), r.GetNewEmail())
 	})
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return &emptypb.Empty{}, nil
@@ -66,7 +65,7 @@ func (s *ServerAPI) UpdatePhoto(ctx context.Context, r *brzrpc.UpdatePhotoReques
 		return nil, s.API.UpdatePhoto(ctx, r.GetId(), r.GetNewPhoto())
 	})
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return &emptypb.Empty{}, nil
@@ -82,27 +81,27 @@ func (s *ServerAPI) ChangePasswd(ctx context.Context, r *brzrpc.ChangePasswordRe
 		return nil, s.API.UpdatePassword(ctx, r.GetId(), r.GetOldPassword(), r.GetNewPassword())
 	})
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return &emptypb.Empty{}, nil
 }
 
-func (s *ServerAPI) CreateUser(ctx context.Context, u *brzrpc.User) (*emptypb.Empty, error) {
-	const op = "grpc.CreateUser"
+// func (s *ServerAPI) CreateUser(ctx context.Context, u *brzrpc.User) (*emptypb.Empty, error) {
+// 	const op = "grpc.CreateUser"
 
-	ctx, done := context.WithTimeout(ctx, waitTime)
-	defer done()
+// 	ctx, done := context.WithTimeout(ctx, waitTime)
+// 	defer done()
 
-	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
-		return nil, s.API.Create(ctx, domain.UserFromRpc(u))
-	})
-	if err != nil {
-		return nil, format.Error(op, err)
-	}
+// 	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+// 		return nil, s.API.Create(ctx, domain.UserFromRpc(u))
+// 	})
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return &emptypb.Empty{}, nil
-}
+// 	return &emptypb.Empty{}, nil
+// }
 
 func (s *ServerAPI) GetUserDataFromToken(ctx context.Context, t *brzrpc.Token) (*brzrpc.User, error) {
 	const op = "grpc.GetUserDataFromToken"
@@ -114,7 +113,7 @@ func (s *ServerAPI) GetUserDataFromToken(ctx context.Context, t *brzrpc.Token) (
 		return s.API.GetUserDataFromToken(ctx, t.GetValue())
 	})
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return domain.UserToRpc(res.(*domain.User)), nil
@@ -129,7 +128,7 @@ func (s *ServerAPI) GetIdFromLogin(ctx context.Context, t *brzrpc.String) (*brzr
 		return s.API.GetIdFromLogin(ctx, t.GetValue())
 	})
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return &brzrpc.Id{Id: res.(string)}, nil

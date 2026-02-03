@@ -6,6 +6,8 @@ import (
 
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/gateway/domain"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/labstack/echo/v4"
@@ -109,10 +111,24 @@ func (e *Echo) CreateBlock(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.NoteId}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.JSON(http.StatusCreated, id)
@@ -168,10 +184,24 @@ func (e *Echo) OpBlock(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.NoteId}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -221,10 +251,24 @@ func (e *Echo) ChangeTypeBlock(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.NoteId}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -274,10 +318,24 @@ func (e *Echo) ChangeBlockOrder(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.NoteId}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -330,10 +388,24 @@ func (e *Echo) DeleteBlock(c echo.Context) error {
 		return c.JSON(code, errRes)
 	}
 	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: noteId}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.NoContent(http.StatusOK)

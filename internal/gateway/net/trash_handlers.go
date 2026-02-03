@@ -43,7 +43,14 @@ func (e *Echo) CleanTrash(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -87,15 +94,36 @@ func (e *Echo) NoteToTrash(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: id}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -139,14 +167,35 @@ func (e *Echo) NoteFromTrash(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.RmNotesFromTrashByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: id}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -179,10 +228,24 @@ func (e *Echo) GetNotesFromTrash(c echo.Context) error {
 	if ntsT, err := e.rdsAPI.API.GetNotesFromTrashByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
-			log.Error(op, "REDIS ERROR", err)
+			st, ok := status.FromError(err)
+			if !ok {
+				log.Error(op, "REDIS ERROR", err)
+			} else {
+				if st.Code() != codes.NotFound {
+					log.Error(op, "REDIS ERROR", err)
+				}
+			}
 		} else {
 			if st.Code() != codes.NotFound {
-				log.Error(op, "REDIS ERROR", err)
+				st, ok := status.FromError(err)
+				if !ok {
+					log.Error(op, "REDIS ERROR", err)
+				} else {
+					if st.Code() != codes.NotFound {
+						log.Error(op, "REDIS ERROR", err)
+					}
+				}
 			}
 		}
 	} else {
@@ -203,7 +266,14 @@ func (e *Echo) GetNotesFromTrash(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.SetNotesFromTrashByUser(ctx, &brzrpc.NoteListByUser{UserId: idUser, Items: nts.GetItems()}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	if nts.GetItems() == nil {

@@ -1,6 +1,7 @@
 package net
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/autumnterror/breezynotes/internal/gateway/domain"
@@ -11,7 +12,13 @@ import (
 
 func bNErrors(op string, err error) (int, domain.Error) {
 	if err != nil {
-		st, ok := status.FromError(err)
+		var newErr error
+		if unwErr := errors.Unwrap(err); unwErr != nil {
+			newErr = unwErr
+		} else {
+			newErr = err
+		}
+		st, ok := status.FromError(newErr)
 		if !ok {
 			log.Error(op, "bad status.FromError", err)
 			return http.StatusBadGateway, domain.Error{Error: "bad status. Check logs"}
@@ -41,11 +48,18 @@ func bNErrors(op string, err error) (int, domain.Error) {
 
 func authErrors(op string, err error) (int, domain.Error) {
 	if err != nil {
-		st, ok := status.FromError(err)
+		var newErr error
+		if unwErr := errors.Unwrap(err); unwErr != nil {
+			newErr = unwErr
+		} else {
+			newErr = err
+		}
+		st, ok := status.FromError(newErr)
 		if !ok {
 			log.Error(op, "bad status.FromError", err)
 			return http.StatusBadGateway, domain.Error{Error: "bad status. Check logs"}
 		}
+		log.Blue(err)
 
 		switch st.Code() {
 		case codes.Unauthenticated:

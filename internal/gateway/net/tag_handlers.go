@@ -60,7 +60,14 @@ func (e *Echo) CreateTag(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.JSON(http.StatusCreated, domain.Id{Id: newId})
@@ -111,7 +118,14 @@ func (e *Echo) UpdateTagTitle(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -162,7 +176,14 @@ func (e *Echo) UpdateTagColor(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -213,7 +234,14 @@ func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -258,7 +286,14 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -292,10 +327,24 @@ func (e *Echo) GetTagsByUser(c echo.Context) error {
 	if tgs, err := e.rdsAPI.API.GetTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
-			log.Error(op, "REDIS ERROR", err)
+			st, ok := status.FromError(err)
+			if !ok {
+				log.Error(op, "REDIS ERROR", err)
+			} else {
+				if st.Code() != codes.NotFound {
+					log.Error(op, "REDIS ERROR", err)
+				}
+			}
 		} else {
 			if st.Code() != codes.NotFound {
-				log.Error(op, "REDIS ERROR", err)
+				st, ok := status.FromError(err)
+				if !ok {
+					log.Error(op, "REDIS ERROR", err)
+				} else {
+					if st.Code() != codes.NotFound {
+						log.Error(op, "REDIS ERROR", err)
+					}
+				}
 			}
 		}
 	} else {
@@ -314,7 +363,14 @@ func (e *Echo) GetTagsByUser(c echo.Context) error {
 	}
 
 	if _, err := e.rdsAPI.API.SetTagsByUser(ctx, &brzrpc.TagsByUser{UserId: idUser, Items: tags.GetItems()}); err != nil {
-		log.Error(op, "REDIS ERROR", err)
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
 	}
 	if len(tags.Items) == 0 {
 		tags.Items = []*brzrpc.Tag{}

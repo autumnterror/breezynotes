@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"errors"
+
 	"github.com/autumnterror/breezynotes/internal/auth/domain"
 	"github.com/autumnterror/breezynotes/internal/auth/service"
 	"github.com/autumnterror/utils_go/pkg/log"

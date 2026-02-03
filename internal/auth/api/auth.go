@@ -5,7 +5,6 @@ import (
 	"time"
 
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/autumnterror/utils_go/pkg/utils/format"
 )
 
 func (s *ServerAPI) Auth(ctx context.Context, r *brzrpc.AuthRequest) (*brzrpc.Tokens, error) {
@@ -28,7 +27,7 @@ func (s *ServerAPI) Auth(ctx context.Context, r *brzrpc.AuthRequest) (*brzrpc.To
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return res.(*brzrpc.Tokens), nil
@@ -54,7 +53,7 @@ func (s *ServerAPI) Reg(ctx context.Context, r *brzrpc.AuthRequest) (*brzrpc.Tok
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 
 	return res.(*brzrpc.Tokens), nil
@@ -71,7 +70,7 @@ func (s *ServerAPI) ValidateTokens(ctx context.Context, r *brzrpc.Tokens) (*brzr
 	})
 
 	if err != nil {
-		return nil, format.Error(op, err)
+		return nil, err
 	}
 	if res.(string) != "" {
 		return &brzrpc.Token{
