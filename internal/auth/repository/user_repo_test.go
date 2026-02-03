@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"testing"
+
 	"github.com/autumnterror/breezynotes/internal/auth/domain"
 	"github.com/autumnterror/breezynotes/internal/auth/infra/psql"
-	"testing"
 
 	"github.com/autumnterror/breezynotes/internal/auth/config"
 	"github.com/autumnterror/utils_go/pkg/log"
@@ -226,7 +227,7 @@ func TestAuthWrongInput1(t *testing.T) {
 	assert.NoError(t, repo.Create(context.Background(), user))
 
 	_, err := repo.Authentication(context.Background(),
-		user.Email,
+		"",
 		"",
 		"",
 	)

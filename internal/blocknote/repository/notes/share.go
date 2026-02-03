@@ -3,10 +3,11 @@ package notes
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"go.mongodb.org/mongo-driver/v2/bson"
-	"time"
 )
 
 func (a *API) ShareNote(ctx context.Context, noteId, userId, role string) error {
@@ -19,11 +20,13 @@ func (a *API) ShareNote(ctx context.Context, noteId, userId, role string) error 
 	case domain.ReaderRole:
 		update = bson.M{
 			"$addToSet": bson.M{"readers": userId},
+			"$pull":     bson.M{"editors": userId},
 			"$set":      bson.M{"updated_at": time.Now().UTC().Unix()},
 		}
 	case domain.EditorRole:
 		update = bson.M{
 			"$addToSet": bson.M{"editors": userId},
+			"$pull":     bson.M{"readers": userId},
 			"$set":      bson.M{"updated_at": time.Now().UTC().Unix()},
 		}
 	default:

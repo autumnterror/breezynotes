@@ -4,6 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/auth"
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/blocknote"
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/redis"
@@ -13,9 +17,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
-	"net/http"
-	"strings"
-	"time"
 )
 
 type Echo struct {
@@ -88,7 +89,6 @@ func New(
 			notes.DELETE("/tag", e.RmTagFromNote)
 
 			notes.PATCH("/share", e.ShareNote)
-			notes.PATCH("/role", e.ChangeUserRole)
 		}
 
 		blocks := api.Group("/block")

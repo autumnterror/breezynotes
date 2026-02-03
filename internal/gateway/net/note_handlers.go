@@ -599,6 +599,17 @@ func (e *Echo) ShareNote(c echo.Context) error {
 		return c.JSON(code, errRes)
 	}
 
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.NoteId}); err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
+	}
+
 	return c.NoContent(http.StatusOK)
 }
 
@@ -616,41 +627,52 @@ func (e *Echo) ShareNote(c echo.Context) error {
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
 // @Router /api/note/role [patch]
-func (e *Echo) ChangeUserRole(c echo.Context) error {
-	const op = "gateway.net.ShareNote"
+// func (e *Echo) ChangeUserRole(c echo.Context) error {
+// 	const op = "gateway.net.ShareNote"
 
-	api := e.bnAPI.API
+// 	api := e.bnAPI.API
 
-	idUser, errGetId := getIdUser(c)
-	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
-	}
+// 	idUser, errGetId := getIdUser(c)
+// 	if errGetId != nil {
+// 		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
+// 	}
 
-	var r domain.ChangeRoleRequest
-	if err := c.Bind(&r); err != nil {
+// 	var r domain.ChangeRoleRequest
+// 	if err := c.Bind(&r); err != nil {
 
-		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
-	}
+// 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
+// 	}
 
-	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
-	defer done()
+// 	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
+// 	defer done()
 
-	id, err := e.authAPI.API.GetIdFromLogin(ctx, &brzrpc.String{Value: r.Login})
-	code, errRes := authErrors(op, err)
-	if code != http.StatusOK {
-		return c.JSON(code, errRes)
-	}
+// 	id, err := e.authAPI.API.GetIdFromLogin(ctx, &brzrpc.String{Value: r.Login})
+// 	code, errRes := authErrors(op, err)
+// 	if code != http.StatusOK {
+// 		return c.JSON(code, errRes)
+// 	}
 
-	_, err = api.ChangeUserRole(ctx, &brzrpc.ChangeUserRoleRequest{
-		UserIdToChange: id.Id,
-		NewRole:        r.NewRole,
-		NoteId:         r.NoteId,
-		UserId:         idUser,
-	})
-	code, errRes = bNErrors(op, err)
-	if code != http.StatusOK {
-		return c.JSON(code, errRes)
-	}
+// 	_, err = api.ChangeUserRole(ctx, &brzrpc.ChangeUserRoleRequest{
+// 		UserIdToChange: id.Id,
+// 		NewRole:        r.NewRole,
+// 		NoteId:         r.NoteId,
+// 		UserId:         idUser,
+// 	})
+// 	code, errRes = bNErrors(op, err)
+// 	if code != http.StatusOK {
+// 		return c.JSON(code, errRes)
+// 	}
 
-	return c.NoContent(http.StatusOK)
-}
+// 	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.NoteId}); err != nil {
+// 		st, ok := status.FromError(err)
+// 		if !ok {
+// 			log.Error(op, "REDIS ERROR", err)
+// 		} else {
+// 			if st.Code() != codes.NotFound {
+// 				log.Error(op, "REDIS ERROR", err)
+// 			}
+// 		}
+// 	}
+
+// 	return c.NoContent(http.StatusOK)
+// }

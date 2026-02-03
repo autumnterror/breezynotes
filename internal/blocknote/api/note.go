@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -157,17 +158,18 @@ func (s *ServerAPI) ShareNote(ctx context.Context, req *brzrpc.ShareNoteRequest)
 	}
 	return nil, nil
 }
-func (s *ServerAPI) ChangeUserRole(ctx context.Context, req *brzrpc.ChangeUserRoleRequest) (*emptypb.Empty, error) {
-	const op = "block.note.grpc.ChangeUserRole"
-	ctx, done := context.WithTimeout(ctx, waitTime)
-	defer done()
 
-	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
-		return nil, s.service.ChangeUserRole(ctx, req.GetNoteId(), req.GetUserId(), req.GetUserIdToChange(), req.GetNewRole())
-	})
+// func (s *ServerAPI) ChangeUserRole(ctx context.Context, req *brzrpc.ChangeUserRoleRequest) (*emptypb.Empty, error) {
+// 	const op = "block.note.grpc.ChangeUserRole"
+// 	ctx, done := context.WithTimeout(ctx, waitTime)
+// 	defer done()
 
-	if err != nil {
-		return nil, err
-	}
-	return nil, nil
-}
+// 	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+// 		return nil, s.service.ChangeUserRole(ctx, req.GetNoteId(), req.GetUserId(), req.GetUserIdToChange(), req.GetNewRole())
+// 	})
+
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return nil, nil
+// }

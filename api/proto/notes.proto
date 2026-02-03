@@ -120,7 +120,7 @@ service BlockNoteService {
   rpc DeleteTag(UserTagId) returns (google.protobuf.Empty);
 
   rpc ShareNote(ShareNoteRequest) returns (google.protobuf.Empty);
-  rpc ChangeUserRole(ChangeUserRoleRequest) returns (google.protobuf.Empty);
+  // rpc ChangeUserRole(ChangeUserRoleRequest) returns (google.protobuf.Empty);
 
   rpc Healthz(google.protobuf.Empty) returns (google.protobuf.Empty);
 }
