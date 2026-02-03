@@ -2,6 +2,7 @@ package blocks
 
 import (
 	"context"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/config"
 	"github.com/autumnterror/breezynotes/internal/blocknote/infra/mongo"
 	"github.com/autumnterror/breezynotes/pkg/block"
@@ -30,8 +31,8 @@ func TestOnText(t *testing.T) {
 
 	id, err = a.Create(context.Background(), "text", idnote, map[string]any{
 		"text": []any{
-			map[string]any{"style": "default", "text": "123456789"},
-			map[string]any{"style": "bald", "text": "01234"},
+			map[string]any{"style": "default", "string": "123456789"},
+			map[string]any{"style": "bald", "string": "01234"},
 		},
 	})
 	assert.NoError(t, err)

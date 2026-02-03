@@ -2,7 +2,8 @@ package api
 
 import (
 	"context"
-	"github.com/autumnterror/breezynotes/api/proto/gen"
+
+	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -56,22 +57,22 @@ func (s *ServerAPI) NoteFromTrash(ctx context.Context, req *brzrpc.UserNoteId) (
 	return nil, nil
 }
 
-func (s *ServerAPI) FindNoteInTrash(ctx context.Context, req *brzrpc.UserNoteId) (*brzrpc.Note, error) {
-	const op = "block.note.grpc.FindNoteInTrash"
+// func (s *ServerAPI) FindNoteInTrash(ctx context.Context, req *brzrpc.UserNoteId) (*brzrpc.Note, error) {
+// 	const op = "block.note.grpc.FindNoteInTrash"
 
-	ctx, done := context.WithTimeout(ctx, waitTime)
-	defer done()
+// 	ctx, done := context.WithTimeout(ctx, waitTime)
+// 	defer done()
 
-	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
-		return s.service.FindOnTrash(ctx, req.GetNoteId(), req.GetUserId())
-	})
+// 	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+// 		return s.service.FindOnTrash(ctx, req.GetNoteId(), req.GetUserId())
+// 	})
 
-	if err != nil {
-		return nil, err
-	}
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return domain.FromNoteDb(res.(*domain.Note)), nil
-}
+// 	return domain.FromNoteDb(res.(*domain.Note)), nil
+// }
 
 func (s *ServerAPI) GetNotesFromTrash(ctx context.Context, req *brzrpc.UserId) (*brzrpc.NoteParts, error) {
 	const op = "block.note.grpc.GetNotesFromTrash"

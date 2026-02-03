@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package brz;
 
+import "domain.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
-import "domain.proto";
 
 option go_package = "github.com/autumnterror/breezynotes;brzrpc";
 
@@ -78,11 +78,10 @@ message CreateBlockRequest {
   string userId = 5;
 }
 
-message SearchRequest{
+message SearchRequest {
   string userId = 1;
   string prompt = 2;
 }
-
 
 // ===== BlockNote Service =====
 service BlockNoteService {
@@ -90,18 +89,18 @@ service BlockNoteService {
   rpc CreateBlock(CreateBlockRequest) returns (Id);
   rpc OpBlock(OpBlockRequest) returns (google.protobuf.Empty);
   rpc GetBlock(NoteBlockUserId) returns (Block);
-//  rpc GetBlockAsFirst(BlockId) returns (StringResponse);
+  //  rpc GetBlockAsFirst(BlockId) returns (StringResponse);
   rpc ChangeBlockOrder(ChangeBlockOrderRequest) returns (google.protobuf.Empty);
   rpc ChangeTypeBlock(ChangeTypeBlockRequest) returns (google.protobuf.Empty);
 
   rpc CleanTrash(UserId) returns (google.protobuf.Empty);
   rpc NoteToTrash(UserNoteId) returns (google.protobuf.Empty);
   rpc NoteFromTrash(UserNoteId) returns (google.protobuf.Empty);
-  rpc FindNoteInTrash(UserNoteId) returns (Note);
+  // rpc FindNoteInTrash(UserNoteId) returns (Note);
 
   rpc GetNote(UserNoteId) returns (NoteWithBlocks);
   rpc CreateNote(Note) returns (google.protobuf.Empty);
-//  rpc UpdateNoteTitle(UpdateNoteTitleRequest) returns (google.protobuf.Empty);
+  //  rpc UpdateNoteTitle(UpdateNoteTitleRequest) returns (google.protobuf.Empty);
   rpc ChangeTitleNote(ChangeTitleNoteRequest) returns (google.protobuf.Empty);
 
   rpc GetAllBlocksInNote(Strings) returns (Blocks);
@@ -114,7 +113,7 @@ service BlockNoteService {
   rpc RemoveTagFromNote(UserNoteId) returns (google.protobuf.Empty);
   rpc CreateTag(Tag) returns (google.protobuf.Empty);
   rpc GetTagsByUser(UserId) returns (Tags);
-//  rpc GetTag(UserTagId) returns (Tag);
+  //  rpc GetTag(UserTagId) returns (Tag);
   rpc UpdateTagTitle(UpdateTagTitleRequest) returns (google.protobuf.Empty);
   rpc UpdateTagColor(UpdateTagColorRequest) returns (google.protobuf.Empty);
   rpc UpdateTagEmoji(UpdateTagEmojiRequest) returns (google.protobuf.Empty);

@@ -60,15 +60,15 @@ func TestWithBlocks(t *testing.T) {
 		}))
 		idBlock1, err := b.Create(context.Background(), "text", idNote, map[string]any{
 			"text": []any{
-				map[string]any{"style": "default", "text": "test1"},
-				map[string]any{"style": "bald", "text": " test2"},
+				map[string]any{"style": "default", "string": "test1"},
+				map[string]any{"style": "bald", "string": " test2"},
 			},
 		})
 		assert.NoError(t, err)
 		idBlock2, err := b.Create(context.Background(), "text", idNote, map[string]any{
 			"text": []any{
-				map[string]any{"style": "default", "text": "test3"},
-				map[string]any{"style": "bald", "text": " test4"},
+				map[string]any{"style": "default", "string": "test3"},
+				map[string]any{"style": "bald", "string": " test4"},
 			},
 		})
 
