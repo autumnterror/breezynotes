@@ -1,0 +1,4094 @@
+{
+	"info": {
+		"_postman_id": "37430ff5-4121-42cf-9303-aa960bc76c08",
+		"name": "breezynotes blocks",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49174408",
+		"_collection_link": "https://denisfashist-3840742.postman.co/workspace/Denis-Fashist's-Workspace~ebcd76a7-4a0c-4b7a-8be9-2fd1dabab400/collection/50178499-37430ff5-4121-42cf-9303-aa960bc76c08?action=share&source=collection_link&creator=49174408"
+	},
+	"item": [
+		{
+			"name": "text",
+			"item": [
+				{
+					"name": "reg (can be 302) Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@test.ru\",\n  \"login\": \"test\",\n  \"pw1\": \"Test123!\",\n  \"pw2\": \"Test123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/reg",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"reg"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "create note Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"idnote\", jsonData.id)",
+									"",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/note",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "createblock text",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"idblock\", jsonData.id)",
+									"",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"text\",\n  \"note_id\":\"{{idnote}}\",\n  \"pos\": 0, \n  \"data\": { \n    \"text\": [\n        {\n            \"style\": \"default\", \n            \"string\":\"123\"\n        }\n    ]\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "block op apply",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"apply_style\",\n  \"data\": {\n    \"start\": 0,\n    \"end\": 2,\n    \"style\": \"bold\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 4",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op insert",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"insert_text\",\n  \"data\": {\n    \"pos\": 3,\n    \"new_text\": \" package main import \\\"fmt\\\" func main() { fmt.Println(\\\"Hello\\\") }\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op delete",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"delete_range\",\n  \"data\": {\n    \"start\": 0,\n    \"end\": 3\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "change type todo",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"new_type\": \"todo\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/type",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"type"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "change type unordered",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"new_type\": \"unordered\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/type",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"type"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 4",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "change type ordered",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"new_type\": \"ordered\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/type",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"type"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 6",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "change type text",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"new_type\": \"text\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/type",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"type"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 8",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "change type code",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"new_type\": \"code\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/type",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"type"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 8",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "change type header_1",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"new_type\": \"header_1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/type",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"type"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 8",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "change type header_2",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"new_type\": \"header_2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/type",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"type"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 8",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "change type header_3",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"new_type\": \"header_3\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/type",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"type"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 7",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "change type quote",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"new_type\": \"quote\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/type",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"type"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 9",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "change type img",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"new_type\": \"img\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/type",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"type"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 9",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "change type link",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"new_type\": \"link\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/type",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"type"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 9",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "change type file",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"new_type\": \"file\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/type",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"type"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 8",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "note to trash Copy",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/trash/to?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"trash",
+								"to"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "clean trash Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/trash",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"trash"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "list",
+			"item": [
+				{
+					"name": "reg (can be 302) Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@test.ru\",\n  \"login\": \"test\",\n  \"pw1\": \"Test123!\",\n  \"pw2\": \"Test123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/reg",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"reg"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "create note Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"idnote\", jsonData.id)",
+									"",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/note",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "createblock",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"idblock\", jsonData.id)",
+									"",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"list\",\n  \"note_id\":\"{{idnote}}\",\n  \"pos\": 0, \n  \"data\": { \n    \"text_data\": {\n        \"text\": [\n            {\n                \"style\": \"default\", \n                \"string\":\"test test test test \"\n            }\n        ]\n    },\n    \"level\": 3,\n    \"type\": \"ordered\",\n    \"value\": 2\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "block op apply",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"apply_style\",\n  \"data\": {\n    \"start\": 0,\n    \"end\": 2,\n    \"style\": \"bold\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 4",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op insert",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"insert_text\",\n  \"data\": {\n    \"pos\": 3,\n    \"new_text\": \" this text on 3 pos \"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op delete",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"delete_range\",\n  \"data\": {\n    \"start\": 0,\n    \"end\": 3\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op change_value",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"change_value\",\n  \"data\": {\n    \"new_value\": 15\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 6",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op change_level",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"change_level\",\n  \"data\": {\n    \"new_level\": 15\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 5",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op change_type_data_todo Copy",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"change_type\",\n  \"data\": {\n    \"new_type\": \"todo\",\n    \"ordered_value\": 2\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 4",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op change_type_data_ord",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"change_type\",\n  \"data\": {\n    \"new_type\": \"ordered\",\n    \"ordered_value\": 2\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 4",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op change_type_data_unord",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"change_type\",\n  \"data\": {\n    \"new_type\": \"unordered\",\n    \"ordered_value\": 2\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "note to trash Copy",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/trash/to?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"trash",
+								"to"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "clean trash Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/trash",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"trash"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "header",
+			"item": [
+				{
+					"name": "reg (can be 302) Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@test.ru\",\n  \"login\": \"test\",\n  \"pw1\": \"Test123!\",\n  \"pw2\": \"Test123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/reg",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"reg"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "create note Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"idnote\", jsonData.id)",
+									"",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/note",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "createblock",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"idblock\", jsonData.id)",
+									"",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"header\",\n  \"note_id\":\"{{idnote}}\",\n  \"pos\": 0, \n  \"data\": { \n    \"text_data\": {\n        \"text\": [\n            {\n                \"style\": \"default\", \n                \"string\":\"test test test test \"\n            }\n        ]\n    },\n    \"level\": 2\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "block op apply",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"apply_style\",\n  \"data\": {\n    \"start\": 0,\n    \"end\": 2,\n    \"style\": \"bold\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 4",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op insert",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"insert_text\",\n  \"data\": {\n    \"pos\": 3,\n    \"new_text\": \" this text on 3 pos \"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op delete",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"delete_range\",\n  \"data\": {\n    \"start\": 0,\n    \"end\": 3\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op change_level",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"change_level\",\n  \"data\": {\n    \"new_level\": 15\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 5",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "note to trash Copy",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/trash/to?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"trash",
+								"to"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "clean trash Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/trash",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"trash"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "img",
+			"item": [
+				{
+					"name": "reg (can be 302) Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@test.ru\",\n  \"login\": \"test\",\n  \"pw1\": \"Test123!\",\n  \"pw2\": \"Test123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/reg",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"reg"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "create note Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"idnote\", jsonData.id)",
+									"",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/note",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "createblock",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"idblock\", jsonData.id)",
+									"",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"img\",\n  \"note_id\":\"{{idnote}}\",\n  \"pos\": 0, \n  \"data\": { \n    \"alt\": \"fnaf 8\",\n    \"src\": \"images/rocx.png\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "block op change_src",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"change_src\",\n  \"data\": {\n    \"new_src\": \"images/new.png\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 6",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op change_alt",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"change_alt\",\n  \"data\": {\n    \"new_alt\": \"new alt\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 5",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "note to trash Copy",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/trash/to?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"trash",
+								"to"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "clean trash Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/trash",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"trash"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "link",
+			"item": [
+				{
+					"name": "reg (can be 302) Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@test.ru\",\n  \"login\": \"test\",\n  \"pw1\": \"Test123!\",\n  \"pw2\": \"Test123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/reg",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"reg"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "create note Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"idnote\", jsonData.id)",
+									"",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/note",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "createblock",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"idblock\", jsonData.id)",
+									"",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"link\",\n  \"note_id\":\"{{idnote}}\",\n  \"pos\": 0, \n  \"data\": { \n    \"text\": \"subscribe to this channel\",\n    \"url\": \"youtu.be/sdfjhgjsdfhvjbkd\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "block op change_text",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"change_text\",\n  \"data\": {\n    \"new_text\": \"remove this channel\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 6",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op change_url",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"change_url\",\n  \"data\": {\n    \"new_url\": \"rutube.com/channel/ivangay\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 5",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "note to trash Copy",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/trash/to?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"trash",
+								"to"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "clean trash Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/trash",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"trash"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "quote",
+			"item": [
+				{
+					"name": "reg (can be 302) Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@test.ru\",\n  \"login\": \"test\",\n  \"pw1\": \"Test123!\",\n  \"pw2\": \"Test123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/reg",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"reg"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "create note Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"idnote\", jsonData.id)",
+									"",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/note",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "createblock",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"idblock\", jsonData.id)",
+									"",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"quote\",\n  \"note_id\":\"{{idnote}}\",\n  \"pos\": 0, \n  \"data\": { \n    \"text\": \"Если ночью все кошки серы, что же это за черный кот, что ведет со мной каждую ночь беседы?\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 6",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op change_text",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"change_text\",\n  \"data\": {\n    \"new_text\": \"А мне б только знахарь, из спины что то торчит, я то ли ангел, то ли бронтозавр!\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 7",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "note to trash Copy",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/trash/to?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"trash",
+								"to"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "clean trash Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/trash",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"trash"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "code",
+			"item": [
+				{
+					"name": "reg (can be 302) Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@test.ru\",\n  \"login\": \"test\",\n  \"pw1\": \"Test123!\",\n  \"pw2\": \"Test123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/reg",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"reg"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "create note Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"idnote\", jsonData.id)",
+									"",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/note",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "createblock",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"idblock\", jsonData.id)",
+									"",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"code\",\n  \"note_id\":\"{{idnote}}\",\n  \"pos\": 0, \n  \"data\": { \n    \"text\": \"console.log(1);\",\n    \"lang\": \"\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 6",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op change_text",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"change_text\",\n  \"data\": {\n    \"new_text\": \" package main import \\\"fmt\\\" func main() { fmt.Println(\\\"Hello\\\") }\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 7",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op analyse_lang",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"analyse_lang\",\n  \"data\": {\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 8",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "note to trash Copy",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/trash/to?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"trash",
+								"to"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "clean trash Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/trash",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"trash"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "file",
+			"item": [
+				{
+					"name": "reg (can be 302) Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@test.ru\",\n  \"login\": \"test\",\n  \"pw1\": \"Test123!\",\n  \"pw2\": \"Test123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/reg",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"reg"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "create note Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"idnote\", jsonData.id)",
+									"",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/note",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "createblock",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"idblock\", jsonData.id)",
+									"",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"file\",\n  \"note_id\":\"{{idnote}}\",\n  \"pos\": 0, \n  \"data\": { \n    \"src\": \"files/test.txt\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 6",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "block op change_src",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"block_id\": \"{{idblock}}\",\n  \"note_id\": \"{{idnote}}\",\n  \"op\": \"change_src\",\n  \"data\": {\n    \"new_src\": \"files/newtest.txt\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/block/op",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"block",
+								"op"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get note with blocks (3 res in text) Copy 7",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/note?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"note"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "note to trash Copy",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/trash/to?id={{idnote}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"trash",
+								"to"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{idnote}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "clean trash Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/trash",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"trash"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
