@@ -16,3 +16,4 @@ config-test.go
 /.idea
 pkg/pkgs/default/textblock/benchmark/text.txt
 build/breezynotes/bin/migrator
+.DS_Store
