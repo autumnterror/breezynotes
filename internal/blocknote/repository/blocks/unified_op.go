@@ -85,6 +85,10 @@ func (a *API) DeleteMany(ctx context.Context, ids []string) error {
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
+	if len(ids) == 0 {
+		return nil
+	}
+
 	filter := bson.D{{"_id", bson.D{{"$in", ids}}}}
 
 	_, err := a.db.DeleteMany(ctx, filter)
