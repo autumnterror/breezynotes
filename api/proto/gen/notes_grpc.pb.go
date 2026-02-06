@@ -20,34 +20,35 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	BlockNoteService_DeleteBlock_FullMethodName        = "/brz.BlockNoteService/DeleteBlock"
-	BlockNoteService_CreateBlock_FullMethodName        = "/brz.BlockNoteService/CreateBlock"
-	BlockNoteService_OpBlock_FullMethodName            = "/brz.BlockNoteService/OpBlock"
-	BlockNoteService_GetBlock_FullMethodName           = "/brz.BlockNoteService/GetBlock"
-	BlockNoteService_ChangeBlockOrder_FullMethodName   = "/brz.BlockNoteService/ChangeBlockOrder"
-	BlockNoteService_ChangeTypeBlock_FullMethodName    = "/brz.BlockNoteService/ChangeTypeBlock"
-	BlockNoteService_CleanTrash_FullMethodName         = "/brz.BlockNoteService/CleanTrash"
-	BlockNoteService_NoteToTrash_FullMethodName        = "/brz.BlockNoteService/NoteToTrash"
-	BlockNoteService_NotesToTrash_FullMethodName       = "/brz.BlockNoteService/NotesToTrash"
-	BlockNoteService_NoteFromTrash_FullMethodName      = "/brz.BlockNoteService/NoteFromTrash"
-	BlockNoteService_GetNote_FullMethodName            = "/brz.BlockNoteService/GetNote"
-	BlockNoteService_CreateNote_FullMethodName         = "/brz.BlockNoteService/CreateNote"
-	BlockNoteService_ChangeTitleNote_FullMethodName    = "/brz.BlockNoteService/ChangeTitleNote"
-	BlockNoteService_GetAllBlocksInNote_FullMethodName = "/brz.BlockNoteService/GetAllBlocksInNote"
-	BlockNoteService_GetAllNotes_FullMethodName        = "/brz.BlockNoteService/GetAllNotes"
-	BlockNoteService_GetNotesByTag_FullMethodName      = "/brz.BlockNoteService/GetNotesByTag"
-	BlockNoteService_GetNotesFromTrash_FullMethodName  = "/brz.BlockNoteService/GetNotesFromTrash"
-	BlockNoteService_Search_FullMethodName             = "/brz.BlockNoteService/Search"
-	BlockNoteService_AddTagToNote_FullMethodName       = "/brz.BlockNoteService/AddTagToNote"
-	BlockNoteService_RemoveTagFromNote_FullMethodName  = "/brz.BlockNoteService/RemoveTagFromNote"
-	BlockNoteService_CreateTag_FullMethodName          = "/brz.BlockNoteService/CreateTag"
-	BlockNoteService_GetTagsByUser_FullMethodName      = "/brz.BlockNoteService/GetTagsByUser"
-	BlockNoteService_UpdateTagTitle_FullMethodName     = "/brz.BlockNoteService/UpdateTagTitle"
-	BlockNoteService_UpdateTagColor_FullMethodName     = "/brz.BlockNoteService/UpdateTagColor"
-	BlockNoteService_UpdateTagEmoji_FullMethodName     = "/brz.BlockNoteService/UpdateTagEmoji"
-	BlockNoteService_DeleteTag_FullMethodName          = "/brz.BlockNoteService/DeleteTag"
-	BlockNoteService_ShareNote_FullMethodName          = "/brz.BlockNoteService/ShareNote"
-	BlockNoteService_Healthz_FullMethodName            = "/brz.BlockNoteService/Healthz"
+	BlockNoteService_GetRegisteredBlocks_FullMethodName = "/brz.BlockNoteService/GetRegisteredBlocks"
+	BlockNoteService_DeleteBlock_FullMethodName         = "/brz.BlockNoteService/DeleteBlock"
+	BlockNoteService_CreateBlock_FullMethodName         = "/brz.BlockNoteService/CreateBlock"
+	BlockNoteService_OpBlock_FullMethodName             = "/brz.BlockNoteService/OpBlock"
+	BlockNoteService_GetBlock_FullMethodName            = "/brz.BlockNoteService/GetBlock"
+	BlockNoteService_ChangeBlockOrder_FullMethodName    = "/brz.BlockNoteService/ChangeBlockOrder"
+	BlockNoteService_ChangeTypeBlock_FullMethodName     = "/brz.BlockNoteService/ChangeTypeBlock"
+	BlockNoteService_CleanTrash_FullMethodName          = "/brz.BlockNoteService/CleanTrash"
+	BlockNoteService_NoteToTrash_FullMethodName         = "/brz.BlockNoteService/NoteToTrash"
+	BlockNoteService_NotesToTrash_FullMethodName        = "/brz.BlockNoteService/NotesToTrash"
+	BlockNoteService_NoteFromTrash_FullMethodName       = "/brz.BlockNoteService/NoteFromTrash"
+	BlockNoteService_GetNote_FullMethodName             = "/brz.BlockNoteService/GetNote"
+	BlockNoteService_CreateNote_FullMethodName          = "/brz.BlockNoteService/CreateNote"
+	BlockNoteService_ChangeTitleNote_FullMethodName     = "/brz.BlockNoteService/ChangeTitleNote"
+	BlockNoteService_GetAllBlocksInNote_FullMethodName  = "/brz.BlockNoteService/GetAllBlocksInNote"
+	BlockNoteService_GetAllNotes_FullMethodName         = "/brz.BlockNoteService/GetAllNotes"
+	BlockNoteService_GetNotesByTag_FullMethodName       = "/brz.BlockNoteService/GetNotesByTag"
+	BlockNoteService_GetNotesFromTrash_FullMethodName   = "/brz.BlockNoteService/GetNotesFromTrash"
+	BlockNoteService_Search_FullMethodName              = "/brz.BlockNoteService/Search"
+	BlockNoteService_AddTagToNote_FullMethodName        = "/brz.BlockNoteService/AddTagToNote"
+	BlockNoteService_RemoveTagFromNote_FullMethodName   = "/brz.BlockNoteService/RemoveTagFromNote"
+	BlockNoteService_CreateTag_FullMethodName           = "/brz.BlockNoteService/CreateTag"
+	BlockNoteService_GetTagsByUser_FullMethodName       = "/brz.BlockNoteService/GetTagsByUser"
+	BlockNoteService_UpdateTagTitle_FullMethodName      = "/brz.BlockNoteService/UpdateTagTitle"
+	BlockNoteService_UpdateTagColor_FullMethodName      = "/brz.BlockNoteService/UpdateTagColor"
+	BlockNoteService_UpdateTagEmoji_FullMethodName      = "/brz.BlockNoteService/UpdateTagEmoji"
+	BlockNoteService_DeleteTag_FullMethodName           = "/brz.BlockNoteService/DeleteTag"
+	BlockNoteService_ShareNote_FullMethodName           = "/brz.BlockNoteService/ShareNote"
+	BlockNoteService_Healthz_FullMethodName             = "/brz.BlockNoteService/Healthz"
 )
 
 // BlockNoteServiceClient is the client API for BlockNoteService service.
@@ -56,6 +57,7 @@ const (
 //
 // ===== BlockNote Service =====
 type BlockNoteServiceClient interface {
+	GetRegisteredBlocks(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Strings, error)
 	DeleteBlock(ctx context.Context, in *NoteBlockUserId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CreateBlock(ctx context.Context, in *CreateBlockRequest, opts ...grpc.CallOption) (*Id, error)
 	OpBlock(ctx context.Context, in *OpBlockRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -95,6 +97,16 @@ type blockNoteServiceClient struct {
 
 func NewBlockNoteServiceClient(cc grpc.ClientConnInterface) BlockNoteServiceClient {
 	return &blockNoteServiceClient{cc}
+}
+
+func (c *blockNoteServiceClient) GetRegisteredBlocks(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Strings, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Strings)
+	err := c.cc.Invoke(ctx, BlockNoteService_GetRegisteredBlocks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *blockNoteServiceClient) DeleteBlock(ctx context.Context, in *NoteBlockUserId, opts ...grpc.CallOption) (*emptypb.Empty, error) {
@@ -392,6 +404,7 @@ func (c *blockNoteServiceClient) Healthz(ctx context.Context, in *emptypb.Empty,
 //
 // ===== BlockNote Service =====
 type BlockNoteServiceServer interface {
+	GetRegisteredBlocks(context.Context, *emptypb.Empty) (*Strings, error)
 	DeleteBlock(context.Context, *NoteBlockUserId) (*emptypb.Empty, error)
 	CreateBlock(context.Context, *CreateBlockRequest) (*Id, error)
 	OpBlock(context.Context, *OpBlockRequest) (*emptypb.Empty, error)
@@ -433,6 +446,9 @@ type BlockNoteServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedBlockNoteServiceServer struct{}
 
+func (UnimplementedBlockNoteServiceServer) GetRegisteredBlocks(context.Context, *emptypb.Empty) (*Strings, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRegisteredBlocks not implemented")
+}
 func (UnimplementedBlockNoteServiceServer) DeleteBlock(context.Context, *NoteBlockUserId) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteBlock not implemented")
 }
@@ -536,6 +552,24 @@ func RegisterBlockNoteServiceServer(s grpc.ServiceRegistrar, srv BlockNoteServic
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&BlockNoteService_ServiceDesc, srv)
+}
+
+func _BlockNoteService_GetRegisteredBlocks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlockNoteServiceServer).GetRegisteredBlocks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BlockNoteService_GetRegisteredBlocks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlockNoteServiceServer).GetRegisteredBlocks(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _BlockNoteService_DeleteBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -1042,6 +1076,10 @@ var BlockNoteService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "brz.BlockNoteService",
 	HandlerType: (*BlockNoteServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetRegisteredBlocks",
+			Handler:    _BlockNoteService_GetRegisteredBlocks_Handler,
+		},
 		{
 			MethodName: "DeleteBlock",
 			Handler:    _BlockNoteService_DeleteBlock_Handler,

@@ -15,6 +15,20 @@ import (
 	"github.com/autumnterror/utils_go/pkg/log"
 )
 
+// GetRegisteredTypes godoc
+// @Summary Get all registered types
+// @Description get
+// @Tags block
+// @Accept json
+// @Produce json
+// @Success 200 {object} []string
+// @Router /api/block/types [get]
+func (e *Echo) GetRegisteredTypes(c echo.Context) error {
+	types, _ := e.bnAPI.API.GetRegisteredBlocks(c.Request().Context(), nil)
+
+	return c.JSON(http.StatusOK, types.Values)
+}
+
 // GetBlock godoc
 // @Summary GetNote block
 // @Description Returns block by ID

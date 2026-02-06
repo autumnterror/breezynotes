@@ -3,15 +3,20 @@ package service
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
 	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/block"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"github.com/autumnterror/utils_go/pkg/utils/uid"
-	"time"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/alg"
 )
+
+func (s *BN) GetRegisteredBlocks(ctx context.Context) []string {
+	return block.GetRegisteredTypes()
+}
 
 func (s *BN) ChangeBlockOrder(ctx context.Context, idNote, idUser string, oldOrder, newOrder int) error {
 	const op = "service.ChangeBlockOrder"

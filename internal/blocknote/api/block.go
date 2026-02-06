@@ -8,6 +8,18 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+func (s *ServerAPI) GetRegisteredBlocks(ctx context.Context, req *emptypb.Empty) (*brzrpc.Strings, error) {
+	const op = "block.note.grpc.GetRegisteredBlocks"
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+	res, _ := handleCRUDResponse(ctx, op, func() (any, error) {
+		return s.service.GetRegisteredBlocks(ctx), nil
+	})
+
+	return &brzrpc.Strings{Values: res.([]string)}, nil
+}
+
 func (s *ServerAPI) GetAllBlocksInNote(ctx context.Context, req *brzrpc.Strings) (*brzrpc.Blocks, error) {
 	const op = "block.note.grpc.GetAllBlocksInNote"
 

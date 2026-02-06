@@ -529,6 +529,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/block/types": {
+            "get": {
+                "description": "get",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "block"
+                ],
+                "summary": "Get all registered types",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/healthz": {
             "get": {
                 "produces": [
@@ -2023,6 +2049,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "role": {
+                    "type": "string"
+                },
                 "tag": {
                     "$ref": "#/definitions/brzrpc.Tag"
                 },
@@ -2277,6 +2306,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
+                    "type": "string"
+                },
+                "role": {
                     "type": "string"
                 },
                 "tag": {

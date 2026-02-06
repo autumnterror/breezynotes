@@ -11,6 +11,8 @@ definitions:
         type: string
       id:
         type: string
+      role:
+        type: string
       tag:
         $ref: '#/definitions/brzrpc.Tag'
       title:
@@ -176,6 +178,8 @@ definitions:
       firstBlock:
         type: string
       id:
+        type: string
+      role:
         type: string
       tag:
         $ref: '#/definitions/domain.Tag'
@@ -660,6 +664,23 @@ paths:
           schema:
             $ref: '#/definitions/domain.Error'
       summary: Change block type
+      tags:
+      - block
+  /api/block/types:
+    get:
+      consumes:
+      - application/json
+      description: get
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Get all registered types
       tags:
       - block
   /api/healthz:

@@ -85,6 +85,8 @@ message SearchRequest {
 
 // ===== BlockNote Service =====
 service BlockNoteService {
+  rpc GetRegisteredBlocks(google.protobuf.Empty) returns (Strings);
+
   rpc DeleteBlock(NoteBlockUserId) returns (google.protobuf.Empty);
   rpc CreateBlock(CreateBlockRequest) returns (Id);
   rpc OpBlock(OpBlockRequest) returns (google.protobuf.Empty);

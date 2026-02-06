@@ -93,12 +93,14 @@ func New(
 
 		blocks := api.Group("/block")
 		{
+			blocks.GET("/types", e.GetRegisteredTypes)
 			blocks.GET("", e.GetBlock)
 			blocks.POST("", e.CreateBlock)
 			blocks.DELETE("", e.DeleteBlock)
 
 			blocks.POST("/op", e.OpBlock)
 			blocks.PATCH("/type", e.ChangeTypeBlock)
+
 			blocks.PATCH("/order", e.ChangeBlockOrder)
 		}
 
