@@ -3,8 +3,10 @@ package notes
 import (
 	"context"
 	"errors"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/utils_go/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/utils/alg"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -42,7 +44,16 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string) (*domain.NotePar
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	cur, err := a.noteAPI.Find(ctx, bson.M{"author": id}, options.Find().SetSort(bson.M{"updated_at": -1}))
+	cur, err := a.noteAPI.Find(ctx,
+		bson.M{
+			"$or": []bson.M{
+				{"author": id},
+				{"editors": id},
+				{"readers": id},
+			},
+		},
+		options.Find().SetSort(bson.M{"updated_at": -1}),
+	)
 
 	if err != nil {
 		return nil, format.Error(op, err)
@@ -67,12 +78,22 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string) (*domain.NotePar
 				log.Warn(op, "get as first", err)
 			}
 		}
+		var role string
+		switch {
+		case n.Author == id:
+			role = "author"
+		case alg.IsIn(id, n.Editors):
+			role = "editor"
+		case alg.IsIn(id, n.Readers):
+			role = "reader"
+		}
 		nts.Ntps = append(nts.Ntps, &domain.NotePart{
 			Id:         n.Id,
 			Title:      n.Title,
 			Tag:        n.Tag,
 			FirstBlock: fb,
 			UpdatedAt:  n.UpdatedAt,
+			Role:       role,
 		})
 
 	}
@@ -109,12 +130,22 @@ func (a *API) GetNoteListByTag(ctx context.Context, idTag, idUser string) (*doma
 				fb = nfb
 			}
 		}
+		var role string
+		switch {
+		case n.Author == idUser:
+			role = "author"
+		case alg.IsIn(idUser, n.Editors):
+			role = "editor"
+		case alg.IsIn(idUser, n.Readers):
+			role = "reader"
+		}
 		nts.Ntps = append(nts.Ntps, &domain.NotePart{
 			Id:         n.Id,
 			Title:      n.Title,
 			Tag:        n.Tag,
 			FirstBlock: fb,
 			UpdatedAt:  n.UpdatedAt,
+			Role:       role,
 		})
 	}
 

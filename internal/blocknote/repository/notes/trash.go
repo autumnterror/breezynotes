@@ -120,7 +120,7 @@ func (a *API) ToTrash(ctx context.Context, id string) error {
 
 // ToTrashAll get notes from a.Notes() Insert on a.trash() and remove from a.Notes()
 func (a *API) ToTrashAll(ctx context.Context, idUser string) error {
-	const op = "notes.ToTrash"
+	const op = "notes.ToTrashAll"
 
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
@@ -136,7 +136,7 @@ func (a *API) ToTrashAll(ctx context.Context, idUser string) error {
 		return nil
 	}
 
-	if _, err := a.trashAPI.InsertMany(ctx, n); err != nil {
+	if _, err := a.trashAPI.InsertMany(ctx, n.Nts); err != nil {
 		return format.Error(op, err)
 	}
 

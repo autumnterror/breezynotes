@@ -40,6 +40,7 @@ type NotePart struct {
 	Tag        *Tag
 	FirstBlock string
 	UpdatedAt  int64
+	Role       string
 }
 
 func ToNotePart(n *brzrpc.NotePart) *NotePart {
@@ -49,6 +50,7 @@ func ToNotePart(n *brzrpc.NotePart) *NotePart {
 		Tag:        ToTag(n.Tag),
 		FirstBlock: n.GetFirstBlock(),
 		UpdatedAt:  n.GetUpdatedAt(),
+		Role:       n.GetRole(),
 	}
 }
 func ToNotePartList(n []*brzrpc.NotePart) []*NotePart {

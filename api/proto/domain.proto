@@ -7,13 +7,23 @@ import "google/protobuf/struct.proto";
 
 option go_package = "github.com/autumnterror/breezynotes;brzrpc";
 
-message BoolResponse { bool ok = 1; }
-message StringResponse { string value = 1; }
-message String { string value = 1; }
-message Strings { repeated string values = 1; }
+message BoolResponse {
+  bool ok = 1;
+}
+message StringResponse {
+  string value = 1;
+}
+message String {
+  string value = 1;
+}
+message Strings {
+  repeated string values = 1;
+}
 
-
-message Token { string value = 1; int64 exp = 2;}
+message Token {
+  string value = 1;
+  int64 exp = 2;
+}
 message Tokens {
   string access_token = 1;
   string refresh_token = 2;
@@ -21,12 +31,22 @@ message Tokens {
   int64 expRefresh = 4;
 }
 
-message UserId { string userId = 1; }
-message NoteId { string noteId = 1; }
-message BlockId { string blockId = 1; }
-message TagId { string tagId = 1; }
+message UserId {
+  string userId = 1;
+}
+message NoteId {
+  string noteId = 1;
+}
+message BlockId {
+  string blockId = 1;
+}
+message TagId {
+  string tagId = 1;
+}
 
-message Id { string id = 1; }
+message Id {
+  string id = 1;
+}
 message UserNoteId {
   string userId = 1;
   string noteId = 2;
@@ -81,7 +101,6 @@ message Block {
   google.protobuf.Struct data = 7;
 }
 
-
 message Note {
   string id = 1;
   string title = 2;
@@ -112,17 +131,24 @@ message NotePart {
   Tag tag = 3;
   string first_block = 4;
   int64 updated_at = 5;
+  string role = 6;
 }
 
 // ===== Collections =====
-message Blocks { repeated Block items = 1; }
-message Notes { repeated Note items = 1; }
-message NoteParts { repeated NotePart items = 1; }
-message Tags { repeated Tag items = 1; }
+message Blocks {
+  repeated Block items = 1;
+}
+message Notes {
+  repeated Note items = 1;
+}
+message NoteParts {
+  repeated NotePart items = 1;
+}
+message Tags {
+  repeated Tag items = 1;
+}
 
 //
-
-
 
 //enum Color {
 //  COLOR_UNSPECIFIED = 0;

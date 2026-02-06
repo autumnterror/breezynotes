@@ -2,6 +2,7 @@ package notes
 
 import (
 	"context"
+
 	"github.com/autumnterror/utils_go/pkg/utils/uid"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
@@ -205,6 +206,14 @@ func TestCrudGood(t *testing.T) {
 			assert.Contains(t, n.Readers, "newreader")
 			assert.Contains(t, n.Editors, "neweditor")
 		}
+
+		n, err := a.GetNoteListByUser(context.Background(), "neweditor")
+		assert.NoError(t, err)
+		assert.Len(t, n.Ntps, 1)
+
+		n, err = a.GetNoteListByUser(context.Background(), "newreader")
+		assert.NoError(t, err)
+		assert.Len(t, n.Ntps, 1)
 
 		assert.NoError(t, a.ChangeUserRole(context.Background(), id, "neweditor", domain.ReaderRole))
 		assert.NoError(t, a.ChangeUserRole(context.Background(), id, "newreader", domain.EditorRole))
