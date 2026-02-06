@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 	"errors"
-	"github.com/autumnterror/breezynotes/pkg/block"
-	domainblocks "github.com/autumnterror/breezynotes/pkg/domain"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
+	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/block"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"github.com/autumnterror/utils_go/pkg/utils/uid"
 	"time"

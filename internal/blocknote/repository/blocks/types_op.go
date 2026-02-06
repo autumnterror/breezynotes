@@ -3,7 +3,7 @@ package blocks
 import (
 	"context"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
-	"github.com/autumnterror/breezynotes/pkg/block"
+	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/block"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 )
 

@@ -16,5 +16,5 @@ config-test.go
 /.idea
 .idea/workspace.xml
 /.idea
-pkg/pkgs/default/textblock/benchmark/text.txt
+internal/blocknote/pkg/pkgs/default/textblock/benchmark/text.txt
 build/breezynotes/bin/migrator
