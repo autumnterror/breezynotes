@@ -27,9 +27,8 @@ func TestOp(t *testing.T) {
 	t.Parallel()
 	t.Run("change_text", func(t *testing.T) {
 		block := testBlock()
-		startBlock, _ := domain.FromUnifiedToCodeBlock(block)
 		data, err := d.Op(ctx, block, "change_text", map[string]any{
-			"new_text": "print('hello world')",
+			"new_text": "<html></html>",
 		})
 		if assert.NoError(t, err) {
 			s, err := structpb.NewStruct(data)
@@ -38,8 +37,8 @@ func TestOp(t *testing.T) {
 				cb, err := domain.FromUnifiedToCodeBlock(block)
 				log.Blue(format.Struct(cb))
 				if assert.NoError(t, err) {
-					assert.Equal(t, "print('hello world')", cb.Data.Text)
-					assert.Equal(t, startBlock.Data.Lang, cb.Data.Lang)
+					assert.Equal(t, "<html></html>", cb.Data.Text)
+					assert.Equal(t, "HTML", cb.Data.Lang)
 					log.Println("change text", format.Struct(cb))
 				}
 			}

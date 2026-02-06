@@ -181,6 +181,68 @@ const docTemplate = `{
             }
         },
         "/api/block": {
+            "get": {
+                "description": "Returns block by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "block"
+                ],
+                "summary": "GetNote block",
+                "parameters": [
+                    {
+                        "description": "Note ID and Block ID",
+                        "name": "GetBlockRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.BlockNoteId"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Block"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Creates block of given type",
                 "consumes": [
@@ -743,67 +805,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/note/role": {
-            "patch": {
-                "description": "replace user to list of editors or readers",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "note"
-                ],
-                "summary": "share note",
-                "parameters": [
-                    {
-                        "description": "share info",
-                        "name": "Note",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/domain.ChangeRoleRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Error"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Error"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Error"
-                        }
-                    },
-                    "504": {
-                        "description": "Gateway Timeout",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Error"
-                        }
-                    }
-                }
-            }
-        },
         "/api/note/search": {
             "get": {
                 "description": "if not fiend title get all block as first and fiend sames",
@@ -1087,7 +1088,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.ChangeTitleNoteRequest"
+                            "$ref": "#/definitions/domain.ChangeTitleNoteRequest"
                         }
                     }
                 ],
@@ -2005,20 +2006,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "brzrpc.ChangeTitleNoteRequest": {
-            "type": "object",
-            "properties": {
-                "idNote": {
-                    "type": "string"
-                },
-                "idUser": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
         "brzrpc.Id": {
             "type": "object",
             "properties": {
@@ -2178,16 +2165,13 @@ const docTemplate = `{
                 }
             }
         },
-        "domain.ChangeRoleRequest": {
+        "domain.ChangeTitleNoteRequest": {
             "type": "object",
             "properties": {
-                "login": {
-                    "type": "string"
-                },
-                "new_role": {
-                    "type": "string"
-                },
                 "note_id": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 }
             }
@@ -2521,8 +2505,6 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "Full API for BreezyNotes.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
-	//LeftDelim:        "{{",
-	//RightDelim:       "}}",
 }
 
 func init() {

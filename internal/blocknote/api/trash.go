@@ -40,6 +40,23 @@ func (s *ServerAPI) NoteToTrash(ctx context.Context, req *brzrpc.UserNoteId) (*e
 
 	return nil, nil
 }
+
+func (s *ServerAPI) NotesToTrash(ctx context.Context, req *brzrpc.UserId) (*emptypb.Empty, error) {
+	const op = "block.note.grpc.ToTrash"
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.service.ToTrashAll(ctx, req.GetUserId())
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
 func (s *ServerAPI) NoteFromTrash(ctx context.Context, req *brzrpc.UserNoteId) (*emptypb.Empty, error) {
 	const op = "block.note.grpc.FromTrash"
 

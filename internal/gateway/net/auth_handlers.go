@@ -52,7 +52,9 @@ func (e *Echo) Auth(c echo.Context) error {
 		Value:    tokens.GetAccessToken(),
 		Path:     "/",
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		//SameSite: http.SameSiteLaxMode,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 		Expires:  time.Unix(tokens.ExpAccess, 0).UTC(),
 	})
 	c.SetCookie(&http.Cookie{
@@ -60,7 +62,9 @@ func (e *Echo) Auth(c echo.Context) error {
 		Value:    tokens.GetRefreshToken(),
 		Path:     "/",
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		//SameSite: http.SameSiteLaxMode,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 		Expires:  time.Unix(tokens.ExpRefresh, 0).UTC(),
 	})
 
@@ -116,7 +120,9 @@ func (e *Echo) Reg(c echo.Context) error {
 		Value:    tokens.GetAccessToken(),
 		Path:     "/",
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		//SameSite: http.SameSiteLaxMode,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 		Expires:  time.Unix(tokens.ExpAccess, 0).UTC(),
 	})
 	c.SetCookie(&http.Cookie{
@@ -124,7 +130,9 @@ func (e *Echo) Reg(c echo.Context) error {
 		Value:    tokens.GetRefreshToken(),
 		Path:     "/",
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		//SameSite: http.SameSiteLaxMode,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 		Expires:  time.Unix(tokens.ExpRefresh, 0).UTC(),
 	})
 
@@ -184,7 +192,9 @@ func (e *Echo) ValidateToken(c echo.Context) error {
 			Value:    token.GetValue(),
 			Path:     "/",
 			HttpOnly: true,
-			SameSite: http.SameSiteLaxMode,
+			//SameSite: http.SameSiteLaxMode,
+			Secure:   true,
+			SameSite: http.SameSiteNoneMode,
 			Expires:  time.Unix(token.GetExp(), 0).UTC(),
 		})
 		return c.JSON(http.StatusCreated, brzrpc.Token{

@@ -3,6 +3,11 @@ package service
 import (
 	"context"
 	"errors"
+	"github.com/autumnterror/breezynotes/pkg/block"
+	domainblocks "github.com/autumnterror/breezynotes/pkg/domain"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/uid"
+	"time"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/alg"
@@ -76,49 +81,6 @@ func (s *BN) GetBlocks(ctx context.Context, ids []string) (*domain.Blocks, error
 	return s.blk.GetMany(ctx, ids)
 }
 
-func (s *BN) CreateBlock(ctx context.Context, _type, noteId string, data map[string]any, pos int, idUser string) (string, error) {
-	const op = "service.CreateBlock"
-
-	if pos < 0 {
-		return "", wrapServiceCheck(op, errors.New("pos < 0"))
-	}
-	if idValidation(noteId) != nil {
-		return "", wrapServiceCheck(op, errors.New("bad note id"))
-	}
-	if idValidation(idUser) != nil {
-		return "", wrapServiceCheck(op, errors.New("bad user id"))
-	}
-
-	if stringEmpty(_type) {
-		return "", wrapServiceCheck(op, errors.New("type is empty"))
-	}
-
-	res, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
-		if n, err := s.nts.Get(ctx, noteId); err != nil {
-			return nil, domain.ErrNotFound
-		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
-			return nil, domain.ErrUnauthorized
-		}
-
-		blockId, err := s.blk.Create(ctx, _type, noteId, data)
-		if err != nil {
-			return nil, err
-		}
-
-		return blockId, s.nts.InsertBlock(ctx, noteId, blockId, pos)
-	})
-
-	if err != nil {
-		return "", err
-	}
-
-	if resS, ok := res.(string); !ok {
-		return "", wrapServiceCheck(op, errors.New("response type mismatch"))
-	} else {
-		return resS, nil
-	}
-}
-
 func (s *BN) DeleteBlock(ctx context.Context, noteId, blockId, idUser string) error {
 	const op = "service.AddTagToNote"
 
@@ -148,6 +110,63 @@ func (s *BN) DeleteBlock(ctx context.Context, noteId, blockId, idUser string) er
 	return err
 }
 
+func (s *BN) CreateBlock(ctx context.Context, _type, noteId string, data map[string]any, pos int, idUser string) (string, error) {
+	const op = "service.CreateBlock"
+
+	if pos < 0 {
+		return "", wrapServiceCheck(op, errors.New("pos < 0"))
+	}
+	if idValidation(noteId) != nil {
+		return "", wrapServiceCheck(op, errors.New("bad note id"))
+	}
+	if idValidation(idUser) != nil {
+		return "", wrapServiceCheck(op, errors.New("bad user id"))
+	}
+
+	if stringEmpty(_type) {
+		return "", wrapServiceCheck(op, errors.New("type is empty"))
+	}
+
+	res, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
+		if n, err := s.nts.Get(ctx, noteId); err != nil {
+			return nil, domain.ErrNotFound
+		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
+			return nil, domain.ErrUnauthorized
+		}
+
+		if block.Registry[_type] == nil {
+			return "", domain.ErrTypeNotDefined
+		}
+		b, err := block.Registry[_type].Create(ctx, data)
+		if err != nil {
+			return "", format.Error(op, err)
+		}
+
+		b.Id = uid.New()
+		b.NoteId = noteId
+		b.Type = _type
+		b.CreatedAt = time.Now().UTC().Unix()
+		b.UpdatedAt = time.Now().UTC().Unix()
+		b.IsUsed = false
+
+		if err := s.blk.CreateBlock(ctx, domain.ToBlockDb(b)); err != nil {
+			return "", format.Error(op, err)
+		}
+
+		return b.Id, s.nts.InsertBlock(ctx, noteId, b.Id, pos)
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	if resS, ok := res.(string); !ok {
+		return "", wrapServiceCheck(op, errors.New("response type mismatch"))
+	} else {
+		return resS, nil
+	}
+}
+
 func (s *BN) OpBlock(ctx context.Context, id, opName string, data map[string]any, idNote, idUser string) error {
 	const op = "service.OpBlock"
 
@@ -164,10 +183,42 @@ func (s *BN) OpBlock(ctx context.Context, id, opName string, data map[string]any
 		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 			return nil, domain.ErrUnauthorized
 		}
+
+		b, err := s.blk.Get(ctx, id)
+		if err != nil {
+			return nil, domain.ErrNotFound
+		}
+
+		if err := s.blk.UpdateUsed(ctx, id, true); err != nil {
+			if errors.Is(err, domain.ErrNotFound) {
+				return nil, domain.ErrAlreadyUsed
+			}
+			return nil, err
+		}
+
+		if block.Registry[b.Type] == nil {
+			return nil, domain.ErrTypeNotDefined
+		}
+
+		newData, err := block.Registry[b.Type].Op(ctx, domain.FromBlockDb(b), opName, data)
+		if err != nil {
+			return nil, err
+		}
+
+		if newData == nil {
+			return nil, nil
+		}
+
+		if err := s.blk.UpdateData(ctx, id, newData); err != nil {
+			return nil, err
+		}
+		if err := s.blk.UpdateUsed(ctx, id, false); err != nil {
+			return nil, err
+		}
 		if err := s.nts.UpdateUpdatedAt(ctx, idNote); err != nil {
 			return nil, err
 		}
-		return nil, s.blk.OpBlock(ctx, id, opName, data)
+		return nil, nil
 	})
 
 	return err
@@ -188,7 +239,36 @@ func (s *BN) ChangeTypeBlock(ctx context.Context, idBlock, idNote, idUser, newTy
 		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 			return nil, domain.ErrUnauthorized
 		}
-		return nil, s.blk.ChangeType(ctx, idBlock, newType)
+
+		b, err := s.blk.Get(ctx, idBlock)
+		if err != nil {
+			return nil, format.Error(op, err)
+		}
+
+		if block.Registry[b.Type] == nil {
+			return nil, domain.ErrTypeNotDefined
+		}
+
+		nb := domain.FromBlockDb(b)
+		err = block.Registry[b.Type].ChangeType(ctx, nb, newType)
+		if err != nil {
+			return nil, format.Error(op, err)
+		}
+
+		switch newType {
+		case domainblocks.ListBlockToDoType, domainblocks.ListBlockOrderedType, domainblocks.ListBlockUnorderedType:
+			newType = "list"
+		case domainblocks.HeaderBlockType1, domainblocks.HeaderBlockType2, domainblocks.HeaderBlockType3:
+			newType = "header"
+		}
+
+		if err := s.blk.UpdateType(ctx, idBlock, newType); err != nil {
+			return nil, format.Error(op, err)
+		}
+		if err := s.blk.UpdateData(ctx, idBlock, nb.Data.AsMap()); err != nil {
+			return nil, format.Error(op, err)
+		}
+		return nil, nil
 	})
 
 	return err

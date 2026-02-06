@@ -23,7 +23,7 @@ import (
 // @Tags note
 // @Accept json
 // @Produce json
-// @Param ChangeTitleNoteRequest body brzrpc.ChangeTitleNoteRequest true "Note ID and new title"
+// @Param ChangeTitleNoteRequest body domain.ChangeTitleNoteRequest true "Note ID and new title"
 // @Success 200
 // @Failure 400 {object} domain.Error
 // @Failure 401 {object} domain.Error

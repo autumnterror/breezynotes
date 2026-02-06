@@ -9,8 +9,8 @@ import (
 )
 
 // UpdateData can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix()
-func (a *API) updateData(ctx context.Context, id string, data map[string]any) error {
-	const op = "blocks.updateData"
+func (a *API) UpdateData(ctx context.Context, id string, data map[string]any) error {
+	const op = "blocks.UpdateData"
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
@@ -38,9 +38,9 @@ func (a *API) updateData(ctx context.Context, id string, data map[string]any) er
 	return nil
 }
 
-// updateType can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix()
-func (a *API) updateType(ctx context.Context, id string, _type string) error {
-	const op = "blocks.updateData"
+// UpdateType can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix()
+func (a *API) UpdateType(ctx context.Context, id string, _type string) error {
+	const op = "blocks.UpdateData"
 
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
@@ -69,9 +69,9 @@ func (a *API) updateType(ctx context.Context, id string, _type string) error {
 	return nil
 }
 
-// updateUsed can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix()
-func (a *API) updateUsed(ctx context.Context, id string, isUsedNew bool) error {
-	const op = "blocks.updateData"
+// UpdateUsed can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix()
+func (a *API) UpdateUsed(ctx context.Context, id string, isUsedNew bool) error {
+	const op = "blocks.UpdateData"
 
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
@@ -112,9 +112,9 @@ func (a *API) updateUsed(ctx context.Context, id string, isUsedNew bool) error {
 	return nil
 }
 
-// createBlock with CreatedAt and UpdatedAt time.Now().UTC().Unix(). Don't create id
-func (a *API) createBlock(ctx context.Context, b *domain.Block) error {
-	const op = "notes.Create"
+// CreateBlock with CreatedAt and UpdatedAt time.Now().UTC().Unix(). Don't create id
+func (a *API) CreateBlock(ctx context.Context, b *domain.Block) error {
+	const op = "blocks.Create"
 
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()

@@ -3,7 +3,7 @@ package domain
 import brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 
 type ChangeTitleNoteRequest struct {
-	Id    string `json:"id"`
+	Id    string `json:"note_id"`
 	Title string `json:"title"`
 }
 type CreateNoteRequest struct {

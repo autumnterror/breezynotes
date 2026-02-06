@@ -77,6 +77,17 @@ func (e *Echo) DeleteUser(c echo.Context) error {
 		return c.JSON(code, errRes)
 	}
 
+	_, err = e.bnAPI.API.NotesToTrash(ctx, &brzrpc.UserId{UserId: idUser})
+	code, errRes = authErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
+	_, err = e.bnAPI.API.CleanTrash(ctx, &brzrpc.UserId{UserId: idUser})
+	code, errRes = authErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
+
 	return c.NoContent(http.StatusOK)
 }
 

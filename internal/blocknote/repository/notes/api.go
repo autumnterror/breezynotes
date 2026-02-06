@@ -20,7 +20,9 @@ func NewApi(noteAPI repository.NoSqlRepo, trashAPI repository.NoSqlRepo, blockAP
 type Repo interface {
 	CleanTrash(ctx context.Context, uid string) error
 	GetNotesFromTrash(ctx context.Context, uid string) (*domain.NoteParts, error)
+	GetNotesFullFromTrash(ctx context.Context, uid string) (*domain.Notes, error)
 	ToTrash(ctx context.Context, id string) error
+	ToTrashAll(ctx context.Context, idUser string) error
 	FromTrash(ctx context.Context, id string) error
 	FindOnTrash(ctx context.Context, id string) (*domain.Note, error)
 

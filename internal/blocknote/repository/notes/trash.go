@@ -67,6 +67,35 @@ func (a *API) GetNotesFromTrash(ctx context.Context, uid string) (*domain.NotePa
 	return pts, nil
 }
 
+// GetNotesFullFromTrash by author id
+func (a *API) GetNotesFullFromTrash(ctx context.Context, uid string) (*domain.Notes, error) {
+	const op = "notes.CleanTrash"
+
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	defer done()
+
+	cur, err := a.trashAPI.Find(ctx, bson.M{"author": uid})
+	if err != nil {
+		return nil, format.Error(op, err)
+	}
+	defer cur.Close(ctx)
+
+	pts := &domain.Notes{
+		Nts: make([]*domain.Note, 0),
+	}
+
+	for cur.Next(ctx) {
+		var n domain.Note
+		if err = cur.Decode(&n); err != nil {
+			return pts, format.Error(op, err)
+		}
+
+		pts.Nts = append(pts.Nts, &n)
+	}
+
+	return pts, nil
+}
+
 // ToTrash get note from a.Notes() Insert on a.trash() and remove from a.Notes()
 func (a *API) ToTrash(ctx context.Context, id string) error {
 	const op = "notes.ToTrash"
@@ -84,6 +113,39 @@ func (a *API) ToTrash(ctx context.Context, id string) error {
 	}
 
 	if err := a.delete(ctx, n.Id); err != nil {
+		return format.Error(op, err)
+	}
+	return nil
+}
+
+// ToTrashAll get notes from a.Notes() Insert on a.trash() and remove from a.Notes()
+func (a *API) ToTrashAll(ctx context.Context, idUser string) error {
+	const op = "notes.ToTrash"
+
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	defer done()
+
+	n, err := a.getAllByUser(ctx, idUser)
+	if err != nil {
+		return format.Error(op, err)
+	}
+	if n == nil {
+		return nil
+	}
+	if len(n.Nts) == 0 {
+		return nil
+	}
+
+	if _, err := a.trashAPI.InsertMany(ctx, n); err != nil {
+		return format.Error(op, err)
+	}
+
+	var ids []string
+	for _, n := range n.Nts {
+		ids = append(ids, n.Id)
+	}
+
+	if err := a.deleteMany(ctx, ids); err != nil {
 		return format.Error(op, err)
 	}
 	return nil

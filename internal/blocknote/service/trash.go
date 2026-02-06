@@ -13,11 +13,30 @@ func (s *BN) CleanTrash(ctx context.Context, uid string) error {
 		return wrapServiceCheck(op, err)
 	}
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
+		nts, err := s.nts.GetNotesFullFromTrash(ctx, uid)
+		if err != nil {
+			return nil, err
+		}
+
+		if nts.Nts == nil {
+			return nil, nil
+		}
+
+		var ids []string
+		for _, n := range nts.Nts {
+			ids = append(ids, n.Blocks...)
+		}
+
+		if err := s.blk.DeleteMany(ctx, ids); err != nil {
+			return nil, err
+		}
+
 		return nil, s.nts.CleanTrash(ctx, uid)
 	})
 
 	return err
 }
+
 func (s *BN) GetNotesFromTrash(ctx context.Context, uid string) (*domain.NoteParts, error) {
 	const op = "service.GetNotesFromTrash"
 	if err := idValidation(uid); err != nil {
@@ -55,6 +74,18 @@ func (s *BN) ToTrash(ctx context.Context, idNote, idUser string) error {
 		}
 
 		return nil, s.nts.ToTrash(ctx, idNote)
+	})
+
+	return err
+}
+
+func (s *BN) ToTrashAll(ctx context.Context, idUser string) error {
+	const op = "service.ToTrash"
+	if err := idValidation(idUser); err != nil {
+		return wrapServiceCheck(op, err)
+	}
+	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
+		return nil, s.nts.ToTrashAll(ctx, idUser)
 	})
 
 	return err

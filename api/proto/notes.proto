@@ -95,6 +95,7 @@ service BlockNoteService {
 
   rpc CleanTrash(UserId) returns (google.protobuf.Empty);
   rpc NoteToTrash(UserNoteId) returns (google.protobuf.Empty);
+  rpc NotesToTrash(UserId) returns (google.protobuf.Empty);
   rpc NoteFromTrash(UserNoteId) returns (google.protobuf.Empty);
   // rpc FindNoteInTrash(UserNoteId) returns (Note);
 

@@ -52,3 +52,20 @@ func (a *API) delete(ctx context.Context, id string) error {
 
 	return nil
 }
+
+// deleteMany note WARNING DO NOT USE FROM gRPC NEED PASS TRASH CYCLE
+func (a *API) deleteMany(ctx context.Context, ids []string) error {
+	const op = "notes.delete"
+
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	defer done()
+
+	filter := bson.D{{"_id", bson.D{{"$in", ids}}}}
+	_, err := a.noteAPI.DeleteMany(ctx, filter)
+
+	if err != nil {
+		return format.Error(op, err)
+	}
+
+	return nil
+}

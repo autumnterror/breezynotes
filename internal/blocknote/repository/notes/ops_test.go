@@ -2,6 +2,7 @@ package notes
 
 import (
 	"context"
+	"github.com/autumnterror/utils_go/pkg/utils/uid"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/breezynotes/internal/blocknote/repository/blocks"
@@ -58,21 +59,37 @@ func TestWithBlocks(t *testing.T) {
 			},
 			Blocks: []string{},
 		}))
-		idBlock1, err := b.Create(context.Background(), "text", idNote, map[string]any{
-			"text": []any{
-				map[string]any{"style": "default", "string": "test1"},
-				map[string]any{"style": "bald", "string": " test2"},
-			},
-		})
-		assert.NoError(t, err)
-		idBlock2, err := b.Create(context.Background(), "text", idNote, map[string]any{
-			"text": []any{
-				map[string]any{"style": "default", "string": "test3"},
-				map[string]any{"style": "bald", "string": " test4"},
-			},
-		})
+		idBlock1 := uid.New()
+		idBlock2 := uid.New()
 
-		assert.NoError(t, err)
+		assert.NoError(t, b.CreateBlock(context.Background(), &domain.Block{
+			Id:        idBlock1,
+			Type:      "text",
+			NoteId:    idNote,
+			CreatedAt: 0,
+			UpdatedAt: 0,
+			IsUsed:    false,
+			Data: map[string]any{
+				"text": []any{
+					map[string]any{"style": "default", "string": "test1"},
+					map[string]any{"style": "bald", "string": " test2"},
+				},
+			},
+		}))
+		assert.NoError(t, b.CreateBlock(context.Background(), &domain.Block{
+			Id:        idBlock2,
+			Type:      "text",
+			NoteId:    idNote,
+			CreatedAt: 0,
+			UpdatedAt: 0,
+			IsUsed:    false,
+			Data: map[string]any{
+				"text": []any{
+					map[string]any{"style": "default", "string": "test3"},
+					map[string]any{"style": "bald", "string": " test4"},
+				},
+			},
+		}))
 
 		assert.NoError(t, a.InsertBlock(context.Background(), idNote, idBlock1, 0))
 		assert.NoError(t, a.InsertBlock(context.Background(), idNote, idBlock2, 0))

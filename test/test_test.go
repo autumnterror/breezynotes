@@ -1,5 +1,11 @@
 package test
 
+import (
+	"github.com/autumnterror/utils_go/pkg/log"
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
+
 // func Move(s []string, old, new int) []string {
 // 	if old < 0 || old >= len(s) {
 // 		return nil
@@ -129,3 +135,14 @@ package test
 // 		fmt.Printf("cost=%d -> %v\n", cost, elapsed)
 // 	}
 // }
+
+func TestSlice(t *testing.T) {
+	nts := [][]int{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}
+
+	var ids []int
+	for _, n := range nts {
+		ids = append(ids, n...)
+	}
+	assert.Equal(t, 9, len(ids))
+	log.Green(ids)
+}

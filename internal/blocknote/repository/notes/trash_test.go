@@ -22,7 +22,7 @@ func TestTrashCycle(t *testing.T) {
 			assert.NoError(t, m.Disconnect())
 		})
 		id := "testIDTrashCycle"
-		assert.NoError(t, a.Create(context.Background(), &domain.Note{
+		n := &domain.Note{
 			Id:        id,
 			Title:     "test",
 			CreatedAt: 0,
@@ -44,7 +44,8 @@ func TestTrashCycle(t *testing.T) {
 			Blocks: []string{
 				"test1bl", "test2bl",
 			},
-		}))
+		}
+		assert.NoError(t, a.Create(context.Background(), n))
 
 		assert.NoError(t, a.ToTrash(context.Background(), id))
 
@@ -53,6 +54,9 @@ func TestTrashCycle(t *testing.T) {
 
 		if nts, err := a.GetNotesFromTrash(context.Background(), "testAuthor"); assert.NoError(t, err) {
 			log.Green("trash notes after create", nts)
+		}
+		if nts, err := a.GetNotesFullFromTrash(context.Background(), "testAuthor"); assert.NoError(t, err) {
+			assert.Equal(t, n, nts.Nts[0])
 		}
 
 		assert.NoError(t, a.FromTrash(context.Background(), id))

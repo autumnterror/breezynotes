@@ -1,14 +1,5 @@
 basePath: /
 definitions:
-  brzrpc.ChangeTitleNoteRequest:
-    properties:
-      idNote:
-        type: string
-      idUser:
-        type: string
-      title:
-        type: string
-    type: object
   brzrpc.Id:
     properties:
       id:
@@ -112,13 +103,11 @@ definitions:
       old_password:
         type: string
     type: object
-  domain.ChangeRoleRequest:
+  domain.ChangeTitleNoteRequest:
     properties:
-      login:
-        type: string
-      new_role:
-        type: string
       note_id:
+        type: string
+      title:
         type: string
     type: object
   domain.ChangeTypeBlockRequest:
@@ -487,6 +476,47 @@ paths:
       summary: delete block
       tags:
       - block
+    get:
+      consumes:
+      - application/json
+      description: Returns block by ID
+      parameters:
+      - description: Note ID and Block ID
+        in: body
+        name: GetBlockRequest
+        required: true
+        schema:
+          $ref: '#/definitions/domain.BlockNoteId'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Block'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
+      summary: GetNote block
+      tags:
+      - block
     post:
       consumes:
       - application/json
@@ -815,46 +845,6 @@ paths:
       summary: GetNote notes by tag
       tags:
       - note
-  /api/note/role:
-    patch:
-      consumes:
-      - application/json
-      description: replace user to list of editors or readers
-      parameters:
-      - description: share info
-        in: body
-        name: Note
-        required: true
-        schema:
-          $ref: '#/definitions/domain.ChangeRoleRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/domain.Error'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/domain.Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/domain.Error'
-        "502":
-          description: Bad Gateway
-          schema:
-            $ref: '#/definitions/domain.Error'
-        "504":
-          description: Gateway Timeout
-          schema:
-            $ref: '#/definitions/domain.Error'
-      summary: share note
-      tags:
-      - note
   /api/note/search:
     get:
       consumes:
@@ -1040,7 +1030,7 @@ paths:
         name: ChangeTitleNoteRequest
         required: true
         schema:
-          $ref: '#/definitions/brzrpc.ChangeTitleNoteRequest'
+          $ref: '#/definitions/domain.ChangeTitleNoteRequest'
       produces:
       - application/json
       responses:

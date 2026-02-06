@@ -130,6 +130,14 @@ test-all:
 		./internal/auth/repository \
 		./internal/auth/jwt \
 		./internal/redis/repository \
-		./pkg/pkgs/default/textblock \
-		./test \
-		./views
+		./pkg/domain \
+		./pkg/text \
+		./pkg/block/default/textblock \
+		./pkg/block/default/codeblock \
+		./pkg/block/default/fileblock \
+		./pkg/block/default/headerblock \
+		./pkg/block/default/imgblock \
+		./pkg/block/default/linkblock \
+		./pkg/block/default/listblock \
+		./pkg/block/default/quoteblock \
+		./test

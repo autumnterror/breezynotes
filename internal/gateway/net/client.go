@@ -131,7 +131,11 @@ func New(
 func (e *Echo) MustRun() {
 	const op = "net.Run"
 
-	if err := e.echo.Start(fmt.Sprintf(":%d", e.cfg.Port)); err != nil && !errors.Is(http.ErrServerClosed, err) {
+	//if err := e.echo.Start(fmt.Sprintf(":%d", e.cfg.Port)); err != nil && !errors.Is(http.ErrServerClosed, err) {
+	//	//	e.echo.Logger.Fatal(format.Error(op, err))
+	//	//}
+
+	if err := e.echo.StartTLS(fmt.Sprintf(":%d", e.cfg.Port), "keys/localhost+2.pem", "keys/localhost+2-key.pem"); err != nil && !errors.Is(http.ErrServerClosed, err) {
 		e.echo.Logger.Fatal(format.Error(op, err))
 	}
 }

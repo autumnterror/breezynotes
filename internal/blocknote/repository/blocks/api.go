@@ -15,11 +15,13 @@ func NewApi(db repository.NoSqlRepo) *API {
 }
 
 type Repo interface {
+	UpdateData(ctx context.Context, id string, data map[string]any) error
+	UpdateType(ctx context.Context, id string, _type string) error
+	UpdateUsed(ctx context.Context, id string, isUsedNew bool) error
+	CreateBlock(ctx context.Context, b *domain.Block) error
 	Delete(ctx context.Context, id string) error
+	DeleteMany(ctx context.Context, ids []string) error
 	Get(ctx context.Context, id string) (*domain.Block, error)
 	GetMany(ctx context.Context, ids []string) (*domain.Blocks, error)
-	Create(ctx context.Context, _type, noteId string, data map[string]any) (string, error)
-	OpBlock(ctx context.Context, id, opName string, data map[string]any) error
 	GetAsFirst(ctx context.Context, id string) (string, error)
-	ChangeType(ctx context.Context, id, newType string) error
 }

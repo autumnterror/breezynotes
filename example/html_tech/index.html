@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BREEZYNOTES</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Контейнер для всплывающих уведомлений -->
+    <div id="toast-container"></div>
+
+    <!-- Представление для аутентификации (логин/регистрация) -->
+    <div id="auth-view">
+        <div class="auth-container">
+            <h1>BREEZYNOTES by Breezy Inv. Tech Demo</h1>
+            <form id="login-form">
+                <h2>Вход</h2>
+                <input type="text" placeholder="Логин" name="login">
+                <input type="email" placeholder="Email" name="email">
+                <input type="password" placeholder="Пароль" name="password" required>
+                <button type="submit">Войти</button>
+                <a class="switch-link" id="show-register">Создать аккаунт</a>
+            </form>
+            <form id="register-form" class="hidden">
+                <h2>Регистрация</h2>
+                <input type="text" placeholder="Логин" name="login" required>
+                <input type="email" placeholder="Email" name="email" required>
+                <input type="password" placeholder="Пароль" name="pw1" required>
+                <input type="password" placeholder="Повторите пароль" name="pw2" required>
+                <button type="submit">Зарегистрироваться</button>
+                <a class="switch-link" id="show-login">У меня уже есть аккаунт</a>
+            </form>
+        </div>
+    </div>
+
+    <!-- Представление для основного приложения (после входа) -->
+    <div id="app-view" class="hidden">
+        <header id="app-header"></header>
+        <main id="page-content"></main>
+        <footer>BREEZYNOTES by Breezy Inv. </footer>
+        <footer>Tech Demo</footer>
+    </div>
+
+    <script src="main.js" type="module"></script>
+</body>
+</html>

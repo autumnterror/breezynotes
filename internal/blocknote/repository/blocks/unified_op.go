@@ -80,6 +80,21 @@ func (a *API) GetMany(ctx context.Context, ids []string) (*domain.Blocks, error)
 	return &domain.Blocks{Blks: ordered}, nil
 }
 
+func (a *API) DeleteMany(ctx context.Context, ids []string) error {
+	const op = "blocks.DeleteMany"
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	defer done()
+
+	filter := bson.D{{"_id", bson.D{{"$in", ids}}}}
+
+	_, err := a.db.DeleteMany(ctx, filter)
+	if err != nil {
+		return format.Error(op, err)
+	}
+
+	return nil
+}
+
 //func (a *API) SearchInContentByNotes(ctx context.Context, idNotes []string) (*domain.Blocks, error) {
 //	const op = "blocks.GetMany"
 //	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
