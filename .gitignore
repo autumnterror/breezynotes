@@ -14,7 +14,7 @@ go.work.sum
 config-test.go
 /html/
 /.idea
-.idea/workspace.xml
-/.idea
 internal/blocknote/pkg/pkgs/default/textblock/benchmark/text.txt
 build/breezynotes/bin/migrator
+*.zip
+.DS_Store
