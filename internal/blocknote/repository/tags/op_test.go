@@ -2,20 +2,22 @@ package tags
 
 import (
 	"context"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
+
+	"testing"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/config"
 	mongo2 "github.com/autumnterror/breezynotes/internal/blocknote/infra/mongo"
 	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestCrudGood(t *testing.T) {
 	t.Parallel()
 	t.Run("crud good", func(t *testing.T) {
 		m := mongo2.MustConnect(config.Test())
-		a := NewApi(m.Tags())
+		a := NewApi(m.Tags(), m.NoteTags())
 
 		assert.NoError(t, a.Create(context.Background(), &domain2.Tag{
 			Id:     "test_id_good",
@@ -53,7 +55,7 @@ func TestCrudGood(t *testing.T) {
 func TestBad(t *testing.T) {
 	t.Parallel()
 	m := mongo2.MustConnect(config.Test())
-	a := NewApi(m.Tags())
+	a := NewApi(m.Tags(), m.NoteTags())
 	t.Cleanup(func() {
 		assert.NoError(t, m.Disconnect())
 	})

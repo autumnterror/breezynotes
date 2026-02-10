@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/api"
 	"github.com/autumnterror/breezynotes/internal/blocknote/config"
 	"github.com/autumnterror/breezynotes/internal/blocknote/infra/mongo"
@@ -45,7 +46,7 @@ func main() {
 
 	m := mongo.MustConnect(cfg)
 	b := blocks.NewApi(m.Blocks())
-	t := tags.NewApi(m.Tags())
+	t := tags.NewApi(m.Tags(), m.NoteTags())
 	n := notes.NewApi(m.Notes(), m.Trash(), m.NoteTags(), t, b)
 	g := api.New(cfg, service.NewNoteService(cfg, mongotx.NewTxRunner(m.C), n, b, t))
 	go g.MustRun()

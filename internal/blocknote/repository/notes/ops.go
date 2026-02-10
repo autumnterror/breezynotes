@@ -2,6 +2,7 @@ package notes
 
 import (
 	"context"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
 
 	"github.com/autumnterror/utils_go/pkg/utils/format"
@@ -47,11 +48,6 @@ func (a *API) delete(ctx context.Context, id string) error {
 		if res.DeletedCount == 0 {
 			return format.Error(op, domain2.ErrNotFound)
 		}
-		return format.Error(op, err)
-	}
-
-	res, err = a.noteTagsAPI.DeleteOne(ctx, bson.D{{"note_id", id}})
-	if err != nil {
 		return format.Error(op, err)
 	}
 

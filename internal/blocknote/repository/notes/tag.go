@@ -2,12 +2,15 @@ package notes
 
 import (
 	"context"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
 
 	"github.com/autumnterror/utils_go/pkg/utils/format"
+	"github.com/autumnterror/utils_go/pkg/utils/uid"
+
+	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
-	"time"
 )
 
 // AddTagToNote can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix(). If tag exist func rewrite it
@@ -43,6 +46,7 @@ func (a *API) AddTagToNote(ctx context.Context, id string, tag *domain2.Tag) err
 		InsertOne(
 			ctx,
 			bson.M{
+				"_id":     uid.New(),
 				"note_id": id,
 				"tag":     tag,
 			},

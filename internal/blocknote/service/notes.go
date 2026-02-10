@@ -97,7 +97,7 @@ func (s *BN) AddTagToNote(ctx context.Context, idNote, tagId, idUser string) err
 		if err != nil {
 			return nil, domain2.ErrNotFound
 		}
-		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
+		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 			return nil, domain2.ErrUnauthorized
 		}
 
@@ -105,14 +105,22 @@ func (s *BN) AddTagToNote(ctx context.Context, idNote, tagId, idUser string) err
 		if err != nil {
 			return nil, domain2.ErrNotFound
 		}
-		return nil, s.nts.AddTagToNote(ctx, idNote, tag)
+		err = s.nts.AddTagToNote(ctx, idNote, tag)
+		if err != nil {
+			return nil, err
+		}
+		n, err = s.nts.Get(ctx, idNote, idUser)
+		if err != nil {
+			return nil, domain2.ErrNotFound
+		}
+		return nil, nil
 	})
 
 	return err
 }
 
 func (s *BN) RemoveTagFromNote(ctx context.Context, idNote string, idUser string) error {
-	const op = "service.AddTagToNote"
+	const op = "service.RemoveTagFromNote"
 
 	if err := idValidation(idNote); err != nil {
 		return wrapServiceCheck(op, err)
@@ -126,7 +134,7 @@ func (s *BN) RemoveTagFromNote(ctx context.Context, idNote string, idUser string
 		if err != nil {
 			return nil, domain2.ErrUnauthorized
 		}
-		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
+		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
 			return nil, domain2.ErrUnauthorized
 		}
 

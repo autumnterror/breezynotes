@@ -65,7 +65,7 @@ func New(
 			auth.POST("", e.Auth)
 			auth.POST("/reg", e.Reg)
 		}
-		user := api.Group("/user")
+		user := api.Group("/user", e.ValidateTokenMW())
 		{
 			user.GET("/data", e.GetUserData)
 			user.DELETE("", e.DeleteUser)
@@ -75,7 +75,7 @@ func New(
 			user.PATCH("/pw", e.ChangePassword)
 		}
 
-		notes := api.Group("/note")
+		notes := api.Group("/note", e.ValidateTokenMW())
 		{
 			notes.GET("", e.GetNote)
 			notes.GET("/search", e.Search)
@@ -94,7 +94,7 @@ func New(
 			notes.PATCH("/public/add", e.AddPublicNote)
 		}
 
-		blocks := api.Group("/block")
+		blocks := api.Group("/block", e.ValidateTokenMW())
 		{
 			blocks.GET("/types", e.GetRegisteredTypes)
 			blocks.GET("", e.GetBlock)
@@ -107,7 +107,7 @@ func New(
 			blocks.PATCH("/order", e.ChangeBlockOrder)
 		}
 
-		trash := api.Group("/trash")
+		trash := api.Group("/trash", e.ValidateTokenMW())
 		{
 			trash.DELETE("", e.CleanTrash)
 			trash.PUT("/to", e.NoteToTrash)
@@ -116,7 +116,7 @@ func New(
 			trash.GET("", e.GetNotesFromTrash)
 		}
 
-		tags := api.Group("/tag")
+		tags := api.Group("/tag", e.ValidateTokenMW())
 		{
 			tags.GET("/by-user", e.GetTagsByUser)
 

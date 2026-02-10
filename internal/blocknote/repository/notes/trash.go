@@ -16,8 +16,23 @@ func (a *API) CleanTrash(ctx context.Context, uid string) error {
 
 	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
+	nts, err := a.GetNotesFromTrash(ctx, uid)
+	if err != nil {
+		return format.Error(op, err)
+	}
+	var ntIds []string
+	for _, nt := range nts.Ntps {
+		ntIds = append(ntIds, nt.Id)
+	}
 
-	_, err := a.trashAPI.DeleteMany(ctx, bson.M{"author": uid})
+	if len(ntIds) != 0 {
+		_, err = a.noteTagsAPI.DeleteMany(ctx, bson.D{{"note_id", bson.D{{"$in", ntIds}}}})
+		if err != nil {
+			return format.Error(op, err)
+		}
+	}
+
+	_, err = a.trashAPI.DeleteMany(ctx, bson.M{"author": uid})
 	if err != nil {
 		return format.Error(op, err)
 	}
@@ -27,12 +42,28 @@ func (a *API) CleanTrash(ctx context.Context, uid string) error {
 
 // GetNotesFromTrash by author id
 func (a *API) GetNotesFromTrash(ctx context.Context, uid string) (*domain2.NoteParts, error) {
-	const op = "notes.CleanTrash"
+	const op = "notes.GetNotesFromTrash"
 
 	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
 
-	cur, err := a.trashAPI.Find(ctx, bson.M{"author": uid})
+	cur, err := a.noteTagsAPI.Find(ctx, bson.M{"tag.user_id": uid})
+	if err != nil {
+		return nil, format.Error(op, err)
+	}
+	defer cur.Close(ctx)
+
+	noteTag := make(map[string]*domain2.Tag)
+
+	for cur.Next(ctx) {
+		nt := domain2.NoteTags{}
+		if err = cur.Decode(&nt); err != nil {
+			return nil, format.Error(op, err)
+		}
+		noteTag[nt.NoteId] = nt.Tag
+	}
+
+	cur, err = a.trashAPI.Find(ctx, bson.M{"author": uid})
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
@@ -57,7 +88,7 @@ func (a *API) GetNotesFromTrash(ctx context.Context, uid string) (*domain2.NoteP
 		np := domain2.NotePart{
 			Id:         n.Id,
 			Title:      n.Title,
-			Tag:        n.Tag,
+			Tag:        noteTag[n.Id],
 			FirstBlock: fb,
 			UpdatedAt:  n.UpdatedAt,
 		}

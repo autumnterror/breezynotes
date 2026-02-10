@@ -8,7 +8,6 @@ import (
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/gateway/domain"
 
-	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/labstack/echo/v4"
 )
 
@@ -166,7 +165,6 @@ func (e *Echo) ValidateToken(c echo.Context) error {
 	}
 	rt, err := c.Cookie("refresh_token")
 	if err != nil {
-		log.Warn(op, "refresh_token cookie missing", err)
 		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "refresh_token cookie missing"})
 	}
 

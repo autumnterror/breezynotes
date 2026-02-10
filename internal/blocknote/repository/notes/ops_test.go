@@ -2,6 +2,7 @@ package notes
 
 import (
 	"context"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/block"
 	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/block/default/textblock"
 	"github.com/autumnterror/breezynotes/internal/blocknote/repository/tags"
@@ -9,9 +10,10 @@ import (
 
 	"github.com/autumnterror/utils_go/pkg/utils/uid"
 
+	"testing"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
 	"github.com/autumnterror/breezynotes/internal/blocknote/repository/blocks"
-	"testing"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/infra/mongo"
 
@@ -22,12 +24,12 @@ import (
 )
 
 func TestWithBlocks(t *testing.T) {
-	t.Parallel()
+
 	t.Run("test with blocks", func(t *testing.T) {
 		block.RegisterBlock("text", &textblock.Driver{})
 		m := mongo.MustConnect(config.Test())
 		b := blocks.NewApi(m.Blocks())
-		tgs := tags.NewApi(m.Tags())
+		tgs := tags.NewApi(m.Tags(), m.NoteTags())
 		a := NewApi(m.Notes(), m.Trash(), m.NoteTags(), tgs, b)
 		idNote := uid.New()
 		idUser := uid.New()
@@ -137,11 +139,11 @@ func TestWithBlocks(t *testing.T) {
 }
 
 func TestCrudGood(t *testing.T) {
-	t.Parallel()
+
 	t.Run("crud good", func(t *testing.T) {
 		m := mongo.MustConnect(config.Test())
 		b := blocks.NewApi(m.Blocks())
-		tgs := tags.NewApi(m.Tags())
+		tgs := tags.NewApi(m.Tags(), m.NoteTags())
 		a := NewApi(m.Notes(), m.Trash(), m.NoteTags(), tgs, b)
 		idNote := uid.New()
 		idUser := uid.New()
@@ -190,7 +192,7 @@ func TestCrudGood(t *testing.T) {
 			log.Green("get after create ", n)
 		}
 
-		if nts, err := a.getAllByUser(context.Background(), "test_auth_TestCrudGood"); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Nts)) {
+		if nts, err := a.getAllByUser(context.Background(), idUser); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Nts)) {
 			log.Green("get all by user after create ", nts)
 		}
 
@@ -218,12 +220,19 @@ func TestCrudGood(t *testing.T) {
 		if nts, err := a.GetNoteListByTag(context.Background(), idTag, idUser); assert.NoError(t, err) && assert.NotEqual(t, 0, len(nts.Ntps)) {
 			log.Green("get by tag ", format.Struct(nts))
 		}
+		if n, err := a.Get(context.Background(), idNote, idUser); assert.NoError(t, err) {
+			log.Green("get after add tag ", n)
+			assert.Equal(t, newTag, n.Tag)
+		}
 
 		assert.NoError(t, a.RemoveTagFromNote(context.Background(), idNote, idUser))
 		if nts, err := a.GetNoteListByTag(context.Background(), idTag, idUser); assert.NoError(t, err) && assert.Equal(t, 0, len(nts.Ntps)) {
-			log.Green("get by tag ", nts)
+			log.Green("get by tag ", format.Struct(nts))
 		}
-
+		if n, err := a.Get(context.Background(), idNote, idUser); assert.NoError(t, err) {
+			log.Green("get after rm tag ", n)
+			assert.Nil(t, n.Tag)
+		}
 		assert.NoError(t, a.ShareNote(context.Background(), idNote, "neweditor", domain2.EditorRole))
 		assert.NoError(t, a.ShareNote(context.Background(), idNote, "newreader", domain2.ReaderRole))
 		if n, err := a.Get(context.Background(), idNote, idUser); assert.NoError(t, err) {
@@ -275,11 +284,11 @@ func TestCrudGood(t *testing.T) {
 }
 
 func TestCrudNotExist(t *testing.T) {
-	t.Parallel()
+
 	t.Run("crud bad", func(t *testing.T) {
 		m := mongo.MustConnect(config.Test())
 		b := blocks.NewApi(m.Blocks())
-		tgs := tags.NewApi(m.Tags())
+		tgs := tags.NewApi(m.Tags(), m.NoteTags())
 		a := NewApi(m.Notes(), m.Trash(), m.NoteTags(), tgs, b)
 		id := uid.New()
 		t.Cleanup(func() {
@@ -301,11 +310,11 @@ func TestCrudNotExist(t *testing.T) {
 }
 
 func TestBlockOrder(t *testing.T) {
-	t.Parallel()
+
 	t.Run("test block order", func(t *testing.T) {
 		m := mongo.MustConnect(config.Test())
 		b := blocks.NewApi(m.Blocks())
-		tgs := tags.NewApi(m.Tags())
+		tgs := tags.NewApi(m.Tags(), m.NoteTags())
 		a := NewApi(m.Notes(), m.Trash(), m.NoteTags(), tgs, b)
 
 		id := uid.New()
@@ -351,11 +360,11 @@ func TestBlockOrder(t *testing.T) {
 	})
 }
 func TestBlockOrder2(t *testing.T) {
-	t.Parallel()
+
 	t.Run("test block order 2 el", func(t *testing.T) {
 		m := mongo.MustConnect(config.Test())
 		b := blocks.NewApi(m.Blocks())
-		tgs := tags.NewApi(m.Tags())
+		tgs := tags.NewApi(m.Tags(), m.NoteTags())
 		a := NewApi(m.Notes(), m.Trash(), m.NoteTags(), tgs, b)
 		id := uid.New()
 

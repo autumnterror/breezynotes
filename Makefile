@@ -130,14 +130,14 @@ test-all:
 		./internal/auth/repository \
 		./internal/auth/jwt \
 		./internal/redis/repository \
-		./pkg/domain \
-		./pkg/text \
-		./pkg/block/default/textblock \
-		./pkg/block/default/codeblock \
-		./pkg/block/default/fileblock \
-		./pkg/block/default/headerblock \
-		./pkg/block/default/imgblock \
-		./pkg/block/default/linkblock \
-		./pkg/block/default/listblock \
-		./pkg/block/default/quoteblock \
+		./internal/blocknote/domain2 \
+		./internal/blocknote/pkg/text \
+		./internal/blocknote/pkg/block/default/textblock \
+		./internal/blocknote/pkg/block/default/codeblock \
+		./internal/blocknote/pkg/block/default/fileblock \
+		./internal/blocknote/pkg/block/default/headerblock \
+		./internal/blocknote/pkg/block/default/imgblock \
+		./internal/blocknote/pkg/block/default/linkblock \
+		./internal/blocknote/pkg/block/default/listblock \
+		./internal/blocknote/pkg/block/default/quoteblock \
 		./test

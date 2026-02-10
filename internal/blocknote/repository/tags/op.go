@@ -3,6 +3,7 @@ package tags
 import (
 	"context"
 	"errors"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -14,6 +15,7 @@ type Repo interface {
 	GetAllById(ctx context.Context, id string) (*domain2.Tags, error)
 	Create(ctx context.Context, t *domain2.Tag) error
 	Delete(ctx context.Context, id string) error
+	DeleteMany(ctx context.Context, ids []string) error
 	UpdateTitle(ctx context.Context, id, nTitle string) error
 	UpdateColor(ctx context.Context, id, nColor string) error
 	UpdateEmoji(ctx context.Context, id, nEmoji string) error
@@ -94,6 +96,25 @@ func (a *API) Delete(ctx context.Context, id string) error {
 	if res.DeletedCount == 0 {
 		return format.Error(op, domain2.ErrNotFound)
 	}
+	return nil
+}
+
+func (a *API) DeleteMany(ctx context.Context, ids []string) error {
+	const op = "tags.deleteMany"
+
+	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	defer done()
+	if len(ids) != 0 {
+		_, err := a.db.DeleteMany(ctx, bson.D{{"_id", bson.D{{"$in", ids}}}})
+		if err != nil {
+			return format.Error(op, err)
+		}
+		_, err = a.noteTagsAPI.DeleteMany(ctx, bson.D{{"tag.user_id", bson.D{{"$in", ids}}}})
+		if err != nil {
+			return format.Error(op, err)
+		}
+	}
+
 	return nil
 }
 

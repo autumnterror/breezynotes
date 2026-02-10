@@ -5,9 +5,10 @@ import (
 )
 
 type API struct {
-	db repository.NoSqlRepo
+	db          repository.NoSqlRepo
+	noteTagsAPI repository.NoSqlRepo
 }
 
-func NewApi(db repository.NoSqlRepo) *API {
-	return &API{db: db}
+func NewApi(db repository.NoSqlRepo, noteTagsAPI repository.NoSqlRepo) *API {
+	return &API{db: db, noteTagsAPI: noteTagsAPI}
 }

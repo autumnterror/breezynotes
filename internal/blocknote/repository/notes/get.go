@@ -42,7 +42,7 @@ func (a *API) Get(ctx context.Context, idNote, idUser string) (*domain2.Note, er
 		return nil, format.Error(op, res.Err())
 	}
 	var nt domain2.NoteTags
-	err = res.Decode(&n)
+	err = res.Decode(&nt)
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
