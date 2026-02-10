@@ -549,6 +549,8 @@ func (e *Echo) RmTagFromNote(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+//TODO delete from roles
+
 // ShareNote godoc
 // @Summary share note
 // @Description add new user to list of editors or readers
@@ -639,6 +641,205 @@ func (e *Echo) ShareNote(c echo.Context) error {
 			}
 		}
 	}
+	return c.NoContent(http.StatusOK)
+}
+
+// BlogNote godoc
+// @Summary change blog state on different
+// @Tags note
+// @Accept json
+// @Produce json
+// @Param Note body domain.NoteId true "note id"
+// @Success 200
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
+// @Router /api/note/blog [patch]
+func (e *Echo) BlogNote(c echo.Context) error {
+	const op = "gateway.net.BlogNote"
+
+	api := e.bnAPI.API
+
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
+	}
+
+	var r domain.NoteId
+	if err := c.Bind(&r); err != nil {
+
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
+	}
+
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
+	defer done()
+
+	_, err := api.PublicNote(ctx, &brzrpc.UserNoteId{
+		NoteId: r.NoteId,
+		UserId: idUser,
+	})
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
+
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.NoteId}); err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
+	}
+	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
+	}
+
+	//TODO delete note from all cache
+
+	return c.NoContent(http.StatusOK)
+}
+
+// PublicNote godoc
+// @Summary change public state on different
+// @Tags note
+// @Accept json
+// @Produce json
+// @Param Note body domain.NoteId true "note id"
+// @Success 200
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
+// @Router /api/note/public [patch]
+func (e *Echo) PublicNote(c echo.Context) error {
+	const op = "gateway.net.PublicNote"
+
+	api := e.bnAPI.API
+
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
+	}
+
+	var r domain.NoteId
+	if err := c.Bind(&r); err != nil {
+
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
+	}
+
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
+	defer done()
+
+	_, err := api.PublicNote(ctx, &brzrpc.UserNoteId{
+		NoteId: r.NoteId,
+		UserId: idUser,
+	})
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
+
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.NoteId}); err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
+	}
+	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
+	}
+
+	//TODO delete note from all cache
+
+	return c.NoContent(http.StatusOK)
+}
+
+// AddPublicNote godoc
+// @Summary add user to readers on public note
+// @Tags note
+// @Accept json
+// @Produce json
+// @Param Note body domain.ShareNoteRequest true "share info"
+// @Success 200
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
+// @Router /api/note/public/add [post]
+func (e *Echo) AddPublicNote(c echo.Context) error {
+	const op = "gateway.net.ShareNote"
+
+	api := e.bnAPI.API
+
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
+	}
+
+	var r domain.ShareNoteRequest
+	if err := c.Bind(&r); err != nil {
+
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
+	}
+
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
+	defer done()
+
+	_, err := api.AddPublicNote(ctx, &brzrpc.UserNoteId{
+		NoteId: r.NoteId,
+		UserId: idUser,
+	})
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
+
+	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.NoteId}); err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
+	}
+	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
+	}
+
 	return c.NoContent(http.StatusOK)
 }
 

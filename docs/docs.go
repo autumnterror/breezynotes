@@ -48,7 +48,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.Tokens"
+                            "$ref": "#/definitions/domain.AuthResponse"
                         }
                     },
                     "400": {
@@ -100,7 +100,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.Tokens"
+                            "$ref": "#/definitions/domain.Tokens"
                         }
                     },
                     "302": {
@@ -150,7 +150,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/brzrpc.Token"
+                            "$ref": "#/definitions/domain.Token"
                         }
                     },
                     "400": {
@@ -761,6 +761,66 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/note/blog": {
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "note"
+                ],
+                "summary": "change blog state on different",
+                "parameters": [
+                    {
+                        "description": "note id",
+                        "name": "Note",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.NoteId"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/api/note/by-tag": {
             "get": {
                 "description": "Returns all notes that contain given tag",
@@ -812,6 +872,126 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/note/public": {
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "note"
+                ],
+                "summary": "change public state on different",
+                "parameters": [
+                    {
+                        "description": "note id",
+                        "name": "Note",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.NoteId"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/note/public/add": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "note"
+                ],
+                "summary": "add user to readers on public note",
+                "parameters": [
+                    {
+                        "description": "share info",
+                        "name": "Note",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.ShareNoteRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/domain.Error"
                         }
@@ -2049,6 +2229,12 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "isBlog": {
+                    "type": "boolean"
+                },
+                "isPublic": {
+                    "type": "boolean"
+                },
                 "role": {
                     "type": "string"
                 },
@@ -2083,34 +2269,6 @@ const docTemplate = `{
                 }
             }
         },
-        "brzrpc.Token": {
-            "type": "object",
-            "properties": {
-                "exp": {
-                    "type": "integer"
-                },
-                "value": {
-                    "type": "string"
-                }
-            }
-        },
-        "brzrpc.Tokens": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                },
-                "expAccess": {
-                    "type": "integer"
-                },
-                "expRefresh": {
-                    "type": "integer"
-                },
-                "refresh_token": {
-                    "type": "string"
-                }
-            }
-        },
         "domain.AuthRequest": {
             "type": "object",
             "properties": {
@@ -2121,6 +2279,26 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.AuthResponse": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "expAccess": {
+                    "type": "integer"
+                },
+                "expRefresh": {
+                    "type": "integer"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/domain.User"
+                },
+                "refreshToken": {
                     "type": "string"
                 }
             }
@@ -2285,6 +2463,14 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.NoteId": {
+            "type": "object",
+            "properties": {
+                "note_id": {
+                    "type": "string"
+                }
+            }
+        },
         "domain.NoteListPaginationResponse": {
             "type": "object",
             "properties": {
@@ -2423,6 +2609,34 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userId": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.Token": {
+            "type": "object",
+            "properties": {
+                "exp": {
+                    "type": "integer"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.Tokens": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "expAccess": {
+                    "type": "integer"
+                },
+                "expRefresh": {
+                    "type": "integer"
+                },
+                "refreshToken": {
                     "type": "string"
                 }
             }

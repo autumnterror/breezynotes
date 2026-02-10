@@ -4,7 +4,7 @@ import (
 	"context"
 
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
 
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -105,5 +105,5 @@ func (s *ServerAPI) GetNotesFromTrash(ctx context.Context, req *brzrpc.UserId) (
 		return nil, err
 	}
 
-	return domain.FromNotePartsDb(res.(*domain.NoteParts)), nil
+	return domain2.FromNotePartsDb(res.(*domain2.NoteParts)), nil
 }

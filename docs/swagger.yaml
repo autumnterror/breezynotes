@@ -11,6 +11,10 @@ definitions:
         type: string
       id:
         type: string
+      isBlog:
+        type: boolean
+      isPublic:
+        type: boolean
       role:
         type: string
       tag:
@@ -33,24 +37,6 @@ definitions:
       userId:
         type: string
     type: object
-  brzrpc.Token:
-    properties:
-      exp:
-        type: integer
-      value:
-        type: string
-    type: object
-  brzrpc.Tokens:
-    properties:
-      access_token:
-        type: string
-      expAccess:
-        type: integer
-      expRefresh:
-        type: integer
-      refresh_token:
-        type: string
-    type: object
   domain.AuthRequest:
     properties:
       email:
@@ -58,6 +44,19 @@ definitions:
       login:
         type: string
       password:
+        type: string
+    type: object
+  domain.AuthResponse:
+    properties:
+      accessToken:
+        type: string
+      expAccess:
+        type: integer
+      expRefresh:
+        type: integer
+      metadata:
+        $ref: '#/definitions/domain.User'
+      refreshToken:
         type: string
     type: object
   domain.Block:
@@ -164,6 +163,11 @@ definitions:
         example: some info
         type: string
     type: object
+  domain.NoteId:
+    properties:
+      note_id:
+        type: string
+    type: object
   domain.NoteListPaginationResponse:
     properties:
       items:
@@ -257,6 +261,24 @@ definitions:
       userId:
         type: string
     type: object
+  domain.Token:
+    properties:
+      exp:
+        type: integer
+      value:
+        type: string
+    type: object
+  domain.Tokens:
+    properties:
+      accessToken:
+        type: string
+      expAccess:
+        type: integer
+      expRefresh:
+        type: integer
+      refreshToken:
+        type: string
+    type: object
   domain.UpdateAboutRequest:
     properties:
       new_about:
@@ -348,7 +370,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/brzrpc.Tokens'
+            $ref: '#/definitions/domain.AuthResponse'
         "400":
           description: Bad Request
           schema:
@@ -382,7 +404,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/brzrpc.Tokens'
+            $ref: '#/definitions/domain.Tokens'
         "302":
           description: Found
           schema:
@@ -416,7 +438,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/brzrpc.Token'
+            $ref: '#/definitions/domain.Token'
         "400":
           description: Bad Request
           schema:
@@ -819,6 +841,45 @@ paths:
       summary: GetNote all notes of user
       tags:
       - note
+  /api/note/blog:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: note id
+        in: body
+        name: Note
+        required: true
+        schema:
+          $ref: '#/definitions/domain.NoteId'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
+      summary: change blog state on different
+      tags:
+      - note
   /api/note/by-tag:
     get:
       consumes:
@@ -864,6 +925,84 @@ paths:
           schema:
             $ref: '#/definitions/domain.Error'
       summary: GetNote notes by tag
+      tags:
+      - note
+  /api/note/public:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: note id
+        in: body
+        name: Note
+        required: true
+        schema:
+          $ref: '#/definitions/domain.NoteId'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
+      summary: change public state on different
+      tags:
+      - note
+  /api/note/public/add:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: share info
+        in: body
+        name: Note
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ShareNoteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
+      summary: add user to readers on public note
       tags:
       - note
   /api/note/search:

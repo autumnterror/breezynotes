@@ -19,7 +19,7 @@ import (
 // @Accept json
 // @Produce json
 // @Param User body domain.AuthRequest true "Login or Email and Password"
-// @Success 200 {object} brzrpc.Tokens
+// @Success 200 {object} domain.AuthResponse
 // @Failure 400 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
@@ -37,7 +37,7 @@ func (e *Echo) Auth(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	tokens, err := api.Auth(ctx, &brzrpc.AuthRequest{
+	res, err := api.Auth(ctx, &brzrpc.AuthRequest{
 		Email:    r.Email,
 		Login:    r.Login,
 		Password: r.Password,
@@ -49,30 +49,31 @@ func (e *Echo) Auth(c echo.Context) error {
 
 	c.SetCookie(&http.Cookie{
 		Name:     "access_token",
-		Value:    tokens.GetAccessToken(),
+		Value:    res.GetAccessToken(),
 		Path:     "/",
 		HttpOnly: true,
 		//SameSite: http.SameSiteLaxMode,
 		Secure:   true,
 		SameSite: http.SameSiteNoneMode,
-		Expires:  time.Unix(tokens.ExpAccess, 0).UTC(),
+		Expires:  time.Unix(res.ExpAccess, 0).UTC(),
 	})
 	c.SetCookie(&http.Cookie{
 		Name:     "refresh_token",
-		Value:    tokens.GetRefreshToken(),
+		Value:    res.GetRefreshToken(),
 		Path:     "/",
 		HttpOnly: true,
 		//SameSite: http.SameSiteLaxMode,
 		Secure:   true,
 		SameSite: http.SameSiteNoneMode,
-		Expires:  time.Unix(tokens.ExpRefresh, 0).UTC(),
+		Expires:  time.Unix(res.ExpRefresh, 0).UTC(),
 	})
 
-	return c.JSON(http.StatusOK, brzrpc.Tokens{
-		AccessToken:  tokens.GetAccessToken(),
-		RefreshToken: tokens.GetRefreshToken(),
-		ExpAccess:    tokens.ExpAccess,
-		ExpRefresh:   tokens.ExpRefresh,
+	return c.JSON(http.StatusOK, domain.AuthResponse{
+		AccessToken:  res.GetAccessToken(),
+		RefreshToken: res.GetRefreshToken(),
+		ExpAccess:    res.ExpAccess,
+		ExpRefresh:   res.ExpRefresh,
+		Metadata:     domain.UserFromRpc(res.GetMetadata()),
 	})
 }
 
@@ -83,7 +84,7 @@ func (e *Echo) Auth(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param User body domain.UserRegister true "Reg data"
-// @Success 200 {object} brzrpc.Tokens
+// @Success 200 {object} domain.Tokens
 // @Failure 400 {object} domain.Error
 // @Failure 302 {object} domain.Error
 // @Failure 502 {object} domain.Error
@@ -136,7 +137,7 @@ func (e *Echo) Reg(c echo.Context) error {
 		Expires:  time.Unix(tokens.ExpRefresh, 0).UTC(),
 	})
 
-	return c.JSON(http.StatusOK, &brzrpc.Tokens{
+	return c.JSON(http.StatusOK, &domain.Tokens{
 		AccessToken:  tokens.AccessToken,
 		RefreshToken: tokens.RefreshToken,
 		ExpAccess:    tokens.ExpAccess,
@@ -150,7 +151,7 @@ func (e *Echo) Reg(c echo.Context) error {
 // @Tags auth
 // @Produce json
 // @Success 200 {object} domain.Message
-// @Success 201 {object} brzrpc.Token
+// @Success 201 {object} domain.Token
 // @Failure 400 {object} domain.Error
 // @Failure 401 {object} domain.Error
 // @Failure 502 {object} domain.Error
@@ -197,7 +198,7 @@ func (e *Echo) ValidateToken(c echo.Context) error {
 			SameSite: http.SameSiteNoneMode,
 			Expires:  time.Unix(token.GetExp(), 0).UTC(),
 		})
-		return c.JSON(http.StatusCreated, brzrpc.Token{
+		return c.JSON(http.StatusCreated, domain.Token{
 			Value: token.GetValue(),
 			Exp:   token.GetExp(),
 		})

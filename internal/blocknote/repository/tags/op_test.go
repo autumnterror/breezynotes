@@ -2,7 +2,7 @@ package tags
 
 import (
 	"context"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/config"
 	mongo2 "github.com/autumnterror/breezynotes/internal/blocknote/infra/mongo"
@@ -17,7 +17,7 @@ func TestCrudGood(t *testing.T) {
 		m := mongo2.MustConnect(config.Test())
 		a := NewApi(m.Tags())
 
-		assert.NoError(t, a.Create(context.Background(), &domain.Tag{
+		assert.NoError(t, a.Create(context.Background(), &domain2.Tag{
 			Id:     "test_id_good",
 			Title:  "test_title",
 			Color:  "test_color",
@@ -59,14 +59,14 @@ func TestBad(t *testing.T) {
 	})
 
 	t.Run("BAD create repeat id", func(t *testing.T) {
-		assert.NoError(t, a.Create(context.Background(), &domain.Tag{
+		assert.NoError(t, a.Create(context.Background(), &domain2.Tag{
 			Id:     "test_id",
 			Title:  "test_title",
 			Color:  "test_color",
 			Emoji:  "test_emoji",
 			UserId: "test_userid",
 		}))
-		assert.Error(t, a.Create(context.Background(), &domain.Tag{
+		assert.Error(t, a.Create(context.Background(), &domain2.Tag{
 			Id:     "test_id",
 			Title:  "test_title",
 			Color:  "test_color",
@@ -78,12 +78,12 @@ func TestBad(t *testing.T) {
 	})
 
 	t.Run("BAD ErrNotFound", func(t *testing.T) {
-		assert.ErrorIs(t, a.UpdateColor(context.Background(), "test_id", "new_color"), domain.ErrNotFound)
-		assert.ErrorIs(t, a.UpdateTitle(context.Background(), "test_id", "new_title"), domain.ErrNotFound)
-		assert.ErrorIs(t, a.UpdateEmoji(context.Background(), "test_id", "new_emoji"), domain.ErrNotFound)
-		assert.ErrorIs(t, a.Delete(context.Background(), "test_id"), domain.ErrNotFound)
+		assert.ErrorIs(t, a.UpdateColor(context.Background(), "test_id", "new_color"), domain2.ErrNotFound)
+		assert.ErrorIs(t, a.UpdateTitle(context.Background(), "test_id", "new_title"), domain2.ErrNotFound)
+		assert.ErrorIs(t, a.UpdateEmoji(context.Background(), "test_id", "new_emoji"), domain2.ErrNotFound)
+		assert.ErrorIs(t, a.Delete(context.Background(), "test_id"), domain2.ErrNotFound)
 		_, err := a.Get(context.Background(), "test_id")
-		assert.ErrorIs(t, err, domain.ErrNotFound)
+		assert.ErrorIs(t, err, domain2.ErrNotFound)
 	})
 
 }

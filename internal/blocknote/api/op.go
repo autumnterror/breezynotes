@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 	"errors"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
 	"github.com/autumnterror/breezynotes/internal/blocknote/service"
 	"github.com/autumnterror/utils_go/pkg/log"
 	"google.golang.org/grpc/codes"
@@ -26,15 +26,15 @@ func handleCRUDResponse(ctx context.Context, op string, action func() (any, erro
 	case r := <-res:
 		if r.err != nil {
 			switch {
-			case errors.Is(r.err, domain.ErrUnauthorized):
+			case errors.Is(r.err, domain2.ErrUnauthorized):
 				return nil, status.Error(codes.Unauthenticated, r.err.Error())
-			case errors.Is(r.err, domain.ErrNotFound):
+			case errors.Is(r.err, domain2.ErrNotFound):
 				return nil, status.Error(codes.NotFound, r.err.Error())
-			case errors.Is(r.err, domain.ErrTypeNotDefined):
+			case errors.Is(r.err, domain2.ErrTypeNotDefined):
 				return nil, status.Error(codes.FailedPrecondition, r.err.Error())
-			case errors.Is(r.err, domain.ErrAlreadyUsed):
+			case errors.Is(r.err, domain2.ErrAlreadyUsed):
 				return nil, status.Error(codes.PermissionDenied, r.err.Error())
-			case errors.Is(r.err, domain.ErrBadRequest), errors.Is(r.err, service.ErrBadServiceCheck):
+			case errors.Is(r.err, domain2.ErrBadRequest), errors.Is(r.err, service.ErrBadServiceCheck):
 				return nil, status.Error(codes.InvalidArgument, r.err.Error())
 			default:
 				log.Error(op, "", r.err)

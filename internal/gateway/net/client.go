@@ -89,6 +89,9 @@ func New(
 			notes.DELETE("/tag", e.RmTagFromNote)
 
 			notes.PATCH("/share", e.ShareNote)
+			notes.PATCH("/blog", e.BlogNote)
+			notes.PATCH("/public", e.PublicNote)
+			notes.PATCH("/public/add", e.AddPublicNote)
 		}
 
 		blocks := api.Group("/block")

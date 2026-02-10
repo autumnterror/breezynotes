@@ -63,6 +63,7 @@ func (d Driver) GetInfo(ctx context.Context, id string) (*domain.User, error) {
 		return nil, format.Error(op, err)
 	}
 	u.Id = id
+	u.Password = ""
 
 	return &u, nil
 }

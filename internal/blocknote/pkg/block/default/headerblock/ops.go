@@ -2,7 +2,7 @@ package headerblock
 
 import (
 	"encoding/json"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain2/domainblocks"
 )
 
 func applyStyleOp(b *domainblocks.HeaderBlock, raw []byte) (map[string]any, error) {

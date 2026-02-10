@@ -63,6 +63,7 @@ message ShareNoteRequest {
   string user_id = 4;
 }
 
+
 message ChangeUserRoleRequest {
   string user_id_to_change = 1;
   string new_role = 2;
@@ -123,6 +124,9 @@ service BlockNoteService {
   rpc DeleteTag(UserTagId) returns (google.protobuf.Empty);
 
   rpc ShareNote(ShareNoteRequest) returns (google.protobuf.Empty);
+  rpc PublicNote(UserNoteId) returns (google.protobuf.Empty);
+  rpc AddPublicNote(UserNoteId) returns (google.protobuf.Empty);
+  rpc BlogNote(UserNoteId) returns (google.protobuf.Empty);
   // rpc ChangeUserRole(ChangeUserRoleRequest) returns (google.protobuf.Empty);
 
   rpc Healthz(google.protobuf.Empty) returns (google.protobuf.Empty);

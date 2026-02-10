@@ -2,7 +2,7 @@ package listblock
 
 import (
 	"encoding/json"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain2/domainblocks"
 	"github.com/autumnterror/utils_go/pkg/log"
 )
 

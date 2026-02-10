@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"errors"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
 	"github.com/autumnterror/utils_go/pkg/utils/alg"
 )
 
@@ -37,7 +37,7 @@ func (s *BN) CleanTrash(ctx context.Context, uid string) error {
 	return err
 }
 
-func (s *BN) GetNotesFromTrash(ctx context.Context, uid string) (*domain.NoteParts, error) {
+func (s *BN) GetNotesFromTrash(ctx context.Context, uid string) (*domain2.NoteParts, error) {
 	const op = "service.GetNotesFromTrash"
 	if err := idValidation(uid); err != nil {
 		return nil, wrapServiceCheck(op, err)
@@ -50,7 +50,7 @@ func (s *BN) GetNotesFromTrash(ctx context.Context, uid string) (*domain.NotePar
 		return nil, err
 	}
 
-	if resS, ok := res.(*domain.NoteParts); !ok {
+	if resS, ok := res.(*domain2.NoteParts); !ok {
 		return nil, wrapServiceCheck(op, errors.New("response type mismatch"))
 	} else {
 		return resS, nil
@@ -65,15 +65,19 @@ func (s *BN) ToTrash(ctx context.Context, idNote, idUser string) error {
 		return wrapServiceCheck(op, err)
 	}
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
-		n, err := s.nts.Get(ctx, idNote)
+		n, err := s.nts.Get(ctx, idNote, idUser)
 		if err != nil {
-			return nil, domain.ErrNotFound
-		}
-		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
-			return nil, domain.ErrUnauthorized
+			return nil, domain2.ErrNotFound
 		}
 
-		return nil, s.nts.ToTrash(ctx, idNote)
+		switch {
+		case n.Author == idUser:
+			return nil, s.nts.ToTrash(ctx, idNote)
+		case alg.IsIn(idUser, n.Editors) || alg.IsIn(idUser, n.Readers):
+			return nil, s.nts.DeleteRole(ctx, idNote, idUser)
+		default:
+			return nil, domain2.ErrUnauthorized
+		}
 	})
 
 	return err
@@ -103,10 +107,10 @@ func (s *BN) FromTrash(ctx context.Context, idNote, idUser string) error {
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		n, err := s.nts.FindOnTrash(ctx, idNote)
 		if err != nil {
-			return nil, domain.ErrNotFound
+			return nil, domain2.ErrNotFound
 		}
 		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
-			return nil, domain.ErrUnauthorized
+			return nil, domain2.ErrUnauthorized
 		}
 
 		return nil, s.nts.FromTrash(ctx, idNote)

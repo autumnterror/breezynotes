@@ -111,6 +111,8 @@ message Note {
   repeated string editors = 7;
   repeated string readers = 8;
   repeated string blocks = 9;
+  bool isPublic = 10;
+  bool isBlog = 11;
 }
 
 message NoteWithBlocks {
@@ -123,6 +125,8 @@ message NoteWithBlocks {
   repeated string editors = 7;
   repeated string readers = 8;
   repeated Block blocks = 9;
+  bool isPublic = 10;
+  bool isBlog = 11;
 }
 
 message NotePart {
@@ -132,6 +136,8 @@ message NotePart {
   string first_block = 4;
   int64 updated_at = 5;
   string role = 6;
+  bool isPublic = 10;
+  bool isBlog = 11;
 }
 
 // ===== Collections =====

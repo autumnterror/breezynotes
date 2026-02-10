@@ -55,3 +55,23 @@ type UserRegister struct {
 	Pw1   string `json:"pw1"`
 	Pw2   string `json:"pw2"`
 }
+
+type Tokens struct {
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
+	ExpAccess    int64  `json:"expAccess"`
+	ExpRefresh   int64  `json:"expRefresh"`
+}
+
+type Token struct {
+	Value string `json:"value"`
+	Exp   int64  `json:"exp"`
+}
+
+type AuthResponse struct {
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
+	ExpAccess    int64  `json:"expAccess"`
+	ExpRefresh   int64  `json:"expRefresh"`
+	Metadata     *User  `json:"metadata"`
+}

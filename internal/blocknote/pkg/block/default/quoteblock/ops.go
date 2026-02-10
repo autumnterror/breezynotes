@@ -2,7 +2,7 @@ package quoteblock
 
 import (
 	"encoding/json"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain2/domainblocks"
 )
 
 // changeText handles the logic for updating the quote's text.

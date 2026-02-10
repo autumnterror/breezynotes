@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain2/domainblocks"
 	blockpkg "github.com/autumnterror/breezynotes/internal/blocknote/pkg/block"
 	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/text"
 	"github.com/autumnterror/utils_go/pkg/utils/format"

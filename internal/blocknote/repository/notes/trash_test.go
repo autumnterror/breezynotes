@@ -3,10 +3,12 @@ package notes
 import (
 	"context"
 	"github.com/autumnterror/breezynotes/internal/blocknote/config"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
 	"github.com/autumnterror/breezynotes/internal/blocknote/infra/mongo"
 	"github.com/autumnterror/breezynotes/internal/blocknote/repository/blocks"
+	"github.com/autumnterror/breezynotes/internal/blocknote/repository/tags"
 	"github.com/autumnterror/utils_go/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/utils/uid"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -16,18 +18,19 @@ func TestTrashCycle(t *testing.T) {
 	t.Run("trash Cycle", func(t *testing.T) {
 		m := mongo.MustConnect(config.Test())
 		b := blocks.NewApi(m.Blocks())
-		a := NewApi(m.Notes(), m.Trash(), b)
+		tgs := tags.NewApi(m.Tags())
+		a := NewApi(m.Notes(), m.Trash(), m.NoteTags(), tgs, b)
 
 		t.Cleanup(func() {
 			assert.NoError(t, m.Disconnect())
 		})
-		id := "testIDTrashCycle"
-		n := &domain.Note{
+		id := uid.New()
+		n := &domain2.Note{
 			Id:        id,
 			Title:     "test",
 			CreatedAt: 0,
 			UpdatedAt: 0,
-			Tag: &domain.Tag{
+			Tag: &domain2.Tag{
 				Id:     "test",
 				Title:  "test",
 				Color:  "test",
@@ -49,7 +52,7 @@ func TestTrashCycle(t *testing.T) {
 
 		assert.NoError(t, a.ToTrash(context.Background(), id))
 
-		_, err := a.Get(context.Background(), id)
+		_, err := a.Get(context.Background(), id, "")
 		assert.Error(t, err)
 
 		if nts, err := a.GetNotesFromTrash(context.Background(), "testAuthor"); assert.NoError(t, err) {
@@ -61,7 +64,7 @@ func TestTrashCycle(t *testing.T) {
 
 		assert.NoError(t, a.FromTrash(context.Background(), id))
 
-		_, err = a.Get(context.Background(), id)
+		_, err = a.Get(context.Background(), id, "")
 		assert.NoError(t, err)
 
 		assert.NoError(t, a.ToTrash(context.Background(), id))
@@ -79,12 +82,13 @@ func TestTrashCycleBad(t *testing.T) {
 	t.Run("trash Cycle Bad", func(t *testing.T) {
 		m := mongo.MustConnect(config.Test())
 		b := blocks.NewApi(m.Blocks())
-		a := NewApi(m.Notes(), m.Trash(), b)
+		tgs := tags.NewApi(m.Tags())
+		a := NewApi(m.Notes(), m.Trash(), m.NoteTags(), tgs, b)
 
 		t.Cleanup(func() {
 			assert.NoError(t, m.Disconnect())
 		})
-		id := "testIDTrashCycleBad"
+		id := uid.New()
 
 		assert.Error(t, a.ToTrash(context.Background(), id))
 		assert.Error(t, a.FromTrash(context.Background(), id))

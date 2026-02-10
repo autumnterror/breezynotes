@@ -2,27 +2,29 @@ package api
 
 import (
 	"context"
+	"github.com/autumnterror/breezynotes/internal/auth/domain"
 	"time"
 
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 )
 
-func (s *ServerAPI) Auth(ctx context.Context, r *brzrpc.AuthRequest) (*brzrpc.Tokens, error) {
+func (s *ServerAPI) Auth(ctx context.Context, r *brzrpc.AuthRequest) (*brzrpc.AuthResponse, error) {
 	const op = "grpc.Auth"
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 
 	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
-		at, rt, err := s.API.Auth(ctx, r.GetEmail(), r.GetLogin(), r.GetPassword())
+		user, at, rt, err := s.API.Auth(ctx, r.GetEmail(), r.GetLogin(), r.GetPassword())
 		if err != nil {
 			return nil, err
 		}
-		return &brzrpc.Tokens{
+		return &brzrpc.AuthResponse{
 			AccessToken:  at,
 			RefreshToken: rt,
 			ExpAccess:    time.Now().UTC().Add(s.Cfg.AccessTokenLifeTime).Unix(),
 			ExpRefresh:   time.Now().UTC().Add(s.Cfg.RefreshTokenLifeTime).Unix(),
+			Metadata:     domain.UserToRpc(user),
 		}, nil
 	})
 
@@ -30,7 +32,7 @@ func (s *ServerAPI) Auth(ctx context.Context, r *brzrpc.AuthRequest) (*brzrpc.To
 		return nil, err
 	}
 
-	return res.(*brzrpc.Tokens), nil
+	return res.(*brzrpc.AuthResponse), nil
 }
 
 func (s *ServerAPI) Reg(ctx context.Context, r *brzrpc.AuthRequest) (*brzrpc.Tokens, error) {

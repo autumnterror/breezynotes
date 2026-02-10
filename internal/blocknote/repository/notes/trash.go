@@ -3,7 +3,7 @@ package notes
 import (
 	"context"
 
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
 
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 
@@ -14,7 +14,7 @@ import (
 func (a *API) CleanTrash(ctx context.Context, uid string) error {
 	const op = "notes.CleanTrash"
 
-	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
 
 	_, err := a.trashAPI.DeleteMany(ctx, bson.M{"author": uid})
@@ -26,10 +26,10 @@ func (a *API) CleanTrash(ctx context.Context, uid string) error {
 }
 
 // GetNotesFromTrash by author id
-func (a *API) GetNotesFromTrash(ctx context.Context, uid string) (*domain.NoteParts, error) {
+func (a *API) GetNotesFromTrash(ctx context.Context, uid string) (*domain2.NoteParts, error) {
 	const op = "notes.CleanTrash"
 
-	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
 
 	cur, err := a.trashAPI.Find(ctx, bson.M{"author": uid})
@@ -38,12 +38,12 @@ func (a *API) GetNotesFromTrash(ctx context.Context, uid string) (*domain.NotePa
 	}
 	defer cur.Close(ctx)
 
-	pts := &domain.NoteParts{
-		Ntps: []*domain.NotePart{},
+	pts := &domain2.NoteParts{
+		Ntps: []*domain2.NotePart{},
 	}
 
 	for cur.Next(ctx) {
-		var n domain.Note
+		var n domain2.Note
 		if err = cur.Decode(&n); err != nil {
 			return pts, format.Error(op, err)
 		}
@@ -54,7 +54,7 @@ func (a *API) GetNotesFromTrash(ctx context.Context, uid string) (*domain.NotePa
 				fb = nfb
 			}
 		}
-		np := domain.NotePart{
+		np := domain2.NotePart{
 			Id:         n.Id,
 			Title:      n.Title,
 			Tag:        n.Tag,
@@ -68,10 +68,10 @@ func (a *API) GetNotesFromTrash(ctx context.Context, uid string) (*domain.NotePa
 }
 
 // GetNotesFullFromTrash by author id
-func (a *API) GetNotesFullFromTrash(ctx context.Context, uid string) (*domain.Notes, error) {
+func (a *API) GetNotesFullFromTrash(ctx context.Context, uid string) (*domain2.Notes, error) {
 	const op = "notes.CleanTrash"
 
-	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
 
 	cur, err := a.trashAPI.Find(ctx, bson.M{"author": uid})
@@ -80,12 +80,12 @@ func (a *API) GetNotesFullFromTrash(ctx context.Context, uid string) (*domain.No
 	}
 	defer cur.Close(ctx)
 
-	pts := &domain.Notes{
-		Nts: make([]*domain.Note, 0),
+	pts := &domain2.Notes{
+		Nts: make([]*domain2.Note, 0),
 	}
 
 	for cur.Next(ctx) {
-		var n domain.Note
+		var n domain2.Note
 		if err = cur.Decode(&n); err != nil {
 			return pts, format.Error(op, err)
 		}
@@ -100,10 +100,10 @@ func (a *API) GetNotesFullFromTrash(ctx context.Context, uid string) (*domain.No
 func (a *API) ToTrash(ctx context.Context, id string) error {
 	const op = "notes.ToTrash"
 
-	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
 
-	n, err := a.Get(ctx, id)
+	n, err := a.Get(ctx, id, "")
 	if err != nil {
 		return format.Error(op, err)
 	}
@@ -122,7 +122,7 @@ func (a *API) ToTrash(ctx context.Context, id string) error {
 func (a *API) ToTrashAll(ctx context.Context, idUser string) error {
 	const op = "notes.ToTrashAll"
 
-	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
 
 	n, err := a.getAllByUser(ctx, idUser)
@@ -155,7 +155,7 @@ func (a *API) ToTrashAll(ctx context.Context, idUser string) error {
 func (a *API) FromTrash(ctx context.Context, id string) error {
 	const op = "notes.FromTrash"
 
-	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
 
 	res := a.trashAPI.FindOne(ctx, bson.M{"_id": id})
@@ -163,7 +163,7 @@ func (a *API) FromTrash(ctx context.Context, id string) error {
 		return format.Error(op, res.Err())
 	}
 
-	var n domain.Note
+	var n domain2.Note
 	if err := res.Decode(&n); err != nil {
 		return format.Error(op, err)
 	}
@@ -181,10 +181,10 @@ func (a *API) FromTrash(ctx context.Context, id string) error {
 }
 
 // FindOnTrash return note by id from trash
-func (a *API) FindOnTrash(ctx context.Context, id string) (*domain.Note, error) {
+func (a *API) FindOnTrash(ctx context.Context, id string) (*domain2.Note, error) {
 	const op = "notes.FindOnTrash"
 
-	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
 
 	res := a.trashAPI.FindOne(ctx, bson.M{"_id": id})
@@ -192,7 +192,7 @@ func (a *API) FindOnTrash(ctx context.Context, id string) (*domain.Note, error) 
 		return nil, format.Error(op, res.Err())
 	}
 
-	var n domain.Note
+	var n domain2.Note
 	err := res.Decode(&n)
 	if err != nil {
 		return nil, format.Error(op, err)

@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -14,7 +14,7 @@ func (s *ServerAPI) CreateTag(ctx context.Context, t *brzrpc.Tag) (*emptypb.Empt
 	defer done()
 
 	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
-		return nil, s.service.CreateTag(ctx, domain.ToTagDb(t))
+		return nil, s.service.CreateTag(ctx, domain2.ToTagDb(t))
 	})
 
 	if err != nil {
@@ -95,7 +95,7 @@ func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc.UserId) (*brz
 		if err != nil {
 			return nil, err
 		}
-		return domain.FromTagsDb(r), nil
+		return domain2.FromTagsDb(r), nil
 	})
 
 	if err != nil {

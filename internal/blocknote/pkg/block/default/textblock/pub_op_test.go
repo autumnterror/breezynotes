@@ -3,7 +3,7 @@ package textblock
 import (
 	"context"
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain2/domainblocks"
 	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/text"
 	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/autumnterror/utils_go/pkg/utils/format"

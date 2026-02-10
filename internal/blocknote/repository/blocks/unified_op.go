@@ -3,7 +3,7 @@ package blocks
 import (
 	"context"
 	"errors"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 
@@ -13,7 +13,7 @@ import (
 // Delete can return mongo.ErrNotFound
 func (a *API) Delete(ctx context.Context, id string) error {
 	const op = "blocks.delete"
-	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
 
 	res, err := a.db.DeleteOne(ctx, bson.D{{"_id", id}})
@@ -21,25 +21,25 @@ func (a *API) Delete(ctx context.Context, id string) error {
 		return format.Error(op, err)
 	}
 	if res.DeletedCount == 0 {
-		return format.Error(op, domain.ErrNotFound)
+		return format.Error(op, domain2.ErrNotFound)
 	}
 	return nil
 }
 
-func (a *API) Get(ctx context.Context, id string) (*domain.Block, error) {
+func (a *API) Get(ctx context.Context, id string) (*domain2.Block, error) {
 	const op = "blocks.Get"
-	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
 
 	res := a.db.FindOne(ctx, bson.D{{"_id", id}})
 	if res.Err() != nil {
 		if errors.Is(res.Err(), mongo.ErrNoDocuments) {
-			return nil, format.Error(op, domain.ErrNotFound)
+			return nil, format.Error(op, domain2.ErrNotFound)
 		}
 		return nil, format.Error(op, res.Err())
 	}
 
-	var b domain.Block
+	var b domain2.Block
 	if err := res.Decode(&b); err != nil {
 		return nil, format.Error(op, err)
 	}
@@ -47,9 +47,9 @@ func (a *API) Get(ctx context.Context, id string) (*domain.Block, error) {
 	return &b, nil
 }
 
-func (a *API) GetMany(ctx context.Context, ids []string) (*domain.Blocks, error) {
+func (a *API) GetMany(ctx context.Context, ids []string) (*domain2.Blocks, error) {
 	const op = "blocks.GetMany"
-	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
 
 	filter := bson.D{{"_id", bson.D{{"$in", ids}}}}
@@ -60,29 +60,29 @@ func (a *API) GetMany(ctx context.Context, ids []string) (*domain.Blocks, error)
 	}
 	defer cur.Close(ctx)
 
-	var blocks []*domain.Block
+	var blocks []*domain2.Block
 	if err = cur.All(ctx, &blocks); err != nil {
 		return nil, format.Error(op, err)
 	}
 
-	blockMap := make(map[string]*domain.Block, len(blocks))
+	blockMap := make(map[string]*domain2.Block, len(blocks))
 	for _, b := range blocks {
 		blockMap[b.Id] = b
 	}
 
-	ordered := make([]*domain.Block, 0, len(ids))
+	ordered := make([]*domain2.Block, 0, len(ids))
 	for _, id := range ids {
 		if b, ok := blockMap[id]; ok {
 			ordered = append(ordered, b)
 		}
 	}
 
-	return &domain.Blocks{Blks: ordered}, nil
+	return &domain2.Blocks{Blks: ordered}, nil
 }
 
 func (a *API) DeleteMany(ctx context.Context, ids []string) error {
 	const op = "blocks.DeleteMany"
-	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
 
 	if len(ids) == 0 {

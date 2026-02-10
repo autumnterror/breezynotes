@@ -8,38 +8,48 @@ import (
 	"github.com/autumnterror/utils_go/pkg/utils/validate"
 )
 
-func (s *AuthService) Auth(ctx context.Context, email, login, pw string) (string, string, error) {
+func (s *AuthService) Auth(ctx context.Context, email, login, pw string) (*domain.User, string, string, error) {
 	const op = "service.Auth"
 	if stringEmpty(email) && stringEmpty(login) {
-		return "", "", wrapServiceCheck(op, errors.New("email and login is empty"))
+		return nil, "", "", wrapServiceCheck(op, errors.New("email and login is empty"))
 	}
 	if stringEmpty(pw) {
-		return "", "", wrapServiceCheck(op, errors.New("pw is empty"))
+		return nil, "", "", wrapServiceCheck(op, errors.New("pw is empty"))
 	}
 
 	repo, err := s.authRepo(ctx)
 	if err != nil {
-		return "", "", err
+		return nil, "", "", err
+	}
+	repoUser, err := s.userRepo(ctx)
+	if err != nil {
+		return nil, "", "", err
 	}
 	repoJwt, err := s.tokenRepo()
 	if err != nil {
-		return "", "", err
+		return nil, "", "", err
 	}
 
 	id, err := repo.Authentication(ctx, email, login, pw)
 	if err != nil {
-		return "", "", err
+		return nil, "", "", err
 	}
 
 	at, err := repoJwt.GenerateToken(id, domain.TokenTypeAccess)
 	if err != nil {
-		return "", "", err
+		return nil, "", "", err
 	}
 	rt, err := repoJwt.GenerateToken(id, domain.TokenTypeRefresh)
 	if err != nil {
-		return "", "", err
+		return nil, "", "", err
 	}
-	return at, rt, nil
+
+	user, err := repoUser.GetInfo(ctx, id)
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	return user, at, rt, nil
 }
 
 func (s *AuthService) Reg(ctx context.Context, email, login, pw string) (string, string, error) {

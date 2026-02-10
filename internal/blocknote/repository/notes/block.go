@@ -3,7 +3,7 @@ package notes
 import (
 	"context"
 	"fmt"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
 
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -14,7 +14,7 @@ import (
 func (a *API) InsertBlock(ctx context.Context, id, blockId string, pos int) error {
 	const op = "notes.InsertBlock"
 
-	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
 
 	res, err := a.
@@ -40,7 +40,7 @@ func (a *API) InsertBlock(ctx context.Context, id, blockId string, pos int) erro
 		return format.Error(op, err)
 	}
 	if res.MatchedCount == 0 {
-		return format.Error(op, domain.ErrNotFound)
+		return format.Error(op, domain2.ErrNotFound)
 	}
 
 	return nil
@@ -50,7 +50,7 @@ func (a *API) InsertBlock(ctx context.Context, id, blockId string, pos int) erro
 func (a *API) DeleteBlock(ctx context.Context, id, blockId string) error {
 	const op = "notes.DeleteBlock"
 
-	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
 
 	res, err := a.
@@ -73,7 +73,7 @@ func (a *API) DeleteBlock(ctx context.Context, id, blockId string) error {
 		return format.Error(op, err)
 	}
 	if res.MatchedCount == 0 {
-		return format.Error(op, domain.ErrNotFound)
+		return format.Error(op, domain2.ErrNotFound)
 	}
 
 	return nil
@@ -82,14 +82,14 @@ func (a *API) DeleteBlock(ctx context.Context, id, blockId string) error {
 // ChangeBlockOrder вставляет блок в срез на новое место
 func (a *API) ChangeBlockOrder(ctx context.Context, noteID string, oldOrder, newOrder int) error {
 	const op = "blocks.ChangeBlockOrder"
-	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
 
 	if oldOrder == newOrder {
 		return nil
 	}
 
-	n, err := a.Get(ctx, noteID)
+	n, err := a.Get(ctx, noteID, "")
 	if err != nil {
 		return fmt.Errorf("%s: get note failed: %w", op, err)
 	}
@@ -104,7 +104,7 @@ func (a *API) ChangeBlockOrder(ctx context.Context, noteID string, oldOrder, new
 	}
 
 	if oldOrder < 0 || oldOrder >= l {
-		return format.Error(op, domain.ErrBadRequest)
+		return format.Error(op, domain2.ErrBadRequest)
 	}
 
 	val := blocks[oldOrder]

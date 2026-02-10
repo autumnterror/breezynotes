@@ -2,7 +2,7 @@ package notes
 
 import (
 	"context"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
 
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 
@@ -11,10 +11,10 @@ import (
 )
 
 // AddTagToNote can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix(). If tag exist func rewrite it
-func (a *API) AddTagToNote(ctx context.Context, id string, tag *domain.Tag) error {
+func (a *API) AddTagToNote(ctx context.Context, id string, tag *domain2.Tag) error {
 	const op = "notes.AddTagToNote"
 
-	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
 
 	res, err := a.
@@ -26,15 +26,28 @@ func (a *API) AddTagToNote(ctx context.Context, id string, tag *domain.Tag) erro
 			},
 			bson.M{
 				"$set": bson.M{
-					"tag":        tag,
+					//"tag":        tag,
 					"updated_at": time.Now().UTC().Unix(),
 				},
 			},
 		)
 	if err != nil || res.MatchedCount == 0 {
 		if res != nil && res.MatchedCount == 0 {
-			return format.Error(op, domain.ErrNotFound)
+			return format.Error(op, domain2.ErrNotFound)
 		}
+		return format.Error(op, err)
+	}
+
+	_, err = a.
+		noteTagsAPI.
+		InsertOne(
+			ctx,
+			bson.M{
+				"note_id": id,
+				"tag":     tag,
+			},
+		)
+	if err != nil {
 		return format.Error(op, err)
 	}
 
@@ -42,10 +55,10 @@ func (a *API) AddTagToNote(ctx context.Context, id string, tag *domain.Tag) erro
 }
 
 // RemoveTagFromNote can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix().
-func (a *API) RemoveTagFromNote(ctx context.Context, idNote string) error {
+func (a *API) RemoveTagFromNote(ctx context.Context, idNote string, idUser string) error {
 	const op = "notes.RemoveTagFromNote"
 
-	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
 	defer done()
 
 	res, err := a.
@@ -57,7 +70,7 @@ func (a *API) RemoveTagFromNote(ctx context.Context, idNote string) error {
 			},
 			bson.M{
 				"$set": bson.M{
-					"tag":        nil,
+					//"tag":        nil,
 					"updated_at": time.Now().UTC().Unix(),
 				},
 			},
@@ -65,9 +78,25 @@ func (a *API) RemoveTagFromNote(ctx context.Context, idNote string) error {
 
 	if err != nil || res.MatchedCount == 0 {
 		if res != nil && res.MatchedCount == 0 {
-			return format.Error(op, domain.ErrNotFound)
+			return format.Error(op, domain2.ErrNotFound)
 		}
 		return format.Error(op, err)
+	}
+
+	resDelete, err := a.
+		noteTagsAPI.
+		DeleteOne(
+			ctx,
+			bson.M{
+				"note_id":     idNote,
+				"tag.user_id": idUser,
+			},
+		)
+	if err != nil {
+		return format.Error(op, err)
+	}
+	if resDelete.DeletedCount == 0 {
+		return format.Error(op, domain2.ErrNotFound)
 	}
 
 	return nil
