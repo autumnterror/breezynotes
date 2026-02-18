@@ -58,6 +58,33 @@ func (s *BN) DeleteTag(ctx context.Context, idTag, idUser string) error {
 
 	return err
 }
+
+func (s *BN) DeleteTags(ctx context.Context, idUser string) error {
+	const op = "service.DeleteTags"
+
+	if err := idValidation(idUser); err != nil {
+		return wrapServiceCheck(op, err)
+	}
+
+	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
+		tags, err := s.tgs.GetAllById(ctx, idUser)
+		if err != nil {
+			return nil, domain2.ErrNotFound
+		}
+		var tagIds []string
+		for _, tag := range tags.Tgs {
+			if tag.UserId != idUser {
+				return nil, domain2.ErrUnauthorized
+			}
+			tagIds = append(tagIds, tag.Id)
+		}
+
+		return nil, s.tgs.DeleteMany(ctx, tagIds)
+	})
+
+	return err
+}
+
 func (s *BN) UpdateTitleTag(ctx context.Context, idTag, idUser, nTitle string) error {
 	const op = "service.UpdateTitleTag"
 	if err := idValidation(idTag); err != nil {

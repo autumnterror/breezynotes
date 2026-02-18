@@ -47,6 +47,7 @@ const (
 	BlockNoteService_UpdateTagColor_FullMethodName      = "/brz.BlockNoteService/UpdateTagColor"
 	BlockNoteService_UpdateTagEmoji_FullMethodName      = "/brz.BlockNoteService/UpdateTagEmoji"
 	BlockNoteService_DeleteTag_FullMethodName           = "/brz.BlockNoteService/DeleteTag"
+	BlockNoteService_DeleteTags_FullMethodName          = "/brz.BlockNoteService/DeleteTags"
 	BlockNoteService_ShareNote_FullMethodName           = "/brz.BlockNoteService/ShareNote"
 	BlockNoteService_PublicNote_FullMethodName          = "/brz.BlockNoteService/PublicNote"
 	BlockNoteService_AddPublicNote_FullMethodName       = "/brz.BlockNoteService/AddPublicNote"
@@ -90,6 +91,7 @@ type BlockNoteServiceClient interface {
 	UpdateTagColor(ctx context.Context, in *UpdateTagColorRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateTagEmoji(ctx context.Context, in *UpdateTagEmojiRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteTag(ctx context.Context, in *UserTagId, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteTags(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ShareNote(ctx context.Context, in *ShareNoteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	PublicNote(ctx context.Context, in *UserNoteId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AddPublicNote(ctx context.Context, in *UserNoteId, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -384,6 +386,16 @@ func (c *blockNoteServiceClient) DeleteTag(ctx context.Context, in *UserTagId, o
 	return out, nil
 }
 
+func (c *blockNoteServiceClient) DeleteTags(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, BlockNoteService_DeleteTags_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *blockNoteServiceClient) ShareNote(ctx context.Context, in *ShareNoteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
@@ -470,6 +482,7 @@ type BlockNoteServiceServer interface {
 	UpdateTagColor(context.Context, *UpdateTagColorRequest) (*emptypb.Empty, error)
 	UpdateTagEmoji(context.Context, *UpdateTagEmojiRequest) (*emptypb.Empty, error)
 	DeleteTag(context.Context, *UserTagId) (*emptypb.Empty, error)
+	DeleteTags(context.Context, *UserId) (*emptypb.Empty, error)
 	ShareNote(context.Context, *ShareNoteRequest) (*emptypb.Empty, error)
 	PublicNote(context.Context, *UserNoteId) (*emptypb.Empty, error)
 	AddPublicNote(context.Context, *UserNoteId) (*emptypb.Empty, error)
@@ -565,6 +578,9 @@ func (UnimplementedBlockNoteServiceServer) UpdateTagEmoji(context.Context, *Upda
 }
 func (UnimplementedBlockNoteServiceServer) DeleteTag(context.Context, *UserTagId) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTag not implemented")
+}
+func (UnimplementedBlockNoteServiceServer) DeleteTags(context.Context, *UserId) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteTags not implemented")
 }
 func (UnimplementedBlockNoteServiceServer) ShareNote(context.Context, *ShareNoteRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ShareNote not implemented")
@@ -1081,6 +1097,24 @@ func _BlockNoteService_DeleteTag_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BlockNoteService_DeleteTags_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlockNoteServiceServer).DeleteTags(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BlockNoteService_DeleteTags_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlockNoteServiceServer).DeleteTags(ctx, req.(*UserId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _BlockNoteService_ShareNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ShareNoteRequest)
 	if err := dec(in); err != nil {
@@ -1281,6 +1315,10 @@ var BlockNoteService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteTag",
 			Handler:    _BlockNoteService_DeleteTag_Handler,
+		},
+		{
+			MethodName: "DeleteTags",
+			Handler:    _BlockNoteService_DeleteTags_Handler,
 		},
 		{
 			MethodName: "ShareNote",

@@ -84,6 +84,22 @@ func (s *ServerAPI) DeleteTag(ctx context.Context, req *brzrpc.UserTagId) (*empt
 	return nil, nil
 }
 
+func (s *ServerAPI) DeleteTags(ctx context.Context, req *brzrpc.UserId) (*emptypb.Empty, error) {
+	const op = "grpc.DeleteTags"
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.service.DeleteTags(ctx, req.GetUserId())
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
+}
+
 func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc.UserId) (*brzrpc.Tags, error) {
 	const op = "grpc.GetTagsByUser"
 

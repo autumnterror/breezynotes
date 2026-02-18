@@ -122,6 +122,7 @@ service BlockNoteService {
   rpc UpdateTagColor(UpdateTagColorRequest) returns (google.protobuf.Empty);
   rpc UpdateTagEmoji(UpdateTagEmojiRequest) returns (google.protobuf.Empty);
   rpc DeleteTag(UserTagId) returns (google.protobuf.Empty);
+  rpc DeleteTags(UserId) returns (google.protobuf.Empty);
 
   rpc ShareNote(ShareNoteRequest) returns (google.protobuf.Empty);
   rpc PublicNote(UserNoteId) returns (google.protobuf.Empty);

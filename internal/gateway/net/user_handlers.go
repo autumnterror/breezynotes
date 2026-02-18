@@ -81,6 +81,12 @@ func (e *Echo) DeleteUser(c echo.Context) error {
 		return c.JSON(code, errRes)
 	}
 
+	_, err = e.bnAPI.API.DeleteTags(ctx, &brzrpc.UserId{UserId: idUser})
+	code, errRes = bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
+
 	_, err = auth.DeleteUser(ctx, &brzrpc.UserId{UserId: idUser})
 
 	code, errRes = authErrors(op, err)
