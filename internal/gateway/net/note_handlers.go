@@ -145,7 +145,7 @@ func (e *Echo) GetNote(c echo.Context) error {
 			if note.GetAuthor() != idUser && !alg.IsIn(idUser, note.GetEditors()) && !alg.IsIn(idUser, note.GetReaders()) {
 				return c.JSON(http.StatusUnauthorized, domain.Error{Error: "user dont have permission"})
 			}
-			return c.JSON(http.StatusOK, note)
+			return c.JSON(http.StatusOK, domain.ToNoteWithBlocksDb(note))
 		}
 	}
 
@@ -166,7 +166,7 @@ func (e *Echo) GetNote(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, note)
+	return c.JSON(http.StatusOK, domain.ToNoteWithBlocksDb(note))
 }
 
 // GetAllNotes godoc
@@ -241,9 +241,12 @@ func (e *Echo) GetAllNotes(c echo.Context) error {
 					if end > len(items) {
 						end = len(items)
 					}
-					nlPad := items[start:end]
+					nlPag := items[start:end]
 
-					return c.JSON(http.StatusOK, nlPad)
+					return c.JSON(http.StatusOK, domain.NoteListPaginationResponse{
+						Items: domain.ToNotePartList(nlPag),
+						Total: len(items),
+					})
 				}
 			}
 		}

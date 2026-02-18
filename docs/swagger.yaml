@@ -179,7 +179,7 @@ definitions:
     type: object
   domain.NotePart:
     properties:
-      firstBlock:
+      first_block:
         type: string
       id:
         type: string
@@ -189,8 +189,7 @@ definitions:
         $ref: '#/definitions/domain.Tag'
       title:
         type: string
-      updatedAt:
-        format: int64
+      updated_at:
         type: integer
     type: object
   domain.NoteTagId:

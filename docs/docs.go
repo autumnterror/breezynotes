@@ -2488,7 +2488,7 @@ const docTemplate = `{
         "domain.NotePart": {
             "type": "object",
             "properties": {
-                "firstBlock": {
+                "first_block": {
                     "type": "string"
                 },
                 "id": {
@@ -2503,9 +2503,8 @@ const docTemplate = `{
                 "title": {
                     "type": "string"
                 },
-                "updatedAt": {
-                    "type": "integer",
-                    "format": "int64"
+                "updated_at": {
+                    "type": "integer"
                 }
             }
         },

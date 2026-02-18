@@ -35,12 +35,12 @@ type ChangeRoleRequest struct {
 }
 
 type NotePart struct {
-	Id         string
-	Title      string
-	Tag        *Tag
-	FirstBlock string
-	UpdatedAt  int64
-	Role       string
+	Id         string `json:"id"`
+	Title      string `json:"title"`
+	Tag        *Tag   `json:"tag"`
+	FirstBlock string `json:"first_block"`
+	UpdatedAt  int64  `json:"updated_at"`
+	Role       string `json:"role"`
 }
 
 func ToNotePart(n *brzrpc.NotePart) *NotePart {
