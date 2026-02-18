@@ -96,7 +96,7 @@ func (a *API) Delete(ctx context.Context, id string) error {
 	if res.DeletedCount == 0 {
 		return format.Error(op, domain2.ErrNotFound)
 	}
-	_, err = a.noteTagsAPI.DeleteMany(ctx, bson.D{{"tag._id", bson.D{{"$in", ids}}}})
+	_, err = a.noteTagsAPI.DeleteMany(ctx, bson.D{{"tag._id", id}})
 	if err != nil {
 		return format.Error(op, err)
 	}
