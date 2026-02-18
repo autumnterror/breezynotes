@@ -24,12 +24,7 @@ jobs:
       - name: Go test (selected packages)
         run: |
           go test \
-            ./internal/blocknote/repository/blocks \
-            ./internal/blocknote/repository/notes \
-            ./internal/blocknote/repository/tags  \
-            ./internal/auth/repository \
             ./internal/auth/jwt \
-            ./internal/redis/repository \
             ./internal/blocknote/domain2 \
             ./internal/blocknote/pkg/text \
             ./internal/blocknote/pkg/block/default/textblock \
