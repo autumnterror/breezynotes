@@ -7,7 +7,7 @@ on:
 jobs:
   test_build_push:
     runs-on: ubuntu-latest
-
+    environment: zitrax
     permissions:
       contents: read
 
