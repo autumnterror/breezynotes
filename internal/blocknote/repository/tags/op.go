@@ -96,6 +96,10 @@ func (a *API) Delete(ctx context.Context, id string) error {
 	if res.DeletedCount == 0 {
 		return format.Error(op, domain2.ErrNotFound)
 	}
+	_, err = a.noteTagsAPI.DeleteMany(ctx, bson.D{{"tag._id", bson.D{{"$in", ids}}}})
+	if err != nil {
+		return format.Error(op, err)
+	}
 	return nil
 }
 
@@ -109,7 +113,7 @@ func (a *API) DeleteMany(ctx context.Context, ids []string) error {
 		if err != nil {
 			return format.Error(op, err)
 		}
-		_, err = a.noteTagsAPI.DeleteMany(ctx, bson.D{{"tag.user_id", bson.D{{"$in", ids}}}})
+		_, err = a.noteTagsAPI.DeleteMany(ctx, bson.D{{"tag._id", bson.D{{"$in", ids}}}})
 		if err != nil {
 			return format.Error(op, err)
 		}
