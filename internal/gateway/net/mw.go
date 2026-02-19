@@ -83,7 +83,8 @@ func (e *Echo) GetUserId() echo.MiddlewareFunc {
 			}
 			u, err := e.authAPI.API.GetIdFromToken(ctx, &brzrpc.Token{Value: at.Value})
 			if err != nil || u.GetId() == "" {
-				return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad access_token"})
+				return next(c)
+				//return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad access_token"})
 			}
 
 			if !uid.Validate(u.GetId()) {
