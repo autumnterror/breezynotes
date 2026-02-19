@@ -2750,8 +2750,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "Full API for BreezyNotes.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
-	LeftDelim:        "{{",
-	RightDelim:       "}}",
+	// LeftDelim:        "{{",
+	// RightDelim:       "}}",
 }
 
 func init() {
