@@ -2604,7 +2604,7 @@
                 "title": {
                     "type": "string"
                 },
-                "userId": {
+                "user_id": {
                     "type": "string"
                 }
             }

@@ -7,7 +7,7 @@ type Tag struct {
 	Title  string `json:"title"`
 	Color  string `json:"color"`
 	Emoji  string `json:"emoji"`
-	UserId string `json:"userId"`
+	UserId string `json:"user_id"`
 }
 type Tags struct {
 	Tgs []Tag `json:"tags"`
