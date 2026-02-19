@@ -37,7 +37,6 @@ func (s *ServerAPI) GetNote(ctx context.Context, req *brzrpc.UserNoteId) (*brzrp
 	if err != nil {
 		return nil, err
 	}
-
 	return domain2.FromNoteWithBlocksDb(res.(*domain2.NoteWithBlocks)), nil
 }
 

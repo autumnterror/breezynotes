@@ -180,8 +180,8 @@ func FromNoteWithBlocksDb(n *NoteWithBlocks) *brzrpc.NoteWithBlocks {
 		Editors:   nn.Editors,
 		Readers:   nn.Readers,
 		Blocks:    FromBlocksDb(&Blocks{Blks: nn.Blocks}).GetItems(),
-		IsPublic:  nn.IsPublic,
-		IsBlog:    nn.IsBlog,
+		IsPublic:  n.IsPublic,
+		IsBlog:    n.IsBlog,
 	}
 }
 

@@ -145,8 +145,6 @@ func (e *Echo) GetNote(c echo.Context) error {
 			if note.GetAuthor() != idUser && !alg.IsIn(idUser, note.GetEditors()) && !alg.IsIn(idUser, note.GetReaders()) && !note.IsPublic && !note.IsBlog {
 				return c.JSON(http.StatusUnauthorized, domain.Error{Error: "user dont have permission FROM CACHE"})
 			}
-
-			log.Blue("read note from cache for user:", idUser, note)
 			return c.JSON(http.StatusOK, domain.ToNoteWithBlocksDb(note))
 		}
 	}
@@ -167,8 +165,6 @@ func (e *Echo) GetNote(c echo.Context) error {
 			}
 		}
 	}
-
-	log.Green(note)
 
 	return c.JSON(http.StatusOK, domain.ToNoteWithBlocksDb(note))
 }

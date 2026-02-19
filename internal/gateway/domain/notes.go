@@ -103,8 +103,8 @@ func ToNoteWithBlocksDb(n *brzrpc.NoteWithBlocks) *NoteWithBlocks {
 		Author:    n.Author,
 		Editors:   nn.Editors,
 		Readers:   nn.Readers,
-		IsPublic:  nn.IsPublic,
-		IsBlog:    nn.IsBlog,
+		IsPublic:  n.IsPublic,
+		IsBlog:    n.IsBlog,
 		Blocks:    ToBlocksDb(&brzrpc.Blocks{Items: nn.Blocks}),
 	}
 }
