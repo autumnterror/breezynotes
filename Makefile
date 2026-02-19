@@ -102,7 +102,7 @@ docx:
 test-method:
 	go test -run $(METHOD) ./... -v
 test-redis:
-	go test ./internal/redis/redis -v
+	go test ./internal/redis/repository -v
 test-test:
 	go test ./test -v
 test-views:

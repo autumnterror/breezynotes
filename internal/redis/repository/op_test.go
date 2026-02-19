@@ -357,6 +357,32 @@ func TestCrudFields(t *testing.T) {
 			assert.Equal(t, "test2", nps[1].Id)
 		}
 	}
+
+	sessionKey := userSessionKey(idTest)
+	members, err := c.Rdb.SMembers(ctx, noteSessionsKey("test")).Result()
+	assert.NoError(t, err)
+	assert.Contains(t, members, sessionKey)
+
+	assert.NoError(t, c.CleanNoteById(ctx, "test"))
+
+	if notesAfter, err := c.GetSessionNotes(ctx, idTest); assert.NoError(t, err) {
+		assert.Equal(t, 0, len(notesAfter))
+	}
+
+	if tgs, err := c.GetSessionTags(ctx, idTest); assert.NoError(t, err) {
+		assert.Equal(t, 2, len(tgs))
+	}
+	if nps, err := c.GetSessionNoteList(ctx, idTest); assert.NoError(t, err) {
+		assert.Equal(t, 2, len(nps))
+	}
+	if tr, err := c.GetSessionNoteTrash(ctx, idTest); assert.NoError(t, err) {
+		assert.Equal(t, 2, len(tr))
+	}
+
+	left, err := c.Rdb.Exists(ctx, noteSessionsKey("test")).Result()
+	assert.NoError(t, err)
+	assert.Equal(t, int64(0), left)
+
 	assert.NoError(t, c.SetSessionNotes(ctx, idTest, nil))
 	assert.NoError(t, c.SetSessionNoteTrash(ctx, idTest, nil))
 	assert.NoError(t, c.SetSessionTags(ctx, idTest, nil))
@@ -364,6 +390,6 @@ func TestCrudFields(t *testing.T) {
 
 	assert.NoError(t, c.deleteSession(context.Background(), idTest))
 	if _, err := c.getSession(context.Background(), idTest); assert.Error(t, err) {
-
 	}
+
 }

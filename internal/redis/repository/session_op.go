@@ -27,19 +27,23 @@ type userSessionRedis struct {
 	NoteTrash []json.RawMessage `json:"note_trash"`
 }
 
-const userSessionKeyPrefix = "user_session:"
-
 func userSessionKey(id string) string {
 	return userSessionKeyPrefix + id
 }
 
 const (
-	ExpSession = time.Hour
+	ExpSession            = time.Hour
+	userSessionKeyPrefix  = "user_session:"
+	noteSessionsKeyPrefix = "note_sessions:"
 )
 
 var (
 	ErrNotFound = fmt.Errorf("session not found")
 )
+
+func noteSessionsKey(noteID string) string {
+	return noteSessionsKeyPrefix + noteID
+}
 
 func (s *Client) saveSession(ctx context.Context, us *userSession) error {
 	const op = "redis.saveSession"

@@ -53,6 +53,16 @@ func (e *Echo) ValidateTokenMW() echo.MiddlewareFunc {
 					SameSite: http.SameSiteNoneMode,
 					Expires:  time.Unix(token.GetExp(), 0).UTC(),
 				})
+				u, err := e.authAPI.API.GetIdFromToken(ctx, &brzrpc.Token{Value: at.Value})
+				if err != nil || u.GetId() == "" {
+					return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad access_token"})
+				}
+				if !uid.Validate(u.GetId()) {
+					return c.JSON(http.StatusUnauthorized, domain.Error{Error: "id is not in format"})
+				}
+
+				c.Set(domain.IdFromContext, u.GetId())
+
 				return next(c)
 			}
 			return next(c)
