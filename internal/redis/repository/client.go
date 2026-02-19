@@ -31,4 +31,5 @@ type Repo interface {
 	SetSessionTags(ctx context.Context, id string, tags []*brzrpc.Tag) error
 	CreateSession(ctx context.Context, id string) error
 	CheckSession(ctx context.Context, id string) error
+	CleanNoteById(ctx context.Context, noteID string) error
 }

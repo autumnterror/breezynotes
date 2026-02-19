@@ -305,7 +305,7 @@ const file_redis_proto_rawDesc = "" +
 	"\fBlocksOnNote\x12\x17\n" +
 	"\anote_id\x18\x01 \x01(\tR\x06noteId\x12 \n" +
 	"\x05items\x18\x02 \x03(\v2\n" +
-	".brz.BlockR\x05items2\xf7\x05\n" +
+	".brz.BlockR\x05items2\xad\x06\n" +
 	"\fRedisService\x125\n" +
 	"\rGetNoteByUser\x12\x0f.brz.UserNoteId\x1a\x13.brz.NoteWithBlocks\x120\n" +
 	"\x11GetNoteListByUser\x12\v.brz.UserId\x1a\x0e.brz.NoteParts\x126\n" +
@@ -318,7 +318,8 @@ const file_redis_proto_rawDesc = "" +
 	"\fRmTagsByUser\x12\v.brz.UserId\x1a\x16.google.protobuf.Empty\x127\n" +
 	"\fRmNoteByUser\x12\x0f.brz.UserNoteId\x1a\x16.google.protobuf.Empty\x12=\n" +
 	"\x16RmNotesFromTrashByUser\x12\v.brz.UserId\x1a\x16.google.protobuf.Empty\x127\n" +
-	"\x10RmNoteListByUser\x12\v.brz.UserId\x1a\x16.google.protobuf.Empty\x129\n" +
+	"\x10RmNoteListByUser\x12\v.brz.UserId\x1a\x16.google.protobuf.Empty\x124\n" +
+	"\rCleanNoteById\x12\v.brz.NoteId\x1a\x16.google.protobuf.Empty\x129\n" +
 	"\aHealthz\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.EmptyB,Z*github.com/autumnterror/breezynotes;brzrpcb\x06proto3"
 
 var (
@@ -347,9 +348,10 @@ var file_redis_proto_goTypes = []any{
 	(*Block)(nil),          // 9: brz.Block
 	(*UserNoteId)(nil),     // 10: brz.UserNoteId
 	(*UserId)(nil),         // 11: brz.UserId
-	(*emptypb.Empty)(nil),  // 12: google.protobuf.Empty
-	(*NoteParts)(nil),      // 13: brz.NoteParts
-	(*Tags)(nil),           // 14: brz.Tags
+	(*NoteId)(nil),         // 12: brz.NoteId
+	(*emptypb.Empty)(nil),  // 13: google.protobuf.Empty
+	(*NoteParts)(nil),      // 14: brz.NoteParts
+	(*Tags)(nil),           // 15: brz.Tags
 }
 var file_redis_proto_depIdxs = []int32{
 	5,  // 0: brz.NoteListByUser.items:type_name -> brz.NotePart
@@ -369,22 +371,24 @@ var file_redis_proto_depIdxs = []int32{
 	10, // 14: brz.RedisService.RmNoteByUser:input_type -> brz.UserNoteId
 	11, // 15: brz.RedisService.RmNotesFromTrashByUser:input_type -> brz.UserId
 	11, // 16: brz.RedisService.RmNoteListByUser:input_type -> brz.UserId
-	12, // 17: brz.RedisService.Healthz:input_type -> google.protobuf.Empty
-	7,  // 18: brz.RedisService.GetNoteByUser:output_type -> brz.NoteWithBlocks
-	13, // 19: brz.RedisService.GetNoteListByUser:output_type -> brz.NoteParts
-	13, // 20: brz.RedisService.GetNotesFromTrashByUser:output_type -> brz.NoteParts
-	14, // 21: brz.RedisService.GetTagsByUser:output_type -> brz.Tags
-	12, // 22: brz.RedisService.SetTagsByUser:output_type -> google.protobuf.Empty
-	12, // 23: brz.RedisService.SetNoteByUser:output_type -> google.protobuf.Empty
-	12, // 24: brz.RedisService.SetNotesFromTrashByUser:output_type -> google.protobuf.Empty
-	12, // 25: brz.RedisService.SetNoteListByUser:output_type -> google.protobuf.Empty
-	12, // 26: brz.RedisService.RmTagsByUser:output_type -> google.protobuf.Empty
-	12, // 27: brz.RedisService.RmNoteByUser:output_type -> google.protobuf.Empty
-	12, // 28: brz.RedisService.RmNotesFromTrashByUser:output_type -> google.protobuf.Empty
-	12, // 29: brz.RedisService.RmNoteListByUser:output_type -> google.protobuf.Empty
-	12, // 30: brz.RedisService.Healthz:output_type -> google.protobuf.Empty
-	18, // [18:31] is the sub-list for method output_type
-	5,  // [5:18] is the sub-list for method input_type
+	12, // 17: brz.RedisService.CleanNoteById:input_type -> brz.NoteId
+	13, // 18: brz.RedisService.Healthz:input_type -> google.protobuf.Empty
+	7,  // 19: brz.RedisService.GetNoteByUser:output_type -> brz.NoteWithBlocks
+	14, // 20: brz.RedisService.GetNoteListByUser:output_type -> brz.NoteParts
+	14, // 21: brz.RedisService.GetNotesFromTrashByUser:output_type -> brz.NoteParts
+	15, // 22: brz.RedisService.GetTagsByUser:output_type -> brz.Tags
+	13, // 23: brz.RedisService.SetTagsByUser:output_type -> google.protobuf.Empty
+	13, // 24: brz.RedisService.SetNoteByUser:output_type -> google.protobuf.Empty
+	13, // 25: brz.RedisService.SetNotesFromTrashByUser:output_type -> google.protobuf.Empty
+	13, // 26: brz.RedisService.SetNoteListByUser:output_type -> google.protobuf.Empty
+	13, // 27: brz.RedisService.RmTagsByUser:output_type -> google.protobuf.Empty
+	13, // 28: brz.RedisService.RmNoteByUser:output_type -> google.protobuf.Empty
+	13, // 29: brz.RedisService.RmNotesFromTrashByUser:output_type -> google.protobuf.Empty
+	13, // 30: brz.RedisService.RmNoteListByUser:output_type -> google.protobuf.Empty
+	13, // 31: brz.RedisService.CleanNoteById:output_type -> google.protobuf.Empty
+	13, // 32: brz.RedisService.Healthz:output_type -> google.protobuf.Empty
+	19, // [19:33] is the sub-list for method output_type
+	5,  // [5:19] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name

@@ -239,17 +239,19 @@ func (s *ServerAPI) RmNoteListByUser(ctx context.Context, req *brzrpc.UserId) (*
 	return nil, nil
 }
 
-//func (s *ServerAPI) CleanNoteById(ctx context.Context, req *brzrpc.NoteId) error {
-//	ctx, done := context.WithTimeout(ctx, waitTime)
-//	defer done()
-//
-//	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
-//		return nil, s.rds.SetSessionNoteList(ctx, req.GetUserId(), nil)
-//	})
-//
-//	if err != nil {
-//		return nil, format.Error(op, err)
-//	}
-//
-//	return nil, nil
-//}
+func (s *ServerAPI) CleanNoteById(ctx context.Context, req *brzrpc.NoteId) error {
+	const op = "redis.grpc.CleanNoteById"
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.rds.CleanNoteById(ctx, req.GetNoteId())
+	})
+
+	if err != nil {
+		return format.Error(op, err)
+	}
+
+	return nil
+}

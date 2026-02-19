@@ -40,7 +40,7 @@ func (e *Echo) ValidateTokenMW() echo.MiddlewareFunc {
 			}
 
 			if token != nil {
-				if token.Value == "" {
+				if token.GetValue() == "" {
 					return next(c)
 				}
 				c.SetCookie(&http.Cookie{
@@ -53,7 +53,7 @@ func (e *Echo) ValidateTokenMW() echo.MiddlewareFunc {
 					SameSite: http.SameSiteNoneMode,
 					Expires:  time.Unix(token.GetExp(), 0).UTC(),
 				})
-				u, err := e.authAPI.API.GetIdFromToken(ctx, &brzrpc.Token{Value: token.Value})
+				u, err := e.authAPI.API.GetIdFromToken(ctx, &brzrpc.Token{Value: token.GetValue()})
 				if err != nil || u.GetId() == "" {
 					return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad access_token"})
 				}

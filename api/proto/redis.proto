@@ -32,6 +32,7 @@ service RedisService {
   rpc RmNoteByUser(UserNoteId) returns (google.protobuf.Empty);
   rpc RmNotesFromTrashByUser(UserId) returns (google.protobuf.Empty);
   rpc RmNoteListByUser(UserId) returns (google.protobuf.Empty);
+  rpc CleanNoteById(NoteId) returns (google.protobuf.Empty);
 
 
   rpc Healthz(google.protobuf.Empty) returns (google.protobuf.Empty);

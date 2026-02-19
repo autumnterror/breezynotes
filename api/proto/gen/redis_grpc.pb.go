@@ -32,6 +32,7 @@ const (
 	RedisService_RmNoteByUser_FullMethodName            = "/brz.RedisService/RmNoteByUser"
 	RedisService_RmNotesFromTrashByUser_FullMethodName  = "/brz.RedisService/RmNotesFromTrashByUser"
 	RedisService_RmNoteListByUser_FullMethodName        = "/brz.RedisService/RmNoteListByUser"
+	RedisService_CleanNoteById_FullMethodName           = "/brz.RedisService/CleanNoteById"
 	RedisService_Healthz_FullMethodName                 = "/brz.RedisService/Healthz"
 )
 
@@ -51,6 +52,7 @@ type RedisServiceClient interface {
 	RmNoteByUser(ctx context.Context, in *UserNoteId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	RmNotesFromTrashByUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	RmNoteListByUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CleanNoteById(ctx context.Context, in *NoteId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Healthz(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -182,6 +184,16 @@ func (c *redisServiceClient) RmNoteListByUser(ctx context.Context, in *UserId, o
 	return out, nil
 }
 
+func (c *redisServiceClient) CleanNoteById(ctx context.Context, in *NoteId, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, RedisService_CleanNoteById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *redisServiceClient) Healthz(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
@@ -208,6 +220,7 @@ type RedisServiceServer interface {
 	RmNoteByUser(context.Context, *UserNoteId) (*emptypb.Empty, error)
 	RmNotesFromTrashByUser(context.Context, *UserId) (*emptypb.Empty, error)
 	RmNoteListByUser(context.Context, *UserId) (*emptypb.Empty, error)
+	CleanNoteById(context.Context, *NoteId) (*emptypb.Empty, error)
 	Healthz(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	mustEmbedUnimplementedRedisServiceServer()
 }
@@ -254,6 +267,9 @@ func (UnimplementedRedisServiceServer) RmNotesFromTrashByUser(context.Context, *
 }
 func (UnimplementedRedisServiceServer) RmNoteListByUser(context.Context, *UserId) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RmNoteListByUser not implemented")
+}
+func (UnimplementedRedisServiceServer) CleanNoteById(context.Context, *NoteId) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CleanNoteById not implemented")
 }
 func (UnimplementedRedisServiceServer) Healthz(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Healthz not implemented")
@@ -495,6 +511,24 @@ func _RedisService_RmNoteListByUser_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RedisService_CleanNoteById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NoteId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RedisServiceServer).CleanNoteById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RedisService_CleanNoteById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RedisServiceServer).CleanNoteById(ctx, req.(*NoteId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _RedisService_Healthz_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
@@ -567,6 +601,10 @@ var RedisService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RmNoteListByUser",
 			Handler:    _RedisService_RmNoteListByUser_Handler,
+		},
+		{
+			MethodName: "CleanNoteById",
+			Handler:    _RedisService_CleanNoteById_Handler,
 		},
 		{
 			MethodName: "Healthz",
