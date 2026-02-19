@@ -1,5 +1,7 @@
 package domain
 
+import brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
+
 type Block struct {
 	Id        string         `json:"id"`
 	Type      string         `json:"type"`
@@ -11,9 +13,36 @@ type Block struct {
 	Data      map[string]any `json:"data"`
 }
 
-type Blocks struct {
-	Items []*Block `json:"items"`
+func ToBlockDb(b *brzrpc.Block) *Block {
+	if b == nil {
+		return nil
+	}
+	return &Block{
+		Id:        b.GetId(),
+		Type:      b.GetType(),
+		NoteId:    b.GetNoteId(),
+		CreatedAt: b.GetCreatedAt(),
+		UpdatedAt: b.GetUpdatedAt(),
+		IsUsed:    b.GetIsUsed(),
+		Data:      b.GetData().AsMap(),
+	}
 }
+
+func ToBlocksDb(b *brzrpc.Blocks) []Block {
+	if b == nil {
+		return []Block{}
+	}
+	if len(b.Items) == 0 {
+		return []Block{}
+	}
+	var blks []Block
+	for _, blk := range b.GetItems() {
+		blks = append(blks, *ToBlockDb(blk))
+	}
+
+	return blks
+}
+
 type CreateBlockRequest struct {
 	NoteId string         `json:"note_id"`
 	Pos    int            `json:"pos"`

@@ -3,6 +3,8 @@ package api
 import (
 	"context"
 	"errors"
+	"slices"
+
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/redis/domain"
 	"github.com/autumnterror/breezynotes/internal/redis/repository"
@@ -10,7 +12,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"slices"
 )
 
 func (s *ServerAPI) ensureCreate(ctx context.Context, idUser string) bool {
@@ -239,7 +240,7 @@ func (s *ServerAPI) RmNoteListByUser(ctx context.Context, req *brzrpc.UserId) (*
 	return nil, nil
 }
 
-func (s *ServerAPI) CleanNoteById(ctx context.Context, req *brzrpc.NoteId) error {
+func (s *ServerAPI) CleanNoteById(ctx context.Context, req *brzrpc.NoteId) (*emptypb.Empty, error) {
 	const op = "redis.grpc.CleanNoteById"
 
 	ctx, done := context.WithTimeout(ctx, waitTime)
@@ -250,8 +251,8 @@ func (s *ServerAPI) CleanNoteById(ctx context.Context, req *brzrpc.NoteId) error
 	})
 
 	if err != nil {
-		return format.Error(op, err)
+		return nil, format.Error(op, err)
 	}
 
-	return nil
+	return nil, nil
 }

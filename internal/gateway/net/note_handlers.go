@@ -142,9 +142,11 @@ func (e *Echo) GetNote(c echo.Context) error {
 		}
 	} else {
 		if note != nil {
-			if note.GetAuthor() != idUser && !alg.IsIn(idUser, note.GetEditors()) && !alg.IsIn(idUser, note.GetReaders()) {
-				return c.JSON(http.StatusUnauthorized, domain.Error{Error: "user dont have permission"})
+			if note.GetAuthor() != idUser && !alg.IsIn(idUser, note.GetEditors()) && !alg.IsIn(idUser, note.GetReaders()) && !note.IsPublic && !note.IsBlog {
+				return c.JSON(http.StatusUnauthorized, domain.Error{Error: "user dont have permission FROM CACHE"})
 			}
+
+			log.Blue("read note from cache for user:", idUser, note)
 			return c.JSON(http.StatusOK, domain.ToNoteWithBlocksDb(note))
 		}
 	}
@@ -165,6 +167,8 @@ func (e *Echo) GetNote(c echo.Context) error {
 			}
 		}
 	}
+
+	log.Green(note)
 
 	return c.JSON(http.StatusOK, domain.ToNoteWithBlocksDb(note))
 }
@@ -677,7 +681,7 @@ func (e *Echo) BlogNote(c echo.Context) error {
 	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	_, err := api.PublicNote(ctx, &brzrpc.UserNoteId{
+	_, err := api.BlogNote(ctx, &brzrpc.UserNoteId{
 		NoteId: r.NoteId,
 		UserId: idUser,
 	})
@@ -686,7 +690,7 @@ func (e *Echo) BlogNote(c echo.Context) error {
 		return c.JSON(code, errRes)
 	}
 
-	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.NoteId}); err != nil {
+	if _, err := e.rdsAPI.API.CleanNoteById(ctx, &brzrpc.NoteId{NoteId: r.NoteId}); err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
 			log.Error(op, "REDIS ERROR", err)
@@ -696,29 +700,6 @@ func (e *Echo) BlogNote(c echo.Context) error {
 			}
 		}
 	}
-	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "REDIS ERROR", err)
-		} else {
-			if st.Code() != codes.NotFound {
-				log.Error(op, "REDIS ERROR", err)
-			}
-		}
-	}
-
-	//if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-	//	st, ok := status.FromError(err)
-	//	if !ok {
-	//		log.Error(op, "REDIS ERROR", err)
-	//	} else {
-	//		if st.Code() != codes.NotFound {
-	//			log.Error(op, "REDIS ERROR", err)
-	//		}
-	//	}
-	//}
-
-	//TODO delete note from all cache
 
 	return c.NoContent(http.StatusOK)
 }
@@ -748,7 +729,6 @@ func (e *Echo) PublicNote(c echo.Context) error {
 
 	var r domain.NoteId
 	if err := c.Bind(&r); err != nil {
-
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
@@ -764,7 +744,7 @@ func (e *Echo) PublicNote(c echo.Context) error {
 		return c.JSON(code, errRes)
 	}
 
-	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.NoteId}); err != nil {
+	if _, err := e.rdsAPI.API.CleanNoteById(ctx, &brzrpc.NoteId{NoteId: r.NoteId}); err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
 			log.Error(op, "REDIS ERROR", err)
@@ -774,18 +754,6 @@ func (e *Echo) PublicNote(c echo.Context) error {
 			}
 		}
 	}
-	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
-		st, ok := status.FromError(err)
-		if !ok {
-			log.Error(op, "REDIS ERROR", err)
-		} else {
-			if st.Code() != codes.NotFound {
-				log.Error(op, "REDIS ERROR", err)
-			}
-		}
-	}
-
-	//TODO delete note from all cache
 
 	return c.NoContent(http.StatusOK)
 }
@@ -802,7 +770,7 @@ func (e *Echo) PublicNote(c echo.Context) error {
 // @Failure 404 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
-// @Router /api/note/public/add [post]
+// @Router /api/note/public/add [patch]
 func (e *Echo) AddPublicNote(c echo.Context) error {
 	const op = "gateway.net.ShareNote"
 
@@ -813,9 +781,8 @@ func (e *Echo) AddPublicNote(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
 	}
 
-	var r domain.ShareNoteRequest
+	var r domain.NoteId
 	if err := c.Bind(&r); err != nil {
-
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
 	}
 
@@ -831,7 +798,7 @@ func (e *Echo) AddPublicNote(c echo.Context) error {
 		return c.JSON(code, errRes)
 	}
 
-	if _, err := e.rdsAPI.API.RmNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: r.NoteId}); err != nil {
+	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
 			log.Error(op, "REDIS ERROR", err)
@@ -841,7 +808,8 @@ func (e *Echo) AddPublicNote(c echo.Context) error {
 			}
 		}
 	}
-	if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+
+	if _, err := e.rdsAPI.API.CleanNoteById(ctx, &brzrpc.NoteId{NoteId: r.NoteId}); err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
 			log.Error(op, "REDIS ERROR", err)

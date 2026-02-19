@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
+	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/autumnterror/utils_go/pkg/utils/alg"
 )
 
@@ -34,6 +35,8 @@ func (s *BN) GetNote(ctx context.Context, idNote, idUser string) (*domain2.NoteW
 	if err != nil {
 		return nil, domain2.ErrNotFound
 	}
+
+	log.Green(n)
 
 	if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) && !n.IsBlog && !n.IsPublic {
 		return nil, domain2.ErrUnauthorized
@@ -276,11 +279,10 @@ func (s *BN) PublicNote(ctx context.Context, idNote, idUser string) error {
 		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
 			return nil, domain2.ErrUnauthorized
 		} else {
-			if n.IsPublic {
+			if !n.IsPublic {
 				isPublic = true
 			}
 		}
-
 		return nil, s.nts.UpdatePublic(ctx, idNote, isPublic)
 	})
 
@@ -307,12 +309,11 @@ func (s *BN) BlogNote(ctx context.Context, idNote, idUser string) error {
 		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
 			return nil, domain2.ErrUnauthorized
 		} else {
-			if n.IsBlog {
+			if !n.IsBlog {
 				isBlog = true
 			}
 		}
-
-		return nil, s.nts.UpdatePublic(ctx, idNote, isBlog)
+		return nil, s.nts.UpdateBlog(ctx, idNote, isBlog)
 	})
 
 	if err != nil {

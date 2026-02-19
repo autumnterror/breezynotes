@@ -76,6 +76,8 @@ type NoteWithBlocks struct {
 	Editors   []string `json:"editors"`
 	Readers   []string `json:"readers"`
 	Blocks    []Block  `json:"blocks"`
+	IsPublic  bool     `json:"is_public"`
+	IsBlog    bool     `json:"is_blog"`
 }
 
 func ToNoteWithBlocksDb(n *brzrpc.NoteWithBlocks) *NoteWithBlocks {
@@ -101,6 +103,8 @@ func ToNoteWithBlocksDb(n *brzrpc.NoteWithBlocks) *NoteWithBlocks {
 		Author:    n.Author,
 		Editors:   nn.Editors,
 		Readers:   nn.Readers,
-		//Blocks:    ToBlocksDb(&brzrpc.Blocks{Items: nn.Blocks}).Blks,
+		IsPublic:  nn.IsPublic,
+		IsBlog:    nn.IsBlog,
+		Blocks:    ToBlocksDb(&brzrpc.Blocks{Items: nn.Blocks}),
 	}
 }
