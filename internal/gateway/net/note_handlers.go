@@ -552,8 +552,6 @@ func (e *Echo) RmTagFromNote(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-//TODO delete from roles
-
 // ShareNote godoc
 // @Summary share note
 // @Description add new user to list of editors or readers
@@ -708,6 +706,17 @@ func (e *Echo) BlogNote(c echo.Context) error {
 			}
 		}
 	}
+
+	//if _, err := e.rdsAPI.API.RmNoteListByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+	//	st, ok := status.FromError(err)
+	//	if !ok {
+	//		log.Error(op, "REDIS ERROR", err)
+	//	} else {
+	//		if st.Code() != codes.NotFound {
+	//			log.Error(op, "REDIS ERROR", err)
+	//		}
+	//	}
+	//}
 
 	//TODO delete note from all cache
 
