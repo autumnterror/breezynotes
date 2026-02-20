@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+
 	"github.com/autumnterror/breezynotes/internal/auth/domain"
 	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
@@ -44,7 +45,7 @@ func (d Driver) CreateAdmin(ctx context.Context) (string, error) {
 		Password: "admin",
 	}
 
-	if idA, err := d.GetIdFromLogin(ctx, "admin"); err != nil {
+	if idA, err := d.GetIdFromLogin(ctx, "admin"); err == nil {
 		if idA != "" {
 			return idA, nil
 		}

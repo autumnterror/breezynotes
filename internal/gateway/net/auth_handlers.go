@@ -2,10 +2,12 @@ package net
 
 import (
 	"context"
-	"github.com/autumnterror/utils_go/pkg/utils/uid"
-	"google.golang.org/protobuf/types/known/structpb"
 	"net/http"
 	"time"
+
+	"github.com/autumnterror/utils_go/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/utils/uid"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/gateway/domain"
@@ -184,14 +186,15 @@ func (e *Echo) Reg(c echo.Context) error {
 	}
 
 	s, err := structpb.NewStruct(map[string]any{
-		"text": []map[string]any{
-			{
-				"style": "default",
-				"text":  "Hi there, it's your first note",
+		"text": []any{
+			map[string]any{
+				"style":  "default",
+				"string": "Hi there, it's your first note",
 			},
 		},
 	})
 	if err != nil {
+		log.Red()
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad data"})
 	}
 	_, err = e.bnAPI.API.CreateBlock(ctx, &brzrpc.CreateBlockRequest{

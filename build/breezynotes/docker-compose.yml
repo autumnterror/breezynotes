@@ -294,17 +294,9 @@ services:
     env_file: .env
     volumes:
       - ./migrations:/migrations:ro
+      - ./scripts/mongo-migrate.sh:/mongo-migrate.sh:ro
     restart: "no"
-    entrypoint: >
-      bash -c "
-        set -e;
-        echo 'Running Mongo migrations...';
-        for f in /migrations/*.js; do
-          echo \"Applying $f\";
-          mongosh \"mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo1:27017,mongo2:27017,mongo3:27017/${MONGO_INITDB_DATABASE}?replicaSet=rs0&authSource=admin\" --file \"$f\";
-        done;
-        echo 'Mongo migrations done ✅';
-      "
+    entrypoint: ["/bin/bash", "/mongo-migrate.sh"]
 networks:
   auth:
     driver: bridge
