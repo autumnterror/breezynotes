@@ -7,20 +7,18 @@ import (
 	"github.com/autumnterror/utils_go/pkg/utils/validate"
 )
 
-//func (s *AuthService) Create(ctx context.Context, u *domain.User) error {
-//	const op = "service.Create"
-//	if err := userValidation(u); err != nil {
-//		return wrapServiceCheck(op, err)
-//	}
-//
-//	return s.runInTx(ctx, op, func(ctx context.Context) error {
-//		repo, err := s.userRepo(ctx)
-//		if err != nil {
-//			return wrapServiceCheck(op, err)
-//		}
-//		return repo.Create(ctx, u)
-//	})
-//}
+func (s *AuthService) CreateAdmin(ctx context.Context) error {
+	const op = "service.CreateAdmin"
+
+	return s.runInTx(ctx, op, func(ctx context.Context) error {
+		repo, err := s.userRepo(ctx)
+		if err != nil {
+			return wrapServiceCheck(op, err)
+		}
+		_, err = repo.CreateAdmin(ctx)
+		return err
+	})
+}
 
 func (s *AuthService) UpdatePassword(ctx context.Context, id, oldPassword string, newPassword string) error {
 	const op = "service.UpdatePassword"

@@ -85,7 +85,6 @@ func (e *Echo) Search(c echo.Context) error {
 	for {
 		note, err := notes.Recv()
 		if err == io.EOF {
-			// Поток завершен сервером
 			break
 		}
 		if err != nil {

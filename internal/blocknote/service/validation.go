@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/uid"
 )
 
@@ -40,7 +40,7 @@ func digEmpty[T int64 | int | float32 | float64](s T) bool {
 	return false
 }
 
-func tagValidation(t *domain2.Tag) error {
+func tagValidation(t *domain.Tag) error {
 	if err := idValidation(t.Id); err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func tagValidation(t *domain2.Tag) error {
 	return nil
 }
 
-func noteValidation(n *domain2.Note) error {
+func noteValidation(n *domain.Note) error {
 	var errs []error
 
 	validateIDs := func(ids []string, fieldName string) {

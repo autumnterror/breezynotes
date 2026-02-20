@@ -12,7 +12,7 @@ import (
 
 	"testing"
 
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/breezynotes/internal/blocknote/repository/blocks"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/infra/mongo"
@@ -44,7 +44,7 @@ func TestWithBlocks(t *testing.T) {
 
 			assert.NoError(t, m.Disconnect())
 		})
-		assert.NoError(t, a.Create(context.Background(), &domain2.Note{
+		assert.NoError(t, a.Create(context.Background(), &domain.Note{
 			Id:        idNote,
 			Title:     "test",
 			CreatedAt: 0,
@@ -68,7 +68,7 @@ func TestWithBlocks(t *testing.T) {
 		idBlock1 := uid.New()
 		idBlock2 := uid.New()
 
-		assert.NoError(t, b.CreateBlock(context.Background(), &domain2.Block{
+		assert.NoError(t, b.CreateBlock(context.Background(), &domain.Block{
 			Id:        idBlock1,
 			Type:      "text",
 			NoteId:    idNote,
@@ -82,7 +82,7 @@ func TestWithBlocks(t *testing.T) {
 				},
 			},
 		}))
-		assert.NoError(t, b.CreateBlock(context.Background(), &domain2.Block{
+		assert.NoError(t, b.CreateBlock(context.Background(), &domain.Block{
 			Id:        idBlock2,
 			Type:      "text",
 			NoteId:    idNote,
@@ -112,7 +112,7 @@ func TestWithBlocks(t *testing.T) {
 		}
 
 		idTag := uid.New()
-		newTag := &domain2.Tag{
+		newTag := &domain.Tag{
 			Id:     idTag,
 			Title:  "newTag",
 			Color:  "newColor",
@@ -162,7 +162,7 @@ func TestCrudGood(t *testing.T) {
 			assert.NoError(t, m.Disconnect())
 		})
 
-		assert.NoError(t, a.Create(context.Background(), &domain2.Note{
+		assert.NoError(t, a.Create(context.Background(), &domain.Note{
 			Id:        idNote,
 			Title:     "test",
 			CreatedAt: 0,
@@ -206,7 +206,7 @@ func TestCrudGood(t *testing.T) {
 			log.Green("get after update updated ", n)
 		}
 
-		newTag := &domain2.Tag{
+		newTag := &domain.Tag{
 			Id:     idTag,
 			Title:  "newTag",
 			Color:  "newColor",
@@ -233,8 +233,8 @@ func TestCrudGood(t *testing.T) {
 			log.Green("get after rm tag ", n)
 			assert.Nil(t, n.Tag)
 		}
-		assert.NoError(t, a.ShareNote(context.Background(), idNote, "neweditor", domain2.EditorRole))
-		assert.NoError(t, a.ShareNote(context.Background(), idNote, "newreader", domain2.ReaderRole))
+		assert.NoError(t, a.ShareNote(context.Background(), idNote, "neweditor", domain.EditorRole))
+		assert.NoError(t, a.ShareNote(context.Background(), idNote, "newreader", domain.ReaderRole))
 		if n, err := a.Get(context.Background(), idNote, idUser); assert.NoError(t, err) {
 			log.Green("get share note ", n)
 			assert.Contains(t, n.Readers, "newreader")
@@ -249,8 +249,8 @@ func TestCrudGood(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, n.Ntps, 1)
 
-		assert.NoError(t, a.ShareNote(context.Background(), idNote, "neweditor", domain2.ReaderRole))
-		assert.NoError(t, a.ShareNote(context.Background(), idNote, "newreader", domain2.EditorRole))
+		assert.NoError(t, a.ShareNote(context.Background(), idNote, "neweditor", domain.ReaderRole))
+		assert.NoError(t, a.ShareNote(context.Background(), idNote, "newreader", domain.EditorRole))
 		if n, err := a.Get(context.Background(), idNote, idUser); assert.NoError(t, err) {
 			log.Green("get ChangeUserRole ", n)
 			assert.Contains(t, n.Editors, "newreader")
@@ -295,17 +295,17 @@ func TestCrudNotExist(t *testing.T) {
 			assert.NoError(t, m.Disconnect())
 		})
 
-		if _, err := a.Get(context.Background(), id, ""); assert.ErrorIs(t, err, domain2.ErrNotFound) {
+		if _, err := a.Get(context.Background(), id, ""); assert.ErrorIs(t, err, domain.ErrNotFound) {
 		}
 		if n, err := a.GetNoteListByUser(context.Background(), id); assert.NoError(t, err) && assert.Equal(t, 0, len(n.Ntps)) {
 		}
 		if n, err := a.GetNoteListByTag(context.Background(), id, id); assert.NoError(t, err) && assert.Equal(t, 0, len(n.Ntps)) {
 		}
-		assert.ErrorIs(t, a.UpdateTitle(context.Background(), id, "new_title"), domain2.ErrNotFound)
-		assert.ErrorIs(t, a.UpdateUpdatedAt(context.Background(), id), domain2.ErrNotFound)
+		assert.ErrorIs(t, a.UpdateTitle(context.Background(), id, "new_title"), domain.ErrNotFound)
+		assert.ErrorIs(t, a.UpdateUpdatedAt(context.Background(), id), domain.ErrNotFound)
 		assert.Error(t, a.delete(context.Background(), id))
-		assert.ErrorIs(t, a.ShareNote(context.Background(), id, "neweditor", domain2.ReaderRole), domain2.ErrNotFound)
-		assert.ErrorIs(t, a.DeleteRole(context.Background(), id, "newreader"), domain2.ErrNotFound)
+		assert.ErrorIs(t, a.ShareNote(context.Background(), id, "neweditor", domain.ReaderRole), domain.ErrNotFound)
+		assert.ErrorIs(t, a.DeleteRole(context.Background(), id, "newreader"), domain.ErrNotFound)
 	})
 }
 
@@ -336,7 +336,7 @@ func TestBlockOrder(t *testing.T) {
 			"test6bl", "test2bl", "test3bl", "test5bl", "test4bl", "test1bl",
 		}
 
-		assert.NoError(t, a.Create(context.Background(), &domain2.Note{
+		assert.NoError(t, a.Create(context.Background(), &domain.Note{
 			Id: id,
 			//Tag:    &domain2.Tag{},
 			Blocks: start,
@@ -379,7 +379,7 @@ func TestBlockOrder2(t *testing.T) {
 			"test2bl", "test1bl",
 		}
 
-		assert.NoError(t, a.Create(context.Background(), &domain2.Note{
+		assert.NoError(t, a.Create(context.Background(), &domain.Note{
 			Id: id,
 			//Tag:    &domain2.Tag{},
 			Blocks: start,

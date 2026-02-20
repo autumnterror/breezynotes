@@ -4,16 +4,16 @@ import (
 	"context"
 	"errors"
 
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 type Repo interface {
-	Get(ctx context.Context, id string) (*domain2.Tag, error)
-	GetAllById(ctx context.Context, id string) (*domain2.Tags, error)
-	Create(ctx context.Context, t *domain2.Tag) error
+	Get(ctx context.Context, id string) (*domain.Tag, error)
+	GetAllById(ctx context.Context, id string) (*domain.Tags, error)
+	Create(ctx context.Context, t *domain.Tag) error
 	Delete(ctx context.Context, id string) error
 	DeleteMany(ctx context.Context, ids []string) error
 	UpdateTitle(ctx context.Context, id, nTitle string) error
@@ -21,20 +21,20 @@ type Repo interface {
 	UpdateEmoji(ctx context.Context, id, nEmoji string) error
 }
 
-func (a *API) Get(ctx context.Context, id string) (*domain2.Tag, error) {
+func (a *API) Get(ctx context.Context, id string) (*domain.Tag, error) {
 	const op = "tags.Get"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	res := a.db.FindOne(ctx, bson.M{"_id": id})
 	if err := res.Err(); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, format.Error(op, domain2.ErrNotFound)
+			return nil, format.Error(op, domain.ErrNotFound)
 		}
 		return nil, format.Error(op, err)
 	}
-	var t domain2.Tag
+	var t domain.Tag
 	if err := res.Decode(&t); err != nil {
 		return nil, format.Error(op, err)
 	}
@@ -42,10 +42,10 @@ func (a *API) Get(ctx context.Context, id string) (*domain2.Tag, error) {
 	return &t, nil
 }
 
-func (a *API) GetAllById(ctx context.Context, id string) (*domain2.Tags, error) {
+func (a *API) GetAllById(ctx context.Context, id string) (*domain.Tags, error) {
 	const op = "tags.GetAllByIdTag"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	cur, err := a.db.Find(ctx, bson.M{"user_id": id})
@@ -54,12 +54,12 @@ func (a *API) GetAllById(ctx context.Context, id string) (*domain2.Tags, error) 
 	}
 	defer cur.Close(ctx)
 
-	tags := &domain2.Tags{
-		Tgs: []*domain2.Tag{},
+	tags := &domain.Tags{
+		Tgs: []*domain.Tag{},
 	}
 
 	for cur.Next(ctx) {
-		var t domain2.Tag
+		var t domain.Tag
 		if err = cur.Decode(&t); err != nil {
 			return nil, format.Error(op, err)
 		}
@@ -70,10 +70,10 @@ func (a *API) GetAllById(ctx context.Context, id string) (*domain2.Tags, error) 
 }
 
 // Create tag. Don't create id
-func (a *API) Create(ctx context.Context, t *domain2.Tag) error {
+func (a *API) Create(ctx context.Context, t *domain.Tag) error {
 	const op = "tags.Create"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	if _, err := a.db.InsertOne(ctx, t); err != nil {
@@ -86,7 +86,7 @@ func (a *API) Create(ctx context.Context, t *domain2.Tag) error {
 func (a *API) Delete(ctx context.Context, id string) error {
 	const op = "tags.delete"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	res, err := a.db.DeleteOne(ctx, bson.D{{"_id", id}})
@@ -94,7 +94,7 @@ func (a *API) Delete(ctx context.Context, id string) error {
 		return format.Error(op, err)
 	}
 	if res.DeletedCount == 0 {
-		return format.Error(op, domain2.ErrNotFound)
+		return format.Error(op, domain.ErrNotFound)
 	}
 	_, err = a.noteTagsAPI.DeleteMany(ctx, bson.D{{"tag._id", id}})
 	if err != nil {
@@ -106,7 +106,7 @@ func (a *API) Delete(ctx context.Context, id string) error {
 func (a *API) DeleteMany(ctx context.Context, ids []string) error {
 	const op = "tags.deleteMany"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 	if len(ids) != 0 {
 		_, err := a.db.DeleteMany(ctx, bson.D{{"_id", bson.D{{"$in", ids}}}})
@@ -144,7 +144,7 @@ func (a *API) UpdateTitle(ctx context.Context, id, nTitle string) error {
 		return format.Error(op, err)
 	}
 	if res.MatchedCount == 0 {
-		return format.Error(op, domain2.ErrNotFound)
+		return format.Error(op, domain.ErrNotFound)
 	}
 	return nil
 }
@@ -171,7 +171,7 @@ func (a *API) UpdateColor(ctx context.Context, id, nColor string) error {
 		return format.Error(op, err)
 	}
 	if res.MatchedCount == 0 {
-		return format.Error(op, domain2.ErrNotFound)
+		return format.Error(op, domain.ErrNotFound)
 	}
 	return nil
 }
@@ -198,7 +198,7 @@ func (a *API) UpdateEmoji(ctx context.Context, id, nEmoji string) error {
 		return format.Error(op, err)
 	}
 	if res.MatchedCount == 0 {
-		return format.Error(op, domain2.ErrNotFound)
+		return format.Error(op, domain.ErrNotFound)
 	}
 	return nil
 }

@@ -2,7 +2,7 @@ package blocks
 
 import (
 	"context"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"time"
@@ -11,7 +11,7 @@ import (
 // UpdateData can return mongo.ErrNotFound. Set updated_at to time.Now().UTC().Unix()
 func (a *API) UpdateData(ctx context.Context, id string, data map[string]any) error {
 	const op = "blocks.UpdateData"
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	res, err := a.
@@ -32,7 +32,7 @@ func (a *API) UpdateData(ctx context.Context, id string, data map[string]any) er
 		return format.Error(op, err)
 	}
 	if res.MatchedCount == 0 {
-		return format.Error(op, domain2.ErrNotFound)
+		return format.Error(op, domain.ErrNotFound)
 	}
 
 	return nil
@@ -42,7 +42,7 @@ func (a *API) UpdateData(ctx context.Context, id string, data map[string]any) er
 func (a *API) UpdateType(ctx context.Context, id string, _type string) error {
 	const op = "blocks.UpdateData"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	res, err := a.
@@ -63,7 +63,7 @@ func (a *API) UpdateType(ctx context.Context, id string, _type string) error {
 		return format.Error(op, err)
 	}
 	if res.MatchedCount == 0 {
-		return format.Error(op, domain2.ErrNotFound)
+		return format.Error(op, domain.ErrNotFound)
 	}
 
 	return nil
@@ -73,7 +73,7 @@ func (a *API) UpdateType(ctx context.Context, id string, _type string) error {
 func (a *API) UpdateUsed(ctx context.Context, id string, isUsedNew bool) error {
 	const op = "blocks.UpdateData"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	var filter bson.M
@@ -106,17 +106,17 @@ func (a *API) UpdateUsed(ctx context.Context, id string, isUsedNew bool) error {
 		return format.Error(op, err)
 	}
 	if res.MatchedCount == 0 {
-		return format.Error(op, domain2.ErrNotFound)
+		return format.Error(op, domain.ErrNotFound)
 	}
 
 	return nil
 }
 
 // CreateBlock with CreatedAt and UpdatedAt time.Now().UTC().Unix(). Don't create id
-func (a *API) CreateBlock(ctx context.Context, b *domain2.Block) error {
+func (a *API) CreateBlock(ctx context.Context, b *domain.Block) error {
 	const op = "blocks.Create"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	b.CreatedAt, b.UpdatedAt = time.Now().UTC().Unix(), time.Now().UTC().Unix()

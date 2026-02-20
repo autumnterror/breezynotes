@@ -53,7 +53,7 @@ func (e *Echo) CleanTrash(c echo.Context) error {
 		}
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // NoteToTrash godoc
@@ -127,7 +127,7 @@ func (e *Echo) NoteToTrash(c echo.Context) error {
 		}
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // NoteFromTrash godoc
@@ -200,7 +200,7 @@ func (e *Echo) NoteFromTrash(c echo.Context) error {
 		}
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // GetNotesFromTrash godoc

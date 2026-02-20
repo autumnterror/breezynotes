@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/autumnterror/utils_go/pkg/utils/alg"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
@@ -14,21 +14,21 @@ import (
 )
 
 // Get return note by id can return mongo.ErrNotFound
-func (a *API) Get(ctx context.Context, idNote, idUser string) (*domain2.Note, error) {
+func (a *API) Get(ctx context.Context, idNote, idUser string) (*domain.Note, error) {
 	const op = "notes.Get"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	res := a.noteAPI.FindOne(ctx, bson.M{"_id": idNote})
 	if res.Err() != nil {
 		if errors.Is(res.Err(), mongo.ErrNoDocuments) {
-			return nil, format.Error(op, domain2.ErrNotFound)
+			return nil, format.Error(op, domain.ErrNotFound)
 		}
 		return nil, format.Error(op, res.Err())
 	}
 
-	var n domain2.Note
+	var n domain.Note
 	err := res.Decode(&n)
 	if err != nil {
 		return nil, format.Error(op, err)
@@ -41,7 +41,7 @@ func (a *API) Get(ctx context.Context, idNote, idUser string) (*domain2.Note, er
 		}
 		return nil, format.Error(op, res.Err())
 	}
-	var nt domain2.NoteTags
+	var nt domain.NoteTags
 	err = res.Decode(&nt)
 	if err != nil {
 		return nil, format.Error(op, err)
@@ -53,10 +53,10 @@ func (a *API) Get(ctx context.Context, idNote, idUser string) (*domain2.Note, er
 }
 
 // GetNoteListByUser use func a.blockAPI.GetAsFirst
-func (a *API) GetNoteListByUser(ctx context.Context, id string) (*domain2.NoteParts, error) {
+func (a *API) GetNoteListByUser(ctx context.Context, id string) (*domain.NoteParts, error) {
 	const op = "notes.GetNoteListByUser"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	cur, err := a.noteTagsAPI.Find(ctx, bson.M{"tag.user_id": id})
@@ -65,10 +65,10 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string) (*domain2.NotePa
 	}
 	defer cur.Close(ctx)
 
-	noteTag := make(map[string]*domain2.Tag)
+	noteTag := make(map[string]*domain.Tag)
 
 	for cur.Next(ctx) {
-		nt := domain2.NoteTags{}
+		nt := domain.NoteTags{}
 		if err = cur.Decode(&nt); err != nil {
 			return nil, format.Error(op, err)
 		}
@@ -91,12 +91,12 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string) (*domain2.NotePa
 	}
 	defer cur.Close(ctx)
 
-	nts := &domain2.NoteParts{
-		Ntps: []*domain2.NotePart{},
+	nts := &domain.NoteParts{
+		Ntps: []*domain.NotePart{},
 	}
 
 	for cur.Next(ctx) {
-		var n domain2.Note
+		var n domain.Note
 		if err = cur.Decode(&n); err != nil {
 			return nil, format.Error(op, err)
 		}
@@ -118,7 +118,7 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string) (*domain2.NotePa
 		case alg.IsIn(id, n.Readers):
 			role = "reader"
 		}
-		nts.Ntps = append(nts.Ntps, &domain2.NotePart{
+		nts.Ntps = append(nts.Ntps, &domain.NotePart{
 			Id:         n.Id,
 			Title:      n.Title,
 			Tag:        noteTag[n.Id],
@@ -135,19 +135,19 @@ func (a *API) GetNoteListByUser(ctx context.Context, id string) (*domain2.NotePa
 }
 
 // GetNoteListByTag use func a.blockAPI.GetAsFirst
-func (a *API) GetNoteListByTag(ctx context.Context, idTag, idUser string) (*domain2.NoteParts, error) {
+func (a *API) GetNoteListByTag(ctx context.Context, idTag, idUser string) (*domain.NoteParts, error) {
 	const op = "notes.GetNoteListByTag"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	nts := &domain2.NoteParts{
-		Ntps: []*domain2.NotePart{},
+	nts := &domain.NoteParts{
+		Ntps: []*domain.NotePart{},
 	}
 
 	tag, err := a.tagAPI.Get(ctx, idTag)
 	if err != nil {
-		if errors.Is(err, domain2.ErrNotFound) {
+		if errors.Is(err, domain.ErrNotFound) {
 			return nts, nil
 		}
 		return nil, format.Error(op, err)
@@ -162,7 +162,7 @@ func (a *API) GetNoteListByTag(ctx context.Context, idTag, idUser string) (*doma
 	var ntIds []string
 
 	for cur.Next(ctx) {
-		nt := domain2.NoteTags{}
+		nt := domain.NoteTags{}
 		if err = cur.Decode(&nt); err != nil {
 			return nil, format.Error(op, err)
 		}
@@ -183,7 +183,7 @@ func (a *API) GetNoteListByTag(ctx context.Context, idTag, idUser string) (*doma
 	defer cur.Close(ctx)
 
 	for cur.Next(ctx) {
-		var n domain2.Note
+		var n domain.Note
 		if err = cur.Decode(&n); err != nil {
 			return nts, format.Error(op, err)
 		}
@@ -203,7 +203,7 @@ func (a *API) GetNoteListByTag(ctx context.Context, idTag, idUser string) (*doma
 		case alg.IsIn(idUser, n.Readers):
 			role = "reader"
 		}
-		nts.Ntps = append(nts.Ntps, &domain2.NotePart{
+		nts.Ntps = append(nts.Ntps, &domain.NotePart{
 			Id:         n.Id,
 			Title:      n.Title,
 			Tag:        tag,
@@ -219,10 +219,10 @@ func (a *API) GetNoteListByTag(ctx context.Context, idTag, idUser string) (*doma
 }
 
 // GetAllByUser return note by id author
-func (a *API) getAllByUser(ctx context.Context, id string) (*domain2.Notes, error) {
+func (a *API) getAllByUser(ctx context.Context, id string) (*domain.Notes, error) {
 	const op = "notes.getAllByUser"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	cur, err := a.noteAPI.Find(ctx, bson.M{"author": id}, options.Find().SetSort(bson.M{"updated_at": -1}))
@@ -231,12 +231,12 @@ func (a *API) getAllByUser(ctx context.Context, id string) (*domain2.Notes, erro
 	}
 	defer cur.Close(ctx)
 
-	nts := &domain2.Notes{
-		Nts: []*domain2.Note{},
+	nts := &domain.Notes{
+		Nts: []*domain.Note{},
 	}
 
 	for cur.Next(ctx) {
-		var n domain2.Note
+		var n domain.Note
 		if err = cur.Decode(&n); err != nil {
 			return nts, format.Error(op, err)
 		}
@@ -246,13 +246,13 @@ func (a *API) getAllByUser(ctx context.Context, id string) (*domain2.Notes, erro
 	return nts, nil
 }
 
-func (a *API) Search(ctx context.Context, id, prompt string) (<-chan *domain2.NotePart, error) {
+func (a *API) Search(ctx context.Context, id, prompt string) (<-chan *domain.NotePart, error) {
 	const op = "notes.Search"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	notesChan := make(chan *domain2.NotePart)
+	notesChan := make(chan *domain.NotePart)
 
 	go func() {
 		defer close(notesChan)
@@ -264,7 +264,7 @@ func (a *API) Search(ctx context.Context, id, prompt string) (<-chan *domain2.No
 		)
 		if err == nil {
 			for cur.Next(ctx) {
-				var n domain2.Note
+				var n domain.Note
 				if err = cur.Decode(&n); err != nil {
 					continue
 				}
@@ -273,7 +273,7 @@ func (a *API) Search(ctx context.Context, id, prompt string) (<-chan *domain2.No
 					cur.Close(ctx)
 					return
 				default:
-					notesChan <- &domain2.NotePart{
+					notesChan <- &domain.NotePart{
 						Id:    n.Id,
 						Title: n.Title,
 						//Tag:        n.Tag,

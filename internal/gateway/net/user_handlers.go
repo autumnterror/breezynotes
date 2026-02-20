@@ -94,7 +94,7 @@ func (e *Echo) DeleteUser(c echo.Context) error {
 		return c.JSON(code, errRes)
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // UpdateAbout godoc
@@ -140,7 +140,7 @@ func (e *Echo) UpdateAbout(c echo.Context) error {
 		return c.JSON(code, errRes)
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // UpdateEmail godoc
@@ -185,7 +185,7 @@ func (e *Echo) UpdateEmail(c echo.Context) error {
 		return c.JSON(code, errRes)
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // UpdatePhoto godoc
@@ -229,7 +229,7 @@ func (e *Echo) UpdatePhoto(c echo.Context) error {
 		return c.JSON(code, errRes)
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // ChangePassword godoc
@@ -280,5 +280,5 @@ func (e *Echo) ChangePassword(c echo.Context) error {
 		return c.JSON(code, errRes)
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }

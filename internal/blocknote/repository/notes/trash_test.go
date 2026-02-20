@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/config"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/breezynotes/internal/blocknote/infra/mongo"
 	"github.com/autumnterror/breezynotes/internal/blocknote/repository/blocks"
 	"github.com/autumnterror/breezynotes/internal/blocknote/repository/tags"
@@ -28,7 +28,7 @@ func TestTrashCycle(t *testing.T) {
 		idNote := uid.New()
 		idUser := uid.New()
 		idTag := uid.New()
-		n := &domain2.Note{
+		n := &domain.Note{
 			Id:        idNote,
 			Title:     "test",
 			CreatedAt: time.Now().UTC().Unix(),
@@ -54,7 +54,7 @@ func TestTrashCycle(t *testing.T) {
 
 		assert.NoError(t, a.Create(context.Background(), n))
 
-		newTag := &domain2.Tag{
+		newTag := &domain.Tag{
 			Id:     idTag,
 			Title:  "newTagTRASH",
 			Color:  "newColor",

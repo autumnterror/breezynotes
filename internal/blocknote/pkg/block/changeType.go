@@ -1,7 +1,7 @@
 package block
 
 import (
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2/domainblocks"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
 	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/text"
 	"github.com/autumnterror/breezynotes/utils/lang"
 )

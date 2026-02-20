@@ -128,7 +128,7 @@ func (e *Echo) UpdateTagTitle(c echo.Context) error {
 		}
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // UpdateTagColor godoc
@@ -186,7 +186,7 @@ func (e *Echo) UpdateTagColor(c echo.Context) error {
 		}
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // UpdateTagEmoji godoc
@@ -244,7 +244,7 @@ func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 		}
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // DeleteTag godoc
@@ -296,7 +296,7 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 		}
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // GetTagsByUser godoc

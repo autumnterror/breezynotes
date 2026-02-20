@@ -283,20 +283,7 @@ services:
         done;
         echo 'MongoDB replica set is healthy!';
       "
-    restart: "no" # Это одноразовая задача
-#  tests:
-#    image: golang:alpine
-#    depends_on:
-#      - mongo1
-#      - mongo2
-#      - mongo3
-#    working_dir: /app
-#    volumes:
-#      - ../..:/app
-#    command: go test ./internal/blocknote/repository/notes -v
-#    networks:
-#      - mongo-cluster
-#    # restart: unless-stopped
+    restart: "no"
 
 networks:
   auth:

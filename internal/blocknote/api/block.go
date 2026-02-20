@@ -4,7 +4,7 @@ import (
 	"context"
 
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -33,7 +33,7 @@ func (s *ServerAPI) GetAllBlocksInNote(ctx context.Context, req *brzrpc.Strings)
 		return nil, err
 	}
 
-	return domain2.FromBlocksDb(res.(*domain2.Blocks)), nil
+	return domain.FromBlocksDb(res.(*domain.Blocks)), nil
 }
 
 func (s *ServerAPI) ChangeBlockOrder(ctx context.Context, req *brzrpc.ChangeBlockOrderRequest) (*emptypb.Empty, error) {

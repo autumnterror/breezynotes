@@ -2,7 +2,7 @@ package linkblock
 
 import (
 	"encoding/json"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2/domainblocks"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
 )
 
 // changeText handles updating the link's display text.

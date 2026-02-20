@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/autumnterror/breezynotes/internal/auth/api"
 	"github.com/autumnterror/breezynotes/internal/auth/config"
 	"github.com/autumnterror/breezynotes/internal/auth/infra/psql"
@@ -11,6 +12,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func main() {
@@ -29,6 +31,13 @@ func main() {
 		cfg,
 	)
 
+	ctx, done := context.WithTimeout(context.Background(), 5*time.Second)
+	err := s.CreateAdmin(ctx)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	done()
 	a := api.New(cfg, s)
 	go a.MustRun()
 

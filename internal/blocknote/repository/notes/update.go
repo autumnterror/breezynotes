@@ -2,7 +2,7 @@ package notes
 
 import (
 	"context"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 
@@ -14,7 +14,7 @@ import (
 func (a *API) UpdateUpdatedAt(ctx context.Context, id string) error {
 	const op = "notes.UpdateUpdatedAt"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	res, err := a.
@@ -34,7 +34,7 @@ func (a *API) UpdateUpdatedAt(ctx context.Context, id string) error {
 		return format.Error(op, err)
 	}
 	if res.MatchedCount == 0 {
-		return format.Error(op, domain2.ErrNotFound)
+		return format.Error(op, domain.ErrNotFound)
 	}
 
 	return nil
@@ -44,7 +44,7 @@ func (a *API) UpdateUpdatedAt(ctx context.Context, id string) error {
 func (a *API) UpdateTitle(ctx context.Context, id string, nTitle string) error {
 	const op = "notes.UpdateTitle"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	res, err := a.
@@ -65,7 +65,7 @@ func (a *API) UpdateTitle(ctx context.Context, id string, nTitle string) error {
 		return format.Error(op, err)
 	}
 	if res.MatchedCount == 0 {
-		return format.Error(op, domain2.ErrNotFound)
+		return format.Error(op, domain.ErrNotFound)
 	}
 
 	return nil
@@ -75,7 +75,7 @@ func (a *API) UpdateTitle(ctx context.Context, id string, nTitle string) error {
 func (a *API) updateBlocks(ctx context.Context, id string, blocks []string) error {
 	const op = "notes.UpdateTitle"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	res, err := a.
@@ -96,7 +96,7 @@ func (a *API) updateBlocks(ctx context.Context, id string, blocks []string) erro
 		return format.Error(op, err)
 	}
 	if res.MatchedCount == 0 {
-		return format.Error(op, domain2.ErrNotFound)
+		return format.Error(op, domain.ErrNotFound)
 	}
 
 	return nil
@@ -106,7 +106,7 @@ func (a *API) updateBlocks(ctx context.Context, id string, blocks []string) erro
 func (a *API) UpdateBlog(ctx context.Context, id string, isBlog bool) error {
 	const op = "notes.UpdateTitle"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	res, err := a.
@@ -127,7 +127,7 @@ func (a *API) UpdateBlog(ctx context.Context, id string, isBlog bool) error {
 		return format.Error(op, err)
 	}
 	if res.MatchedCount == 0 {
-		return format.Error(op, domain2.ErrNotFound)
+		return format.Error(op, domain.ErrNotFound)
 	}
 
 	return nil
@@ -137,7 +137,7 @@ func (a *API) UpdateBlog(ctx context.Context, id string, isBlog bool) error {
 func (a *API) UpdatePublic(ctx context.Context, id string, isPublic bool) error {
 	const op = "notes.UpdateTitle"
 
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	res, err := a.
@@ -158,7 +158,7 @@ func (a *API) UpdatePublic(ctx context.Context, id string, isPublic bool) error 
 		return format.Error(op, err)
 	}
 	if res.MatchedCount == 0 {
-		return format.Error(op, domain2.ErrNotFound)
+		return format.Error(op, domain.ErrNotFound)
 	}
 
 	return nil

@@ -2,7 +2,7 @@ package blocks
 
 import (
 	"context"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/block"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 )
@@ -10,7 +10,7 @@ import (
 // GetAsFirst universal func that get block, calls func GetAsFirst by field _type. NEED TO REGISTER TYPE BEFORE USE
 func (a *API) GetAsFirst(ctx context.Context, id string) (string, error) {
 	const op = "blocks.GetAsFirst"
-	ctx, done := context.WithTimeout(ctx, domain2.WaitTime)
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	b, err := a.Get(ctx, id)
@@ -18,8 +18,8 @@ func (a *API) GetAsFirst(ctx context.Context, id string) (string, error) {
 		return "", format.Error(op, err)
 	}
 	if block.Registry[b.Type] == nil {
-		return "", domain2.ErrTypeNotDefined
+		return "", domain.ErrTypeNotDefined
 	}
 
-	return block.Registry[b.Type].GetAsFirst(ctx, domain2.FromBlockDb(b)), nil
+	return block.Registry[b.Type].GetAsFirst(ctx, domain.FromBlockDb(b)), nil
 }

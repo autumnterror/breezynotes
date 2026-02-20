@@ -2,7 +2,7 @@ package fileblock
 
 import (
 	"encoding/json"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2/domainblocks"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
 )
 
 // changeSrc handles the logic for updating the file source URL.

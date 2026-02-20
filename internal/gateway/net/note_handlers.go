@@ -82,7 +82,7 @@ func (e *Echo) ChangeTitleNote(c echo.Context) error {
 		}
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // GetNote godoc
@@ -482,7 +482,7 @@ func (e *Echo) AddTagToNote(c echo.Context) error {
 		}
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // RmTagFromNote godoc
@@ -549,7 +549,7 @@ func (e *Echo) RmTagFromNote(c echo.Context) error {
 		}
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // ShareNote godoc
@@ -642,7 +642,7 @@ func (e *Echo) ShareNote(c echo.Context) error {
 			}
 		}
 	}
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // BlogNote godoc
@@ -697,7 +697,7 @@ func (e *Echo) BlogNote(c echo.Context) error {
 		}
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // PublicNote godoc
@@ -751,7 +751,7 @@ func (e *Echo) PublicNote(c echo.Context) error {
 		}
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // AddPublicNote godoc
@@ -816,7 +816,7 @@ func (e *Echo) AddPublicNote(c echo.Context) error {
 		}
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // ChangeUserRole godoc
@@ -880,5 +880,5 @@ func (e *Echo) AddPublicNote(c echo.Context) error {
 // 		}
 // 	}
 
-// 	return c.NoContent(http.StatusOK)
+// 	return c.NoContent(http.StatusNoContent)
 // }

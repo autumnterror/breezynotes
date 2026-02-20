@@ -218,7 +218,7 @@ func (e *Echo) OpBlock(c echo.Context) error {
 		}
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // ChangeTypeBlock godoc
@@ -285,7 +285,7 @@ func (e *Echo) ChangeTypeBlock(c echo.Context) error {
 		}
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // ChangeBlockOrder godoc
@@ -352,7 +352,7 @@ func (e *Echo) ChangeBlockOrder(c echo.Context) error {
 		}
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // DeleteBlock godoc
@@ -423,5 +423,5 @@ func (e *Echo) DeleteBlock(c echo.Context) error {
 		}
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }

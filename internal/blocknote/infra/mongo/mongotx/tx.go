@@ -2,7 +2,7 @@ package mongotx
 
 import (
 	"context"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -42,7 +42,7 @@ func (r *TxRunner) RunInTx(ctx context.Context, fn func(ctx context.Context) (in
 func (r *TxRunner) Healthz(ctx context.Context) error {
 	var result map[string]any
 
-	err := r.db.Database(domain2.Db).RunCommand(ctx, map[string]interface{}{"ping": 1}).Decode(&result)
+	err := r.db.Database(domain.Db).RunCommand(ctx, map[string]interface{}{"ping": 1}).Decode(&result)
 	if err != nil {
 		return err
 	}

@@ -5,12 +5,12 @@ import (
 	"errors"
 	"time"
 
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2/domainblocks"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
 	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/block"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"github.com/autumnterror/utils_go/pkg/utils/uid"
 
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/alg"
 )
 
@@ -38,11 +38,11 @@ func (s *BN) ChangeBlockOrder(ctx context.Context, idNote, idUser string, oldOrd
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		n, err := s.nts.Get(ctx, idNote, idUser)
 		if err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		}
 
 		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
-			return nil, domain2.ErrUnauthorized
+			return nil, domain.ErrUnauthorized
 		}
 
 		return nil, s.nts.ChangeBlockOrder(ctx, idNote, oldOrder, newOrder)
@@ -51,7 +51,7 @@ func (s *BN) ChangeBlockOrder(ctx context.Context, idNote, idUser string, oldOrd
 	return err
 }
 
-func (s *BN) GetBlock(ctx context.Context, idBlock, idNote, idUser string) (*domain2.Block, error) {
+func (s *BN) GetBlock(ctx context.Context, idBlock, idNote, idUser string) (*domain.Block, error) {
 	const op = "service.GetBlock"
 	if err := idValidation(idBlock); err != nil {
 		return nil, wrapServiceCheck(op, err)
@@ -65,16 +65,16 @@ func (s *BN) GetBlock(ctx context.Context, idBlock, idNote, idUser string) (*dom
 
 	n, err := s.nts.Get(ctx, idNote, idUser)
 	if err != nil {
-		return nil, domain2.ErrNotFound
+		return nil, domain.ErrNotFound
 	}
 	if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) && !n.IsBlog && !n.IsPublic {
-		return nil, domain2.ErrUnauthorized
+		return nil, domain.ErrUnauthorized
 	}
 
 	return s.blk.Get(ctx, idBlock)
 }
 
-func (s *BN) GetBlocks(ctx context.Context, ids []string) (*domain2.Blocks, error) {
+func (s *BN) GetBlocks(ctx context.Context, ids []string) (*domain.Blocks, error) {
 	const op = "service.GetBlocks"
 
 	for _, id := range ids {
@@ -101,9 +101,9 @@ func (s *BN) DeleteBlock(ctx context.Context, idNote, blockId, idUser string) er
 
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		if n, err := s.nts.Get(ctx, idNote, idUser); err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
-			return nil, domain2.ErrUnauthorized
+			return nil, domain.ErrUnauthorized
 		}
 
 		if err := s.blk.Delete(ctx, blockId); err != nil {
@@ -134,13 +134,13 @@ func (s *BN) CreateBlock(ctx context.Context, _type, idNote string, data map[str
 
 	res, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		if n, err := s.nts.Get(ctx, idNote, idUser); err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
-			return nil, domain2.ErrUnauthorized
+			return nil, domain.ErrUnauthorized
 		}
 
 		if block.Registry[_type] == nil {
-			return "", domain2.ErrTypeNotDefined
+			return "", domain.ErrTypeNotDefined
 		}
 		b, err := block.Registry[_type].Create(ctx, data)
 		if err != nil {
@@ -154,7 +154,7 @@ func (s *BN) CreateBlock(ctx context.Context, _type, idNote string, data map[str
 		b.UpdatedAt = time.Now().UTC().Unix()
 		b.IsUsed = false
 
-		if err := s.blk.CreateBlock(ctx, domain2.ToBlockDb(b)); err != nil {
+		if err := s.blk.CreateBlock(ctx, domain.ToBlockDb(b)); err != nil {
 			return "", format.Error(op, err)
 		}
 
@@ -184,28 +184,28 @@ func (s *BN) OpBlock(ctx context.Context, id, opName string, data map[string]any
 
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		if n, err := s.nts.Get(ctx, idNote, idUser); err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
-			return nil, domain2.ErrUnauthorized
+			return nil, domain.ErrUnauthorized
 		}
 
 		b, err := s.blk.Get(ctx, id)
 		if err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		}
 
 		if err := s.blk.UpdateUsed(ctx, id, true); err != nil {
-			if errors.Is(err, domain2.ErrNotFound) {
-				return nil, domain2.ErrAlreadyUsed
+			if errors.Is(err, domain.ErrNotFound) {
+				return nil, domain.ErrAlreadyUsed
 			}
 			return nil, err
 		}
 
 		if block.Registry[b.Type] == nil {
-			return nil, domain2.ErrTypeNotDefined
+			return nil, domain.ErrTypeNotDefined
 		}
 
-		newData, err := block.Registry[b.Type].Op(ctx, domain2.FromBlockDb(b), opName, data)
+		newData, err := block.Registry[b.Type].Op(ctx, domain.FromBlockDb(b), opName, data)
 		if err != nil {
 			return nil, err
 		}
@@ -240,9 +240,9 @@ func (s *BN) ChangeTypeBlock(ctx context.Context, idBlock, idNote, idUser, newTy
 
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		if n, err := s.nts.Get(ctx, idNote, idUser); err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
-			return nil, domain2.ErrUnauthorized
+			return nil, domain.ErrUnauthorized
 		}
 
 		b, err := s.blk.Get(ctx, idBlock)
@@ -251,10 +251,10 @@ func (s *BN) ChangeTypeBlock(ctx context.Context, idBlock, idNote, idUser, newTy
 		}
 
 		if block.Registry[b.Type] == nil {
-			return nil, domain2.ErrTypeNotDefined
+			return nil, domain.ErrTypeNotDefined
 		}
 
-		nb := domain2.FromBlockDb(b)
+		nb := domain.FromBlockDb(b)
 		err = block.Registry[b.Type].ChangeType(ctx, nb, newType)
 		if err != nil {
 			return nil, format.Error(op, err)

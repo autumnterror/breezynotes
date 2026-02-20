@@ -96,6 +96,13 @@ func TestUsersOperations(t *testing.T) {
 		log.Println("after delete")
 		print()
 	})
+
+	t.Run("create admin", func(t *testing.T) {
+		err := repo.CreateAdmin(context.Background())
+		assert.NoError(t, err)
+	})
+	print()
+
 }
 
 func setupTestTx(t *testing.T) (*Driver, *sql.Tx, func()) {

@@ -2,7 +2,7 @@ package textblock
 
 import (
 	"encoding/json"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2/domainblocks"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
 )
 
 func applyStyleOp(b *domainblocks.TextBlock, raw []byte) (map[string]any, error) {

@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/autumnterror/utils_go/pkg/utils/alg"
 )
 
-func (s *BN) CreateNote(ctx context.Context, n *domain2.Note) error {
+func (s *BN) CreateNote(ctx context.Context, n *domain.Note) error {
 	const op = "service.CreateNote"
 	if err := noteValidation(n); err != nil {
 		return wrapServiceCheck(op, err)
@@ -22,7 +22,7 @@ func (s *BN) CreateNote(ctx context.Context, n *domain2.Note) error {
 	return err
 }
 
-func (s *BN) GetNote(ctx context.Context, idNote, idUser string) (*domain2.NoteWithBlocks, error) {
+func (s *BN) GetNote(ctx context.Context, idNote, idUser string) (*domain.NoteWithBlocks, error) {
 	const op = "service.Get"
 	if err := idValidation(idNote); err != nil {
 		return nil, wrapServiceCheck(op, err)
@@ -33,13 +33,13 @@ func (s *BN) GetNote(ctx context.Context, idNote, idUser string) (*domain2.NoteW
 
 	n, err := s.nts.Get(ctx, idNote, idUser)
 	if err != nil {
-		return nil, domain2.ErrNotFound
+		return nil, domain.ErrNotFound
 	}
 
 	log.Green(n)
 
 	if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) && !n.IsBlog && !n.IsPublic {
-		return nil, domain2.ErrUnauthorized
+		return nil, domain.ErrUnauthorized
 	}
 
 	blks, err := s.blk.GetMany(ctx, n.Blocks)
@@ -47,7 +47,7 @@ func (s *BN) GetNote(ctx context.Context, idNote, idUser string) (*domain2.NoteW
 		return nil, err
 	}
 
-	return &domain2.NoteWithBlocks{
+	return &domain.NoteWithBlocks{
 		Id:        n.Id,
 		Title:     n.Title,
 		Blocks:    blks.Blks,
@@ -62,7 +62,7 @@ func (s *BN) GetNote(ctx context.Context, idNote, idUser string) (*domain2.NoteW
 	}, nil
 }
 
-func (s *BN) GetNoteListByUser(ctx context.Context, idUser string) (*domain2.NoteParts, error) {
+func (s *BN) GetNoteListByUser(ctx context.Context, idUser string) (*domain.NoteParts, error) {
 	const op = "service.GetNoteListByUser"
 	if err := idValidation(idUser); err != nil {
 		return nil, wrapServiceCheck(op, err)
@@ -71,7 +71,7 @@ func (s *BN) GetNoteListByUser(ctx context.Context, idUser string) (*domain2.Not
 	return s.nts.GetNoteListByUser(ctx, idUser)
 }
 
-func (s *BN) GetNoteListByTag(ctx context.Context, idTag, idUser string) (*domain2.NoteParts, error) {
+func (s *BN) GetNoteListByTag(ctx context.Context, idTag, idUser string) (*domain.NoteParts, error) {
 	const op = "service.GetNoteListByTag"
 	if err := idValidation(idTag); err != nil {
 		return nil, wrapServiceCheck(op, err)
@@ -98,15 +98,15 @@ func (s *BN) AddTagToNote(ctx context.Context, idNote, tagId, idUser string) err
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		n, err := s.nts.Get(ctx, idNote, idUser)
 		if err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		}
 		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
-			return nil, domain2.ErrUnauthorized
+			return nil, domain.ErrUnauthorized
 		}
 
 		tag, err := s.tgs.Get(ctx, tagId)
 		if err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		}
 		err = s.nts.AddTagToNote(ctx, idNote, tag)
 		if err != nil {
@@ -114,7 +114,7 @@ func (s *BN) AddTagToNote(ctx context.Context, idNote, tagId, idUser string) err
 		}
 		n, err = s.nts.Get(ctx, idNote, idUser)
 		if err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		}
 		return nil, nil
 	})
@@ -135,10 +135,10 @@ func (s *BN) RemoveTagFromNote(ctx context.Context, idNote string, idUser string
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		n, err := s.nts.Get(ctx, idNote, idUser)
 		if err != nil {
-			return nil, domain2.ErrUnauthorized
+			return nil, domain.ErrUnauthorized
 		}
 		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) {
-			return nil, domain2.ErrUnauthorized
+			return nil, domain.ErrUnauthorized
 		}
 
 		return nil, s.nts.RemoveTagFromNote(ctx, idNote, idUser)
@@ -164,10 +164,10 @@ func (s *BN) UpdateTitleNote(ctx context.Context, idNote, idUser, nTitle string)
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		n, err := s.nts.Get(ctx, idNote, idUser)
 		if err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		}
 		if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
-			return nil, domain2.ErrUnauthorized
+			return nil, domain.ErrUnauthorized
 		}
 
 		return nil, s.nts.UpdateTitle(ctx, idNote, nTitle)
@@ -176,7 +176,7 @@ func (s *BN) UpdateTitleNote(ctx context.Context, idNote, idUser, nTitle string)
 	return err
 }
 
-func (s *BN) Search(ctx context.Context, idUser, prompt string) (<-chan *domain2.NotePart, error) {
+func (s *BN) Search(ctx context.Context, idUser, prompt string) (<-chan *domain.NotePart, error) {
 	const op = "service.Search"
 	if err := idValidation(idUser); err != nil {
 		return nil, wrapServiceCheck(op, err)
@@ -207,17 +207,17 @@ func (s *BN) ShareNote(ctx context.Context, idNote, idUser, idUserToShare, role 
 	}
 
 	switch role {
-	case domain2.EditorRole:
-	case domain2.ReaderRole:
+	case domain.EditorRole:
+	case domain.ReaderRole:
 	default:
 		return wrapServiceCheck(op, errors.New("role undefined"))
 	}
 
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		if n, err := s.nts.Get(ctx, idNote, idUser); err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
-			return nil, domain2.ErrUnauthorized
+			return nil, domain.ErrUnauthorized
 		} else {
 			if n.Author == idUserToShare {
 				return nil, wrapServiceCheck(op, errors.New("can't share for author"))
@@ -246,14 +246,14 @@ func (s *BN) AddPublicNote(ctx context.Context, idNote, idUser string) error {
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 
 		if n, err := s.nts.Get(ctx, idNote, idUser); err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		} else if n.Author == idUser || alg.IsIn(idUser, n.Editors) || alg.IsIn(idUser, n.Readers) {
 			return nil, nil
 		} else if !n.IsPublic || !n.IsBlog {
-			return nil, domain2.ErrUnauthorized
+			return nil, domain.ErrUnauthorized
 		}
 
-		return nil, s.nts.ShareNote(ctx, idNote, idUser, domain2.ReaderRole)
+		return nil, s.nts.ShareNote(ctx, idNote, idUser, domain.ReaderRole)
 	})
 
 	if err != nil {
@@ -275,9 +275,9 @@ func (s *BN) PublicNote(ctx context.Context, idNote, idUser string) error {
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		isPublic := false
 		if n, err := s.nts.Get(ctx, idNote, idUser); err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
-			return nil, domain2.ErrUnauthorized
+			return nil, domain.ErrUnauthorized
 		} else {
 			if !n.IsPublic {
 				isPublic = true
@@ -305,9 +305,9 @@ func (s *BN) BlogNote(ctx context.Context, idNote, idUser string) error {
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		isBlog := false
 		if n, err := s.nts.Get(ctx, idNote, idUser); err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		} else if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
-			return nil, domain2.ErrUnauthorized
+			return nil, domain.ErrUnauthorized
 		} else {
 			if !n.IsBlog {
 				isBlog = true

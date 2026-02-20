@@ -4,7 +4,7 @@ import (
 	"context"
 
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -37,7 +37,7 @@ func (s *ServerAPI) GetNote(ctx context.Context, req *brzrpc.UserNoteId) (*brzrp
 	if err != nil {
 		return nil, err
 	}
-	return domain2.FromNoteWithBlocksDb(res.(*domain2.NoteWithBlocks)), nil
+	return domain.FromNoteWithBlocksDb(res.(*domain.NoteWithBlocks)), nil
 }
 
 func (s *ServerAPI) GetAllNotes(ctx context.Context, req *brzrpc.UserId) (*brzrpc.NoteParts, error) {
@@ -54,7 +54,7 @@ func (s *ServerAPI) GetAllNotes(ctx context.Context, req *brzrpc.UserId) (*brzrp
 		return nil, err
 	}
 
-	return domain2.FromNotePartsDb(res.(*domain2.NoteParts)), nil
+	return domain.FromNotePartsDb(res.(*domain.NoteParts)), nil
 }
 
 func (s *ServerAPI) GetNotesByTag(ctx context.Context, req *brzrpc.UserTagId) (*brzrpc.NoteParts, error) {
@@ -71,11 +71,11 @@ func (s *ServerAPI) GetNotesByTag(ctx context.Context, req *brzrpc.UserTagId) (*
 		return nil, err
 	}
 
-	return domain2.FromNotePartsDb(res.(*domain2.NoteParts)), nil
+	return domain.FromNotePartsDb(res.(*domain.NoteParts)), nil
 }
 
 func (s *ServerAPI) Search(req *brzrpc.SearchRequest, stream brzrpc.BlockNoteService_SearchServer) error {
-	const op = "block.note.grpc.RemoveTagFromNote"
+	const op = "block.note.grpc.Search"
 
 	ctx, done := context.WithTimeout(stream.Context(), waitTime)
 	defer done()
@@ -86,7 +86,7 @@ func (s *ServerAPI) Search(req *brzrpc.SearchRequest, stream brzrpc.BlockNoteSer
 	}
 
 	for n := range chn {
-		if err := stream.Send(domain2.FromNotePartDb(n)); err != nil {
+		if err := stream.Send(domain.FromNotePartDb(n)); err != nil {
 			return err
 		}
 	}
@@ -100,7 +100,7 @@ func (s *ServerAPI) CreateNote(ctx context.Context, req *brzrpc.Note) (*emptypb.
 	ctx, done := context.WithTimeout(ctx, waitTime)
 	defer done()
 	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
-		return nil, s.service.CreateNote(ctx, domain2.ToNoteDb(req))
+		return nil, s.service.CreateNote(ctx, domain.ToNoteDb(req))
 	})
 
 	if err != nil {

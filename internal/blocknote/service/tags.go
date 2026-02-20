@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"errors"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 )
 
 //func (s *BN) GetTag(ctx context.Context, id string) (*domain.Tag, error) {
@@ -15,7 +15,7 @@ import (
 //	return s.tgs.Get(ctx, id)
 //}
 
-func (s *BN) GetAllByIdTag(ctx context.Context, id string) (*domain2.Tags, error) {
+func (s *BN) GetAllByIdTag(ctx context.Context, id string) (*domain.Tags, error) {
 	const op = "service.GetAllByIdTag"
 	if err := idValidation(id); err != nil {
 		return nil, wrapServiceCheck(op, err)
@@ -23,7 +23,7 @@ func (s *BN) GetAllByIdTag(ctx context.Context, id string) (*domain2.Tags, error
 	return s.tgs.GetAllById(ctx, id)
 }
 
-func (s *BN) CreateTag(ctx context.Context, t *domain2.Tag) error {
+func (s *BN) CreateTag(ctx context.Context, t *domain.Tag) error {
 	const op = "service.CreateTag"
 	if err := tagValidation(t); err != nil {
 		return wrapServiceCheck(op, err)
@@ -48,10 +48,10 @@ func (s *BN) DeleteTag(ctx context.Context, idTag, idUser string) error {
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		tag, err := s.tgs.Get(ctx, idTag)
 		if err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		}
 		if tag.UserId != idUser {
-			return nil, domain2.ErrUnauthorized
+			return nil, domain.ErrUnauthorized
 		}
 		return nil, s.tgs.Delete(ctx, idTag)
 	})
@@ -69,12 +69,12 @@ func (s *BN) DeleteTags(ctx context.Context, idUser string) error {
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		tags, err := s.tgs.GetAllById(ctx, idUser)
 		if err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		}
 		var tagIds []string
 		for _, tag := range tags.Tgs {
 			if tag.UserId != idUser {
-				return nil, domain2.ErrUnauthorized
+				return nil, domain.ErrUnauthorized
 			}
 			tagIds = append(tagIds, tag.Id)
 		}
@@ -100,10 +100,10 @@ func (s *BN) UpdateTitleTag(ctx context.Context, idTag, idUser, nTitle string) e
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		tag, err := s.tgs.Get(ctx, idTag)
 		if err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		}
 		if tag.UserId != idUser {
-			return nil, domain2.ErrUnauthorized
+			return nil, domain.ErrUnauthorized
 		}
 		return nil, s.tgs.UpdateTitle(ctx, idTag, nTitle)
 	})
@@ -126,10 +126,10 @@ func (s *BN) UpdateColorTag(ctx context.Context, idTag, idUser, nColor string) e
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		tag, err := s.tgs.Get(ctx, idTag)
 		if err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		}
 		if tag.UserId != idUser {
-			return nil, domain2.ErrUnauthorized
+			return nil, domain.ErrUnauthorized
 		}
 		return nil, s.tgs.UpdateColor(ctx, idTag, nColor)
 	})
@@ -152,10 +152,10 @@ func (s *BN) UpdateEmojiTag(ctx context.Context, idTag, idUser, nEmoji string) e
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
 		tag, err := s.tgs.Get(ctx, idTag)
 		if err != nil {
-			return nil, domain2.ErrNotFound
+			return nil, domain.ErrNotFound
 		}
 		if tag.UserId != idUser {
-			return nil, domain2.ErrUnauthorized
+			return nil, domain.ErrUnauthorized
 		}
 		return nil, s.tgs.UpdateEmoji(ctx, idTag, nEmoji)
 	})

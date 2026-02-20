@@ -1,4 +1,4 @@
-package domain2
+package domain
 
 import brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 

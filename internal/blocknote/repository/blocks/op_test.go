@@ -2,7 +2,7 @@ package blocks
 
 import (
 	"context"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/block"
 	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/block/default/textblock"
 
@@ -27,7 +27,7 @@ func TestOnText(t *testing.T) {
 		assert.NoError(t, m.Disconnect())
 	})
 
-	assert.NoError(t, a.CreateBlock(context.Background(), &domain2.Block{
+	assert.NoError(t, a.CreateBlock(context.Background(), &domain.Block{
 		Id:        id,
 		Type:      "text",
 		NoteId:    "",
@@ -58,7 +58,7 @@ func TestOnText(t *testing.T) {
 	b, err = a.Get(context.Background(), id)
 	assert.NoError(t, err)
 	log.Green("get block after update data ", b)
-	assert.Equal(t, newData, domain2.ToBlockDb(domain2.FromBlockDb(b)).Data)
+	assert.Equal(t, newData, domain.ToBlockDb(domain.FromBlockDb(b)).Data)
 
 	newType := "test"
 	assert.NoError(t, a.UpdateType(context.Background(), id, newType))
@@ -77,7 +77,7 @@ func TestOnText(t *testing.T) {
 	id2 := "test_block_2"
 	id3 := "test_block_3"
 
-	assert.NoError(t, a.CreateBlock(context.Background(), &domain2.Block{
+	assert.NoError(t, a.CreateBlock(context.Background(), &domain.Block{
 		Id:        id2,
 		Type:      "text",
 		NoteId:    "",
@@ -92,7 +92,7 @@ func TestOnText(t *testing.T) {
 		},
 	}))
 
-	assert.NoError(t, a.CreateBlock(context.Background(), &domain2.Block{
+	assert.NoError(t, a.CreateBlock(context.Background(), &domain.Block{
 		Id:        id3,
 		Type:      "text",
 		NoteId:    "",
@@ -110,7 +110,7 @@ func TestOnText(t *testing.T) {
 	assert.NoError(t, a.DeleteMany(context.Background(), []string{id2, id3}))
 
 	_, err = a.Get(context.Background(), id2)
-	assert.ErrorIs(t, err, domain2.ErrNotFound)
+	assert.ErrorIs(t, err, domain.ErrNotFound)
 	_, err = a.Get(context.Background(), id3)
-	assert.ErrorIs(t, err, domain2.ErrNotFound)
+	assert.ErrorIs(t, err, domain.ErrNotFound)
 }

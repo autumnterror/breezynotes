@@ -2,7 +2,7 @@ package codeblock
 
 import (
 	"context"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2/domainblocks"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
 	"testing"
 
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"

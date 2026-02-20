@@ -2,7 +2,7 @@ package imgblock
 
 import (
 	"encoding/json"
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain2/domainblocks"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
 )
 
 // changeSrc handles updating the image source URL.
