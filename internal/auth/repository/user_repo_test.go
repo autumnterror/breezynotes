@@ -97,12 +97,29 @@ func TestUsersOperations(t *testing.T) {
 		print()
 	})
 
+	var idAdmin string
+	var err error
 	t.Run("create admin", func(t *testing.T) {
-		err := repo.CreateAdmin(context.Background())
+		idAdmin, err = repo.CreateAdmin(context.Background())
 		assert.NoError(t, err)
 	})
 	print()
 
+	assert.NotEqual(t, idAdmin, "")
+
+	t.Run("get info", func(t *testing.T) {
+		info, err := repo.GetInfo(context.Background(), idAdmin)
+		assert.NoError(t, err)
+		fmt.Printf("👤 GetInfo: %s", format.Struct(info))
+		assert.Equal(t, "admin", info.Login)
+	})
+
+	t.Run("delete admin", func(t *testing.T) {
+		err := repo.Delete(context.Background(), idAdmin)
+		assert.NoError(t, err)
+		log.Println("after delete")
+		print()
+	})
 }
 
 func setupTestTx(t *testing.T) (*Driver, *sql.Tx, func()) {

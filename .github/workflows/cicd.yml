@@ -24,7 +24,7 @@ jobs:
       - name: Go test (selected packages)
         run: |
           go test \
-            ./internal/blocknote/domain2 \
+            ./internal/blocknote/domain \
             ./internal/blocknote/pkg/text \
             ./internal/blocknote/pkg/block/default/textblock \
             ./internal/blocknote/pkg/block/default/codeblock \
