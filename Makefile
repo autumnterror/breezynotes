@@ -130,7 +130,7 @@ test-all:
 		./internal/auth/repository \
 		./internal/auth/jwt \
 		./internal/redis/repository \
-		./internal/blocknote/domain2 \
+		./internal/blocknote/domain \
 		./internal/blocknote/pkg/text \
 		./internal/blocknote/pkg/block/default/textblock \
 		./internal/blocknote/pkg/block/default/codeblock \
