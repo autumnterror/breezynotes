@@ -117,10 +117,14 @@ service BlockNoteService {
   rpc RemoveTagFromNote(UserNoteId) returns (google.protobuf.Empty);
   rpc CreateTag(Tag) returns (google.protobuf.Empty);
   rpc GetTagsByUser(UserId) returns (Tags);
+  rpc GetPinnedTagsByUser(UserId) returns (Tags);
   //  rpc GetTag(UserTagId) returns (Tag);
   rpc UpdateTagTitle(UpdateTagTitleRequest) returns (google.protobuf.Empty);
   rpc UpdateTagColor(UpdateTagColorRequest) returns (google.protobuf.Empty);
   rpc UpdateTagEmoji(UpdateTagEmojiRequest) returns (google.protobuf.Empty);
+  rpc UpdateTagPinned(UserTagId) returns (google.protobuf.Empty);
+
+
   rpc DeleteTag(UserTagId) returns (google.protobuf.Empty);
   rpc DeleteTags(UserId) returns (google.protobuf.Empty);
 

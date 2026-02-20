@@ -119,12 +119,14 @@ func New(
 		tags := api.Group("/tag", e.ValidateTokenMW())
 		{
 			tags.GET("/by-user", e.GetTagsByUser)
+			tags.GET("/pinned", e.GetPinnedTagsByUser)
 
 			tags.POST("", e.CreateTag)
 
 			tags.PATCH("/title", e.UpdateTagTitle)
 			tags.PATCH("/color", e.UpdateTagColor)
 			tags.PATCH("/emoji", e.UpdateTagEmoji)
+			tags.PATCH("/pinned", e.UpdatePinnedEmoji)
 
 			tags.DELETE("", e.DeleteTag)
 		}

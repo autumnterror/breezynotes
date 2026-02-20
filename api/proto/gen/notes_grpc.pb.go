@@ -43,9 +43,11 @@ const (
 	BlockNoteService_RemoveTagFromNote_FullMethodName   = "/brz.BlockNoteService/RemoveTagFromNote"
 	BlockNoteService_CreateTag_FullMethodName           = "/brz.BlockNoteService/CreateTag"
 	BlockNoteService_GetTagsByUser_FullMethodName       = "/brz.BlockNoteService/GetTagsByUser"
+	BlockNoteService_GetPinnedTagsByUser_FullMethodName = "/brz.BlockNoteService/GetPinnedTagsByUser"
 	BlockNoteService_UpdateTagTitle_FullMethodName      = "/brz.BlockNoteService/UpdateTagTitle"
 	BlockNoteService_UpdateTagColor_FullMethodName      = "/brz.BlockNoteService/UpdateTagColor"
 	BlockNoteService_UpdateTagEmoji_FullMethodName      = "/brz.BlockNoteService/UpdateTagEmoji"
+	BlockNoteService_UpdateTagPinned_FullMethodName     = "/brz.BlockNoteService/UpdateTagPinned"
 	BlockNoteService_DeleteTag_FullMethodName           = "/brz.BlockNoteService/DeleteTag"
 	BlockNoteService_DeleteTags_FullMethodName          = "/brz.BlockNoteService/DeleteTags"
 	BlockNoteService_ShareNote_FullMethodName           = "/brz.BlockNoteService/ShareNote"
@@ -86,10 +88,12 @@ type BlockNoteServiceClient interface {
 	RemoveTagFromNote(ctx context.Context, in *UserNoteId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CreateTag(ctx context.Context, in *Tag, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetTagsByUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Tags, error)
+	GetPinnedTagsByUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Tags, error)
 	// rpc GetTag(UserTagId) returns (Tag);
 	UpdateTagTitle(ctx context.Context, in *UpdateTagTitleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateTagColor(ctx context.Context, in *UpdateTagColorRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateTagEmoji(ctx context.Context, in *UpdateTagEmojiRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateTagPinned(ctx context.Context, in *UserTagId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteTag(ctx context.Context, in *UserTagId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteTags(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ShareNote(ctx context.Context, in *ShareNoteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -346,6 +350,16 @@ func (c *blockNoteServiceClient) GetTagsByUser(ctx context.Context, in *UserId, 
 	return out, nil
 }
 
+func (c *blockNoteServiceClient) GetPinnedTagsByUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Tags, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Tags)
+	err := c.cc.Invoke(ctx, BlockNoteService_GetPinnedTagsByUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *blockNoteServiceClient) UpdateTagTitle(ctx context.Context, in *UpdateTagTitleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
@@ -370,6 +384,16 @@ func (c *blockNoteServiceClient) UpdateTagEmoji(ctx context.Context, in *UpdateT
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, BlockNoteService_UpdateTagEmoji_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *blockNoteServiceClient) UpdateTagPinned(ctx context.Context, in *UserTagId, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, BlockNoteService_UpdateTagPinned_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -477,10 +501,12 @@ type BlockNoteServiceServer interface {
 	RemoveTagFromNote(context.Context, *UserNoteId) (*emptypb.Empty, error)
 	CreateTag(context.Context, *Tag) (*emptypb.Empty, error)
 	GetTagsByUser(context.Context, *UserId) (*Tags, error)
+	GetPinnedTagsByUser(context.Context, *UserId) (*Tags, error)
 	// rpc GetTag(UserTagId) returns (Tag);
 	UpdateTagTitle(context.Context, *UpdateTagTitleRequest) (*emptypb.Empty, error)
 	UpdateTagColor(context.Context, *UpdateTagColorRequest) (*emptypb.Empty, error)
 	UpdateTagEmoji(context.Context, *UpdateTagEmojiRequest) (*emptypb.Empty, error)
+	UpdateTagPinned(context.Context, *UserTagId) (*emptypb.Empty, error)
 	DeleteTag(context.Context, *UserTagId) (*emptypb.Empty, error)
 	DeleteTags(context.Context, *UserId) (*emptypb.Empty, error)
 	ShareNote(context.Context, *ShareNoteRequest) (*emptypb.Empty, error)
@@ -567,6 +593,9 @@ func (UnimplementedBlockNoteServiceServer) CreateTag(context.Context, *Tag) (*em
 func (UnimplementedBlockNoteServiceServer) GetTagsByUser(context.Context, *UserId) (*Tags, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTagsByUser not implemented")
 }
+func (UnimplementedBlockNoteServiceServer) GetPinnedTagsByUser(context.Context, *UserId) (*Tags, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPinnedTagsByUser not implemented")
+}
 func (UnimplementedBlockNoteServiceServer) UpdateTagTitle(context.Context, *UpdateTagTitleRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateTagTitle not implemented")
 }
@@ -575,6 +604,9 @@ func (UnimplementedBlockNoteServiceServer) UpdateTagColor(context.Context, *Upda
 }
 func (UnimplementedBlockNoteServiceServer) UpdateTagEmoji(context.Context, *UpdateTagEmojiRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateTagEmoji not implemented")
+}
+func (UnimplementedBlockNoteServiceServer) UpdateTagPinned(context.Context, *UserTagId) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTagPinned not implemented")
 }
 func (UnimplementedBlockNoteServiceServer) DeleteTag(context.Context, *UserTagId) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTag not implemented")
@@ -1025,6 +1057,24 @@ func _BlockNoteService_GetTagsByUser_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BlockNoteService_GetPinnedTagsByUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlockNoteServiceServer).GetPinnedTagsByUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BlockNoteService_GetPinnedTagsByUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlockNoteServiceServer).GetPinnedTagsByUser(ctx, req.(*UserId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _BlockNoteService_UpdateTagTitle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateTagTitleRequest)
 	if err := dec(in); err != nil {
@@ -1075,6 +1125,24 @@ func _BlockNoteService_UpdateTagEmoji_Handler(srv interface{}, ctx context.Conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BlockNoteServiceServer).UpdateTagEmoji(ctx, req.(*UpdateTagEmojiRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BlockNoteService_UpdateTagPinned_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserTagId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlockNoteServiceServer).UpdateTagPinned(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BlockNoteService_UpdateTagPinned_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlockNoteServiceServer).UpdateTagPinned(ctx, req.(*UserTagId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1301,6 +1369,10 @@ var BlockNoteService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _BlockNoteService_GetTagsByUser_Handler,
 		},
 		{
+			MethodName: "GetPinnedTagsByUser",
+			Handler:    _BlockNoteService_GetPinnedTagsByUser_Handler,
+		},
+		{
 			MethodName: "UpdateTagTitle",
 			Handler:    _BlockNoteService_UpdateTagTitle_Handler,
 		},
@@ -1311,6 +1383,10 @@ var BlockNoteService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateTagEmoji",
 			Handler:    _BlockNoteService_UpdateTagEmoji_Handler,
+		},
+		{
+			MethodName: "UpdateTagPinned",
+			Handler:    _BlockNoteService_UpdateTagPinned_Handler,
 		},
 		{
 			MethodName: "DeleteTag",

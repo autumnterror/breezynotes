@@ -89,6 +89,7 @@ message Tag {
   string color = 3;
   string emoji = 4;
   string userId = 5;
+  bool isPinned = 6;
 }
 
 message Block {

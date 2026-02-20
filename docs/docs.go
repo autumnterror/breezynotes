@@ -952,7 +952,7 @@ const docTemplate = `{
             }
         },
         "/api/note/public/add": {
-            "post": {
+            "patch": {
                 "consumes": [
                     "application/json"
                 ],
@@ -1576,6 +1576,108 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/domain.UpdateTagEmojiRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tag/pinned": {
+            "get": {
+                "description": "Returns all tags for user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tag"
+                ],
+                "summary": "GetNote tags by user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Tag"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tag"
+                ],
+                "summary": "Update pinned emoji",
+                "parameters": [
+                    {
+                        "description": "Tag ID and emoji",
+                        "name": "UpdateTagEmojiRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.UpdatePinnedEmojiRequest"
                         }
                     }
                 ],
@@ -2261,6 +2363,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "isPinned": {
+                    "type": "boolean"
+                },
                 "title": {
                     "type": "string"
                 },
@@ -2543,6 +2648,12 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "is_blog": {
+                    "type": "boolean"
+                },
+                "is_public": {
+                    "type": "boolean"
+                },
                 "readers": {
                     "type": "array",
                     "items": {
@@ -2604,6 +2715,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "is_pinned": {
+                    "type": "boolean"
+                },
                 "title": {
                     "type": "string"
                 },
@@ -2660,6 +2774,14 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "new_photo": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.UpdatePinnedEmojiRequest": {
+            "type": "object",
+            "properties": {
+                "id_tag": {
                     "type": "string"
                 }
             }
@@ -2750,8 +2872,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "Full API for BreezyNotes.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
-	// LeftDelim:        "{{",
-	// RightDelim:       "}}",
+	LeftDelim:        "{{",
+	RightDelim:       "}}",
 }
 
 func init() {

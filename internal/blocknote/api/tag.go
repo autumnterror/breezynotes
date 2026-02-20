@@ -68,6 +68,23 @@ func (s *ServerAPI) UpdateTagEmoji(ctx context.Context, req *brzrpc.UpdateTagEmo
 	}
 	return nil, nil
 }
+
+func (s *ServerAPI) UpdateTagPinned(ctx context.Context, req *brzrpc.UserTagId) (*emptypb.Empty, error) {
+	const op = "grpc.UpdateTagPinned"
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	_, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return nil, s.service.UpdatePinned(ctx, req.GetTagId(), req.GetUserId())
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
+}
+
 func (s *ServerAPI) DeleteTag(ctx context.Context, req *brzrpc.UserTagId) (*emptypb.Empty, error) {
 	const op = "grpc.DeleteTag"
 
@@ -108,6 +125,27 @@ func (s *ServerAPI) GetTagsByUser(ctx context.Context, req *brzrpc.UserId) (*brz
 
 	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
 		r, err := s.service.GetAllByIdTag(ctx, req.GetUserId())
+		if err != nil {
+			return nil, err
+		}
+		return domain.FromTagsDb(r), nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return res.(*brzrpc.Tags), nil
+}
+
+func (s *ServerAPI) GetPinnedTagsByUser(ctx context.Context, req *brzrpc.UserId) (*brzrpc.Tags, error) {
+	const op = "grpc.GetPinnedTagsByUser"
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		r, err := s.service.GetAllByIdTagPinned(ctx, req.GetUserId())
 		if err != nil {
 			return nil, err
 		}

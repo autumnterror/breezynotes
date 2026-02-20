@@ -34,13 +34,30 @@ func TestCrudGood(t *testing.T) {
 		assert.NoError(t, a.UpdateColor(context.Background(), "test_id_good", "new_color"))
 		assert.NoError(t, a.UpdateTitle(context.Background(), "test_id_good", "new_title"))
 		assert.NoError(t, a.UpdateEmoji(context.Background(), "test_id_good", "new_emoji"))
+		assert.NoError(t, a.UpdatePinned(context.Background(), "test_id_good", true))
 
 		if tgs, err := a.GetAllById(context.Background(), "test_userid"); assert.NoError(t, err) {
 			log.Green("get after update", tgs.Tgs)
 		}
 
-		_, err := a.Get(context.Background(), "test_id_good")
+		tag, err := a.Get(context.Background(), "test_id_good")
 		assert.NoError(t, err)
+		assert.Equal(t, true, tag.IsPinned)
+
+		if tgs, err := a.GetAllByIdPinned(context.Background(), "test_userid"); assert.NoError(t, err) {
+			assert.Equal(t, 1, len(tgs.Tgs))
+			log.Green("get after update pinned", tgs.Tgs)
+		}
+
+		assert.NoError(t, a.UpdatePinned(context.Background(), "test_id_good", false))
+		tag, err = a.Get(context.Background(), "test_id_good")
+		assert.NoError(t, err)
+		assert.Equal(t, false, tag.IsPinned)
+
+		if tgs, err := a.GetAllByIdPinned(context.Background(), "test_userid"); assert.NoError(t, err) {
+			assert.Equal(t, 0, len(tgs.Tgs))
+			log.Green("get after update pinned", tgs.Tgs)
+		}
 
 		t.Cleanup(func() {
 			assert.NoError(t, a.Delete(context.Background(), "test_id_good"))

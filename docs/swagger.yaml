@@ -32,6 +32,8 @@ definitions:
         type: string
       id:
         type: string
+      isPinned:
+        type: boolean
       title:
         type: string
       userId:
@@ -215,6 +217,10 @@ definitions:
         type: array
       id:
         type: string
+      is_blog:
+        type: boolean
+      is_public:
+        type: boolean
       readers:
         items:
           type: string
@@ -255,6 +261,8 @@ definitions:
         type: string
       id:
         type: string
+      is_pinned:
+        type: boolean
       title:
         type: string
       user_id:
@@ -291,6 +299,11 @@ definitions:
   domain.UpdatePhotoRequest:
     properties:
       new_photo:
+        type: string
+    type: object
+  domain.UpdatePinnedEmojiRequest:
+    properties:
+      id_tag:
         type: string
     type: object
   domain.UpdateTagColorRequest:
@@ -966,7 +979,7 @@ paths:
       tags:
       - note
   /api/note/public/add:
-    post:
+    patch:
       consumes:
       - application/json
       parameters:
@@ -1401,6 +1414,73 @@ paths:
           schema:
             $ref: '#/definitions/domain.Error'
       summary: Update tag emoji
+      tags:
+      - tag
+  /api/tag/pinned:
+    get:
+      consumes:
+      - application/json
+      description: Returns all tags for user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Tag'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
+      summary: GetNote tags by user
+      tags:
+      - tag
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Tag ID and emoji
+        in: body
+        name: UpdateTagEmojiRequest
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdatePinnedEmojiRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
+      summary: Update pinned emoji
       tags:
       - tag
   /api/tag/title:

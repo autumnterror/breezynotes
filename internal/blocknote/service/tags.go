@@ -162,3 +162,37 @@ func (s *BN) UpdateEmojiTag(ctx context.Context, idTag, idUser, nEmoji string) e
 
 	return err
 }
+
+func (s *BN) UpdatePinned(ctx context.Context, idTag, idUser string) error {
+	const op = "service.UpdateEmojiTag"
+	if err := idValidation(idTag); err != nil {
+		return wrapServiceCheck(op, err)
+	}
+	if err := idValidation(idUser); err != nil {
+		return wrapServiceCheck(op, err)
+	}
+
+	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
+		isPinned := false
+		tag, err := s.tgs.Get(ctx, idTag)
+		if err != nil {
+			return nil, domain.ErrNotFound
+		}
+		if tag.UserId != idUser {
+			return nil, domain.ErrUnauthorized
+		}
+		if !tag.IsPinned {
+			isPinned = true
+		}
+		return nil, s.tgs.UpdatePinned(ctx, idTag, isPinned)
+	})
+
+	return err
+}
+func (s *BN) GetAllByIdTagPinned(ctx context.Context, id string) (*domain.Tags, error) {
+	const op = "service.GetAllByIdTagPinned"
+	if err := idValidation(id); err != nil {
+		return nil, wrapServiceCheck(op, err)
+	}
+	return s.tgs.GetAllByIdPinned(ctx, id)
+}

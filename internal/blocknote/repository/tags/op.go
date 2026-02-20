@@ -13,12 +13,14 @@ import (
 type Repo interface {
 	Get(ctx context.Context, id string) (*domain.Tag, error)
 	GetAllById(ctx context.Context, id string) (*domain.Tags, error)
+	GetAllByIdPinned(ctx context.Context, id string) (*domain.Tags, error)
 	Create(ctx context.Context, t *domain.Tag) error
 	Delete(ctx context.Context, id string) error
 	DeleteMany(ctx context.Context, ids []string) error
 	UpdateTitle(ctx context.Context, id, nTitle string) error
 	UpdateColor(ctx context.Context, id, nColor string) error
 	UpdateEmoji(ctx context.Context, id, nEmoji string) error
+	UpdatePinned(ctx context.Context, id string, isPinned bool) error
 }
 
 func (a *API) Get(ctx context.Context, id string) (*domain.Tag, error) {
@@ -43,12 +45,39 @@ func (a *API) Get(ctx context.Context, id string) (*domain.Tag, error) {
 }
 
 func (a *API) GetAllById(ctx context.Context, id string) (*domain.Tags, error) {
-	const op = "tags.GetAllByIdTag"
+	const op = "tags.GetAllById"
 
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
 	cur, err := a.db.Find(ctx, bson.M{"user_id": id})
+	if err != nil {
+		return nil, format.Error(op, err)
+	}
+	defer cur.Close(ctx)
+
+	tags := &domain.Tags{
+		Tgs: []*domain.Tag{},
+	}
+
+	for cur.Next(ctx) {
+		var t domain.Tag
+		if err = cur.Decode(&t); err != nil {
+			return nil, format.Error(op, err)
+		}
+		tags.Tgs = append(tags.Tgs, &t)
+	}
+
+	return tags, nil
+}
+
+func (a *API) GetAllByIdPinned(ctx context.Context, id string) (*domain.Tags, error) {
+	const op = "tags.GetAllByIdPinned"
+
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	defer done()
+
+	cur, err := a.db.Find(ctx, bson.M{"user_id": id, "is_pinned": true})
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
@@ -190,6 +219,33 @@ func (a *API) UpdateEmoji(ctx context.Context, id, nEmoji string) error {
 			bson.M{
 				"$set": bson.M{
 					"emoji": nEmoji,
+				},
+			},
+		)
+
+	if err != nil {
+		return format.Error(op, err)
+	}
+	if res.MatchedCount == 0 {
+		return format.Error(op, domain.ErrNotFound)
+	}
+	return nil
+}
+
+// UpdatePinned return mongo.ErrNotFound
+func (a *API) UpdatePinned(ctx context.Context, id string, isPinned bool) error {
+	const op = "tags.UpdateEmoji"
+
+	res, err := a.
+		db.
+		UpdateOne(
+			ctx,
+			bson.M{
+				"_id": id,
+			},
+			bson.M{
+				"$set": bson.M{
+					"is_pinned": isPinned,
 				},
 			},
 		)

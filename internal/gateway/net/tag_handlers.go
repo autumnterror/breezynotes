@@ -247,6 +247,62 @@ func (e *Echo) UpdateTagEmoji(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// UpdatePinnedEmoji godoc
+// @Summary Update pinned emoji
+// @Tags tag
+// @Accept json
+// @Produce json
+// @Param UpdateTagEmojiRequest body domain.UpdatePinnedEmojiRequest true "Tag ID and emoji"
+// @Success 200
+// @Failure 400 {object} domain.Error
+// @Failure 401 {object} domain.Error
+// @Failure 404 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
+// @Router /api/tag/pinned [patch]
+func (e *Echo) UpdatePinnedEmoji(c echo.Context) error {
+	const op = "gateway.net.UpdatePinnedEmoji"
+
+	api := e.bnAPI.API
+
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
+	}
+
+	var r domain.UpdatePinnedEmojiRequest
+	if err := c.Bind(&r); err != nil {
+
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
+	}
+
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
+	defer done()
+
+	_, err := api.UpdateTagPinned(ctx, &brzrpc.UserTagId{
+		TagId:  r.IdTag,
+		UserId: idUser,
+	})
+
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
+
+	if _, err := e.rdsAPI.API.RmTagsByUser(ctx, &brzrpc.UserId{UserId: idUser}); err != nil {
+		st, ok := status.FromError(err)
+		if !ok {
+			log.Error(op, "REDIS ERROR", err)
+		} else {
+			if st.Code() != codes.NotFound {
+				log.Error(op, "REDIS ERROR", err)
+			}
+		}
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
+
 // DeleteTag godoc
 // @Summary delete tag
 // @Description Deletes tag by ID
@@ -373,6 +429,39 @@ func (e *Echo) GetTagsByUser(c echo.Context) error {
 	}
 	if len(tags.Items) == 0 {
 		tags.Items = []*brzrpc.Tag{}
+	}
+
+	return c.JSON(http.StatusOK, domain.ToTags(tags).Tgs)
+}
+
+// GetPinnedTagsByUser godoc
+// @Summary GetNote tags by user
+// @Description Returns all tags for user
+// @Tags tag
+// @Accept json
+// @Produce json
+// @Success 200 {object} []domain.Tag
+// @Failure 401 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
+// @Router /api/tag/pinned [get]
+func (e *Echo) GetPinnedTagsByUser(c echo.Context) error {
+	const op = "gateway.net.GetPinnedTagsByUser"
+
+	api := e.bnAPI.API
+
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
+	}
+
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
+	defer done()
+
+	tags, err := api.GetPinnedTagsByUser(ctx, &brzrpc.UserId{UserId: idUser})
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
 	}
 
 	return c.JSON(http.StatusOK, domain.ToTags(tags).Tgs)

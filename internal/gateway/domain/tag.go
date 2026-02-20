@@ -3,11 +3,12 @@ package domain
 import brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 
 type Tag struct {
-	Id     string `json:"id"`
-	Title  string `json:"title"`
-	Color  string `json:"color"`
-	Emoji  string `json:"emoji"`
-	UserId string `json:"user_id"`
+	Id       string `json:"id"`
+	Title    string `json:"title"`
+	Color    string `json:"color"`
+	Emoji    string `json:"emoji"`
+	UserId   string `json:"user_id"`
+	IsPinned bool   `json:"is_pinned"`
 }
 type Tags struct {
 	Tgs []Tag `json:"tags"`
@@ -18,11 +19,12 @@ func ToTag(t *brzrpc.Tag) *Tag {
 		return nil
 	}
 	return &Tag{
-		Id:     t.Id,
-		Title:  t.Title,
-		Color:  t.Color,
-		Emoji:  t.Emoji,
-		UserId: t.UserId,
+		Id:       t.Id,
+		Title:    t.Title,
+		Color:    t.Color,
+		Emoji:    t.Emoji,
+		UserId:   t.UserId,
+		IsPinned: t.IsPinned,
 	}
 }
 
@@ -59,4 +61,7 @@ type UpdateTagEmojiRequest struct {
 type UpdateTagColorRequest struct {
 	IdTag string `json:"id_tag"`
 	Color string `json:"color"`
+}
+type UpdatePinnedEmojiRequest struct {
+	IdTag string `json:"id_tag"`
 }

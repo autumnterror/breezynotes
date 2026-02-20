@@ -850,7 +850,7 @@ const file_notes_proto_rawDesc = "" +
 	"\x06userId\x18\x05 \x01(\tR\x06userId\"?\n" +
 	"\rSearchRequest\x12\x16\n" +
 	"\x06userId\x18\x01 \x01(\tR\x06userId\x12\x16\n" +
-	"\x06prompt\x18\x02 \x01(\tR\x06prompt2\xd1\x0e\n" +
+	"\x06prompt\x18\x02 \x01(\tR\x06prompt2\xbb\x0f\n" +
 	"\x10BlockNoteService\x12;\n" +
 	"\x13GetRegisteredBlocks\x12\x16.google.protobuf.Empty\x1a\f.brz.Strings\x12;\n" +
 	"\vDeleteBlock\x12\x14.brz.NoteBlockUserId\x1a\x16.google.protobuf.Empty\x12/\n" +
@@ -877,10 +877,12 @@ const file_notes_proto_rawDesc = "" +
 	"\fAddTagToNote\x12\x12.brz.NoteTagUserId\x1a\x16.google.protobuf.Empty\x12<\n" +
 	"\x11RemoveTagFromNote\x12\x0f.brz.UserNoteId\x1a\x16.google.protobuf.Empty\x12-\n" +
 	"\tCreateTag\x12\b.brz.Tag\x1a\x16.google.protobuf.Empty\x12'\n" +
-	"\rGetTagsByUser\x12\v.brz.UserId\x1a\t.brz.Tags\x12D\n" +
+	"\rGetTagsByUser\x12\v.brz.UserId\x1a\t.brz.Tags\x12-\n" +
+	"\x13GetPinnedTagsByUser\x12\v.brz.UserId\x1a\t.brz.Tags\x12D\n" +
 	"\x0eUpdateTagTitle\x12\x1a.brz.UpdateTagTitleRequest\x1a\x16.google.protobuf.Empty\x12D\n" +
 	"\x0eUpdateTagColor\x12\x1a.brz.UpdateTagColorRequest\x1a\x16.google.protobuf.Empty\x12D\n" +
-	"\x0eUpdateTagEmoji\x12\x1a.brz.UpdateTagEmojiRequest\x1a\x16.google.protobuf.Empty\x123\n" +
+	"\x0eUpdateTagEmoji\x12\x1a.brz.UpdateTagEmojiRequest\x1a\x16.google.protobuf.Empty\x129\n" +
+	"\x0fUpdateTagPinned\x12\x0e.brz.UserTagId\x1a\x16.google.protobuf.Empty\x123\n" +
 	"\tDeleteTag\x12\x0e.brz.UserTagId\x1a\x16.google.protobuf.Empty\x121\n" +
 	"\n" +
 	"DeleteTags\x12\v.brz.UserId\x1a\x16.google.protobuf.Empty\x12:\n" +
@@ -961,51 +963,55 @@ var file_notes_proto_depIdxs = []int32{
 	16, // 22: brz.BlockNoteService.RemoveTagFromNote:input_type -> brz.UserNoteId
 	21, // 23: brz.BlockNoteService.CreateTag:input_type -> brz.Tag
 	15, // 24: brz.BlockNoteService.GetTagsByUser:input_type -> brz.UserId
-	4,  // 25: brz.BlockNoteService.UpdateTagTitle:input_type -> brz.UpdateTagTitleRequest
-	5,  // 26: brz.BlockNoteService.UpdateTagColor:input_type -> brz.UpdateTagColorRequest
-	6,  // 27: brz.BlockNoteService.UpdateTagEmoji:input_type -> brz.UpdateTagEmojiRequest
-	19, // 28: brz.BlockNoteService.DeleteTag:input_type -> brz.UserTagId
-	15, // 29: brz.BlockNoteService.DeleteTags:input_type -> brz.UserId
-	8,  // 30: brz.BlockNoteService.ShareNote:input_type -> brz.ShareNoteRequest
-	16, // 31: brz.BlockNoteService.PublicNote:input_type -> brz.UserNoteId
-	16, // 32: brz.BlockNoteService.AddPublicNote:input_type -> brz.UserNoteId
-	16, // 33: brz.BlockNoteService.BlogNote:input_type -> brz.UserNoteId
-	13, // 34: brz.BlockNoteService.Healthz:input_type -> google.protobuf.Empty
-	18, // 35: brz.BlockNoteService.GetRegisteredBlocks:output_type -> brz.Strings
-	13, // 36: brz.BlockNoteService.DeleteBlock:output_type -> google.protobuf.Empty
-	22, // 37: brz.BlockNoteService.CreateBlock:output_type -> brz.Id
-	13, // 38: brz.BlockNoteService.OpBlock:output_type -> google.protobuf.Empty
-	23, // 39: brz.BlockNoteService.GetBlock:output_type -> brz.Block
-	13, // 40: brz.BlockNoteService.ChangeBlockOrder:output_type -> google.protobuf.Empty
-	13, // 41: brz.BlockNoteService.ChangeTypeBlock:output_type -> google.protobuf.Empty
-	13, // 42: brz.BlockNoteService.CleanTrash:output_type -> google.protobuf.Empty
-	13, // 43: brz.BlockNoteService.NoteToTrash:output_type -> google.protobuf.Empty
-	13, // 44: brz.BlockNoteService.NotesToTrash:output_type -> google.protobuf.Empty
-	13, // 45: brz.BlockNoteService.NoteFromTrash:output_type -> google.protobuf.Empty
-	24, // 46: brz.BlockNoteService.GetNote:output_type -> brz.NoteWithBlocks
-	13, // 47: brz.BlockNoteService.CreateNote:output_type -> google.protobuf.Empty
-	13, // 48: brz.BlockNoteService.ChangeTitleNote:output_type -> google.protobuf.Empty
-	25, // 49: brz.BlockNoteService.GetAllBlocksInNote:output_type -> brz.Blocks
-	26, // 50: brz.BlockNoteService.GetAllNotes:output_type -> brz.NoteParts
-	26, // 51: brz.BlockNoteService.GetNotesByTag:output_type -> brz.NoteParts
-	26, // 52: brz.BlockNoteService.GetNotesFromTrash:output_type -> brz.NoteParts
-	27, // 53: brz.BlockNoteService.Search:output_type -> brz.NotePart
-	13, // 54: brz.BlockNoteService.AddTagToNote:output_type -> google.protobuf.Empty
-	13, // 55: brz.BlockNoteService.RemoveTagFromNote:output_type -> google.protobuf.Empty
-	13, // 56: brz.BlockNoteService.CreateTag:output_type -> google.protobuf.Empty
-	28, // 57: brz.BlockNoteService.GetTagsByUser:output_type -> brz.Tags
-	13, // 58: brz.BlockNoteService.UpdateTagTitle:output_type -> google.protobuf.Empty
-	13, // 59: brz.BlockNoteService.UpdateTagColor:output_type -> google.protobuf.Empty
-	13, // 60: brz.BlockNoteService.UpdateTagEmoji:output_type -> google.protobuf.Empty
-	13, // 61: brz.BlockNoteService.DeleteTag:output_type -> google.protobuf.Empty
-	13, // 62: brz.BlockNoteService.DeleteTags:output_type -> google.protobuf.Empty
-	13, // 63: brz.BlockNoteService.ShareNote:output_type -> google.protobuf.Empty
-	13, // 64: brz.BlockNoteService.PublicNote:output_type -> google.protobuf.Empty
-	13, // 65: brz.BlockNoteService.AddPublicNote:output_type -> google.protobuf.Empty
-	13, // 66: brz.BlockNoteService.BlogNote:output_type -> google.protobuf.Empty
-	13, // 67: brz.BlockNoteService.Healthz:output_type -> google.protobuf.Empty
-	35, // [35:68] is the sub-list for method output_type
-	2,  // [2:35] is the sub-list for method input_type
+	15, // 25: brz.BlockNoteService.GetPinnedTagsByUser:input_type -> brz.UserId
+	4,  // 26: brz.BlockNoteService.UpdateTagTitle:input_type -> brz.UpdateTagTitleRequest
+	5,  // 27: brz.BlockNoteService.UpdateTagColor:input_type -> brz.UpdateTagColorRequest
+	6,  // 28: brz.BlockNoteService.UpdateTagEmoji:input_type -> brz.UpdateTagEmojiRequest
+	19, // 29: brz.BlockNoteService.UpdateTagPinned:input_type -> brz.UserTagId
+	19, // 30: brz.BlockNoteService.DeleteTag:input_type -> brz.UserTagId
+	15, // 31: brz.BlockNoteService.DeleteTags:input_type -> brz.UserId
+	8,  // 32: brz.BlockNoteService.ShareNote:input_type -> brz.ShareNoteRequest
+	16, // 33: brz.BlockNoteService.PublicNote:input_type -> brz.UserNoteId
+	16, // 34: brz.BlockNoteService.AddPublicNote:input_type -> brz.UserNoteId
+	16, // 35: brz.BlockNoteService.BlogNote:input_type -> brz.UserNoteId
+	13, // 36: brz.BlockNoteService.Healthz:input_type -> google.protobuf.Empty
+	18, // 37: brz.BlockNoteService.GetRegisteredBlocks:output_type -> brz.Strings
+	13, // 38: brz.BlockNoteService.DeleteBlock:output_type -> google.protobuf.Empty
+	22, // 39: brz.BlockNoteService.CreateBlock:output_type -> brz.Id
+	13, // 40: brz.BlockNoteService.OpBlock:output_type -> google.protobuf.Empty
+	23, // 41: brz.BlockNoteService.GetBlock:output_type -> brz.Block
+	13, // 42: brz.BlockNoteService.ChangeBlockOrder:output_type -> google.protobuf.Empty
+	13, // 43: brz.BlockNoteService.ChangeTypeBlock:output_type -> google.protobuf.Empty
+	13, // 44: brz.BlockNoteService.CleanTrash:output_type -> google.protobuf.Empty
+	13, // 45: brz.BlockNoteService.NoteToTrash:output_type -> google.protobuf.Empty
+	13, // 46: brz.BlockNoteService.NotesToTrash:output_type -> google.protobuf.Empty
+	13, // 47: brz.BlockNoteService.NoteFromTrash:output_type -> google.protobuf.Empty
+	24, // 48: brz.BlockNoteService.GetNote:output_type -> brz.NoteWithBlocks
+	13, // 49: brz.BlockNoteService.CreateNote:output_type -> google.protobuf.Empty
+	13, // 50: brz.BlockNoteService.ChangeTitleNote:output_type -> google.protobuf.Empty
+	25, // 51: brz.BlockNoteService.GetAllBlocksInNote:output_type -> brz.Blocks
+	26, // 52: brz.BlockNoteService.GetAllNotes:output_type -> brz.NoteParts
+	26, // 53: brz.BlockNoteService.GetNotesByTag:output_type -> brz.NoteParts
+	26, // 54: brz.BlockNoteService.GetNotesFromTrash:output_type -> brz.NoteParts
+	27, // 55: brz.BlockNoteService.Search:output_type -> brz.NotePart
+	13, // 56: brz.BlockNoteService.AddTagToNote:output_type -> google.protobuf.Empty
+	13, // 57: brz.BlockNoteService.RemoveTagFromNote:output_type -> google.protobuf.Empty
+	13, // 58: brz.BlockNoteService.CreateTag:output_type -> google.protobuf.Empty
+	28, // 59: brz.BlockNoteService.GetTagsByUser:output_type -> brz.Tags
+	28, // 60: brz.BlockNoteService.GetPinnedTagsByUser:output_type -> brz.Tags
+	13, // 61: brz.BlockNoteService.UpdateTagTitle:output_type -> google.protobuf.Empty
+	13, // 62: brz.BlockNoteService.UpdateTagColor:output_type -> google.protobuf.Empty
+	13, // 63: brz.BlockNoteService.UpdateTagEmoji:output_type -> google.protobuf.Empty
+	13, // 64: brz.BlockNoteService.UpdateTagPinned:output_type -> google.protobuf.Empty
+	13, // 65: brz.BlockNoteService.DeleteTag:output_type -> google.protobuf.Empty
+	13, // 66: brz.BlockNoteService.DeleteTags:output_type -> google.protobuf.Empty
+	13, // 67: brz.BlockNoteService.ShareNote:output_type -> google.protobuf.Empty
+	13, // 68: brz.BlockNoteService.PublicNote:output_type -> google.protobuf.Empty
+	13, // 69: brz.BlockNoteService.AddPublicNote:output_type -> google.protobuf.Empty
+	13, // 70: brz.BlockNoteService.BlogNote:output_type -> google.protobuf.Empty
+	13, // 71: brz.BlockNoteService.Healthz:output_type -> google.protobuf.Empty
+	37, // [37:72] is the sub-list for method output_type
+	2,  // [2:37] is the sub-list for method input_type
 	2,  // [2:2] is the sub-list for extension type_name
 	2,  // [2:2] is the sub-list for extension extendee
 	0,  // [0:2] is the sub-list for field type_name
