@@ -296,7 +296,7 @@ services:
       - ./migrations:/migrations:ro
       - ./scripts/mongo-migrate.sh:/mongo-migrate.sh:ro
     restart: "no"
-    entrypoint: ["/bin/bash", "/mongo-migrate.sh"]
+    entrypoint: ["bash", "/mongo-migrate.sh"]
 networks:
   auth:
     driver: bridge
