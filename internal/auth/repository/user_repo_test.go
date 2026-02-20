@@ -303,5 +303,5 @@ func TestAuthPwIncorrect(t *testing.T) {
 		user.Login,
 		"123",
 	)
-	assert.True(t, errors.Is(err, domain.ErrPasswordIncorrect))
+	assert.True(t, errors.Is(err, domain.ErrLoginOrPasswordIncorrect))
 }

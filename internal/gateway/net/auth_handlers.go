@@ -2,6 +2,8 @@ package net
 
 import (
 	"context"
+	"github.com/autumnterror/utils_go/pkg/utils/uid"
+	"google.golang.org/protobuf/types/known/structpb"
 	"net/http"
 	"time"
 
@@ -135,6 +137,74 @@ func (e *Echo) Reg(c echo.Context) error {
 		SameSite: http.SameSiteNoneMode,
 		Expires:  time.Unix(tokens.ExpRefresh, 0).UTC(),
 	})
+
+	uId, err := e.authAPI.API.GetIdFromToken(ctx, &brzrpc.Token{Value: tokens.GetAccessToken()})
+	if err != nil || uId.GetId() == "" {
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad access_token"})
+	}
+
+	idTag := uid.New()
+	_, err = e.bnAPI.API.CreateTag(ctx, &brzrpc.Tag{
+		Id:     idTag,
+		Title:  "default",
+		Color:  "#FF00ED",
+		Emoji:  "✍️",
+		UserId: uId.GetId(),
+	})
+	code, errRes = bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
+
+	idNote := uid.New()
+	_, err = e.bnAPI.API.CreateNote(ctx, &brzrpc.Note{
+		Id:        idNote,
+		Title:     "Test Note!",
+		CreatedAt: time.Now().UTC().Unix(),
+		UpdatedAt: time.Now().UTC().Unix(),
+		Tag:       nil,
+		Author:    uId.GetId(),
+		Editors:   []string{},
+		Readers:   []string{},
+		Blocks:    []string{},
+	})
+	code, errRes = bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
+
+	_, err = e.bnAPI.API.AddTagToNote(ctx, &brzrpc.NoteTagUserId{
+		NoteId: idNote,
+		TagId:  idTag,
+		UserId: uId.GetId(),
+	})
+	code, errRes = bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
+
+	s, err := structpb.NewStruct(map[string]any{
+		"text": []map[string]any{
+			{
+				"style": "default",
+				"text":  "Hi there, it's your first note",
+			},
+		},
+	})
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad data"})
+	}
+	_, err = e.bnAPI.API.CreateBlock(ctx, &brzrpc.CreateBlockRequest{
+		Type:   "text",
+		NoteId: idNote,
+		Pos:    int32(0),
+		Data:   s,
+		UserId: uId.GetId(),
+	})
+	code, errRes = bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
 
 	return c.JSON(http.StatusOK, &domain.Tokens{
 		AccessToken:  tokens.AccessToken,

@@ -40,14 +40,14 @@ func (d Driver) Authentication(ctx context.Context, email, login, pw string) (st
 	var id string
 	if err := d.Driver.QueryRowContext(ctx, query, arg).Scan(&id, &hashed); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return "", domain.ErrNotFound
+			return "", domain.ErrLoginOrPasswordIncorrect
 		}
 		return "", format.Error(op, err)
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(pw)); err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return "", domain.ErrPasswordIncorrect
+			return "", domain.ErrLoginOrPasswordIncorrect
 		}
 		return "", format.Error(op, err)
 	}

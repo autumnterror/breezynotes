@@ -41,7 +41,7 @@ func handleCRUDResponse(ctx context.Context, op string, action func() (any, erro
 				return nil, status.Error(codes.Unauthenticated, r.err.Error())
 			case errors.Is(r.err, domain.ErrTokenWrongType):
 				return nil, status.Error(codes.InvalidArgument, r.err.Error())
-			case errors.Is(r.err, service.ErrBadServiceCheck), errors.Is(r.err, domain.ErrWrongInput), errors.Is(r.err, domain.ErrPasswordIncorrect):
+			case errors.Is(r.err, service.ErrBadServiceCheck), errors.Is(r.err, domain.ErrWrongInput), errors.Is(r.err, domain.ErrLoginOrPasswordIncorrect):
 				return nil, status.Error(codes.InvalidArgument, r.err.Error())
 
 			default:

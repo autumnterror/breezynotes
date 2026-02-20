@@ -86,8 +86,6 @@ func (s *ServerAPI) GetBlock(ctx context.Context, req *brzrpc.NoteBlockUserId) (
 	return res.(*brzrpc.Block), nil
 }
 
-//TYPES
-
 func (s *ServerAPI) CreateBlock(ctx context.Context, req *brzrpc.CreateBlockRequest) (*brzrpc.Id, error) {
 	const op = "block.note.grpc.createBlock"
 

@@ -182,7 +182,7 @@ services:
       - mongo-cluster
     healthcheck:
       test: |
-        mongosh --host mongo1 --authenticationDatabase admin -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --eval "db.adminCommand('ping')"
+        mongosh --host mongo2 --authenticationDatabase admin -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --eval "db.adminCommand('ping')"
       interval: 5s
       timeout: 10s
       retries: 10
@@ -217,7 +217,7 @@ services:
       - mongo-cluster
     healthcheck:
       test: |
-        mongosh --host mongo1 --authenticationDatabase admin -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --eval "db.adminCommand('ping')"
+        mongosh --host mongo3 --authenticationDatabase admin -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --eval "db.adminCommand('ping')"
       interval: 5s
       timeout: 10s
       retries: 10
@@ -284,7 +284,27 @@ services:
         echo 'MongoDB replica set is healthy!';
       "
     restart: "no"
-
+  breezynotes-mongo-migrator:
+    image: mongo:latest
+    depends_on:
+      breezynotes-mongo-repl-set-check:
+        condition: service_completed_successfully
+    networks:
+      - mongo-cluster
+    env_file: .env
+    volumes:
+      - ./migrations:/migrations:ro
+    restart: "no"
+    entrypoint: >
+      bash -c "
+        set -e;
+        echo 'Running Mongo migrations...';
+        for f in /migrations/*.js; do
+          echo \"Applying $f\";
+          mongosh \"mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo1:27017,mongo2:27017,mongo3:27017/${MONGO_INITDB_DATABASE}?replicaSet=rs0&authSource=admin\" --file \"$f\";
+        done;
+        echo 'Mongo migrations done ✅';
+      "
 networks:
   auth:
     driver: bridge
