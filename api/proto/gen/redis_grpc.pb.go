@@ -34,6 +34,7 @@ const (
 	RedisService_RmNoteListByUser_FullMethodName        = "/brz.RedisService/RmNoteListByUser"
 	RedisService_CleanNoteById_FullMethodName           = "/brz.RedisService/CleanNoteById"
 	RedisService_Healthz_FullMethodName                 = "/brz.RedisService/Healthz"
+	RedisService_RateLimit_FullMethodName               = "/brz.RedisService/RateLimit"
 )
 
 // RedisServiceClient is the client API for RedisService service.
@@ -54,6 +55,7 @@ type RedisServiceClient interface {
 	RmNoteListByUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CleanNoteById(ctx context.Context, in *NoteId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Healthz(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	RateLimit(ctx context.Context, in *RateLimitRequest, opts ...grpc.CallOption) (*RateLimitResponse, error)
 }
 
 type redisServiceClient struct {
@@ -204,6 +206,16 @@ func (c *redisServiceClient) Healthz(ctx context.Context, in *emptypb.Empty, opt
 	return out, nil
 }
 
+func (c *redisServiceClient) RateLimit(ctx context.Context, in *RateLimitRequest, opts ...grpc.CallOption) (*RateLimitResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RateLimitResponse)
+	err := c.cc.Invoke(ctx, RedisService_RateLimit_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RedisServiceServer is the server API for RedisService service.
 // All implementations must embed UnimplementedRedisServiceServer
 // for forward compatibility.
@@ -222,6 +234,7 @@ type RedisServiceServer interface {
 	RmNoteListByUser(context.Context, *UserId) (*emptypb.Empty, error)
 	CleanNoteById(context.Context, *NoteId) (*emptypb.Empty, error)
 	Healthz(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
+	RateLimit(context.Context, *RateLimitRequest) (*RateLimitResponse, error)
 	mustEmbedUnimplementedRedisServiceServer()
 }
 
@@ -273,6 +286,9 @@ func (UnimplementedRedisServiceServer) CleanNoteById(context.Context, *NoteId) (
 }
 func (UnimplementedRedisServiceServer) Healthz(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Healthz not implemented")
+}
+func (UnimplementedRedisServiceServer) RateLimit(context.Context, *RateLimitRequest) (*RateLimitResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RateLimit not implemented")
 }
 func (UnimplementedRedisServiceServer) mustEmbedUnimplementedRedisServiceServer() {}
 func (UnimplementedRedisServiceServer) testEmbeddedByValue()                      {}
@@ -547,6 +563,24 @@ func _RedisService_Healthz_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RedisService_RateLimit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RateLimitRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RedisServiceServer).RateLimit(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RedisService_RateLimit_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RedisServiceServer).RateLimit(ctx, req.(*RateLimitRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RedisService_ServiceDesc is the grpc.ServiceDesc for RedisService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -609,6 +643,10 @@ var RedisService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Healthz",
 			Handler:    _RedisService_Healthz_Handler,
+		},
+		{
+			MethodName: "RateLimit",
+			Handler:    _RedisService_RateLimit_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -23,3 +23,15 @@ func (a *API) GetAsFirst(ctx context.Context, id string) (string, error) {
 
 	return block.Registry[b.Type].GetAsFirst(ctx, domain.FromBlockDb(b)), nil
 }
+
+func (a *API) GetAsFirstNoDb(ctx context.Context, b *domain.Block) (string, error) {
+	const op = "blocks.GetAsFirstNoDbGetAsFirstNoDb"
+	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
+	defer done()
+
+	if block.Registry[b.Type] == nil {
+		return "", domain.ErrTypeNotDefined
+	}
+
+	return block.Registry[b.Type].GetAsFirst(ctx, domain.FromBlockDb(b)), nil
+}

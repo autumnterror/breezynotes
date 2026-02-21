@@ -283,6 +283,110 @@ func (x *BlocksOnNote) GetItems() []*Block {
 	return nil
 }
 
+type RateLimitRequest struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	Key                string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	WindowMilliseconds int64                  `protobuf:"varint,2,opt,name=windowMilliseconds,proto3" json:"windowMilliseconds,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *RateLimitRequest) Reset() {
+	*x = RateLimitRequest{}
+	mi := &file_redis_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RateLimitRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RateLimitRequest) ProtoMessage() {}
+
+func (x *RateLimitRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_redis_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RateLimitRequest.ProtoReflect.Descriptor instead.
+func (*RateLimitRequest) Descriptor() ([]byte, []int) {
+	return file_redis_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *RateLimitRequest) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *RateLimitRequest) GetWindowMilliseconds() int64 {
+	if x != nil {
+		return x.WindowMilliseconds
+	}
+	return 0
+}
+
+type RateLimitResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Count         int64                  `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
+	Ttl           int64                  `protobuf:"varint,2,opt,name=ttl,proto3" json:"ttl,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RateLimitResponse) Reset() {
+	*x = RateLimitResponse{}
+	mi := &file_redis_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RateLimitResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RateLimitResponse) ProtoMessage() {}
+
+func (x *RateLimitResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_redis_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RateLimitResponse.ProtoReflect.Descriptor instead.
+func (*RateLimitResponse) Descriptor() ([]byte, []int) {
+	return file_redis_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *RateLimitResponse) GetCount() int64 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+func (x *RateLimitResponse) GetTtl() int64 {
+	if x != nil {
+		return x.Ttl
+	}
+	return 0
+}
+
 var File_redis_proto protoreflect.FileDescriptor
 
 const file_redis_proto_rawDesc = "" +
@@ -305,7 +409,13 @@ const file_redis_proto_rawDesc = "" +
 	"\fBlocksOnNote\x12\x17\n" +
 	"\anote_id\x18\x01 \x01(\tR\x06noteId\x12 \n" +
 	"\x05items\x18\x02 \x03(\v2\n" +
-	".brz.BlockR\x05items2\xad\x06\n" +
+	".brz.BlockR\x05items\"T\n" +
+	"\x10RateLimitRequest\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12.\n" +
+	"\x12windowMilliseconds\x18\x02 \x01(\x03R\x12windowMilliseconds\";\n" +
+	"\x11RateLimitResponse\x12\x14\n" +
+	"\x05count\x18\x01 \x01(\x03R\x05count\x12\x10\n" +
+	"\x03ttl\x18\x02 \x01(\x03R\x03ttl2\xe9\x06\n" +
 	"\fRedisService\x125\n" +
 	"\rGetNoteByUser\x12\x0f.brz.UserNoteId\x1a\x13.brz.NoteWithBlocks\x120\n" +
 	"\x11GetNoteListByUser\x12\v.brz.UserId\x1a\x0e.brz.NoteParts\x126\n" +
@@ -320,7 +430,8 @@ const file_redis_proto_rawDesc = "" +
 	"\x16RmNotesFromTrashByUser\x12\v.brz.UserId\x1a\x16.google.protobuf.Empty\x127\n" +
 	"\x10RmNoteListByUser\x12\v.brz.UserId\x1a\x16.google.protobuf.Empty\x124\n" +
 	"\rCleanNoteById\x12\v.brz.NoteId\x1a\x16.google.protobuf.Empty\x129\n" +
-	"\aHealthz\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.EmptyB,Z*github.com/autumnterror/breezynotes;brzrpcb\x06proto3"
+	"\aHealthz\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\x12:\n" +
+	"\tRateLimit\x12\x15.brz.RateLimitRequest\x1a\x16.brz.RateLimitResponseB,Z*github.com/autumnterror/breezynotes;brzrpcb\x06proto3"
 
 var (
 	file_redis_proto_rawDescOnce sync.Once
@@ -334,61 +445,65 @@ func file_redis_proto_rawDescGZIP() []byte {
 	return file_redis_proto_rawDescData
 }
 
-var file_redis_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_redis_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_redis_proto_goTypes = []any{
-	(*NoteListByUser)(nil), // 0: brz.NoteListByUser
-	(*NotesByUser)(nil),    // 1: brz.NotesByUser
-	(*NoteByUser)(nil),     // 2: brz.NoteByUser
-	(*TagsByUser)(nil),     // 3: brz.TagsByUser
-	(*BlocksOnNote)(nil),   // 4: brz.BlocksOnNote
-	(*NotePart)(nil),       // 5: brz.NotePart
-	(*Note)(nil),           // 6: brz.Note
-	(*NoteWithBlocks)(nil), // 7: brz.NoteWithBlocks
-	(*Tag)(nil),            // 8: brz.Tag
-	(*Block)(nil),          // 9: brz.Block
-	(*UserNoteId)(nil),     // 10: brz.UserNoteId
-	(*UserId)(nil),         // 11: brz.UserId
-	(*NoteId)(nil),         // 12: brz.NoteId
-	(*emptypb.Empty)(nil),  // 13: google.protobuf.Empty
-	(*NoteParts)(nil),      // 14: brz.NoteParts
-	(*Tags)(nil),           // 15: brz.Tags
+	(*NoteListByUser)(nil),    // 0: brz.NoteListByUser
+	(*NotesByUser)(nil),       // 1: brz.NotesByUser
+	(*NoteByUser)(nil),        // 2: brz.NoteByUser
+	(*TagsByUser)(nil),        // 3: brz.TagsByUser
+	(*BlocksOnNote)(nil),      // 4: brz.BlocksOnNote
+	(*RateLimitRequest)(nil),  // 5: brz.RateLimitRequest
+	(*RateLimitResponse)(nil), // 6: brz.RateLimitResponse
+	(*NotePart)(nil),          // 7: brz.NotePart
+	(*Note)(nil),              // 8: brz.Note
+	(*NoteWithBlocks)(nil),    // 9: brz.NoteWithBlocks
+	(*Tag)(nil),               // 10: brz.Tag
+	(*Block)(nil),             // 11: brz.Block
+	(*UserNoteId)(nil),        // 12: brz.UserNoteId
+	(*UserId)(nil),            // 13: brz.UserId
+	(*NoteId)(nil),            // 14: brz.NoteId
+	(*emptypb.Empty)(nil),     // 15: google.protobuf.Empty
+	(*NoteParts)(nil),         // 16: brz.NoteParts
+	(*Tags)(nil),              // 17: brz.Tags
 }
 var file_redis_proto_depIdxs = []int32{
-	5,  // 0: brz.NoteListByUser.items:type_name -> brz.NotePart
-	6,  // 1: brz.NotesByUser.items:type_name -> brz.Note
-	7,  // 2: brz.NoteByUser.note:type_name -> brz.NoteWithBlocks
-	8,  // 3: brz.TagsByUser.items:type_name -> brz.Tag
-	9,  // 4: brz.BlocksOnNote.items:type_name -> brz.Block
-	10, // 5: brz.RedisService.GetNoteByUser:input_type -> brz.UserNoteId
-	11, // 6: brz.RedisService.GetNoteListByUser:input_type -> brz.UserId
-	11, // 7: brz.RedisService.GetNotesFromTrashByUser:input_type -> brz.UserId
-	11, // 8: brz.RedisService.GetTagsByUser:input_type -> brz.UserId
+	7,  // 0: brz.NoteListByUser.items:type_name -> brz.NotePart
+	8,  // 1: brz.NotesByUser.items:type_name -> brz.Note
+	9,  // 2: brz.NoteByUser.note:type_name -> brz.NoteWithBlocks
+	10, // 3: brz.TagsByUser.items:type_name -> brz.Tag
+	11, // 4: brz.BlocksOnNote.items:type_name -> brz.Block
+	12, // 5: brz.RedisService.GetNoteByUser:input_type -> brz.UserNoteId
+	13, // 6: brz.RedisService.GetNoteListByUser:input_type -> brz.UserId
+	13, // 7: brz.RedisService.GetNotesFromTrashByUser:input_type -> brz.UserId
+	13, // 8: brz.RedisService.GetTagsByUser:input_type -> brz.UserId
 	3,  // 9: brz.RedisService.SetTagsByUser:input_type -> brz.TagsByUser
 	2,  // 10: brz.RedisService.SetNoteByUser:input_type -> brz.NoteByUser
 	0,  // 11: brz.RedisService.SetNotesFromTrashByUser:input_type -> brz.NoteListByUser
 	0,  // 12: brz.RedisService.SetNoteListByUser:input_type -> brz.NoteListByUser
-	11, // 13: brz.RedisService.RmTagsByUser:input_type -> brz.UserId
-	10, // 14: brz.RedisService.RmNoteByUser:input_type -> brz.UserNoteId
-	11, // 15: brz.RedisService.RmNotesFromTrashByUser:input_type -> brz.UserId
-	11, // 16: brz.RedisService.RmNoteListByUser:input_type -> brz.UserId
-	12, // 17: brz.RedisService.CleanNoteById:input_type -> brz.NoteId
-	13, // 18: brz.RedisService.Healthz:input_type -> google.protobuf.Empty
-	7,  // 19: brz.RedisService.GetNoteByUser:output_type -> brz.NoteWithBlocks
-	14, // 20: brz.RedisService.GetNoteListByUser:output_type -> brz.NoteParts
-	14, // 21: brz.RedisService.GetNotesFromTrashByUser:output_type -> brz.NoteParts
-	15, // 22: brz.RedisService.GetTagsByUser:output_type -> brz.Tags
-	13, // 23: brz.RedisService.SetTagsByUser:output_type -> google.protobuf.Empty
-	13, // 24: brz.RedisService.SetNoteByUser:output_type -> google.protobuf.Empty
-	13, // 25: brz.RedisService.SetNotesFromTrashByUser:output_type -> google.protobuf.Empty
-	13, // 26: brz.RedisService.SetNoteListByUser:output_type -> google.protobuf.Empty
-	13, // 27: brz.RedisService.RmTagsByUser:output_type -> google.protobuf.Empty
-	13, // 28: brz.RedisService.RmNoteByUser:output_type -> google.protobuf.Empty
-	13, // 29: brz.RedisService.RmNotesFromTrashByUser:output_type -> google.protobuf.Empty
-	13, // 30: brz.RedisService.RmNoteListByUser:output_type -> google.protobuf.Empty
-	13, // 31: brz.RedisService.CleanNoteById:output_type -> google.protobuf.Empty
-	13, // 32: brz.RedisService.Healthz:output_type -> google.protobuf.Empty
-	19, // [19:33] is the sub-list for method output_type
-	5,  // [5:19] is the sub-list for method input_type
+	13, // 13: brz.RedisService.RmTagsByUser:input_type -> brz.UserId
+	12, // 14: brz.RedisService.RmNoteByUser:input_type -> brz.UserNoteId
+	13, // 15: brz.RedisService.RmNotesFromTrashByUser:input_type -> brz.UserId
+	13, // 16: brz.RedisService.RmNoteListByUser:input_type -> brz.UserId
+	14, // 17: brz.RedisService.CleanNoteById:input_type -> brz.NoteId
+	15, // 18: brz.RedisService.Healthz:input_type -> google.protobuf.Empty
+	5,  // 19: brz.RedisService.RateLimit:input_type -> brz.RateLimitRequest
+	9,  // 20: brz.RedisService.GetNoteByUser:output_type -> brz.NoteWithBlocks
+	16, // 21: brz.RedisService.GetNoteListByUser:output_type -> brz.NoteParts
+	16, // 22: brz.RedisService.GetNotesFromTrashByUser:output_type -> brz.NoteParts
+	17, // 23: brz.RedisService.GetTagsByUser:output_type -> brz.Tags
+	15, // 24: brz.RedisService.SetTagsByUser:output_type -> google.protobuf.Empty
+	15, // 25: brz.RedisService.SetNoteByUser:output_type -> google.protobuf.Empty
+	15, // 26: brz.RedisService.SetNotesFromTrashByUser:output_type -> google.protobuf.Empty
+	15, // 27: brz.RedisService.SetNoteListByUser:output_type -> google.protobuf.Empty
+	15, // 28: brz.RedisService.RmTagsByUser:output_type -> google.protobuf.Empty
+	15, // 29: brz.RedisService.RmNoteByUser:output_type -> google.protobuf.Empty
+	15, // 30: brz.RedisService.RmNotesFromTrashByUser:output_type -> google.protobuf.Empty
+	15, // 31: brz.RedisService.RmNoteListByUser:output_type -> google.protobuf.Empty
+	15, // 32: brz.RedisService.CleanNoteById:output_type -> google.protobuf.Empty
+	15, // 33: brz.RedisService.Healthz:output_type -> google.protobuf.Empty
+	6,  // 34: brz.RedisService.RateLimit:output_type -> brz.RateLimitResponse
+	20, // [20:35] is the sub-list for method output_type
+	5,  // [5:20] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
@@ -406,7 +521,7 @@ func file_redis_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_redis_proto_rawDesc), len(file_redis_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

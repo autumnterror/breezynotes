@@ -14,7 +14,8 @@ message NotesByUser { string user_id = 1; repeated Note items = 2; }
 message NoteByUser { string user_id = 1; NoteWithBlocks note = 2; }
 message TagsByUser { string user_id = 1; repeated Tag items = 2; }
 message BlocksOnNote { string note_id = 1; repeated Block items = 2; }
-
+message RateLimitRequest {string key = 1; int64 windowMilliseconds = 2; }
+message RateLimitResponse {int64 count = 1; int64 ttl = 2; }
 
 
 service RedisService {
@@ -36,4 +37,6 @@ service RedisService {
 
 
   rpc Healthz(google.protobuf.Empty) returns (google.protobuf.Empty);
+  rpc RateLimit(RateLimitRequest) returns (RateLimitResponse);
+
 }

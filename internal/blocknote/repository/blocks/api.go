@@ -24,4 +24,5 @@ type Repo interface {
 	Get(ctx context.Context, id string) (*domain.Block, error)
 	GetMany(ctx context.Context, ids []string) (*domain.Blocks, error)
 	GetAsFirst(ctx context.Context, id string) (string, error)
+	GetAsFirstNoDb(ctx context.Context, b *domain.Block) (string, error)
 }

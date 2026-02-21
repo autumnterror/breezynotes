@@ -25,6 +25,7 @@ type Echo struct {
 	authAPI *auth.Client
 	bnAPI   *blocknote.Client
 	rdsAPI  *redis.Client
+	rateCfg rateLimitConfig
 }
 
 func New(
@@ -51,6 +52,10 @@ func New(
 		AllowHeaders:     []string{echo.HeaderContentType},
 		AllowCredentials: true,
 	}))
+
+	e.rateCfg.setDefaults()
+	e.rateCfg.PerRoute = true
+	e.echo.Use(e.RateLimitMW(e.rateCfg))
 
 	//e.echo.Use(middleware.Logger(), middleware.Recover())
 	//e.echo.Static("/", "./example/html")

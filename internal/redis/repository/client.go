@@ -32,4 +32,5 @@ type Repo interface {
 	CreateSession(ctx context.Context, id string) error
 	CheckSession(ctx context.Context, id string) error
 	CleanNoteById(ctx context.Context, noteID string) error
+	RateLimit(ctx context.Context, key string, windowMilliseconds int64) (count int64, ttl int64, err error)
 }

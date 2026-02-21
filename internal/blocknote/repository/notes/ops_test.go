@@ -24,7 +24,6 @@ import (
 )
 
 func TestWithBlocks(t *testing.T) {
-
 	t.Run("test with blocks", func(t *testing.T) {
 		block.RegisterBlock("text", &textblock.Driver{})
 		m := mongo.MustConnect(config.Test())

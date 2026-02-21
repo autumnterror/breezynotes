@@ -50,5 +50,5 @@ type Repo interface {
 	DeleteRole(ctx context.Context, noteId, userId string) error
 	//ChangeUserRole(ctx context.Context, noteId, userId, newRole string) error
 
-	Search(ctx context.Context, idUser, prompt string) (<-chan *domain.NotePart, error)
+	Search(ctx context.Context, id, prompt string) <-chan *domain.NotePart
 }

@@ -3,7 +3,6 @@ package notes
 import (
 	"context"
 	"errors"
-
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/autumnterror/utils_go/pkg/utils/alg"
@@ -11,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"strings"
 )
 
 // Get return note by id can return mongo.ErrNotFound
@@ -246,47 +246,116 @@ func (a *API) getAllByUser(ctx context.Context, id string) (*domain.Notes, error
 	return nts, nil
 }
 
-func (a *API) Search(ctx context.Context, id, prompt string) (<-chan *domain.NotePart, error) {
+func chunkStrings(ids []string, size int) [][]string {
+	if size <= 0 {
+		size = 1000
+	}
+	var chunks [][]string
+	for i := 0; i < len(ids); i += size {
+		end := i + size
+		if end > len(ids) {
+			end = len(ids)
+		}
+		chunks = append(chunks, ids[i:end])
+	}
+	return chunks
+}
+
+// Search to title, after to content. With batching
+func (a *API) Search(ctx context.Context, id, prompt string) <-chan *domain.NotePart {
 	const op = "notes.Search"
 
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
-	defer done()
 
 	notesChan := make(chan *domain.NotePart)
+	p := strings.ToLower(prompt)
 
 	go func() {
+		defer done()
 		defer close(notesChan)
+
+		var blockIds []string
+		noteIds := make(map[string]domain.Note)
 
 		cur, err := a.noteAPI.Find(
 			ctx,
-			bson.M{"author": id, "title": bson.M{"$regex": prompt, "$options": "i"}},
+			bson.M{"$or": []bson.M{
+				{"author": id},
+				{"editors": id},
+				{"readers": id},
+			}},
 			options.Find().SetSort(bson.M{"updated_at": -1}),
 		)
+		if err != nil {
+			return
+		}
+
+		defer cur.Close(ctx)
 		if err == nil {
 			for cur.Next(ctx) {
 				var n domain.Note
 				if err = cur.Decode(&n); err != nil {
 					continue
 				}
+				blockIds = append(blockIds, n.Blocks...)
+				noteIds[n.Id] = n
+				if !strings.Contains(strings.ToLower(n.Title), p) {
+					continue
+				}
 				select {
 				case <-ctx.Done():
-					cur.Close(ctx)
 					return
-				default:
-					notesChan <- &domain.NotePart{
-						Id:    n.Id,
-						Title: n.Title,
-						//Tag:        n.Tag,
-						FirstBlock: "",
+				case notesChan <- &domain.NotePart{
+					Id:         n.Id,
+					Title:      n.Title,
+					FirstBlock: "",
+					UpdatedAt:  n.UpdatedAt,
+					IsBlog:     n.IsBlog,
+					IsPublic:   n.IsPublic,
+				}:
+				}
+			}
+
+		}
+
+		if len(p) < 3 {
+			return
+		}
+
+		batchSize := 1000
+		for _, batch := range chunkStrings(blockIds, batchSize) {
+			blcks, err := a.blockAPI.GetMany(ctx, batch)
+			if err != nil {
+				continue
+			}
+
+			for _, b := range blcks.Blks {
+				str, err := a.blockAPI.GetAsFirstNoDb(ctx, b)
+				if err != nil {
+					continue
+				}
+				if strings.Contains(strings.ToLower(str), p) {
+					n, ok := noteIds[b.NoteId]
+					if !ok {
+						continue
+					}
+					select {
+					case <-ctx.Done():
+						return
+					case notesChan <- &domain.NotePart{
+						Id:         n.Id,
+						Title:      n.Title,
+						FirstBlock: str,
 						UpdatedAt:  n.UpdatedAt,
 						IsBlog:     n.IsBlog,
 						IsPublic:   n.IsPublic,
+					}:
 					}
+
 				}
 			}
-			cur.Close(ctx)
 		}
 	}()
 
-	return notesChan, nil
+	return notesChan
 }
