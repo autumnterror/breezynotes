@@ -183,7 +183,7 @@ func (s *BN) Search(ctx context.Context, idUser, prompt string) (<-chan *domain.
 	if stringEmpty(prompt) {
 		return nil, nil
 	}
-	return s.nts.Search(ctx, idUser, prompt)
+	return s.nts.Search(ctx, idUser, prompt), nil
 }
 
 func (s *BN) ShareNote(ctx context.Context, idNote, idUser, idUserToShare, role string) error {

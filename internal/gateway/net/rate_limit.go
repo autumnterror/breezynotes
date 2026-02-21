@@ -4,12 +4,13 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
-	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
-	"github.com/labstack/echo/v4"
 	"net"
 	"net/http"
 	"strings"
 	"time"
+
+	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
+	"github.com/labstack/echo/v4"
 )
 
 type rateLimitConfig struct {
