@@ -55,17 +55,27 @@ func New(
 	//e.echo.Use(middleware.Logger(), middleware.Recover())
 	//e.echo.Static("/", "./example/html")
 
-	api := e.echo.Group("/api", ValidateID(), e.GetUserId())
+	apiPublic := e.echo.Group("/api", ValidateID())
 	{
-		api.GET("/healthz", e.Healthz)
+		apiPublic.GET("/healthz", e.Healthz)
 
-		auth := api.Group("/auth")
+		auth := apiPublic.Group("/auth", e.GetUserId())
 		{
 			auth.GET("/token", e.ValidateToken)
 			auth.POST("", e.Auth)
 			auth.POST("/reg", e.Reg)
 		}
-		user := api.Group("/user", e.ValidateTokenMW())
+
+		notes := apiPublic.Group("/note")
+		{
+			notes.GET("", e.GetNote, e.GetUserId())
+		}
+	}
+
+	api := e.echo.Group("/api", ValidateID(), e.GetUserId(), e.ValidateTokenMW())
+	{
+
+		user := api.Group("/user")
 		{
 			user.GET("/data", e.GetUserData)
 			user.DELETE("", e.DeleteUser)
@@ -75,9 +85,8 @@ func New(
 			user.PATCH("/pw", e.ChangePassword)
 		}
 
-		notes := api.Group("/note", e.ValidateTokenMW())
+		notes := api.Group("/note")
 		{
-			notes.GET("", e.GetNote)
 			notes.GET("/search", e.Search)
 			notes.POST("", e.CreateNote)
 
@@ -94,7 +103,7 @@ func New(
 			notes.PATCH("/public/add", e.AddPublicNote)
 		}
 
-		blocks := api.Group("/block", e.ValidateTokenMW())
+		blocks := api.Group("/block")
 		{
 			blocks.GET("/types", e.GetRegisteredTypes)
 			blocks.GET("", e.GetBlock)
@@ -107,16 +116,16 @@ func New(
 			blocks.PATCH("/order", e.ChangeBlockOrder)
 		}
 
-		trash := api.Group("/trash", e.ValidateTokenMW())
+		trash := api.Group("/trash")
 		{
 			trash.DELETE("", e.CleanTrash)
 			trash.PUT("/to", e.NoteToTrash)
 			trash.PUT("/from", e.NoteFromTrash)
-			//trash.POST("/note/find", e.FindNoteInTrash)
+			trash.GET("/note", e.FindNoteInTrash)
 			trash.GET("", e.GetNotesFromTrash)
 		}
 
-		tags := api.Group("/tag", e.ValidateTokenMW())
+		tags := api.Group("/tag")
 		{
 			tags.GET("/by-user", e.GetTagsByUser)
 			tags.GET("/pinned", e.GetPinnedTagsByUser)

@@ -151,7 +151,7 @@ func (e *Echo) NoteFromTrash(c echo.Context) error {
 
 	id := c.QueryParam("id")
 	if id == "" {
-		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad param"})
 	}
 
 	idUser, errGetId := getIdUser(c)
@@ -204,12 +204,12 @@ func (e *Echo) NoteFromTrash(c echo.Context) error {
 }
 
 // GetNotesFromTrash godoc
-// @Summary GetNote notes from trash
+// @Summary notes from trash
 // @Description Returns notes from trash by user ID
 // @Tags trash
 // @Accept json
 // @Produce json
-// @Success 200 {object} []brzrpc.NotePart
+// @Success 200 {object} []domain.NotePart
 // @Failure 401 {object} domain.Error
 // @Failure 502 {object} domain.Error
 // @Failure 504 {object} domain.Error
@@ -286,4 +286,42 @@ func (e *Echo) GetNotesFromTrash(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, nts.GetItems())
+}
+
+// FindNoteInTrash godoc
+// @Summary get note from trash
+// @Description Returns note from trash by user ID and note ID
+// @Tags trash
+// @Accept json
+// @Produce json
+// @Param id query string true "Note ID"
+// @Success 200 {object} domain.NoteWithBlocks
+// @Failure 401 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
+// @Router /api/trash/note [get]
+func (e *Echo) FindNoteInTrash(c echo.Context) error {
+	const op = "gateway.net.FindNoteInTrash"
+
+	api := e.bnAPI.API
+
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
+	}
+	idNote := c.QueryParam("id")
+	if idNote == "" {
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad param"})
+	}
+
+	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
+	defer done()
+
+	note, err := api.FindNoteInTrash(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: idNote})
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
+
+	return c.JSON(http.StatusOK, domain.ToNoteWithBlocksDb(note))
 }

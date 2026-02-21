@@ -2,6 +2,8 @@ package notes
 
 import (
 	"context"
+	"errors"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 
@@ -212,14 +214,17 @@ func (a *API) FromTrash(ctx context.Context, id string) error {
 }
 
 // FindOnTrash return note by id from trash
-func (a *API) FindOnTrash(ctx context.Context, id string) (*domain.Note, error) {
+func (a *API) FindOnTrash(ctx context.Context, idNote, idUser string) (*domain.Note, error) {
 	const op = "notes.FindOnTrash"
 
 	ctx, done := context.WithTimeout(ctx, domain.WaitTime)
 	defer done()
 
-	res := a.trashAPI.FindOne(ctx, bson.M{"_id": id})
+	res := a.trashAPI.FindOne(ctx, bson.M{"_id": idNote})
 	if res.Err() != nil {
+		if errors.Is(res.Err(), mongo.ErrNoDocuments) {
+			return nil, domain.ErrNotFound
+		}
 		return nil, format.Error(op, res.Err())
 	}
 
@@ -228,6 +233,21 @@ func (a *API) FindOnTrash(ctx context.Context, id string) (*domain.Note, error) 
 	if err != nil {
 		return nil, format.Error(op, err)
 	}
+
+	res = a.noteTagsAPI.FindOne(ctx, bson.M{"note_id": idNote, "tag.user_id": idUser})
+	if res.Err() != nil {
+		if errors.Is(res.Err(), mongo.ErrNoDocuments) {
+			return &n, nil
+		}
+		return nil, format.Error(op, res.Err())
+	}
+	var nt domain.NoteTags
+	err = res.Decode(&nt)
+	if err != nil {
+		return nil, format.Error(op, err)
+	}
+
+	n.Tag = nt.Tag
 
 	return &n, nil
 }

@@ -105,7 +105,7 @@ func (s *BN) FromTrash(ctx context.Context, idNote, idUser string) error {
 		return wrapServiceCheck(op, err)
 	}
 	_, err := s.tx.RunInTx(ctx, func(ctx context.Context) (interface{}, error) {
-		n, err := s.nts.FindOnTrash(ctx, idNote)
+		n, err := s.nts.FindOnTrash(ctx, idNote, idUser)
 		if err != nil {
 			return nil, domain.ErrNotFound
 		}
@@ -119,22 +119,41 @@ func (s *BN) FromTrash(ctx context.Context, idNote, idUser string) error {
 	return err
 }
 
-//func (s *BN) FindOnTrash(ctx context.Context, idNote, idUser string) (*domain.Note, error) {
-//	const op = "service.FindOnTrash"
-//
-//	if err := idValidation(idNote); err != nil {
-//		return nil, wrapServiceCheck(op, err)
-//	}
-//	if err := idValidation(idUser); err != nil {
-//		return nil, wrapServiceCheck(op, err)
-//	}
-//	n, err := s.nts.Get(ctx, idNote)
-//	if err != nil {
-//		return nil, domain.ErrNotFound
-//	}
-//	if n.Author != idUser && !alg.IsIn(idUser, n.Editors) {
-//		return nil, domain.ErrUnauthorized
-//	}
-//
-//	return s.nts.FindOnTrash(ctx, idNote)
-//}
+func (s *BN) FindOnTrash(ctx context.Context, idNote, idUser string) (*domain.NoteWithBlocks, error) {
+	const op = "service.FindOnTrash"
+
+	if err := idValidation(idNote); err != nil {
+		return nil, wrapServiceCheck(op, err)
+	}
+	if err := idValidation(idUser); err != nil {
+		return nil, wrapServiceCheck(op, err)
+	}
+
+	n, err := s.nts.FindOnTrash(ctx, idNote, idUser)
+	if err != nil {
+		return nil, domain.ErrNotFound
+	}
+
+	if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) && !n.IsBlog && !n.IsPublic {
+		return nil, domain.ErrUnauthorized
+	}
+
+	blks, err := s.blk.GetMany(ctx, n.Blocks)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.NoteWithBlocks{
+		Id:        n.Id,
+		Title:     n.Title,
+		Blocks:    blks.Blks,
+		Author:    n.Author,
+		Readers:   n.Readers,
+		Editors:   n.Editors,
+		CreatedAt: n.CreatedAt,
+		UpdatedAt: n.UpdatedAt,
+		Tag:       n.Tag,
+		IsBlog:    n.IsBlog,
+		IsPublic:  n.IsPublic,
+	}, nil
+}

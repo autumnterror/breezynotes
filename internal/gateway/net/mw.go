@@ -98,7 +98,7 @@ func (e *Echo) GetUserId() echo.MiddlewareFunc {
 			}
 
 			if !uid.Validate(u.GetId()) {
-				return c.JSON(http.StatusUnauthorized, domain.Error{Error: "id is not in format"})
+				return c.JSON(http.StatusUnauthorized, domain.Error{Error: "id in token is not in format"})
 			}
 
 			c.Set(domain.IdFromContext, u.GetId())

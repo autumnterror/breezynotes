@@ -356,7 +356,7 @@ func (e *Echo) DeleteTag(c echo.Context) error {
 }
 
 // GetTagsByUser godoc
-// @Summary GetNote tags by user
+// @Summary tags by user
 // @Description Returns all tags for user
 // @Tags tag
 // @Accept json
@@ -435,7 +435,7 @@ func (e *Echo) GetTagsByUser(c echo.Context) error {
 }
 
 // GetPinnedTagsByUser godoc
-// @Summary GetNote tags by user
+// @Summary tags by user
 // @Description Returns all tags for user
 // @Tags tag
 // @Accept json

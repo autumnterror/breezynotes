@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
-	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/autumnterror/utils_go/pkg/utils/alg"
 )
 
@@ -27,16 +26,16 @@ func (s *BN) GetNote(ctx context.Context, idNote, idUser string) (*domain.NoteWi
 	if err := idValidation(idNote); err != nil {
 		return nil, wrapServiceCheck(op, err)
 	}
-	if err := idValidation(idUser); err != nil {
-		return nil, wrapServiceCheck(op, err)
+	if idUser != "" {
+		if err := idValidation(idUser); err != nil {
+			return nil, wrapServiceCheck(op, err)
+		}
 	}
 
 	n, err := s.nts.Get(ctx, idNote, idUser)
 	if err != nil {
 		return nil, domain.ErrNotFound
 	}
-
-	log.Green(n)
 
 	if n.Author != idUser && !alg.IsIn(idUser, n.Editors) && !alg.IsIn(idUser, n.Readers) && !n.IsBlog && !n.IsPublic {
 		return nil, domain.ErrUnauthorized

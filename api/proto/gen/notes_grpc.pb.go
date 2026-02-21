@@ -31,6 +31,7 @@ const (
 	BlockNoteService_NoteToTrash_FullMethodName         = "/brz.BlockNoteService/NoteToTrash"
 	BlockNoteService_NotesToTrash_FullMethodName        = "/brz.BlockNoteService/NotesToTrash"
 	BlockNoteService_NoteFromTrash_FullMethodName       = "/brz.BlockNoteService/NoteFromTrash"
+	BlockNoteService_FindNoteInTrash_FullMethodName     = "/brz.BlockNoteService/FindNoteInTrash"
 	BlockNoteService_GetNote_FullMethodName             = "/brz.BlockNoteService/GetNote"
 	BlockNoteService_CreateNote_FullMethodName          = "/brz.BlockNoteService/CreateNote"
 	BlockNoteService_ChangeTitleNote_FullMethodName     = "/brz.BlockNoteService/ChangeTitleNote"
@@ -75,6 +76,7 @@ type BlockNoteServiceClient interface {
 	NoteToTrash(ctx context.Context, in *UserNoteId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	NotesToTrash(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	NoteFromTrash(ctx context.Context, in *UserNoteId, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	FindNoteInTrash(ctx context.Context, in *UserNoteId, opts ...grpc.CallOption) (*NoteWithBlocks, error)
 	GetNote(ctx context.Context, in *UserNoteId, opts ...grpc.CallOption) (*NoteWithBlocks, error)
 	CreateNote(ctx context.Context, in *Note, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// rpc UpdateNoteTitle(UpdateNoteTitleRequest) returns (google.protobuf.Empty);
@@ -215,6 +217,16 @@ func (c *blockNoteServiceClient) NoteFromTrash(ctx context.Context, in *UserNote
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, BlockNoteService_NoteFromTrash_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *blockNoteServiceClient) FindNoteInTrash(ctx context.Context, in *UserNoteId, opts ...grpc.CallOption) (*NoteWithBlocks, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NoteWithBlocks)
+	err := c.cc.Invoke(ctx, BlockNoteService_FindNoteInTrash_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -488,6 +500,7 @@ type BlockNoteServiceServer interface {
 	NoteToTrash(context.Context, *UserNoteId) (*emptypb.Empty, error)
 	NotesToTrash(context.Context, *UserId) (*emptypb.Empty, error)
 	NoteFromTrash(context.Context, *UserNoteId) (*emptypb.Empty, error)
+	FindNoteInTrash(context.Context, *UserNoteId) (*NoteWithBlocks, error)
 	GetNote(context.Context, *UserNoteId) (*NoteWithBlocks, error)
 	CreateNote(context.Context, *Note) (*emptypb.Empty, error)
 	// rpc UpdateNoteTitle(UpdateNoteTitleRequest) returns (google.protobuf.Empty);
@@ -556,6 +569,9 @@ func (UnimplementedBlockNoteServiceServer) NotesToTrash(context.Context, *UserId
 }
 func (UnimplementedBlockNoteServiceServer) NoteFromTrash(context.Context, *UserNoteId) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NoteFromTrash not implemented")
+}
+func (UnimplementedBlockNoteServiceServer) FindNoteInTrash(context.Context, *UserNoteId) (*NoteWithBlocks, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindNoteInTrash not implemented")
 }
 func (UnimplementedBlockNoteServiceServer) GetNote(context.Context, *UserNoteId) (*NoteWithBlocks, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNote not implemented")
@@ -844,6 +860,24 @@ func _BlockNoteService_NoteFromTrash_Handler(srv interface{}, ctx context.Contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BlockNoteServiceServer).NoteFromTrash(ctx, req.(*UserNoteId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BlockNoteService_FindNoteInTrash_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserNoteId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlockNoteServiceServer).FindNoteInTrash(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BlockNoteService_FindNoteInTrash_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlockNoteServiceServer).FindNoteInTrash(ctx, req.(*UserNoteId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1323,6 +1357,10 @@ var BlockNoteService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "NoteFromTrash",
 			Handler:    _BlockNoteService_NoteFromTrash_Handler,
+		},
+		{
+			MethodName: "FindNoteInTrash",
+			Handler:    _BlockNoteService_FindNoteInTrash_Handler,
 		},
 		{
 			MethodName: "GetNote",

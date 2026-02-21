@@ -86,7 +86,7 @@ func (e *Echo) ChangeTitleNote(c echo.Context) error {
 }
 
 // GetNote godoc
-// @Summary GetNote note
+// @Summary note
 // @Description Returns note by ID
 // @Tags note
 // @Accept json
@@ -104,20 +104,20 @@ func (e *Echo) GetNote(c echo.Context) error {
 
 	api := e.bnAPI.API
 
-	id := c.QueryParam("id")
-	if id == "" {
+	idNote := c.QueryParam("id")
+	if idNote == "" {
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad param"})
 	}
 
 	idUser, errGetId := getIdUser(c)
 	if errGetId != nil {
-		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
+		idUser = ""
 	}
 
 	ctx, done := context.WithTimeout(c.Request().Context(), domain.WaitTime)
 	defer done()
 
-	if note, err := e.rdsAPI.API.GetNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: id}); err != nil {
+	if note, err := e.rdsAPI.API.GetNoteByUser(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: idNote}); err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
 			st, ok := status.FromError(err)
@@ -149,7 +149,7 @@ func (e *Echo) GetNote(c echo.Context) error {
 		}
 	}
 
-	note, err := api.GetNote(ctx, &brzrpc.UserNoteId{NoteId: id, UserId: idUser})
+	note, err := api.GetNote(ctx, &brzrpc.UserNoteId{NoteId: idNote, UserId: idUser})
 	code, errRes := bNErrors(op, err)
 	if code != http.StatusOK {
 		return c.JSON(code, errRes)
@@ -170,7 +170,7 @@ func (e *Echo) GetNote(c echo.Context) error {
 }
 
 // GetAllNotes godoc
-// @Summary GetNote all notes of user
+// @Summary all notes of user
 // @Description Returns all notes by user ID
 // @Tags note
 // @Accept json
@@ -288,7 +288,7 @@ func (e *Echo) GetAllNotes(c echo.Context) error {
 }
 
 // GetNotesByTag godoc
-// @Summary GetNote notes by tag
+// @Summary notes by tag
 // @Description Returns all notes that contain given tag
 // @Tags note
 // @Accept json

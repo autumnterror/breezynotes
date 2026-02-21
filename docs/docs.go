@@ -192,7 +192,7 @@ const docTemplate = `{
                 "tags": [
                     "block"
                 ],
-                "summary": "GetNote block",
+                "summary": "block",
                 "parameters": [
                     {
                         "description": "Note ID and Block ID",
@@ -592,7 +592,7 @@ const docTemplate = `{
                 "tags": [
                     "note"
                 ],
-                "summary": "GetNote note",
+                "summary": "note",
                 "parameters": [
                     {
                         "type": "string",
@@ -710,7 +710,7 @@ const docTemplate = `{
                 "tags": [
                     "note"
                 ],
-                "summary": "GetNote all notes of user",
+                "summary": "all notes of user",
                 "parameters": [
                     {
                         "type": "integer",
@@ -833,7 +833,7 @@ const docTemplate = `{
                 "tags": [
                     "note"
                 ],
-                "summary": "GetNote notes by tag",
+                "summary": "notes by tag",
                 "parameters": [
                     {
                         "type": "string",
@@ -1462,7 +1462,7 @@ const docTemplate = `{
                 "tags": [
                     "tag"
                 ],
-                "summary": "GetNote tags by user",
+                "summary": "tags by user",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1628,7 +1628,7 @@ const docTemplate = `{
                 "tags": [
                     "tag"
                 ],
-                "summary": "GetNote tags by user",
+                "summary": "tags by user",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1791,14 +1791,14 @@ const docTemplate = `{
                 "tags": [
                     "trash"
                 ],
-                "summary": "GetNote notes from trash",
+                "summary": "notes from trash",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/brzrpc.NotePart"
+                                "$ref": "#/definitions/domain.NotePart"
                             }
                         }
                     },
@@ -1899,6 +1899,56 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/trash/note": {
+            "get": {
+                "description": "Returns note from trash by user ID and note ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "trash"
+                ],
+                "summary": "get note from trash",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Note ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.NoteWithBlocks"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/domain.Error"
                         }
@@ -2872,6 +2922,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "Full API for BreezyNotes.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
+	LeftDelim:        "{{",
+	RightDelim:       "}}",
 }
 
 func init() {

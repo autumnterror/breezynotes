@@ -30,7 +30,7 @@ func (e *Echo) GetRegisteredTypes(c echo.Context) error {
 }
 
 // GetBlock godoc
-// @Summary GetNote block
+// @Summary block
 // @Description Returns block by ID
 // @Tags block
 // @Accept json

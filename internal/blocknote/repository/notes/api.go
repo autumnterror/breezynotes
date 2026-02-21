@@ -27,7 +27,7 @@ type Repo interface {
 	ToTrash(ctx context.Context, id string) error
 	ToTrashAll(ctx context.Context, idUser string) error
 	FromTrash(ctx context.Context, id string) error
-	FindOnTrash(ctx context.Context, id string) (*domain.Note, error)
+	FindOnTrash(ctx context.Context, idNote, idUser string) (*domain.Note, error)
 
 	Create(ctx context.Context, n *domain.Note) error
 	Get(ctx context.Context, idNote, idUser string) (*domain.Note, error)

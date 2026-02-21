@@ -552,7 +552,7 @@ paths:
           description: Gateway Timeout
           schema:
             $ref: '#/definitions/domain.Error'
-      summary: GetNote block
+      summary: block
       tags:
       - block
     post:
@@ -771,7 +771,7 @@ paths:
           description: Gateway Timeout
           schema:
             $ref: '#/definitions/domain.Error'
-      summary: GetNote note
+      summary: note
       tags:
       - note
     post:
@@ -850,7 +850,7 @@ paths:
           description: Gateway Timeout
           schema:
             $ref: '#/definitions/domain.Error'
-      summary: GetNote all notes of user
+      summary: all notes of user
       tags:
       - note
   /api/note/blog:
@@ -936,7 +936,7 @@ paths:
           description: Gateway Timeout
           schema:
             $ref: '#/definitions/domain.Error'
-      summary: GetNote notes by tag
+      summary: notes by tag
       tags:
       - note
   /api/note/public:
@@ -1333,7 +1333,7 @@ paths:
           description: Gateway Timeout
           schema:
             $ref: '#/definitions/domain.Error'
-      summary: GetNote tags by user
+      summary: tags by user
       tags:
       - tag
   /api/tag/color:
@@ -1442,7 +1442,7 @@ paths:
           description: Gateway Timeout
           schema:
             $ref: '#/definitions/domain.Error'
-      summary: GetNote tags by user
+      summary: tags by user
       tags:
       - tag
     patch:
@@ -1559,7 +1559,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/brzrpc.NotePart'
+              $ref: '#/definitions/domain.NotePart'
             type: array
         "401":
           description: Unauthorized
@@ -1573,7 +1573,7 @@ paths:
           description: Gateway Timeout
           schema:
             $ref: '#/definitions/domain.Error'
-      summary: GetNote notes from trash
+      summary: notes from trash
       tags:
       - trash
   /api/trash/from:
@@ -1613,6 +1613,39 @@ paths:
           schema:
             $ref: '#/definitions/domain.Error'
       summary: Restore note from trash
+      tags:
+      - trash
+  /api/trash/note:
+    get:
+      consumes:
+      - application/json
+      description: Returns note from trash by user ID and note ID
+      parameters:
+      - description: Note ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.NoteWithBlocks'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
+      summary: get note from trash
       tags:
       - trash
   /api/trash/to:
