@@ -56,6 +56,13 @@ func TestUsersOperations(t *testing.T) {
 		fmt.Printf("👤 GetInfo: %s", format.Struct(info))
 	})
 
+	t.Run("get info slice", func(t *testing.T) {
+		info, err := repo.GetInfos(context.Background(), []string{user.Id})
+		assert.NoError(t, err)
+		assert.NotEqual(t, 0, len(info))
+		fmt.Printf("👤 GetInfo slice: %s", format.Struct(info))
+	})
+
 	t.Run("GetIdFromLogin", func(t *testing.T) {
 		gettedId, err := repo.GetIdFromLogin(context.Background(), user.Login)
 		assert.NoError(t, err)
@@ -163,6 +170,11 @@ func TestUpdateNonExistentUser(t *testing.T) {
 	err := repo.UpdateAbout(context.Background(), uid.New(), "123")
 	assert.Error(t, err)
 	assert.True(t, errors.Is(err, domain.ErrNotFound))
+	t.Run("get info empty slice", func(t *testing.T) {
+		info, err := repo.GetInfos(context.Background(), []string{""})
+		assert.NoError(t, err)
+		assert.Equal(t, 0, len(info))
+	})
 }
 
 func TestDeleteNonExistentUser(t *testing.T) {

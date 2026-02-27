@@ -2,11 +2,10 @@ syntax = "proto3";
 
 package brz;
 
-import "google/protobuf/empty.proto";
 import "domain.proto";
+import "google/protobuf/empty.proto";
 
 option go_package = "github.com/autumnterror/breezynotes;brzrpc";
-
 
 // ===== Requests =====
 message AuthRequest {
@@ -33,7 +32,6 @@ message ChangePasswordRequest {
   string old_password = 3;
 }
 
-
 message AuthResponse {
   string access_token = 1;
   string refresh_token = 2;
@@ -48,12 +46,12 @@ service AuthService {
   rpc Reg(AuthRequest) returns (Tokens);
   rpc ValidateTokens(Tokens) returns (Token);
 
-//  rpc GenerateAccessToken(UserId) returns (Token);
-//  rpc GenerateRefreshToken(UserId) returns (Token);
-//  rpc GenerateTokens(UserId) returns (Tokens);
-//  rpc Refresh(Token) returns (Token);
-//  rpc CheckToken(Token) returns (google.protobuf.Empty);
-  
+  //  rpc GenerateAccessToken(UserId) returns (Token);
+  //  rpc GenerateRefreshToken(UserId) returns (Token);
+  //  rpc GenerateTokens(UserId) returns (Tokens);
+  //  rpc Refresh(Token) returns (Token);
+  //  rpc CheckToken(Token) returns (google.protobuf.Empty);
+
   rpc DeleteUser(UserId) returns (google.protobuf.Empty);
   rpc UpdateAbout(UpdateAboutRequest) returns (google.protobuf.Empty);
   rpc UpdateEmail(UpdateEmailRequest) returns (google.protobuf.Empty);
@@ -64,6 +62,8 @@ service AuthService {
   rpc GetUserDataFromToken(Token) returns (User);
   rpc GetIdFromToken(Token) returns (Id);
   rpc GetIdFromLogin(String) returns (Id);
+
+  rpc GetInfos(Ids) returns (Users);
 
   rpc Healthz(google.protobuf.Empty) returns (google.protobuf.Empty);
 }

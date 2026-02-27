@@ -133,3 +133,19 @@ func (s *ServerAPI) GetIdFromLogin(ctx context.Context, t *brzrpc.String) (*brzr
 
 	return &brzrpc.Id{Id: res.(string)}, nil
 }
+
+func (s *ServerAPI) GetInfos(ctx context.Context, ids *brzrpc.Ids) (*brzrpc.Users, error) {
+	const op = "grpc.GetInfos"
+
+	ctx, done := context.WithTimeout(ctx, waitTime)
+	defer done()
+
+	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
+		return s.API.GetInfos(ctx, ids.GetIds())
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return domain.UsersToRpc(&domain.Users{Us: res.([]domain.User)}), nil
+}

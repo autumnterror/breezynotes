@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/autumnterror/breezynotes/internal/auth/domain"
 	"github.com/autumnterror/utils_go/pkg/log"
@@ -22,6 +24,7 @@ type UserRepo interface {
 	UpdateAbout(ctx context.Context, id, about string) error
 	Delete(ctx context.Context, id string) error
 	GetInfo(ctx context.Context, id string) (*domain.User, error)
+	GetInfos(ctx context.Context, ids []string) ([]domain.User, error)
 	GetIdFromLogin(ctx context.Context, login string) (string, error)
 }
 
@@ -117,6 +120,55 @@ func (d Driver) GetInfo(ctx context.Context, id string) (*domain.User, error) {
 	u.Password = ""
 
 	return &u, nil
+}
+
+// GetInfos get info about users by ids. If none found, returns domain.ErrNotFound
+func (d Driver) GetInfos(ctx context.Context, ids []string) ([]domain.User, error) {
+	const op = "users.GetInfos"
+
+	if len(ids) == 0 {
+		return []domain.User{}, nil
+	}
+
+	placeholders := make([]string, 0, len(ids))
+	args := make([]any, 0, len(ids))
+	for i, id := range ids {
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+		SELECT id, login, email, about, photo
+		FROM users
+		WHERE id IN (%s)
+	`, strings.Join(placeholders, ","))
+
+	rows, err := d.Driver.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, format.Error(op, err)
+	}
+	defer rows.Close()
+
+	users := make([]domain.User, 0, len(ids))
+
+	for rows.Next() {
+		var u domain.User
+		if err := rows.Scan(&u.Id, &u.Login, &u.Email, &u.About, &u.Photo); err != nil {
+			return nil, format.Error(op, err)
+		}
+		u.Password = ""
+		users = append(users, u)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, format.Error(op, err)
+	}
+
+	if len(users) == 0 {
+		return []domain.User{}, nil
+	}
+
+	return users, nil
 }
 
 // GetIdFromLogin get info about user by login. May send sql.ErrNoRows

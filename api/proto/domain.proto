@@ -47,6 +47,13 @@ message TagId {
 message Id {
   string id = 1;
 }
+
+message Ids {
+  repeated string ids = 1;
+}
+message Users {
+  repeated User users = 1;
+}
 message UserNoteId {
   string userId = 1;
   string noteId = 2;

@@ -34,6 +34,12 @@ type ChangeRoleRequest struct {
 	NewRole string `json:"new_role"`
 }
 
+type Roles struct {
+	Author  User   `json:"author"`
+	Editors []User `json:"editors"`
+	Readers []User `json:"readers"`
+}
+
 type NotePart struct {
 	Id         string `json:"id"`
 	Title      string `json:"title"`

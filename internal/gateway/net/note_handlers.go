@@ -819,6 +819,71 @@ func (e *Echo) AddPublicNote(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// GetUserData godoc
+// @Summary get info about users in note
+// @Tags note
+// @Produce json
+// @Param id query string true  "Note ID"
+// @Success 200 {object} domain.Roles
+// @Failure 401 {object} domain.Error
+// @Failure 502 {object} domain.Error
+// @Failure 504 {object} domain.Error
+// @Router /api/note/roles [get]
+func (e *Echo) GetRoles(c echo.Context) error {
+	const op = "gateway.net.GetRoles"
+	noteId := c.QueryParam("id")
+	if noteId == "" {
+		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad param"})
+	}
+
+	idUser, errGetId := getIdUser(c)
+	if errGetId != nil {
+		return c.JSON(http.StatusUnauthorized, domain.Error{Error: "bad idUser from access token"})
+	}
+
+	ctx, cancel := context.WithTimeout(c.Request().Context(), domain.WaitTime)
+	defer cancel()
+
+	n, err := e.bnAPI.API.GetNote(ctx, &brzrpc.UserNoteId{UserId: idUser, NoteId: noteId})
+	code, errRes := bNErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
+
+	var ids []string
+	ids = append(ids, n.Author)
+	for _, id := range n.Editors {
+		ids = append(ids, id)
+	}
+	for _, id := range n.Readers {
+		ids = append(ids, id)
+	}
+
+	infos, err := e.authAPI.API.GetInfos(ctx, &brzrpc.Ids{Ids: ids})
+	code, errRes = authErrors(op, err)
+	if code != http.StatusOK {
+		return c.JSON(code, errRes)
+	}
+
+	res := domain.Roles{
+		Author:  domain.User{},
+		Editors: []domain.User{},
+		Readers: []domain.User{},
+	}
+	for _, info := range infos.Users {
+		switch {
+		case info.Id == n.Author:
+			res.Author = *domain.UserFromRpc(info)
+		case alg.IsIn(info.Id, n.Editors):
+			res.Editors = append(res.Editors, *domain.UserFromRpc(info))
+		case alg.IsIn(info.Id, n.Readers):
+			res.Readers = append(res.Readers, *domain.UserFromRpc(info))
+		}
+	}
+
+	return c.JSON(http.StatusOK, res)
+}
+
 // ChangeUserRole godoc
 // @Summary share note
 // @Description replace user to list of editors or readers

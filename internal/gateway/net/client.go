@@ -93,6 +93,7 @@ func New(
 		notes := api.Group("/note")
 		{
 			notes.GET("/search", e.Search)
+			notes.GET("/roles", e.GetRoles)
 			notes.POST("", e.CreateNote)
 
 			notes.GET("/all", e.GetAllNotes)

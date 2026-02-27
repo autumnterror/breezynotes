@@ -38,3 +38,23 @@ func UserToRpc(u *User) *brzrpc.User {
 		Password: u.Password,
 	}
 }
+
+type Users struct {
+	Us []User
+}
+
+func UsersToRpc(us *Users) *brzrpc.Users {
+	usRpc := &brzrpc.Users{
+		Users: []*brzrpc.User{},
+	}
+
+	if us == nil {
+		return usRpc
+	}
+
+	for _, u := range us.Us {
+		usRpc.Users = append(usRpc.Users, UserToRpc(&u))
+	}
+
+	return usRpc
+}

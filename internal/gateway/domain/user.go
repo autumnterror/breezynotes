@@ -8,7 +8,7 @@ type User struct {
 	Email    string `json:"email"`
 	About    string `json:"about"`
 	Photo    string `json:"photo"`
-	Password string `json:"password"`
+	Password string `json:"password,omitempty"`
 }
 
 func UserFromRpc(u *brzrpc.User) *User {

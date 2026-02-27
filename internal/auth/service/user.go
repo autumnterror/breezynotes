@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+
 	"github.com/autumnterror/breezynotes/internal/auth/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/validate"
 )
@@ -124,6 +125,27 @@ func (s *AuthService) GetIdFromLogin(ctx context.Context, login string) (string,
 		return "", wrapServiceCheck(op, err)
 	}
 	return repo.GetIdFromLogin(ctx, login)
+}
+
+func (s *AuthService) GetInfos(ctx context.Context, ids []string) ([]domain.User, error) {
+	const op = "service.GetInfos"
+
+	if len(ids) == 0 {
+		return []domain.User{}, nil
+	}
+
+	for _, id := range ids {
+		if err := idValidation(id); err != nil {
+			return nil, err
+		}
+	}
+
+	repo, err := s.userRepo(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return repo.GetInfos(ctx, ids)
 }
 
 func (s *AuthService) GetUserDataFromToken(ctx context.Context, token string) (*domain.User, error) {
