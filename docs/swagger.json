@@ -1,6 +1,6 @@
 {
     "schemes": [
-        "http"
+        "https"
     ],
     "swagger": "2.0",
     "info": {
@@ -962,12 +962,12 @@
                 "summary": "add user to readers on public note",
                 "parameters": [
                     {
-                        "description": "share info",
+                        "description": "info",
                         "name": "Note",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/domain.ShareNoteRequest"
+                            "$ref": "#/definitions/domain.NoteId"
                         }
                     }
                 ],
@@ -2674,10 +2674,8 @@
         "domain.NoteWithBlocks": {
             "type": "object",
             "properties": {
-                "author": {
-                    "type": "string"
-                },
                 "blocks": {
+                    "description": "Author    string   `json:\"author\"`\nEditors   []string `json:\"editors\"`\nReaders   []string `json:\"readers\"`",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/domain.Block"
@@ -2685,12 +2683,6 @@
                 },
                 "created_at": {
                     "type": "integer"
-                },
-                "editors": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 },
                 "id": {
                     "type": "string"
@@ -2700,12 +2692,6 @@
                 },
                 "is_public": {
                     "type": "boolean"
-                },
-                "readers": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 },
                 "tag": {
                     "$ref": "#/definitions/domain.Tag"

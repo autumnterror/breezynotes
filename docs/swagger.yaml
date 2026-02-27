@@ -203,28 +203,22 @@ definitions:
     type: object
   domain.NoteWithBlocks:
     properties:
-      author:
-        type: string
       blocks:
+        description: |-
+          Author    string   `json:"author"`
+          Editors   []string `json:"editors"`
+          Readers   []string `json:"readers"`
         items:
           $ref: '#/definitions/domain.Block'
         type: array
       created_at:
         type: integer
-      editors:
-        items:
-          type: string
-        type: array
       id:
         type: string
       is_blog:
         type: boolean
       is_public:
         type: boolean
-      readers:
-        items:
-          type: string
-        type: array
       tag:
         $ref: '#/definitions/domain.Tag'
       title:
@@ -983,12 +977,12 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: share info
+      - description: info
         in: body
         name: Note
         required: true
         schema:
-          $ref: '#/definitions/domain.ShareNoteRequest'
+          $ref: '#/definitions/domain.NoteId'
       produces:
       - application/json
       responses:
@@ -1909,5 +1903,5 @@ paths:
       tags:
       - user
 schemes:
-- http
+- https
 swagger: "2.0"

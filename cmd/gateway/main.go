@@ -3,6 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	_ "github.com/autumnterror/breezynotes/docs"
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/auth"
 	"github.com/autumnterror/breezynotes/internal/gateway/clients/blocknote"
@@ -11,10 +16,6 @@ import (
 	"github.com/autumnterror/breezynotes/internal/gateway/net"
 	"github.com/autumnterror/utils_go/pkg/log"
 	"golang.org/x/sync/errgroup"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 )
 
 // @title Breezy notes gateway REST UserAPI
@@ -28,7 +29,7 @@ import (
 
 // @host localhost:8080
 // @BasePath /
-// @schemes http
+// @schemes https
 func main() {
 	const op = "cmd.gateway"
 

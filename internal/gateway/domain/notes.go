@@ -67,17 +67,17 @@ func ToNotePartList(n []*brzrpc.NotePart) []*NotePart {
 }
 
 type NoteWithBlocks struct {
-	Title     string   `json:"title"`
-	CreatedAt int64    `json:"created_at"`
-	UpdatedAt int64    `json:"updated_at"`
-	Tag       *Tag     `json:"tag"`
-	Id        string   `json:"id"`
-	Author    string   `json:"author"`
-	Editors   []string `json:"editors"`
-	Readers   []string `json:"readers"`
-	Blocks    []Block  `json:"blocks"`
-	IsPublic  bool     `json:"is_public"`
-	IsBlog    bool     `json:"is_blog"`
+	Title     string `json:"title"`
+	CreatedAt int64  `json:"created_at"`
+	UpdatedAt int64  `json:"updated_at"`
+	Tag       *Tag   `json:"tag"`
+	Id        string `json:"id"`
+	// Author    string   `json:"author"`
+	// Editors   []string `json:"editors"`
+	// Readers   []string `json:"readers"`
+	Blocks   []Block `json:"blocks"`
+	IsPublic bool    `json:"is_public"`
+	IsBlog   bool    `json:"is_blog"`
 }
 
 func ToNoteWithBlocksDb(n *brzrpc.NoteWithBlocks) *NoteWithBlocks {
@@ -100,11 +100,11 @@ func ToNoteWithBlocksDb(n *brzrpc.NoteWithBlocks) *NoteWithBlocks {
 		CreatedAt: n.CreatedAt,
 		UpdatedAt: n.UpdatedAt,
 		Tag:       ToTag(n.Tag),
-		Author:    n.Author,
-		Editors:   nn.Editors,
-		Readers:   nn.Readers,
-		IsPublic:  n.IsPublic,
-		IsBlog:    n.IsBlog,
-		Blocks:    ToBlocksDb(&brzrpc.Blocks{Items: nn.Blocks}),
+		// Author:    n.Author,
+		// Editors:   nn.Editors,
+		// Readers:   nn.Readers,
+		IsPublic: n.IsPublic,
+		IsBlog:   n.IsBlog,
+		Blocks:   ToBlocksDb(&brzrpc.Blocks{Items: nn.Blocks}),
 	}
 }

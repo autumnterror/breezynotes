@@ -965,12 +965,12 @@ const docTemplate = `{
                 "summary": "add user to readers on public note",
                 "parameters": [
                     {
-                        "description": "share info",
+                        "description": "info",
                         "name": "Note",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/domain.ShareNoteRequest"
+                            "$ref": "#/definitions/domain.NoteId"
                         }
                     }
                 ],
@@ -2677,10 +2677,8 @@ const docTemplate = `{
         "domain.NoteWithBlocks": {
             "type": "object",
             "properties": {
-                "author": {
-                    "type": "string"
-                },
                 "blocks": {
+                    "description": "Author    string   ` + "`" + `json:\"author\"` + "`" + `\nEditors   []string ` + "`" + `json:\"editors\"` + "`" + `\nReaders   []string ` + "`" + `json:\"readers\"` + "`" + `",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/domain.Block"
@@ -2688,12 +2686,6 @@ const docTemplate = `{
                 },
                 "created_at": {
                     "type": "integer"
-                },
-                "editors": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 },
                 "id": {
                     "type": "string"
@@ -2703,12 +2695,6 @@ const docTemplate = `{
                 },
                 "is_public": {
                     "type": "boolean"
-                },
-                "readers": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 },
                 "tag": {
                     "$ref": "#/definitions/domain.Tag"
@@ -2917,7 +2903,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "0.1-.-infDev",
 	Host:             "localhost:8080",
 	BasePath:         "/",
-	Schemes:          []string{"http"},
+	Schemes:          []string{"https"},
 	Title:            "Breezy notes gateway REST UserAPI",
 	Description:      "Full API for BreezyNotes.",
 	InfoInstanceName: "swagger",

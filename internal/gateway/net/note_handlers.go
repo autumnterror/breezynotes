@@ -759,7 +759,7 @@ func (e *Echo) PublicNote(c echo.Context) error {
 // @Tags note
 // @Accept json
 // @Produce json
-// @Param Note body domain.ShareNoteRequest true "share info"
+// @Param Note body domain.NoteId true "info"
 // @Success 200
 // @Failure 400 {object} domain.Error
 // @Failure 401 {object} domain.Error

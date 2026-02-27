@@ -149,7 +149,7 @@ func (e *Echo) Reg(c echo.Context) error {
 	_, err = e.bnAPI.API.CreateTag(ctx, &brzrpc.Tag{
 		Id:     idTag,
 		Title:  "default",
-		Color:  "#FF00ED",
+		Color:  "pink",
 		Emoji:  "✍️",
 		UserId: uId.GetId(),
 	})

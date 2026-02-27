@@ -77,8 +77,7 @@
     *   `"bad JSON"` - Некорректный формат JSON.
     *   `"email and login is empty"` - Не указан email или логин.
     *   `"pw is empty"` - Не указан пароль.
-    *   `"password incorrect"` - Неверный пароль.
-*   `404 Not Found` - Пользователь с такими данными не найден.
+    *   `"login or password incorrect"` - Неверный логин (почта) или пароль.
 *   `502 Bad Gateway` / `504 Gateway Timeout` - Внутренние ошибки сервера.
 
 #### `POST /api/auth/reg`
