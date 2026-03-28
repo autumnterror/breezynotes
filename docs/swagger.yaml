@@ -127,6 +127,8 @@ definitions:
       data:
         additionalProperties: {}
         type: object
+      new_id:
+        type: string
       note_id:
         type: string
       pos:
@@ -237,6 +239,19 @@ definitions:
         type: string
       op:
         type: string
+    type: object
+  domain.Roles:
+    properties:
+      author:
+        $ref: '#/definitions/domain.User'
+      editors:
+        items:
+          $ref: '#/definitions/domain.User'
+        type: array
+      readers:
+        items:
+          $ref: '#/definitions/domain.User'
+        type: array
     type: object
   domain.ShareNoteRequest:
     properties:
@@ -1009,6 +1024,36 @@ paths:
           schema:
             $ref: '#/definitions/domain.Error'
       summary: add user to readers on public note
+      tags:
+      - note
+  /api/note/roles:
+    get:
+      parameters:
+      - description: Note ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Roles'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/domain.Error'
+      summary: get info about users in note
       tags:
       - note
   /api/note/search:
