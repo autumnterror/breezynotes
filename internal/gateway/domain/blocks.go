@@ -44,6 +44,7 @@ func ToBlocksDb(b *brzrpc.Blocks) []Block {
 }
 
 type CreateBlockRequest struct {
+	NewId  string         `json:"new_id"`
 	NoteId string         `json:"note_id"`
 	Pos    int            `json:"pos"`
 	Type   string         `json:"type"`

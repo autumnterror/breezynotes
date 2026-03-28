@@ -118,6 +118,7 @@ func (e *Echo) CreateBlock(c echo.Context) error {
 		Pos:    int32(r.Pos),
 		Data:   s,
 		UserId: idUser,
+		NewId:  r.NewId,
 	})
 	code, errRes := bNErrors(op, err)
 	if code != http.StatusOK {

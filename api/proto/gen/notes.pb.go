@@ -671,6 +671,7 @@ type CreateBlockRequest struct {
 	Pos           int32                  `protobuf:"varint,3,opt,name=pos,proto3" json:"pos,omitempty"`
 	Data          *structpb.Struct       `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
 	UserId        string                 `protobuf:"bytes,5,opt,name=userId,proto3" json:"userId,omitempty"`
+	NewId         string                 `protobuf:"bytes,6,opt,name=newId,proto3" json:"newId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -736,6 +737,13 @@ func (x *CreateBlockRequest) GetData() *structpb.Struct {
 func (x *CreateBlockRequest) GetUserId() string {
 	if x != nil {
 		return x.UserId
+	}
+	return ""
+}
+
+func (x *CreateBlockRequest) GetNewId() string {
+	if x != nil {
+		return x.NewId
 	}
 	return ""
 }
@@ -841,13 +849,14 @@ const file_notes_proto_rawDesc = "" +
 	"\x11user_id_to_change\x18\x01 \x01(\tR\x0euserIdToChange\x12\x19\n" +
 	"\bnew_role\x18\x02 \x01(\tR\anewRole\x12\x17\n" +
 	"\anote_id\x18\x03 \x01(\tR\x06noteId\x12\x17\n" +
-	"\auser_id\x18\x04 \x01(\tR\x06userId\"\x97\x01\n" +
+	"\auser_id\x18\x04 \x01(\tR\x06userId\"\xad\x01\n" +
 	"\x12CreateBlockRequest\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12\x16\n" +
 	"\x06noteId\x18\x02 \x01(\tR\x06noteId\x12\x10\n" +
 	"\x03pos\x18\x03 \x01(\x05R\x03pos\x12+\n" +
 	"\x04data\x18\x04 \x01(\v2\x17.google.protobuf.StructR\x04data\x12\x16\n" +
-	"\x06userId\x18\x05 \x01(\tR\x06userId\"?\n" +
+	"\x06userId\x18\x05 \x01(\tR\x06userId\x12\x14\n" +
+	"\x05newId\x18\x06 \x01(\tR\x05newId\"?\n" +
 	"\rSearchRequest\x12\x16\n" +
 	"\x06userId\x18\x01 \x01(\tR\x06userId\x12\x16\n" +
 	"\x06prompt\x18\x02 \x01(\tR\x06prompt2\xf4\x0f\n" +

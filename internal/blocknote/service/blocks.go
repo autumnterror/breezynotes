@@ -5,13 +5,11 @@ import (
 	"errors"
 	"time"
 
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
 	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/block"
-	"github.com/autumnterror/utils_go/pkg/utils/format"
-	"github.com/autumnterror/utils_go/pkg/utils/uid"
-
-	"github.com/autumnterror/breezynotes/internal/blocknote/domain"
 	"github.com/autumnterror/utils_go/pkg/utils/alg"
+	"github.com/autumnterror/utils_go/pkg/utils/format"
 )
 
 func (s *BN) GetRegisteredBlocks(ctx context.Context) []string {
@@ -115,7 +113,7 @@ func (s *BN) DeleteBlock(ctx context.Context, idNote, blockId, idUser string) er
 	return err
 }
 
-func (s *BN) CreateBlock(ctx context.Context, _type, idNote string, data map[string]any, pos int, idUser string) (string, error) {
+func (s *BN) CreateBlock(ctx context.Context, newId, _type, idNote string, data map[string]any, pos int, idUser string) (string, error) {
 	const op = "service.CreateBlock"
 
 	if pos < 0 {
@@ -147,7 +145,7 @@ func (s *BN) CreateBlock(ctx context.Context, _type, idNote string, data map[str
 			return "", format.Error(op, err)
 		}
 
-		b.Id = uid.New()
+		b.Id = newId
 		b.NoteId = idNote
 		b.Type = _type
 		b.CreatedAt = time.Now().UTC().Unix()

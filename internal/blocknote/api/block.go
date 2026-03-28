@@ -93,7 +93,7 @@ func (s *ServerAPI) CreateBlock(ctx context.Context, req *brzrpc.CreateBlockRequ
 	defer done()
 
 	res, err := handleCRUDResponse(ctx, op, func() (any, error) {
-		return s.service.CreateBlock(ctx, req.GetType(), req.GetNoteId(), req.GetData().AsMap(), int(req.GetPos()), req.GetUserId())
+		return s.service.CreateBlock(ctx, req.GetNewId(), req.GetType(), req.GetNoteId(), req.GetData().AsMap(), int(req.GetPos()), req.GetUserId())
 	})
 
 	if err != nil {
