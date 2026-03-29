@@ -14,9 +14,7 @@ import (
 )
 
 type rateLimitConfig struct {
-	// Limit - max requests per Window
-	Limit int64
-	// Window - fixed time window (e.g. 60s)
+	Limit  int64
 	Window time.Duration
 	// If true: include route pattern in key (e.g. /api/login has separate bucket)
 	// If false: per-IP global bucket for all routes
@@ -32,7 +30,7 @@ func (cfg *rateLimitConfig) setDefaults() {
 		cfg.Prefix = "ratelimit"
 	}
 	if cfg.Limit <= 0 {
-		cfg.Limit = 20
+		cfg.Limit = 100
 	}
 	if cfg.Window <= 0 {
 		cfg.Window = 1 * time.Minute

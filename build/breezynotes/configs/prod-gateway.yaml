@@ -6,3 +6,5 @@ timeout: 10s
 backoff: 100ms
 port: 8080
 mode: "PROD"
+rate_limit: 100
+rate_limit_window: 1m

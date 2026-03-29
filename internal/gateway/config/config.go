@@ -11,13 +11,15 @@ import (
 )
 
 type Config struct {
-	AddrAuth      string
-	AddrBlockNote string
-	AddrRedis     string
-	Timeout       time.Duration
-	Backoff       time.Duration
-	RetriesCount  int
-	Port          int
+	AddrAuth        string
+	AddrBlockNote   string
+	AddrRedis       string
+	Timeout         time.Duration
+	Backoff         time.Duration
+	RetriesCount    int
+	Port            int
+	RateLimit       int
+	RateLimitWindow time.Duration
 }
 
 // MustSetup return config and panic if error
@@ -41,14 +43,16 @@ func setup() (*Config, error) {
 	viper.SetConfigFile(configPath)
 
 	var cfg struct {
-		AddrAuth      string        `mapstructure:"addr_auth"`
-		AddrBlockNote string        `mapstructure:"addr_blocknote"`
-		AddrRedis     string        `mapstructure:"addr_redis"`
-		Timeout       time.Duration `mapstructure:"timeout"`
-		Backoff       time.Duration `mapstructure:"backoff"`
-		RetriesCount  int           `mapstructure:"retries_count"`
-		Port          int           `mapstructure:"port"`
-		Mode          string        `mapstructure:"mode"`
+		AddrAuth        string        `mapstructure:"addr_auth"`
+		AddrBlockNote   string        `mapstructure:"addr_blocknote"`
+		AddrRedis       string        `mapstructure:"addr_redis"`
+		Timeout         time.Duration `mapstructure:"timeout"`
+		Backoff         time.Duration `mapstructure:"backoff"`
+		RetriesCount    int           `mapstructure:"retries_count"`
+		Port            int           `mapstructure:"port"`
+		Mode            string        `mapstructure:"mode"`
+		RateLimit       int           `mapstructure:"rate_limit"`
+		RateLimitWindow time.Duration `mapstructure:"rate_limit_window"`
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -63,12 +67,14 @@ func setup() (*Config, error) {
 	}
 
 	return &Config{
-		AddrAuth:      cfg.AddrAuth,
-		AddrBlockNote: cfg.AddrBlockNote,
-		AddrRedis:     cfg.AddrRedis,
-		Timeout:       cfg.Timeout,
-		Backoff:       cfg.Backoff,
-		RetriesCount:  cfg.RetriesCount,
-		Port:          cfg.Port,
+		AddrAuth:        cfg.AddrAuth,
+		AddrBlockNote:   cfg.AddrBlockNote,
+		AddrRedis:       cfg.AddrRedis,
+		Timeout:         cfg.Timeout,
+		Backoff:         cfg.Backoff,
+		RetriesCount:    cfg.RetriesCount,
+		Port:            cfg.Port,
+		RateLimit:       cfg.RateLimit,
+		RateLimitWindow: cfg.RateLimitWindow,
 	}, nil
 }
