@@ -9,13 +9,13 @@ import (
 type QuoteBlock struct {
 	Id     string `bson:"_id" json:"id"`
 	Type   string `bson:"type" json:"type"`
-	NoteId string `bson:"noteId" json:"noteId"`
+	NoteId string `bson:"note_id" json:"note_id"`
 
-	CreatedAt int64 `bson:"createdAt" json:"createdAt"`
-	UpdatedAt int64 `bson:"updatedAt" json:"updatedAt"`
-	IsUsed    bool  `bson:"is_used"`
+	CreatedAt int64 `bson:"created_at" json:"created_at"`
+	UpdatedAt int64 `bson:"updated_at" json:"updated_at"`
 
-	Data *QuoteData `bson:"data" json:"data"`
+	IsUsed bool       `bson:"is_used"`
+	Data   *QuoteData `bson:"data" json:"data"`
 }
 
 type QuoteData struct {

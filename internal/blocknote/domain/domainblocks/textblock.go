@@ -55,23 +55,58 @@ func FromUnifiedToTextBlock(b *brzrpc.Block) (*TextBlock, error) {
 		return tb, nil
 	}
 
-	data, err := text.NewDataFromMap(s.AsMap())
+	m := s.AsMap()
+	tb.Data = &TextData{}
+
+	rawTextData, ok := m["text_data"]
+	if !ok || rawTextData == nil {
+		return tb, nil
+	}
+
+	textDataMap, ok := rawTextData.(map[string]any)
+	if !ok {
+		return tb, format.Error(op, errors.New("text_data is not an object"))
+	}
+
+	data, err := text.NewDataFromMap(textDataMap)
 	if err != nil {
 		return tb, format.Error(op, err)
 	}
 
-	tb.Data = data
+	tb.Data = &TextData{TextData: data}
 	return tb, nil
 }
 
 type TextBlock struct {
 	Id     string `bson:"_id" json:"id"`
 	Type   string `bson:"type" json:"type"`
-	NoteId string `bson:"noteId" json:"noteId"`
+	NoteId string `bson:"note_id" json:"note_id"`
 
-	CreatedAt int64 `bson:"createdAt" json:"createdAt"`
-	UpdatedAt int64 `bson:"updatedAt" json:"updatedAt"`
-	IsUsed    bool  `bson:"is_used"`
+	CreatedAt int64 `bson:"created_at" json:"created_at"`
+	UpdatedAt int64 `bson:"updated_at" json:"updated_at"`
 
-	Data *text.Data `bson:"data" json:"data"`
+	IsUsed bool `bson:"is_used"`
+
+	Data *TextData `bson:"data" json:"data"`
+}
+
+type TextData struct {
+	TextData *text.Data `json:"text_data" bson:"text_data"`
+}
+
+func (ld *TextData) ToMap() map[string]any {
+	if ld == nil {
+		return nil
+	}
+
+	textmap := map[string]any{}
+
+	if ld.TextData != nil {
+		textMap := ld.TextData.ToMap()
+		if textMap != nil {
+			textmap["text_data"] = textMap
+		}
+	}
+
+	return textmap
 }

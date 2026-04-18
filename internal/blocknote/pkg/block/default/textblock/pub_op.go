@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
 	blockpkg "github.com/autumnterror/breezynotes/internal/blocknote/pkg/block"
+	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/text"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"google.golang.org/protobuf/types/known/structpb"
 
@@ -22,7 +23,7 @@ func (tb *Driver) GetAsFirst(ctx context.Context, block *brzrpc.Block) string {
 	if b.Data == nil {
 		return ""
 	}
-	return b.Data.PlainText()
+	return b.Data.TextData.PlainText()
 }
 
 func (tb *Driver) Op(ctx context.Context, block *brzrpc.Block, op string, data map[string]any) (map[string]any, error) {
@@ -67,10 +68,14 @@ func (tb *Driver) ChangeType(ctx context.Context, block *brzrpc.Block, newType s
 		return format.Error(op, err)
 	}
 	var plainText string
+	var textData *text.Data
 	if b.Data != nil {
-		plainText = b.Data.PlainText()
+		textData = b.Data.TextData
+		if b.Data.TextData != nil {
+			plainText = b.Data.TextData.PlainText()
+		}
 	}
-	newData, err := blockpkg.ChangeTypeUnif(b.Data, plainText, newType, 0, 0)
+	newData, err := blockpkg.ChangeTypeUnif(textData, plainText, newType, 0, 0)
 	if err != nil {
 		return format.Error(op, err)
 	}

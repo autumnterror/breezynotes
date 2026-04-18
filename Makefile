@@ -100,17 +100,19 @@ docx:
 	swag init --dir ./cmd/gateway,./internal/gateway/net/,./internal/gateway/domain/,./api/proto/gen --output ./docs
 
 test-method:
-	go test -run $(METHOD) ./... -v
+	go test -run $(method) ./... -v
 test-redis:
 	go test ./internal/redis/repository -v
 test-test:
 	go test ./test -v
 test-views:
 	go test ./views -v
-test-textblock:
-	go test ./pkg/pkgs/default/textblock -v
-test-textblock-bm:
-	go test ./pkg/pkgs/default/textblock/benchmark -v
+test-blocks-domain:
+	go test ./internal/blocknote/domain/domainblocks -v
+
+test-pkgs:
+	go test ./internal/blocknote/pkg/block/default/... -v
+
 test-blocks:
 	go test ./internal/blocknote/repository/blocks -v
 test-notes:
@@ -132,12 +134,5 @@ test-all:
 		./internal/redis/repository \
 		./internal/blocknote/domain \
 		./internal/blocknote/pkg/text \
-		./internal/blocknote/pkg/block/default/textblock \
-		./internal/blocknote/pkg/block/default/codeblock \
-		./internal/blocknote/pkg/block/default/fileblock \
-		./internal/blocknote/pkg/block/default/headerblock \
-		./internal/blocknote/pkg/block/default/imgblock \
-		./internal/blocknote/pkg/block/default/linkblock \
-		./internal/blocknote/pkg/block/default/listblock \
-		./internal/blocknote/pkg/block/default/quoteblock \
+		./internal/blocknote/pkg/block/default/... \
 		./test

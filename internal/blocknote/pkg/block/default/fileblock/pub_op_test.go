@@ -79,7 +79,7 @@ func TestChangeType(t *testing.T) {
 		assert.NoError(t, d.ChangeType(ctx, block, domainblocks.TextBlockType))
 		tb, err := domainblocks.FromUnifiedToTextBlock(block)
 		assert.NoError(t, err)
-		assert.Equal(t, "from file", tb.Data.PlainText())
+		assert.Equal(t, "from file", tb.Data.TextData.PlainText())
 	})
 
 	t.Run(domainblocks.QuoteBlockType, func(t *testing.T) {

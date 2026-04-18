@@ -14,7 +14,10 @@ func ChangeTypeUnif(textData *text.Data, plainText, newType string, levelList ui
 	var newData map[string]any
 	switch newType {
 	case domainblocks.TextBlockType:
-		newData = textData.ToMap()
+		nd := domainblocks.TextData{
+			TextData: textData,
+		}
+		newData = nd.ToMap()
 	case domainblocks.ListBlockToDoType:
 		nd := domainblocks.ListData{
 			TextData: textData,

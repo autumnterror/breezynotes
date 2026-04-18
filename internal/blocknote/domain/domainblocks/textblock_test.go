@@ -18,16 +18,19 @@ func TestText(t *testing.T) {
 			CreatedAt: 0,
 			UpdatedAt: 0,
 			IsUsed:    false,
-			Data: &text.Data{Text: []text.Part{
-				{
-					Style:  "default",
-					String: "test def",
+			Data: &TextData{
+				TextData: &text.Data{
+					Text: []text.Part{
+						{
+							Style:  "default",
+							String: "test def",
+						},
+						{
+							Style:  "bald",
+							String: "test bald",
+						},
+					},
 				},
-				{
-					Style:  "bald",
-					String: "test bald",
-				},
-			},
 			},
 		}
 
@@ -35,15 +38,16 @@ func TestText(t *testing.T) {
 		if assert.NoError(t, err) {
 			log.Println(op+"txt.ToUnified()", format.Struct(unif))
 		}
+
 		ntxt, err := FromUnifiedToTextBlock(unif)
 		if assert.NoError(t, err) {
 			log.Println(op+" FromUnifiedToTextBlock(unif)", format.Struct(ntxt))
 		}
 
 		assert.Equal(t, txt, *ntxt)
-		if assert.NoError(t, ntxt.Data.ApplyStyle(0, 2, "new")) {
-			if assert.Equal(t, len(ntxt.Data.Text), 3) {
-				assert.Equal(t, ntxt.Data.Text[0].Style, "new")
+		if assert.NoError(t, ntxt.Data.TextData.ApplyStyle(0, 2, "new")) {
+			if assert.Equal(t, len(ntxt.Data.TextData.Text), 3) {
+				assert.Equal(t, ntxt.Data.TextData.Text[0].Style, "new")
 			}
 			log.Println(op+" .ApplyStyle(0, 2, \"new\")", format.Struct(ntxt))
 		}

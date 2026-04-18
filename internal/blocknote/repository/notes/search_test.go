@@ -10,8 +10,11 @@ import (
 	"github.com/autumnterror/breezynotes/internal/blocknote/infra/mongo"
 	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/block"
 	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/block/default/textblock"
+	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/text"
 	"github.com/autumnterror/breezynotes/internal/blocknote/repository/blocks"
 	"github.com/autumnterror/breezynotes/internal/blocknote/repository/tags"
+
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
 
 	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/autumnterror/utils_go/pkg/utils/uid"
@@ -103,59 +106,38 @@ func TestSearch(t *testing.T) {
 			IsPublic:  false,
 		}))
 
-		assert.NoError(t, b.CreateBlock(context.Background(), &domain.Block{
-			Id:     blkTitle1,
-			Type:   "text",
-			NoteId: nTitle,
-			Data: map[string]any{
-				"text": []any{
-					map[string]any{"style": "default", "string": "This block contains testcase in content too"},
+		createTextBlock := func(id, noteId, content string) {
+			tb := &domainblocks.TextBlock{
+				Id:        id,
+				Type:      "text",
+				NoteId:    noteId,
+				CreatedAt: 0,
+				UpdatedAt: 0,
+				IsUsed:    false,
+				Data: &domainblocks.TextData{
+					TextData: &text.Data{
+						Text: []text.Part{
+							{
+								Style:  "default",
+								String: content,
+							},
+						},
+					},
 				},
-			},
-		}))
-		assert.NoError(t, b.CreateBlock(context.Background(), &domain.Block{
-			Id:     blkTitle2,
-			Type:   "text",
-			NoteId: nTitle,
-			Data: map[string]any{
-				"text": []any{
-					map[string]any{"style": "default", "string": "Other text"},
-				},
-			},
-		}))
+			}
 
-		assert.NoError(t, b.CreateBlock(context.Background(), &domain.Block{
-			Id:     blkContent1,
-			Type:   "text",
-			NoteId: nContent,
-			Data: map[string]any{
-				"text": []any{
-					map[string]any{"style": "default", "string": "only CONTENT has TestCase keyword"},
-				},
-			},
-		}))
+			unif, err := tb.ToUnified()
+			assert.NoError(t, err)
 
-		assert.NoError(t, b.CreateBlock(context.Background(), &domain.Block{
-			Id:     blkAccess1,
-			Type:   "text",
-			NoteId: nAccess,
-			Data: map[string]any{
-				"text": []any{
-					map[string]any{"style": "default", "string": "access note content testcase"},
-				},
-			},
-		}))
+			dbBlock := domain.ToBlockDb(unif)
+			assert.NoError(t, b.CreateBlock(context.Background(), dbBlock))
+		}
 
-		assert.NoError(t, b.CreateBlock(context.Background(), &domain.Block{
-			Id:     blkNoAccess1,
-			Type:   "text",
-			NoteId: nNoAccess,
-			Data: map[string]any{
-				"text": []any{
-					map[string]any{"style": "default", "string": "hidden testcase content"},
-				},
-			},
-		}))
+		createTextBlock(blkTitle1, nTitle, "This block contains testcase in content too")
+		createTextBlock(blkTitle2, nTitle, "Other text")
+		createTextBlock(blkContent1, nContent, "only CONTENT has TestCase keyword")
+		createTextBlock(blkAccess1, nAccess, "access note content testcase")
+		createTextBlock(blkNoAccess1, nNoAccess, "hidden testcase content")
 
 		assert.NoError(t, a.InsertBlock(context.Background(), nTitle, blkTitle1, 0))
 		assert.NoError(t, a.InsertBlock(context.Background(), nTitle, blkTitle2, 1))
@@ -186,9 +168,7 @@ func TestSearch(t *testing.T) {
 
 			assert.GreaterOrEqual(t, count[nTitle], 1)
 			assert.GreaterOrEqual(t, count[nTitle], 2)
-
 			assert.GreaterOrEqual(t, count[nContent], 1)
-
 			assert.Equal(t, 0, count[nNoAccess])
 		}
 

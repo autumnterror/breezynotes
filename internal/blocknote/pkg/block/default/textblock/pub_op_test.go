@@ -38,8 +38,8 @@ func TestOp(t *testing.T) {
 				block.Data = s
 				txt, err := domainblocks.FromUnifiedToTextBlock(block)
 				if assert.NoError(t, err) {
-					if assert.Equal(t, len(txt.Data.Text), 3) {
-						assert.Equal(t, txt.Data.Text[0].Style, "test")
+					if assert.Equal(t, len(txt.Data.TextData.Text), 3) {
+						assert.Equal(t, txt.Data.TextData.Text[0].Style, "test")
 						log.Println("apply style", format.Struct(txt))
 					}
 				}
@@ -59,8 +59,8 @@ func TestOp(t *testing.T) {
 				block.Data = s
 				txt, err := domainblocks.FromUnifiedToTextBlock(block)
 				if assert.NoError(t, err) {
-					if assert.Equal(t, len(txt.Data.Text), 2) {
-						assert.Equal(t, txt.Data.Text[0].String, "text default test")
+					if assert.Equal(t, len(txt.Data.TextData.Text), 2) {
+						assert.Equal(t, txt.Data.TextData.Text[0].String, "text default test")
 						log.Println("insert text", format.Struct(txt))
 					}
 				}
@@ -81,8 +81,8 @@ func TestOp(t *testing.T) {
 				block.Data = s
 				txt, err := domainblocks.FromUnifiedToTextBlock(block)
 				if assert.NoError(t, err) {
-					if assert.Equal(t, len(txt.Data.Text), 2) {
-						assert.Equal(t, txt.Data.Text[0].String, "default")
+					if assert.Equal(t, len(txt.Data.TextData.Text), 2) {
+						assert.Equal(t, txt.Data.TextData.Text[0].String, "default")
 						log.Println("delete range", format.Struct(txt))
 					}
 				}
@@ -145,7 +145,7 @@ func TestChangeType(t *testing.T) {
 		lb, err := domainblocks.FromUnifiedToListBlock(block)
 		assert.NoError(t, err)
 		log.Println("after change on todo", format.Struct(block))
-		assert.Equal(t, txt.Data, lb.Data.TextData)
+		assert.Equal(t, txt.Data.TextData, lb.Data.TextData)
 		assert.Equal(t, domainblocks.ListBlockToDoType, lb.Data.Type)
 	})
 	t.Run(domainblocks.ListBlockUnorderedType, func(t *testing.T) {
@@ -157,7 +157,7 @@ func TestChangeType(t *testing.T) {
 		lb, err := domainblocks.FromUnifiedToListBlock(block)
 		assert.NoError(t, err)
 		log.Println("after change on unordered", format.Struct(block))
-		assert.Equal(t, txt.Data, lb.Data.TextData)
+		assert.Equal(t, txt.Data.TextData, lb.Data.TextData)
 		assert.Equal(t, domainblocks.ListBlockUnorderedType, lb.Data.Type)
 	})
 	t.Run(domainblocks.ListBlockOrderedType, func(t *testing.T) {
@@ -169,7 +169,7 @@ func TestChangeType(t *testing.T) {
 		lb, err := domainblocks.FromUnifiedToListBlock(block)
 		assert.NoError(t, err)
 		log.Println("after change on ordered", format.Struct(block))
-		assert.Equal(t, txt.Data, lb.Data.TextData)
+		assert.Equal(t, txt.Data.TextData, lb.Data.TextData)
 		assert.Equal(t, domainblocks.ListBlockOrderedType, lb.Data.Type)
 	})
 	t.Run(domainblocks.CodeBlockType, func(t *testing.T) {
@@ -181,7 +181,7 @@ func TestChangeType(t *testing.T) {
 		lb, err := domainblocks.FromUnifiedToCodeBlock(block)
 		assert.NoError(t, err)
 		log.Println("after change on code", format.Struct(block))
-		assert.Equal(t, txt.Data.PlainText(), lb.Data.Text)
+		assert.Equal(t, txt.Data.TextData.PlainText(), lb.Data.Text)
 	})
 	t.Run(domainblocks.HeaderBlockType1, func(t *testing.T) {
 		block := testBlock()
@@ -192,7 +192,7 @@ func TestChangeType(t *testing.T) {
 		lb, err := domainblocks.FromUnifiedToHeaderBlock(block)
 		assert.NoError(t, err)
 		log.Println("after change on header_1", format.Struct(block))
-		assert.Equal(t, txt.Data, lb.Data.TextData)
+		assert.Equal(t, txt.Data.TextData, lb.Data.TextData)
 		assert.Equal(t, uint(1), lb.Data.Level)
 	})
 	t.Run(domainblocks.HeaderBlockType2, func(t *testing.T) {
@@ -204,7 +204,7 @@ func TestChangeType(t *testing.T) {
 		lb, err := domainblocks.FromUnifiedToHeaderBlock(block)
 		assert.NoError(t, err)
 		log.Println("after change on header_2", format.Struct(block))
-		assert.Equal(t, txt.Data, lb.Data.TextData)
+		assert.Equal(t, txt.Data.TextData, lb.Data.TextData)
 		assert.Equal(t, uint(2), lb.Data.Level)
 	})
 	t.Run(domainblocks.HeaderBlockType3, func(t *testing.T) {
@@ -216,7 +216,7 @@ func TestChangeType(t *testing.T) {
 		lb, err := domainblocks.FromUnifiedToHeaderBlock(block)
 		assert.NoError(t, err)
 		log.Println("after change on header_3", format.Struct(block))
-		assert.Equal(t, txt.Data, lb.Data.TextData)
+		assert.Equal(t, txt.Data.TextData, lb.Data.TextData)
 		assert.Equal(t, uint(3), lb.Data.Level)
 	})
 	t.Run(domainblocks.FileBlockType, func(t *testing.T) {
@@ -237,7 +237,7 @@ func TestChangeType(t *testing.T) {
 		lb, err := domainblocks.FromUnifiedToImgBlock(block)
 		assert.NoError(t, err)
 		log.Println("after change on img", format.Struct(block))
-		assert.Equal(t, txt.Data.PlainText(), lb.Data.Alt)
+		assert.Equal(t, txt.Data.TextData.PlainText(), lb.Data.Alt)
 	})
 	t.Run(domainblocks.LinkBlockType, func(t *testing.T) {
 		block := testBlock()
@@ -248,7 +248,7 @@ func TestChangeType(t *testing.T) {
 		lb, err := domainblocks.FromUnifiedToLinkBlock(block)
 		assert.NoError(t, err)
 		log.Println("after change on link", format.Struct(block))
-		assert.Equal(t, txt.Data.PlainText(), lb.Data.Text)
+		assert.Equal(t, txt.Data.TextData.PlainText(), lb.Data.Text)
 	})
 	t.Run(domainblocks.QuoteBlockType, func(t *testing.T) {
 		block := testBlock()
@@ -259,7 +259,7 @@ func TestChangeType(t *testing.T) {
 		lb, err := domainblocks.FromUnifiedToQuoteBlock(block)
 		assert.NoError(t, err)
 		log.Println("after change on quote", format.Struct(block))
-		assert.Equal(t, txt.Data.PlainText(), lb.Data.Text)
+		assert.Equal(t, txt.Data.TextData.PlainText(), lb.Data.Text)
 
 	})
 }
@@ -269,6 +269,8 @@ func TestChangeTypeNil(t *testing.T) {
 	t.Run(domainblocks.TextBlockType, func(t *testing.T) {
 		block := testNilBlock()
 		assert.NoError(t, d.ChangeType(ctx, block, domainblocks.TextBlockType))
+		txt, _ := domainblocks.FromUnifiedToTextBlock(block)
+		assert.Nil(t, txt.Data.TextData)
 	})
 	t.Run(domainblocks.ListBlockToDoType, func(t *testing.T) {
 		block := testNilBlock()
@@ -277,7 +279,7 @@ func TestChangeTypeNil(t *testing.T) {
 		assert.NoError(t, d.ChangeType(ctx, block, domainblocks.ListBlockToDoType))
 		lb, err := domainblocks.FromUnifiedToListBlock(block)
 		assert.NoError(t, err)
-		assert.Equal(t, txt.Data, lb.Data.TextData)
+		assert.Equal(t, txt.Data.TextData, lb.Data.TextData)
 		assert.Equal(t, domainblocks.ListBlockToDoType, lb.Data.Type)
 	})
 	t.Run(domainblocks.ListBlockUnorderedType, func(t *testing.T) {
@@ -287,7 +289,7 @@ func TestChangeTypeNil(t *testing.T) {
 		assert.NoError(t, d.ChangeType(ctx, block, domainblocks.ListBlockUnorderedType))
 		lb, err := domainblocks.FromUnifiedToListBlock(block)
 		assert.NoError(t, err)
-		assert.Equal(t, txt.Data, lb.Data.TextData)
+		assert.Equal(t, txt.Data.TextData, lb.Data.TextData)
 		assert.Equal(t, domainblocks.ListBlockUnorderedType, lb.Data.Type)
 	})
 	t.Run(domainblocks.ListBlockOrderedType, func(t *testing.T) {
@@ -297,7 +299,7 @@ func TestChangeTypeNil(t *testing.T) {
 		assert.NoError(t, d.ChangeType(ctx, block, domainblocks.ListBlockOrderedType))
 		lb, err := domainblocks.FromUnifiedToListBlock(block)
 		assert.NoError(t, err)
-		assert.Equal(t, txt.Data, lb.Data.TextData)
+		assert.Equal(t, txt.Data.TextData, lb.Data.TextData)
 		assert.Equal(t, domainblocks.ListBlockOrderedType, lb.Data.Type)
 	})
 	t.Run(domainblocks.CodeBlockType, func(t *testing.T) {
@@ -315,7 +317,7 @@ func TestChangeTypeNil(t *testing.T) {
 		assert.NoError(t, d.ChangeType(ctx, block, domainblocks.HeaderBlockType1))
 		lb, err := domainblocks.FromUnifiedToHeaderBlock(block)
 		assert.NoError(t, err)
-		assert.Equal(t, txt.Data, lb.Data.TextData)
+		assert.Equal(t, txt.Data.TextData, lb.Data.TextData)
 		assert.Equal(t, uint(1), lb.Data.Level)
 	})
 	t.Run(domainblocks.HeaderBlockType2, func(t *testing.T) {
@@ -326,7 +328,7 @@ func TestChangeTypeNil(t *testing.T) {
 		assert.NoError(t, d.ChangeType(ctx, block, domainblocks.HeaderBlockType2))
 		lb, err := domainblocks.FromUnifiedToHeaderBlock(block)
 		assert.NoError(t, err)
-		assert.Equal(t, txt.Data, lb.Data.TextData)
+		assert.Equal(t, txt.Data.TextData, lb.Data.TextData)
 		assert.Equal(t, uint(2), lb.Data.Level)
 	})
 	t.Run(domainblocks.HeaderBlockType3, func(t *testing.T) {
@@ -337,7 +339,7 @@ func TestChangeTypeNil(t *testing.T) {
 		assert.NoError(t, d.ChangeType(ctx, block, domainblocks.HeaderBlockType3))
 		lb, err := domainblocks.FromUnifiedToHeaderBlock(block)
 		assert.NoError(t, err)
-		assert.Equal(t, txt.Data, lb.Data.TextData)
+		assert.Equal(t, txt.Data.TextData, lb.Data.TextData)
 		assert.Equal(t, uint(3), lb.Data.Level)
 	})
 	t.Run(domainblocks.FileBlockType, func(t *testing.T) {
@@ -383,16 +385,20 @@ func testBlock() *brzrpc.Block {
 		CreatedAt: 0,
 		UpdatedAt: 0,
 		IsUsed:    false,
-		Data: &text.Data{Text: []text.Part{
-			{
-				Style:  "default",
-				String: "text default",
+		Data: &domainblocks.TextData{
+			TextData: &text.Data{
+				Text: []text.Part{
+					{
+						Style:  "default",
+						String: "text default",
+					},
+					{
+						Style:  "bold",
+						String: " text bold",
+					},
+				},
 			},
-			{
-				Style:  "bold",
-				String: " text bold",
-			},
-		}},
+		},
 	}
 
 	txtUnif, err := txt.ToUnified()
@@ -410,7 +416,7 @@ func testNilBlock() *brzrpc.Block {
 		CreatedAt: 0,
 		UpdatedAt: 0,
 		IsUsed:    false,
-		Data:      nil,
+		Data:      &domainblocks.TextData{TextData: nil},
 	}
 
 	txtUnif, err := txt.ToUnified()

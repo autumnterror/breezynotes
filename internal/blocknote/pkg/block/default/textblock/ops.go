@@ -9,6 +9,10 @@ func applyStyleOp(b *domainblocks.TextBlock, raw []byte) (map[string]any, error)
 	if b.Data == nil {
 		return nil, nil
 	}
+	if b.Data.TextData == nil {
+		return nil, nil
+	}
+
 	var req struct {
 		Start int    `json:"start"`
 		End   int    `json:"end"`
@@ -17,7 +21,7 @@ func applyStyleOp(b *domainblocks.TextBlock, raw []byte) (map[string]any, error)
 	if err := json.Unmarshal(raw, &req); err != nil {
 		return nil, err
 	}
-	if err := b.Data.ApplyStyle(req.Start, req.End, req.Style); err != nil {
+	if err := b.Data.TextData.ApplyStyle(req.Start, req.End, req.Style); err != nil {
 		return nil, err
 	}
 	nb, err := b.ToUnified()
@@ -31,6 +35,10 @@ func insertTextOp(b *domainblocks.TextBlock, raw []byte) (map[string]any, error)
 	if b.Data == nil {
 		return nil, nil
 	}
+	if b.Data.TextData == nil {
+		return nil, nil
+	}
+
 	var req struct {
 		Pos     int    `json:"pos"`
 		NewText string `json:"new_text"`
@@ -38,7 +46,7 @@ func insertTextOp(b *domainblocks.TextBlock, raw []byte) (map[string]any, error)
 	if err := json.Unmarshal(raw, &req); err != nil {
 		return nil, err
 	}
-	if err := b.Data.InsertText(req.Pos, req.NewText); err != nil {
+	if err := b.Data.TextData.InsertText(req.Pos, req.NewText); err != nil {
 		return nil, err
 	}
 	nb, err := b.ToUnified()
@@ -53,6 +61,9 @@ func deleteRangeOp(b *domainblocks.TextBlock, raw []byte) (map[string]any, error
 	if b.Data == nil {
 		return nil, nil
 	}
+	if b.Data.TextData == nil {
+		return nil, nil
+	}
 	var req struct {
 		Start int `json:"start"`
 		End   int `json:"end"`
@@ -60,7 +71,7 @@ func deleteRangeOp(b *domainblocks.TextBlock, raw []byte) (map[string]any, error
 	if err := json.Unmarshal(raw, &req); err != nil {
 		return nil, err
 	}
-	if err := b.Data.DeleteRange(req.Start, req.End); err != nil {
+	if err := b.Data.TextData.DeleteRange(req.Start, req.End); err != nil {
 		return nil, err
 	}
 	nb, err := b.ToUnified()

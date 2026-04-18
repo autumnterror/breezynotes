@@ -400,7 +400,7 @@ func TestChangeTypeFromList(t *testing.T) {
 		tb, err := domainblocks.FromUnifiedToTextBlock(block)
 		assert.NoError(t, err)
 		log.Println("after change on text", format.Struct(block))
-		assert.Equal(t, list.Data.TextData, tb.Data)
+		assert.Equal(t, list.Data.TextData, tb.Data.TextData)
 	})
 
 	t.Run(domainblocks.ListBlockToDoType, func(t *testing.T) {
@@ -529,7 +529,7 @@ func TestChangeTypeFromListNil(t *testing.T) {
 		assert.NoError(t, d.ChangeType(ctx, block, domainblocks.TextBlockType))
 		tb, err := domainblocks.FromUnifiedToTextBlock(block)
 		assert.NoError(t, err)
-		assert.Nil(t, tb.Data)
+		assert.Nil(t, tb.Data.TextData)
 	})
 
 	t.Run(domainblocks.ListBlockToDoType, func(t *testing.T) {

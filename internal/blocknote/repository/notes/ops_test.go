@@ -2,6 +2,8 @@ package notes
 
 import (
 	"context"
+	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
+	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/text"
 
 	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/block"
 	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/block/default/textblock"
@@ -67,34 +69,48 @@ func TestWithBlocks(t *testing.T) {
 		idBlock1 := uid.New()
 		idBlock2 := uid.New()
 
-		assert.NoError(t, b.CreateBlock(context.Background(), &domain.Block{
+		tb1 := &domainblocks.TextBlock{
 			Id:        idBlock1,
 			Type:      "text",
 			NoteId:    idNote,
 			CreatedAt: 0,
 			UpdatedAt: 0,
 			IsUsed:    false,
-			Data: map[string]any{
-				"text": []any{
-					map[string]any{"style": "default", "string": "test1"},
-					map[string]any{"style": "bald", "string": " test2"},
+			Data: &domainblocks.TextData{
+				TextData: &text.Data{
+					Text: []text.Part{
+						{Style: "default", String: "test1"},
+						{Style: "bald", String: " test2"},
+					},
 				},
 			},
-		}))
-		assert.NoError(t, b.CreateBlock(context.Background(), &domain.Block{
+		}
+		tb1unif, err := tb1.ToUnified()
+		assert.NoError(t, err)
+		tb1block := domain.ToBlockDb(tb1unif)
+
+		tb2 := &domainblocks.TextBlock{
 			Id:        idBlock2,
 			Type:      "text",
 			NoteId:    idNote,
 			CreatedAt: 0,
 			UpdatedAt: 0,
 			IsUsed:    false,
-			Data: map[string]any{
-				"text": []any{
-					map[string]any{"style": "default", "string": "test3"},
-					map[string]any{"style": "bald", "string": " test4"},
+			Data: &domainblocks.TextData{
+				TextData: &text.Data{
+					Text: []text.Part{
+						{Style: "default", String: "test3"},
+						{Style: "bald", String: " test4"},
+					},
 				},
 			},
-		}))
+		}
+		tb2unif, err := tb2.ToUnified()
+		assert.NoError(t, err)
+		tb2block := domain.ToBlockDb(tb2unif)
+
+		assert.NoError(t, b.CreateBlock(context.Background(), tb1block))
+		assert.NoError(t, b.CreateBlock(context.Background(), tb2block))
 
 		assert.NoError(t, a.InsertBlock(context.Background(), idNote, idBlock1, 0))
 		assert.NoError(t, a.InsertBlock(context.Background(), idNote, idBlock2, 0))
