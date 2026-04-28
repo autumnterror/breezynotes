@@ -83,7 +83,11 @@ func New(
 
 	api := e.echo.Group("/api", ValidateID(), e.GetUserId(), e.ValidateTokenMW())
 	{
-
+		f := api.Group("/files")
+		{
+			f.POST("", e.UploadFile)
+			f.DELETE("", e.DeleteFile)
+		}
 		user := api.Group("/user")
 		{
 			user.GET("/data", e.GetUserData)

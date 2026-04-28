@@ -10,3 +10,7 @@ type Message struct {
 type Error struct {
 	Error string `json:"error" example:"error"`
 }
+
+type Name struct {
+	Name string `json:"name"`
+}

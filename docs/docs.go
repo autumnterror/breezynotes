@@ -555,6 +555,70 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/files": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "files"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Name"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный формат данных",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка на сервере",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "files"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "название файла",
+                        "name": "title",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Неверное название",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка на сервере",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/api/healthz": {
             "get": {
                 "produces": [
@@ -2667,6 +2731,14 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.Name": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "domain.NoteId": {
             "type": "object",
             "properties": {
@@ -2977,6 +3049,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "Full API for BreezyNotes.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
+	//LeftDelim:        "{{",
+	//RightDelim:       "}}",
 }
 
 func init() {

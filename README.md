@@ -33,7 +33,7 @@
 *   [Тип: `quote`](#тип-quote)
 *   [Тип: `code`](#тип-code)
 *   [Тип: `file`](#тип-file)
-
+5.  [Работа с файлами](#файлы)
 ---
 
 ## <a name="общие-положения"></a>1. Общие положения
@@ -703,3 +703,42 @@
   }
 }
 ```
+
+## <a name="Файлы"></a>5. Работа с файлами
+
+#### `POST /api/files`
+Загрузка файла на сервер.
+
+Файл передаётся через `multipart/form-data` в поле `file`.
+
+После загрузки сервер сохраняет файл в директорию `./files`, присваивая ему новое имя в формате:
+
+`uuid + оригинальное расширение файла`
+
+Например:
+
+`example.pdf` → `550e8400-e29b-41d4-a716-446655440000.pdf`
+
+В ответе возвращается новое имя файла.
+
+*   **Возможные статусы и ошибки:**
+*   `200 OK` - Файл успешно загружен. Возвращает имя сохранённого файла.
+*   `400 Bad Request` (`"file field 'file' is required"`, `"cannot open uploaded file"`, `"file extension is required"`, `"file is too large"`).
+*   `500 Internal Server Error` (`"failed to save file"`).
+
+#### `DELETE /api/files`
+Удаление файла с сервера.
+
+Название файла передаётся в query-параметре `title`.
+
+Пример:
+
+`DELETE /api/files?title=550e8400-e29b-41d4-a716-446655440000.pdf`
+
+Файл удаляется из директории `./files`.
+
+*   **Возможные статусы и ошибки:**
+*   `204 No Content` - Файл успешно удалён.
+*   `400 Bad Request` (`"empty filename"`, `"invalid filename"`).
+*   `404 Not Found` - Файл не найден.
+*   `500 Internal Server Error` (`"check logs"`).

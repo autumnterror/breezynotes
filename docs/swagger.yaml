@@ -167,6 +167,11 @@ definitions:
         example: some info
         type: string
     type: object
+  domain.Name:
+    properties:
+      name:
+        type: string
+    type: object
   domain.NoteId:
     properties:
       note_id:
@@ -726,6 +731,47 @@ paths:
       summary: Get all registered types
       tags:
       - block
+  /api/files:
+    delete:
+      parameters:
+      - description: название файла
+        in: query
+        name: title
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Неверное название
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "500":
+          description: Ошибка на сервере
+          schema:
+            $ref: '#/definitions/domain.Error'
+      tags:
+      - files
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Name'
+        "400":
+          description: Неверный формат данных
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "500":
+          description: Ошибка на сервере
+          schema:
+            $ref: '#/definitions/domain.Error'
+      tags:
+      - files
   /api/healthz:
     get:
       produces:
