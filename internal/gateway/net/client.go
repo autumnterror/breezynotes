@@ -62,7 +62,7 @@ func New(
 	e.echo.Use(e.RateLimitMW(rateCfg))
 
 	//e.echo.Use(middleware.Logger(), middleware.Recover())
-	//e.echo.Static("/", "./example/html")
+	e.echo.Static("/files", "./files")
 
 	apiPublic := e.echo.Group("/api", ValidateID())
 	{
