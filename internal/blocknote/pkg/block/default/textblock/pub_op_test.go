@@ -388,20 +388,7 @@ func testBlock() *brzrpc.Block {
 		IsUsed:    false,
 		Data: &domainblocks.TextData{
 			TextData: &text.Data{
-				Text: []text.Part{
-					{
-						Style:  "default",
-						String: "Привет, это твой первый блок! Если тебе что то не понятно, обратись на сайт ",
-					},
-					{
-						Style:  "bold",
-						String: "breezy.su",
-					},
-					{
-						Style:  "default",
-						String: " там тебе точно помогут :3",
-					},
-				},
+				Text: []text.Part{{Style: "default", String: "text default"}, {Style: "bold", String: " text bold"}},
 			},
 		},
 	}
