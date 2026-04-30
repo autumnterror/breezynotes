@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
 	blockpkg "github.com/autumnterror/breezynotes/internal/blocknote/pkg/block"
 	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/text"
+	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"google.golang.org/protobuf/types/known/structpb"
 
@@ -29,6 +31,8 @@ func (tb *Driver) GetAsFirst(ctx context.Context, block *brzrpc.Block) string {
 func (tb *Driver) Op(ctx context.Context, block *brzrpc.Block, op string, data map[string]any) (map[string]any, error) {
 	b, err := domainblocks.FromUnifiedToTextBlock(block)
 	if err != nil {
+		log.Println(format.Struct(block))
+		log.Error(op, "", err)
 		return nil, errors.New("bad block")
 	}
 

@@ -13,6 +13,7 @@ services:
     volumes:
       - ./configs:/app/configs
       - ./keys:/app/keys
+      - ./files:/app/files
     environment:
       CONFIG_PATH: configs/prod-gateway.yaml
     restart: unless-stopped

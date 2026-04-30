@@ -2,6 +2,8 @@ package textblock
 
 import (
 	"context"
+	"testing"
+
 	brzrpc "github.com/autumnterror/breezynotes/api/proto/gen"
 	"github.com/autumnterror/breezynotes/internal/blocknote/domain/domainblocks"
 	"github.com/autumnterror/breezynotes/internal/blocknote/pkg/text"
@@ -9,7 +11,6 @@ import (
 	"github.com/autumnterror/utils_go/pkg/utils/format"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/structpb"
-	"testing"
 )
 
 func TestGetAsFirst(t *testing.T) {
@@ -390,11 +391,15 @@ func testBlock() *brzrpc.Block {
 				Text: []text.Part{
 					{
 						Style:  "default",
-						String: "text default",
+						String: "Привет, это твой первый блок! Если тебе что то не понятно, обратись на сайт ",
 					},
 					{
 						Style:  "bold",
-						String: " text bold",
+						String: "breezy.su",
+					},
+					{
+						Style:  "default",
+						String: " там тебе точно помогут :3",
 					},
 				},
 			},

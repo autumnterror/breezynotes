@@ -29,16 +29,16 @@ build-all-mac:
 	docker build --platform linux/amd64 -t zitrax78/breezynotes-redis --file ./build/docker/redis/dockerfile .
 
 build-gateway:
-	docker build -t zitrax78/breezynotes-gateway --file ./build/docker/gateway/dockerfile .
+	docker build --platform linux/amd64 -t zitrax78/breezynotes-gateway --file ./build/docker/gateway/dockerfile .
 
 build-auth:
-	docker build -t zitrax78/breezynotes-auth --file ./build/docker/auth/dockerfile .
+	docker build --platform linux/amd64 -t zitrax78/breezynotes-auth --file ./build/docker/auth/dockerfile .
 
 build-blocknote:
-	docker build -t zitrax78/breezynotes-blocknote --file ./build/docker/blocknote/dockerfile .
+	docker build --platform linux/amd64 -t zitrax78/breezynotes-blocknote --file ./build/docker/blocknote/dockerfile .
 
 build-redis:
-	docker build -t zitrax78/breezynotes-redis --file ./build/docker/redis/dockerfile .
+	docker build --platform linux/amd64 -t zitrax78/breezynotes-redis --file ./build/docker/redis/dockerfile .
 
 # Migration operations
 build-migrator:

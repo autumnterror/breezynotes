@@ -2,6 +2,7 @@ package net
 
 import (
 	"errors"
+
 	"github.com/autumnterror/breezynotes/internal/gateway/domain"
 	"github.com/autumnterror/utils_go/pkg/log"
 
@@ -30,7 +31,6 @@ const (
 // @Router /api/files [post]
 func (e *Echo) UploadFile(c echo.Context) error {
 	const op = "handlers.UploadFile"
-	log.Blue(op)
 
 	fileHeader, err := c.FormFile("file")
 	if err != nil {

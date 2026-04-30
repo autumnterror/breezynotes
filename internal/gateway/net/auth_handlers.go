@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/autumnterror/utils_go/pkg/log"
 	"github.com/autumnterror/utils_go/pkg/utils/uid"
 	"google.golang.org/protobuf/types/known/structpb"
 
@@ -186,15 +185,24 @@ func (e *Echo) Reg(c echo.Context) error {
 	}
 
 	s, err := structpb.NewStruct(map[string]any{
-		"text": []any{
-			map[string]any{
-				"style":  "default",
-				"string": "Hi there, it's your first note",
+		"text_data": map[string]any{
+			"text": []any{
+				map[string]any{
+					"style":  "default",
+					"string": "Привет, это твой первый блок! Если тебе что то не понятно, обратись на сайт ",
+				},
+				map[string]any{
+					"style":  "bold",
+					"string": "breezy.su",
+				},
+				map[string]any{
+					"style":  "default",
+					"string": " там тебе точно помогут :3",
+				},
 			},
 		},
 	})
 	if err != nil {
-		log.Red()
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad data"})
 	}
 	_, err = e.bnAPI.API.CreateBlock(ctx, &brzrpc.CreateBlockRequest{
@@ -203,6 +211,7 @@ func (e *Echo) Reg(c echo.Context) error {
 		Pos:    int32(0),
 		Data:   s,
 		UserId: uId.GetId(),
+		NewId:  uid.New(),
 	})
 	code, errRes = bNErrors(op, err)
 	if code != http.StatusOK {

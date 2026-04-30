@@ -25,6 +25,29 @@ func UserFromRpc(u *brzrpc.User) *User {
 	}
 }
 
+type UserWithRole struct {
+	Id    string `json:"id"`
+	Login string `json:"login"`
+	Email string `json:"email"`
+	About string `json:"about"`
+	Photo string `json:"photo"`
+	Role  string `json:"role"`
+}
+
+func UserWithRoleFromRpc(u *brzrpc.User, role string) *UserWithRole {
+	if u == nil {
+		return nil
+	}
+	return &UserWithRole{
+		Id:    u.GetId(),
+		Login: u.GetLogin(),
+		Email: u.GetEmail(),
+		About: u.GetAbout(),
+		Photo: u.GetPhoto(),
+		Role:  role,
+	}
+}
+
 type UpdateAboutRequest struct {
 	NewAbout string `json:"new_about"`
 }

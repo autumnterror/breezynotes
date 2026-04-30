@@ -13,6 +13,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/autumnterror/utils_go/pkg/log"
+	"github.com/autumnterror/utils_go/pkg/utils/uid"
 )
 
 // GetRegisteredTypes godoc
@@ -97,6 +98,10 @@ func (e *Echo) CreateBlock(c echo.Context) error {
 	var r domain.CreateBlockRequest
 	if err := c.Bind(&r); err != nil {
 		return c.JSON(http.StatusBadRequest, domain.Error{Error: "bad JSON"})
+	}
+
+	if r.NewId == "" {
+		r.NewId = uid.New()
 	}
 
 	idUser, errGetId := getIdUser(c)
